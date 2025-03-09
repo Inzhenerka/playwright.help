@@ -9,16 +9,16 @@ import styles from "./styles.module.css";
 
 const features = [
   {
-    title: "Any browser \u2022 Any platform \u2022 One API",
+    title: "Любой браузер \u2022 Любая платформа \u2022 Один API",
     description: <>
       <p>
-        <b>Cross-browser.</b> Playwright supports all modern rendering engines including Chromium, WebKit, and Firefox.
+        <b>Кросс-браузерный.</b> Playwright поддерживает все современные рендеринг-движки, включая Chromium, WebKit и Firefox.
       </p>
       <p>
-        <b>Cross-platform.</b> Test on Windows, Linux, and macOS, locally or on CI, headless or headed.
+        <b>Кросс-платформенный.</b> Тестирование на Windows, Linux и macOS, локально или в CI, в безголовом или обычном режиме.
       </p>
       <p>
-        <b>Cross-language.</b> Use the Playwright API in <a
+        <b>На разных языках программирования.</b> Используйте API Playwright на <a
         href="https://playwright.dev/docs/intro">TypeScript</a>, <a
         href="https://playwright.dev/docs/intro">JavaScript</a>, <a
         href="https://playwright.dev/python/docs/intro">Python</a>, <a
@@ -26,7 +26,7 @@ const features = [
         href="https://playwright.dev/java/docs/intro">Java</a>.
       </p>
       <p>
-        <b>Test Mobile Web.</b> Native mobile emulation of Google Chrome for Android and Mobile Safari. The same rendering engine works on your Desktop and in the Cloud.
+        <b>Тестирование мобильного веба.</b> Нативная мобильная эмуляция Google Chrome для Android и Mobile Safari. Тот же рендеринг-движок работает как на вашем компьютере, так и в облаке.
       </p>
     </>,
   },
@@ -35,45 +35,45 @@ const features = [
   {
   },
   {
-    title: "Resilient \u2022 No flaky tests",
+    title: "Надёжность \u2022 Без нестабильных тестов",
     description: (
       <>
         <p>
-          <b>Auto-wait.</b> Playwright waits for elements to be actionable prior to performing
-          actions. It also has a rich set of introspection events. The combination of the two
-          eliminates the need for artificial timeouts - the primary cause of flaky tests.
+          <b>Автоматическое ожидание.</b> Playwright ожидает, пока элементы станут доступны для взаимодействия перед выполнением
+          действий. Он также имеет богатый набор событий для отслеживания. Комбинация этих двух
+          функций устраняет необходимость в искусственных задержках — основной причине нестабильных тестов.
         </p>
         <p>
-          <b>Web-first assertions.</b> Playwright assertions are created specifically for the
-          dynamic web. Checks are automatically retried until the necessary conditions are met.
+          <b>Веб-ориентированные проверки.</b> Проверки Playwright созданы специально для
+          динамического веба. Проверки автоматически повторяются, пока необходимые условия не будут выполнены.
         </p>
         <p>
-          <b>Tracing.</b> Configure test retry strategy, capture execution trace, videos, screenshots
-          to eliminate flakes.
+          <b>Трассировка.</b> Настраивайте стратегию повторных попыток тестов, записывайте трассировку выполнения, видео, скриншоты
+          для устранения нестабильности.
         </p>
       </>
     ),
   },
   {
-    title: "No trade-offs \u2022 No limits",
+    title: "Никаких компромиссов \u2022 Никаких ограничений",
     description: (
       <>
         <p>
-          Browsers run web content belonging to different origins in different processes.
-          Playwright is aligned with the modern browsers architecture and runs tests out-of-process.
-          This makes Playwright free of the typical in-process test runner limitations.
+          Браузеры запускают веб-контент из разных источников в разных процессах.
+          Playwright соответствует архитектуре современных браузеров и выполняет тесты в отдельных процессах.
+          Это освобождает Playwright от типичных ограничений, присущих запуску тестов в одном процессе.
         </p>
         <p>
-          <b>Multiple everything.</b> Test scenarios that span multiple <b>tabs</b>, multiple <b>origins</b> and multiple <b>users</b>.
-          Create scenarios with different contexts for different users and run them against your server, all in one test.
+          <b>Множество всего.</b> Тестовые сценарии, охватывающие несколько <b>вкладок</b>, несколько <b>источников</b> и несколько <b>пользователей</b>.
+          Создавайте сценарии с разными контекстами для разных пользователей и запускайте их на своём сервере, всё в одном тесте.
         </p>
         <p>
-          <b>Trusted events.</b> Hover elements, interact with dynamic controls, produce trusted events.
-          Playwright uses real browser input pipeline indistinguishable from the real user.
+          <b>Достоверные события.</b> Наведение на элементы, взаимодействие с динамическими элементами управления, генерация достоверных событий.
+          Playwright использует реальный конвейер ввода браузера, неотличимый от действий реального пользователя.
         </p>
         <p>
-          <b>Test frames, pierce Shadow DOM.</b> Playwright selectors pierce shadow DOM and
-          allow entering frames seamlessly.
+          <b>Тестирование фреймов, проникновение в Shadow DOM.</b> Селекторы Playwright проникают в Shadow DOM и
+          позволяют беспрепятственно переходить между фреймами.
         </p>
       </>
     ),
@@ -83,34 +83,34 @@ const features = [
   {
   },
   {
-    title: "Full isolation \u2022 Fast execution",
+    title: "Полная изоляция \u2022 Быстрое выполнение",
     description: (
       <>
         <p>
-          <b>Browser contexts.</b> Playwright creates a browser context for each test. Browser
-          context is equivalent to a brand new browser profile. This delivers full test isolation
-          with zero overhead. Creating a new browser context only takes a handful of milliseconds.
+          <b>Контексты браузера.</b> Playwright создаёт контекст браузера для каждого теста. Контекст
+          браузера эквивалентен новому профилю браузера. Это обеспечивает полную изоляцию тестов
+          без дополнительных накладных расходов. Создание нового контекста браузера занимает всего несколько миллисекунд.
         </p>
         <p>
-          <b>Log in once.</b> Save the authentication state of the context and reuse it in all the tests.
-          This bypasses repetitive log-in operations in each test, yet delivers full isolation of independent tests.
+          <b>Вход один раз.</b> Сохраняйте состояние аутентификации контекста и повторно используйте его во всех тестах.
+          Это позволяет избежать повторных операций входа в каждом тесте, но при этом обеспечивает полную изоляцию независимых тестов.
         </p>
       </>
     ),
   },
   {
-    title: "Powerful Tooling",
+    title: "Мощные инструменты",
     description: (
       <>
         <p>
-          <b><a href="docs/codegen">Codegen.</a></b> Generate tests by recording your actions. Save them into any language.
+          <b><a href="docs/codegen">Генерация кода.</a></b> Генерируйте тесты, записывая свои действия. Сохраняйте их на любом языке.
         </p>
         <p>
-          <b><a href="docs/debug#playwright-inspector">Playwright inspector.</a></b> Inspect page, generate selectors, step through the test execution, see click points, explore execution logs.
+          <b><a href="docs/debug#playwright-inspector">Инспектор Playwright.</a></b> Исследуйте страницу, генерируйте селекторы, выполняйте тест пошагово, просматривайте точки кликов, изучайте логи выполнения.
         </p>
         <p>
-          <b><a href="docs/trace-viewer-intro">Trace Viewer.</a></b> Capture all the information to investigate the test failure. Playwright trace
-          contains test execution screencast, live DOM snapshots, action explorer, test source, and many more.
+          <b><a href="docs/trace-viewer-intro">Просмотр трассировки.</a></b> Собирайте всю информацию для расследования сбоев тестов. Трассировка Playwright
+          содержит скринкаст выполнения теста, интерактивные снимки DOM, проводник по действиям, исходный код теста и многое другое.
         </p>
       </>
     ),
@@ -156,7 +156,7 @@ const FeatureRow: React.FC<FeatureRowProps> = ({ title, description, videoUrl, i
     <div className={"col col--7"}>
       <video muted controls loop>
         <source src={videoUrl} type="video/mp4" />
-        Your browser does not support the video tag.
+        Ваш браузер не поддерживает тег video.
       </video>
     </div>
   );
@@ -214,20 +214,20 @@ const Home: React.FC = () => {
   return (
     <Layout
       title={siteConfig.tagline}
-      description="Cross-browser end-to-end testing for modern web apps"
+      description="Кросс-браузерное сквозное тестирование для современных веб-приложений"
     >
       <header className={clsx("hero hero--primary", styles.heroBanner)}>
         <div className="container">
           <h1 className={clsx("hero__title", styles.heroTitle)}>
-            <span className={styles.highlight}>Playwright</span> enables
-            reliable end-to-end testing for modern web apps.
+            <span className={styles.highlight}>Playwright</span> обеспечивает
+            надёжное сквозное тестирование для современных веб-приложений.
           </h1>
           <div className={styles.buttons}>
             <Link
               className={styles.getStarted}
               to={useBaseUrl("docs/intro")}
             >
-              Get started
+              Начать работу
             </Link>
             <GitHubStarButton owner="microsoft" repo={siteConfig.customFields.repositoryName as string}/>
           </div>
@@ -238,7 +238,7 @@ const Home: React.FC = () => {
         <br></br>
         <br></br>
         <div style={{textAlign: 'center'}}>
-          <img src="img/logos/Browsers.png" width="40%" alt="Browsers (Chromium, Firefox, WebKit)" />
+          <img src="img/logos/Browsers.png" width="40%" alt="Браузеры (Chromium, Firefox, WebKit)" />
         </div>
         <section className={styles.features}>
           <div className="container">
@@ -254,7 +254,7 @@ const Home: React.FC = () => {
           <div className="container">
             <div className="row">
               <div className={clsx("col col--12", styles.logosColumn)}>
-                <h2>Chosen by companies and open source projects</h2>
+                <h2>Выбран компаниями и проектами с открытым исходным кодом</h2>
                 <ul className={styles.logosList}>
                   {logos.map(({ imageUrl, href, alt }, idx) => (
                     <li key={idx}>
