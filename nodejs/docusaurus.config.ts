@@ -42,12 +42,12 @@ if (isProd) {
 
 export default {
   title: "Playwright",
-  tagline: "Fast and reliable end-to-end testing for modern web apps",
+  tagline: "Быстрое и надежное сквозное тестирование современных веб-приложений",
   // Repo config for GitHub Pages
-  url: "https://playwright.dev",
+  url: "https://playwright.inzhenerka.tech",
   baseUrl: "/",
-  organizationName: "microsoft",
-  projectName: "playwright.dev",
+  organizationName: "inzhenerka",
+  projectName: "playwright.inzhenerka.tech",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "throw",
   scripts: ["/js/redirection.js"],
@@ -131,28 +131,28 @@ export default {
       style: "dark",
       links: [
         {
-          title: "Learn",
+          title: "Обучение",
           items: [
             {
-              label: "Getting started",
+              label: "Начало работы",
               to: "docs/intro",
             },
             {
-              label: "Playwright Training",
-              href: "https://learn.microsoft.com/en-us/training/modules/build-with-playwright/",
+              label: "Тренажер по Playwright ⭐",
+              href: "https://inzhenerka.tech/playwright",
             },
             {
-              label: "Learn Videos",
+              label: "Обучающие видео",
               to: "/community/learn-videos",
             },
             {
-              label: "Feature Videos",
+              label: "Обзорные видео",
               to: "/community/feature-videos",
             },
           ],
         },
         {
-          title: "Community",
+          title: "Сообщество",
           items: [
             {
               label: "Stack Overflow",
@@ -194,14 +194,14 @@ export default {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Microsoft`,
+      copyright: `${new Date().getFullYear()} ООО "ИНЖЕНЕРКАТЕХ". На основе материалов Microsoft`,
     },
     algolia: {
       indexName: 'playwright-nodejs',
       appId: 'K09ICMCV6X',
       apiKey: 'a5b64422711c37ab6a0ce4d86d16cdd9',
     },
-    image: 'https://repository-images.githubusercontent.com/221981891/8c5c6942-c91f-4df1-825f-4cf474056bd7',
+    image: '/img/playwright-cover.jpg',
   },
   themes: [
     [
