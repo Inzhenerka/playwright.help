@@ -44,10 +44,10 @@ export default {
   title: "Playwright",
   tagline: "Быстрое и надежное сквозное тестирование современных веб-приложений",
   // Repo config for GitHub Pages
-  url: "https://playwright.inzhenerka.tech",
+  url: "https://playwright.help",
   baseUrl: "/",
   organizationName: "Inzhenerka",
-  projectName: "playwright.inzhenerka.tech",
+  projectName: "playwright.help",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "throw",
   scripts: ["/js/redirection.js"],
