@@ -237,6 +237,23 @@ const Home: React.FC = () => {
       <main>
         <br></br>
         <br></br>
+
+        <section className={styles.features}>
+          <div className="container">
+            <div className="row">
+              <div className={clsx("col col--12", styles.logosColumn)}>
+                <h2>Это перевод</h2>
+                <p>
+                    Сайт является переведенной версией оригинальной документации по Playwright. Мы приглашаем всех желающих вносить правки и улучшения в перевод, чтобы сделать его ещё точнее и полезнее для сообщества.
+                    Если вы заметили неточность или хотите помочь улучшить перевод, присылайте правки в <a href="https://github.com/Inzhenerka/playwright.inzhenerka.tech" target="_blank" rel="noreferrer noopener">репозиторий</a> или в <a href="https://t.me/inzhenerkatech_sup" target="_blank" rel="noreferrer noopener">поддержку</a>.
+
+                    Сайт полностью дублирует оригинальный, поэтому для перевода любой страницы достаточно заменить адрес <b>https://playwright.dev</b> на <b>https://playwright.inzhenerka.tech</b>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <div style={{textAlign: 'center'}}>
           <img src="img/logos/Browsers.png" width="40%" alt="Браузеры (Chromium, Firefox, WebKit)" />
         </div>

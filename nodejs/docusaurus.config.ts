@@ -46,7 +46,7 @@ export default {
   // Repo config for GitHub Pages
   url: "https://playwright.inzhenerka.tech",
   baseUrl: "/",
-  organizationName: "inzhenerka",
+  organizationName: "Inzhenerka",
   projectName: "playwright.inzhenerka.tech",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "throw",
