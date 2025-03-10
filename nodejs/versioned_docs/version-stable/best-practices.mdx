@@ -1,32 +1,32 @@
 ---
 id: best-practices
-title: "Best Practices"
+title: "Лучшие практики"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-This guide should help you to make sure you are following our best practices and writing tests that are more resilient.
+Этот гид поможет вам убедиться, что вы следуете нашим лучшим практикам и пишете более устойчивые тесты.
 
-## Testing philosophy
+## Философия тестирования
 
-### Test user-visible behavior
+### Тестируйте поведение, видимое пользователю
 
-Automated tests should verify that the application code works for the end users, and avoid relying on implementation details such as things which users will not typically use, see, or even know about such as the name of a function, whether something is an array, or the CSS class of some element. The end user will see or interact with what is rendered on the page, so your test should typically only see/interact with the same rendered output.
+Автоматизированные тесты должны проверять, что код приложения работает для конечных пользователей, и избегать зависимости от деталей реализации, таких как вещи, которые пользователи обычно не используют, не видят или даже не знают, например, имя функции, является ли что-то массивом или CSS-классом какого-либо элемента. Конечный пользователь будет видеть или взаимодействовать с тем, что отображается на странице, поэтому ваш тест должен, как правило, видеть/взаимодействовать только с тем же отображаемым результатом.
 
-### Make tests as isolated as possible
+### Делайте тесты как можно более изолированными
 
-Each test should be completely isolated from another test and should run independently with its own local storage, session storage, data, cookies etc. [Test isolation](./browser-contexts.mdx) improves reproducibility, makes debugging easier and prevents cascading test failures.
+Каждый тест должен быть полностью изолирован от другого теста и должен выполняться независимо с собственным локальным хранилищем, сессиями, данными, куками и т.д. [Изоляция тестов](./browser-contexts.mdx) улучшает воспроизводимость, упрощает отладку и предотвращает каскадные сбои тестов.
 
-In order to avoid repetition for a particular part of your test you can use [before and after hooks](/api/class-test.mdx). Within your test file add a before hook to run a part of your test before each test such as going to a particular URL or logging in to a part of your app. This keeps your tests isolated as no test relies on another. However it is also ok to have a little duplication when tests are simple enough especially if it keeps your tests clearer and easier to read and maintain.
+Чтобы избежать повторений в определенной части вашего теста, вы можете использовать [хуки before и after](/api/class-test.mdx). Внутри вашего тестового файла добавьте хук before, чтобы выполнить часть вашего теста перед каждым тестом, например, перейти на определенный URL или войти в часть вашего приложения. Это сохраняет изоляцию ваших тестов, так как ни один тест не зависит от другого. Однако также допустимо иметь небольшое дублирование, когда тесты достаточно просты, особенно если это делает ваши тесты более понятными и легкими для чтения и поддержки.
 
 ```js
 import { test } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
-  // Runs before each test and signs in each page.
+  // Выполняется перед каждым тестом и выполняет вход на каждой странице.
   await page.goto('https://github.com/login');
   await page.getByLabel('Username or email address').fill('username');
   await page.getByLabel('Password').fill('password');
@@ -34,21 +34,21 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('first', async ({ page }) => {
-  // page is signed in.
+  // страница вошла в систему.
 });
 
 test('second', async ({ page }) => {
-  // page is signed in.
+  // страница вошла в систему.
 });
 ```
 
-You can also reuse the signed-in state in the tests with [setup project](./auth.mdx#basic-shared-account-in-all-tests). That way you can log in only once and then skip the log in step for all of the tests.
+Вы также можете повторно использовать состояние входа в тестах с помощью [setup project](./auth.mdx#basic-shared-account-in-all-tests). Таким образом, вы можете войти только один раз и затем пропустить шаг входа для всех тестов.
 
-### Avoid testing third-party dependencies
+### Избегайте тестирования сторонних зависимостей
 
-Only test what you control. Don't try to test links to external sites or third party servers that you do not control. Not only is it time consuming and can slow down your tests but also you cannot control the content of the page you are linking to, or if there are cookie banners or overlay pages or anything else that might cause your test to fail.
+Тестируйте только то, что вы контролируете. Не пытайтесь тестировать ссылки на внешние сайты или сторонние серверы, которые вы не контролируете. Это не только занимает много времени и может замедлить ваши тесты, но и вы не можете контролировать содержимое страницы, на которую вы ссылаетесь, или наличие баннеров с куками, оверлеев или чего-либо еще, что может привести к сбою вашего теста.
 
-Instead, use the [Playwright Network API](/network.mdx#handle-requests) and guarantee the response needed.
+Вместо этого используйте [Playwright Network API](/network.mdx#handle-requests) и гарантируйте необходимый ответ.
 
 ```js
 await page.route('**/api/fetch_data_third_party_dependency', route => route.fulfill({
@@ -58,30 +58,30 @@ await page.route('**/api/fetch_data_third_party_dependency', route => route.fulf
 await page.goto('https://example.com');
 ```
 
-### Testing with a database
+### Тестирование с базой данных
 
-If working with a database then make sure you control the data. Test against a staging environment and make sure it doesn't change. For visual regression tests make sure the operating system and browser versions are the same.
+Если вы работаете с базой данных, убедитесь, что вы контролируете данные. Тестируйте на тестовом окружении и убедитесь, что оно не меняется. Для тестов визуальной регрессии убедитесь, что версии операционной системы и браузера одинаковы.
 
-## Best Practices
+## Лучшие практики
 
-### Use locators
+### Используйте локаторы
 
-In order to write end to end tests we need to first find elements on the webpage. We can do this by using Playwright's built in [locators](./locators.mdx). Locators come with auto waiting and retry-ability. Auto waiting means that Playwright performs a range of actionability checks on the elements, such as ensuring the element is visible and enabled before it performs the click. To make tests resilient, we recommend prioritizing user-facing attributes and explicit contracts.
+Чтобы писать end-to-end тесты, нам сначала нужно найти элементы на веб-странице. Мы можем сделать это, используя встроенные [локаторы](./locators.mdx) Playwright. Локаторы имеют автоматическое ожидание и возможность повторной попытки. Автоматическое ожидание означает, что Playwright выполняет ряд проверок на возможность взаимодействия с элементами, таких как обеспечение видимости и доступности элемента перед выполнением клика. Чтобы сделать тесты устойчивыми, мы рекомендуем приоритизировать атрибуты, видимые пользователю, и явные контракты.
 
 ```js
 // 👍
 page.getByRole('button', { name: 'submit' });
 ```
 
-#### Use chaining and filtering
+#### Используйте цепочку и фильтрацию
 
-Locators can be [chained](./locators.mdx#matching-inside-a-locator) to narrow down the search to a particular part of the page.
+Локаторы могут быть [связаны](./locators.mdx#matching-inside-a-locator) для уточнения поиска в определенной части страницы.
 
 ```js
 const product = page.getByRole('listitem').filter({ hasText: 'Product 2' });
 ```
 
-You can also [filter locators](./locators.mdx#filtering-locators) by text or by another locator.
+Вы также можете [фильтровать локаторы](./locators.mdx#filtering-locators) по тексту или другому локатору.
 
 ```js
 await page
@@ -91,29 +91,29 @@ await page
     .click();
 ```
 
-#### Prefer user-facing attributes to XPath or CSS selectors
+#### Предпочитайте атрибуты, видимые пользователю, вместо XPath или CSS-селекторов
 
-Your DOM can easily change so having your tests depend on your DOM structure can lead to failing tests. For example consider selecting this button by its CSS classes. Should the designer change something then the class might change, thus breaking your test.
+Ваша DOM-структура может легко измениться, поэтому зависимость ваших тестов от структуры DOM может привести к сбоям тестов. Например, рассмотрим выбор этой кнопки по ее CSS-классам. Если дизайнер что-то изменит, класс может измениться, что приведет к сбою вашего теста.
 
 ```js
 // 👎
 page.locator('button.buttonIcon.episode-actions-later');
 ```
 
-Use locators that are resilient to changes in the DOM.
+Используйте локаторы, которые устойчивы к изменениям в DOM.
 
 ```js
 // 👍
 page.getByRole('button', { name: 'submit' });
 ```
 
-### Generate locators
+### Генерируйте локаторы
 
-Playwright has a [test generator](./codegen.mdx) that can generate tests and pick locators for you. It will look at your page and figure out the best locator, prioritizing role, text and test id locators. If the generator finds multiple elements matching the locator, it will improve the locator to make it resilient and uniquely identify the target element, so you don't have to worry about failing tests due to locators.
+Playwright имеет [генератор тестов](./codegen.mdx), который может генерировать тесты и выбирать локаторы за вас. Он будет смотреть на вашу страницу и определять лучший локатор, приоритизируя локаторы по роли, тексту и идентификатору теста. Если генератор находит несколько элементов, соответствующих локатору, он улучшит локатор, чтобы сделать его устойчивым и уникально идентифицировать целевой элемент, так что вам не придется беспокоиться о сбоях тестов из-за локаторов.
 
-#### Use `codegen` to generate locators
+#### Используйте `codegen` для генерации локаторов
 
-To pick a locator run the `codegen` command followed by the URL that you would like to pick a locator from.
+Чтобы выбрать локатор, выполните команду `codegen`, за которой следует URL, из которого вы хотите выбрать локатор.
 
 <Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
 
@@ -143,21 +143,21 @@ pnpm exec playwright codegen playwright.dev
 
 </Tabs>
 
-This will open a new browser window as well as the Playwright inspector. To pick a locator first click on the 'Record' button to stop the recording. By default when you run the `codegen` command it will start a new recording. Once you stop the recording the 'Pick Locator' button will be available to click.
+Это откроет новое окно браузера, а также инспектор Playwright. Чтобы выбрать локатор, сначала нажмите кнопку 'Запись', чтобы остановить запись. По умолчанию, когда вы запускаете команду `codegen`, она начнет новую запись. Как только вы остановите запись, кнопка 'Выбрать локатор' станет доступной для нажатия.
 
-You can then hover over any element on your page in the browser window and see the locator highlighted below your cursor. Clicking on an element will add the locator into the Playwright inspector. You can either copy the locator and paste into your test file or continue to explore the locator by editing it in the Playwright Inspector, for example by modifying the text, and seeing the results in the browser window.
+Затем вы можете навести курсор на любой элемент на вашей странице в окне браузера и увидеть, как локатор выделяется под вашим курсором. Нажатие на элемент добавит локатор в инспектор Playwright. Вы можете либо скопировать локатор и вставить его в ваш тестовый файл, либо продолжить исследовать локатор, редактируя его в инспекторе Playwright, например, изменяя текст и наблюдая за результатами в окне браузера.
 
 <img width="1394" alt="generating locators with codegen" loading="lazy" src="https://user-images.githubusercontent.com/13063165/212103268-e7d8ee8b-d307-4cba-be13-831f3fbb1f40.png" />
 
-#### Use the VS Code extension to generate locators
+#### Используйте расширение VS Code для генерации локаторов
 
-You can also use the [VS Code Extension](./getting-started-vscode.mdx) to generate locators as well as record a test. The VS Code extension also gives you a great developer experience when writing, running, and debugging tests.
+Вы также можете использовать [расширение VS Code](./getting-started-vscode.mdx) для генерации локаторов, а также записи теста. Расширение VS Code также предоставляет отличный опыт разработчика при написании, запуске и отладке тестов.
 
 <img width="1394" alt="generating locators in vs code with codegen" loading="lazy" src="https://user-images.githubusercontent.com/13063165/212269873-aca04043-16ce-4627-906f-7351d09740ab.png" />
 
-### Use web first assertions
+### Используйте утверждения, ориентированные на веб
 
-Assertions are a way to verify that the expected result and the actual result matched or not. By using [web first assertions](./test-assertions.mdx) Playwright will wait until the expected condition is met. For example, when testing an alert message, a test would click a button that makes a message appear and check that the alert message is there. If the alert message takes half a second to appear, assertions such as `toBeVisible()` will wait and retry if needed.
+Утверждения — это способ проверить, совпадают ли ожидаемый результат и фактический результат. Используя [утверждения, ориентированные на веб](./test-assertions.mdx), Playwright будет ждать, пока не будет выполнено ожидаемое условие. Например, при тестировании сообщения об оповещении тест нажимает кнопку, которая вызывает появление сообщения, и проверяет, что сообщение об оповещении присутствует. Если сообщение об оповещении появляется через полсекунды, такие утверждения, как `toBeVisible()`, будут ждать и повторять попытку при необходимости.
 
 ```js
 // 👍
@@ -167,35 +167,35 @@ await expect(page.getByText('welcome')).toBeVisible();
 expect(await page.getByText('welcome').isVisible()).toBe(true);
 ```
 
-#### Don't use manual assertions
+#### Не используйте ручные утверждения
 
-Don't use manual assertions that are not awaiting the expect. In the code below the await is inside the expect rather than before it. When using assertions such as `isVisible()` the test won't wait a single second, it will just check the locator is there and return immediately.
+Не используйте ручные утверждения, которые не ожидают expect. В приведенном ниже коде await находится внутри expect, а не перед ним. При использовании утверждений, таких как `isVisible()`, тест не будет ждать ни секунды, он просто проверит, что локатор присутствует, и немедленно вернется.
 
 ```js
 // 👎
 expect(await page.getByText('welcome').isVisible()).toBe(true);
 ```
 
-Use web first assertions such as `toBeVisible()` instead.
+Вместо этого используйте утверждения, ориентированные на веб, такие как `toBeVisible()`.
 
 ```js
 // 👍
 await expect(page.getByText('welcome')).toBeVisible();
 ```
 
-### Configure debugging
+### Настройка отладки
 
-#### Local debugging
+#### Локальная отладка
 
-For local debugging we recommend you [debug your tests live in VSCode.](/getting-started-vscode.mdx#live-debugging) by installing the [VS Code extension](./getting-started-vscode.mdx). You can run tests in debug mode by right clicking on the line next to the test you want to run which will open a browser window and pause at where the breakpoint is set.
+Для локальной отладки мы рекомендуем вам [отлаживать ваши тесты в реальном времени в VSCode.](/getting-started-vscode.mdx#live-debugging), установив [расширение VS Code](./getting-started-vscode.mdx). Вы можете запускать тесты в режиме отладки, щелкнув правой кнопкой мыши на строке рядом с тестом, который вы хотите запустить, что откроет окно браузера и приостановит выполнение на установленной точке останова.
 
 <img width="1338" alt="debugging tests in vscode" loading="lazy" src="https://user-images.githubusercontent.com/13063165/212274675-5c6e1647-2aab-40fd-9804-8680c1ac2d16.png" />
 
-You can live debug your test by clicking or editing the locators in your test in VS Code which will highlight this locator in the browser window as well as show you any other matching locators found on the page.
+Вы можете отлаживать ваш тест в реальном времени, щелкая или редактируя локаторы в вашем тесте в VS Code, что выделит этот локатор в окне браузера, а также покажет вам любые другие совпадающие локаторы, найденные на странице.
 
 <img width="1394" alt="live debugging locators in vscode" loading="lazy" src="https://user-images.githubusercontent.com/13063165/212273189-da271dc4-0f59-4138-92a8-10e719066cbe.png" />
 
-You can also debug your tests with the Playwright inspector by running your tests with the `--debug` flag.
+Вы также можете отлаживать ваши тесты с помощью инспектора Playwright, запуская ваши тесты с флагом `--debug`.
 
 <Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
 
@@ -225,11 +225,11 @@ pnpm exec playwright test --debug
 
 </Tabs>
 
-You can then step through your test, view actionability logs and edit the locator live and see it highlighted in the browser window. This will show you which locators match, how many of them there are.
+Затем вы можете пройти через ваш тест, просмотреть журналы возможности взаимодействия и редактировать локатор в реальном времени, видя его выделение в окне браузера. Это покажет вам, какие локаторы совпадают, и сколько их.
 
 <img width="1350" alt="debugging with the playwright inspector" loading="lazy" src="https://user-images.githubusercontent.com/13063165/212276296-4f5b18e7-2bd7-4766-9aa5-783517bd4aa2.png" />
 
-To debug a specific test add the name of the test file and the line number of the test followed by the `--debug` flag.
+Чтобы отладить конкретный тест, добавьте имя файла теста и номер строки теста, за которым следует флаг `--debug`.
 
 <Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
 
@@ -259,13 +259,13 @@ pnpm exec playwright test example.spec.ts:9 --debug
 
 </Tabs>
 
-#### Debugging on CI
+#### Отладка в CI
 
-For CI failures, use the Playwright [trace viewer](./trace-viewer.mdx) instead of videos and screenshots. The trace viewer gives you a full trace of your tests as a local Progressive Web App (PWA) that can easily be shared. With the trace viewer you can view the timeline, inspect DOM snapshots for each action using dev tools, view network requests and more.
+Для сбоев в CI используйте [просмотрщик трассировок](./trace-viewer.mdx) Playwright вместо видео и скриншотов. Просмотрщик трассировок предоставляет вам полную трассировку ваших тестов в виде локального прогрессивного веб-приложения (PWA), которое можно легко поделиться. С помощью просмотрщика трассировок вы можете просмотреть временную шкалу, исследовать снимки DOM для каждого действия с помощью инструментов разработчика, просмотреть сетевые запросы и многое другое.
 
 <img width="1516" alt="playwrights trace viewer" loading="lazy" src="https://user-images.githubusercontent.com/13063165/212277895-c63d94c2-bd06-4881-864e-62790a072ca3.png" />
 
-Traces are configured in the Playwright config file and are set to run on CI on the first retry of a failed test. We don't recommend setting this to `on` so that traces are run on every test as it's very performance heavy. However you can run a trace locally when developing with the `--trace` flag.
+Трассировки настраиваются в файле конфигурации Playwright и устанавливаются для выполнения в CI при первой попытке повторного запуска неудавшегося теста. Мы не рекомендуем устанавливать это значение в `on`, чтобы трассировки выполнялись для каждого теста, так как это сильно влияет на производительность. Однако вы можете запустить трассировку локально при разработке с флагом `--trace`.
 
 <Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
 
@@ -295,7 +295,7 @@ pnpm exec playwright test --trace on
 
 </Tabs>
 
-Once you run this command your traces will be recorded for each test and can be viewed directly from the HTML report.
+После выполнения этой команды ваши трассировки будут записываться для каждого теста и могут быть просмотрены непосредственно из HTML-отчета.
 
 <Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
 
@@ -327,22 +327,22 @@ pnpm exec playwright show-report
 
 <img width="1516" alt="Playwrights HTML report" loading="lazy" src="https://user-images.githubusercontent.com/13063165/212279022-d929d4c0-2271-486a-a75f-166ac231d25f.png" />
 
-Traces can be opened by clicking on the icon next to the test file name or by opening each of the test reports and scrolling down to the traces section.
+Трассировки можно открыть, нажав на значок рядом с именем файла теста или открыв каждый из отчетов тестов и прокручивая вниз до раздела трассировок.
 
 <img width="1516" alt="Screenshot 2023-01-13 at 09 58 34" loading="lazy" src="https://user-images.githubusercontent.com/13063165/212279699-c9eb134f-4f4e-4f19-805c-37596d3272a6.png" />
 
-### Use Playwright's Tooling
+### Используйте инструменты Playwright
 
-Playwright comes with a range of tooling to help you write tests.
-- The [VS Code extension](./getting-started-vscode.mdx) gives you a great developer experience when writing, running, and debugging tests.
-- The [test generator](./codegen.mdx) can generate tests and pick locators for you.
-- The [trace viewer](./trace-viewer.mdx) gives you a full trace of your tests as a local PWA that can easily be shared. With the trace viewer you can view the timeline, inspect DOM snapshots for each action, view network requests and more.
-- The [UI Mode](./test-ui-mode) lets you explore, run and debug tests with a time travel experience complete with watch mode. All test files are loaded into the testing sidebar where you can expand each file and describe block to individually run, view, watch and debug each test.
-- [TypeScript](./test-typescript) in Playwright works out of the box and gives you better IDE integrations. Your IDE will show you everything you can do and highlight when you do something wrong. No TypeScript experience is needed and it is not necessary for your code to be in TypeScript, all you need to do is create your tests with a `.ts` extension.
+Playwright поставляется с набором инструментов, которые помогут вам писать тесты.
+- Расширение [VS Code](./getting-started-vscode.mdx) предоставляет отличный опыт разработчика при написании, запуске и отладке тестов.
+- [Генератор тестов](./codegen.mdx) может генерировать тесты и выбирать локаторы за вас.
+- [Просмотрщик трассировок](./trace-viewer.mdx) предоставляет вам полную трассировку ваших тестов в виде локального PWA, которое можно легко поделиться. С помощью просмотрщика трассировок вы можете просмотреть временную шкалу, исследовать снимки DOM для каждого действия, просмотреть сетевые запросы и многое другое.
+- Режим [UI](./test-ui-mode) позволяет вам исследовать, запускать и отлаживать тесты с опытом путешествия во времени, включая режим наблюдения. Все тестовые файлы загружаются в боковую панель тестирования, где вы можете развернуть каждый файл и блок описания, чтобы индивидуально запускать, просматривать, наблюдать и отлаживать каждый тест.
+- [TypeScript](./test-typescript) в Playwright работает из коробки и предоставляет вам лучшие интеграции с IDE. Ваша IDE покажет вам все, что вы можете сделать, и выделит, когда вы делаете что-то неправильно. Не требуется опыт работы с TypeScript, и не обязательно, чтобы ваш код был на TypeScript, все, что вам нужно сделать, это создать ваши тесты с расширением `.ts`.
 
-### Test across all browsers
+### Тестируйте во всех браузерах
 
-Playwright makes it easy to test your site across all [browsers](./test-projects.mdx#configure-projects-for-multiple-browsers) no matter what platform you are on. Testing across all browsers ensures your app works for all users. In your config file you can set up projects adding the name and which browser or device to use.
+Playwright упрощает тестирование вашего сайта во всех [браузерах](./test-projects.mdx#configure-projects-for-multiple-browsers), независимо от платформы, на которой вы находитесь. Тестирование во всех браузерах гарантирует, что ваше приложение работает для всех пользователей. В вашем файле конфигурации вы можете настроить проекты, добавив имя и какой браузер или устройство использовать.
 
 ```js title="playwright.config.ts"
 import { defineConfig, devices } from '@playwright/test';
@@ -365,9 +365,9 @@ export default defineConfig({
 });
 ```
 
-### Keep your Playwright dependency up to date
+### Держите вашу зависимость Playwright в актуальном состоянии
 
-By keeping your Playwright version up to date you will be able to test your app on the latest browser versions and catch failures before the latest browser version is released to the public.
+Держите вашу версию Playwright в актуальном состоянии, чтобы вы могли тестировать ваше приложение на последних версиях браузеров и выявлять сбои до того, как последняя версия браузера будет выпущена для широкой публики.
 
 <Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
 
@@ -397,9 +397,9 @@ pnpm install --save-dev @playwright/test@latest
 
 </Tabs>
 
-Check the [release notes](./release-notes.mdx) to see what the latest version is and what changes have been released.
+Проверьте [заметки о выпуске](./release-notes.mdx), чтобы узнать, какая версия последняя и какие изменения были выпущены.
 
-You can see what version of Playwright you have by running the following command.
+Вы можете увидеть, какая версия Playwright у вас установлена, выполнив следующую команду.
 
 <Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
 
@@ -429,33 +429,33 @@ pnpm exec playwright --version
 
 </Tabs>
 
-### Run tests on CI
+### Запускайте тесты в CI
 
-Setup CI/CD and run your tests frequently. The more often you run your tests the better. Ideally you should run your tests on each commit and pull request. Playwright comes with a [GitHub actions workflow](/ci-intro.mdx) so that tests will run on CI for you with no setup required. Playwright can also be setup on the [CI environment](/ci.mdx) of your choice.
+Настройте CI/CD и запускайте ваши тесты часто. Чем чаще вы запускаете ваши тесты, тем лучше. В идеале вы должны запускать ваши тесты при каждом коммите и запросе на слияние. Playwright поставляется с [рабочим процессом GitHub actions](/ci-intro.mdx), чтобы тесты запускались в CI без необходимости в настройке. Playwright также может быть настроен в [CI-среде](/ci.mdx) по вашему выбору.
 
-Use Linux when running your tests on CI as it is cheaper. Developers can use whatever environment when running locally but use linux on CI. Consider setting up [Sharding](./test-sharding.mdx) to make CI faster.
+Используйте Linux при запуске ваших тестов в CI, так как это дешевле. Разработчики могут использовать любую среду при запуске локально, но используйте Linux в CI. Рассмотрите возможность настройки [шардинга](./test-sharding.mdx), чтобы ускорить CI.
 
-#### Optimize browser downloads on CI
+#### Оптимизируйте загрузку браузеров в CI
 
-Only install the browsers that you actually need, especially on CI. For example, if you're only testing with Chromium, install just Chromium.
+Устанавливайте только те браузеры, которые вам действительно нужны, особенно в CI. Например, если вы тестируете только с Chromium, установите только Chromium.
 
 ```bash title=".github/workflows/playwright.yml"
-# Instead of installing all browsers
+# Вместо установки всех браузеров
 npx playwright install --with-deps
 
-# Install only Chromium
+# Установите только Chromium
 npx playwright install chromium --with-deps
 ```
 
-This saves both download time and disk space on your CI machines.
+Это экономит как время загрузки, так и дисковое пространство на ваших CI-устройствах.
 
-### Lint your tests
+### Линтинг ваших тестов
 
-We recommend TypeScript and linting with ESLint for your tests to catch errors early. Use [`@typescript-eslint/no-floating-promises`](https://typescript-eslint.io/rules/no-floating-promises/) [ESLint](https://eslint.org) rule to make sure there are no missing awaits before the asynchronous calls to the Playwright API. On your CI you can run `tsc --noEmit` to ensure that functions are called with the right signature.
+Мы рекомендуем использовать TypeScript и линтинг с ESLint для ваших тестов, чтобы выявлять ошибки на ранних стадиях. Используйте правило [`@typescript-eslint/no-floating-promises`](https://typescript-eslint.io/rules/no-floating-promises/) [ESLint](https://eslint.org), чтобы убедиться, что нет пропущенных await перед асинхронными вызовами к API Playwright. В вашем CI вы можете запустить `tsc --noEmit`, чтобы убедиться, что функции вызываются с правильной сигнатурой.
 
-### Use parallelism and sharding
+### Используйте параллелизм и шардирование
 
-Playwright runs tests in [parallel](./test-parallel.mdx) by default. Tests in a single file are run in order, in the same worker process. If you have many independent tests in a single file, you might want to run them in parallel
+Playwright по умолчанию запускает тесты в [параллельном режиме](./test-parallel.mdx). Тесты в одном файле выполняются в порядке, в одном рабочем процессе. Если у вас много независимых тестов в одном файле, вы можете захотеть запустить их параллельно.
 
 ```js
 import { test } from '@playwright/test';
@@ -466,7 +466,7 @@ test('runs in parallel 1', async ({ page }) => { /* ... */ });
 test('runs in parallel 2', async ({ page }) => { /* ... */ });
 ```
 
-Playwright can [shard](./test-parallel.mdx#shard-tests-between-multiple-machines) a test suite, so that it can be executed on multiple machines.
+Playwright может [шардировать](./test-parallel.mdx#shard-tests-between-multiple-machines) тестовый набор, чтобы его можно было выполнять на нескольких машинах.
 
 <Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
 
@@ -496,123 +496,16 @@ pnpm exec playwright test --shard=1/3
 
 </Tabs>
 
-## Productivity tips
+## Советы по продуктивности
 
-### Use Soft assertions
+### Используйте мягкие утверждения
 
-If your test fails, Playwright will give you an error message showing what part of the test failed which you can see either in VS Code, the terminal, the HTML report, or the trace viewer. However, you can also use [soft assertions](/test-assertions.mdx#soft-assertions). These do not immediately terminate the test execution, but rather compile and display a list of failed assertions once the test ended.
+Если ваш тест не проходит, Playwright предоставит вам сообщение об ошибке, показывающее, какая часть теста не прошла, что вы можете увидеть либо в VS Code, либо в терминале, HTML-отчете или просмотрщике трассировок. Однако вы также можете использовать [мягкие утверждения](/test-assertions.mdx#soft-assertions). Они не прекращают выполнение теста немедленно, а вместо этого компилируют и отображают список неудачных утверждений после завершения теста.
 
 ```js
-// Make a few checks that will not stop the test when failed...
+// Сделайте несколько проверок, которые не остановят тест при сбое...
 await expect.soft(page.getByTestId('status')).toHaveText('Success');
 
-// ... and continue the test to check more things.
+// ... и продолжайте тест, чтобы проверить больше вещей.
 await page.getByRole('link', { name: 'next page' }).click();
 ```
-
-
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
-[APIRequest]: /api/class-apirequest.mdx "APIRequest"
-[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
-[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
-[Browser]: /api/class-browser.mdx "Browser"
-[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
-[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
-[BrowserType]: /api/class-browsertype.mdx "BrowserType"
-[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
-[Clock]: /api/class-clock.mdx "Clock"
-[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
-[Coverage]: /api/class-coverage.mdx "Coverage"
-[Dialog]: /api/class-dialog.mdx "Dialog"
-[Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
-[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
-[FileChooser]: /api/class-filechooser.mdx "FileChooser"
-[Frame]: /api/class-frame.mdx "Frame"
-[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
-[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
-[JSHandle]: /api/class-jshandle.mdx "JSHandle"
-[Keyboard]: /api/class-keyboard.mdx "Keyboard"
-[Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
-[Logger]: /api/class-logger.mdx "Logger"
-[Mouse]: /api/class-mouse.mdx "Mouse"
-[Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
-[Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
-[Request]: /api/class-request.mdx "Request"
-[Response]: /api/class-response.mdx "Response"
-[Route]: /api/class-route.mdx "Route"
-[Selectors]: /api/class-selectors.mdx "Selectors"
-[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
-[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
-[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: /api/class-tracing.mdx "Tracing"
-[Video]: /api/class-video.mdx "Video"
-[WebError]: /api/class-weberror.mdx "WebError"
-[WebSocket]: /api/class-websocket.mdx "WebSocket"
-[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
-[Worker]: /api/class-worker.mdx "Worker"
-[Fixtures]: /api/class-fixtures.mdx "Fixtures"
-[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
-[FullProject]: /api/class-fullproject.mdx "FullProject"
-[Location]: /api/class-location.mdx "Location"
-[Test]: /api/class-test.mdx "Test"
-[TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestInfo]: /api/class-testinfo.mdx "TestInfo"
-[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
-[TestOptions]: /api/class-testoptions.mdx "TestOptions"
-[TestProject]: /api/class-testproject.mdx "TestProject"
-[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
-[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
-[Reporter]: /api/class-reporter.mdx "Reporter"
-[Suite]: /api/class-suite.mdx "Suite"
-[TestCase]: /api/class-testcase.mdx "TestCase"
-[TestError]: /api/class-testerror.mdx "TestError"
-[TestResult]: /api/class-testresult.mdx "TestResult"
-[TestStep]: /api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
-
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
-[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
-[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
-[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
-[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
-[URL]: https://nodejs.org/api/url.html "URL"
-[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
-
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
-[Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

@@ -1,55 +1,55 @@
 ---
 id: ci
-title: "Continuous Integration"
+title: "Непрерывная интеграция"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright tests can be executed in CI environments. We have created sample configurations for common CI providers.
+Тесты Playwright могут выполняться в средах CI. Мы создали пример конфигураций для распространенных CI-провайдеров.
 
-3 steps to get your tests running on CI:
-1. **Ensure CI agent can run browsers**: Use [our Docker image](./docker.mdx) in Linux agents or install your dependencies using the [CLI](./browsers#install-system-dependencies).
-1. **Install Playwright**:
+3 шага, чтобы запустить ваши тесты в CI:
+1. **Убедитесь, что агент CI может запускать браузеры**: Используйте [наш образ Docker](./docker.mdx) на Linux-агентах или установите ваши зависимости с помощью [CLI](./browsers#install-system-dependencies).
+1. **Установите Playwright**:
    
    ```bash
-   # Install NPM packages
+   # Установите пакеты NPM
    npm ci
    
-   # Install Playwright browsers and dependencies
+   # Установите браузеры и зависимости Playwright
    npx playwright install --with-deps
    ```
    
-1. **Run your tests**:
+1. **Запустите ваши тесты**:
    
    ```bash
    npx playwright test
    ```
    
-## Workers
+## Рабочие процессы
 
-We recommend setting [workers](./api/class-testconfig.mdx#test-config-workers) to "1" in CI environments to prioritize stability and reproducibility. Running tests sequentially ensures each test gets the full system resources, avoiding potential conflicts. However, if you have a powerful self-hosted CI system, you may enable [parallel](./test-parallel.mdx) tests. For wider parallelization, consider [sharding](./test-parallel.mdx#shard-tests-between-multiple-machines) - distributing tests across multiple CI jobs.
+Мы рекомендуем устанавливать [workers](./api/class-testconfig.mdx#test-config-workers) на "1" в средах CI, чтобы приоритизировать стабильность и воспроизводимость. Последовательное выполнение тестов гарантирует, что каждый тест получает все системные ресурсы, избегая потенциальных конфликтов. Однако, если у вас мощная самохостинговая CI-система, вы можете включить [параллельные](./test-parallel.mdx) тесты. Для более широкой параллелизации рассмотрите [шардинг](./test-parallel.mdx#shard-tests-between-multiple-machines) - распределение тестов между несколькими заданиями CI.
 
 ```js title="playwright.config.ts"
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  // Opt out of parallel tests on CI.
+  // Отказ от параллельных тестов в CI.
   workers: process.env.CI ? 1 : undefined,
 });
 ```
 
-## CI configurations
+## Конфигурации CI
 
-The [Command line tools](./browsers#install-system-dependencies) can be used to install all operating system dependencies in CI.
+[Инструменты командной строки](./browsers#install-system-dependencies) могут быть использованы для установки всех зависимостей операционной системы в CI.
 
 ### GitHub Actions
 
-#### On push/pull_request
+#### При push/pull_request
 
-Tests will run on push or pull request on branches main/master. The [workflow](https://docs.github.com/en/actions/using-workflows/about-workflows) will install all dependencies, install Playwright and then run the tests. It will also create the HTML report.
+Тесты будут выполняться при push или pull request на ветках main/master. [Рабочий процесс](https://docs.github.com/en/actions/using-workflows/about-workflows) установит все зависимости, установит Playwright, а затем запустит тесты. Он также создаст HTML-отчет.
 
 ```yml title=".github/workflows/playwright.yml"
 name: Playwright Tests
@@ -67,11 +67,11 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
-    - name: Install dependencies
+    - name: Установить зависимости
       run: npm ci
-    - name: Install Playwright Browsers
+    - name: Установить браузеры Playwright
       run: npx playwright install --with-deps
-    - name: Run Playwright tests
+    - name: Запустить тесты Playwright
       run: npx playwright test
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
@@ -81,13 +81,13 @@ jobs:
         retention-days: 30
 ```
 
-#### On push/pull_request (sharded)
+#### При push/pull_request (шардинг)
 
-GitHub Actions supports [sharding tests between multiple jobs](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs). Check out our [sharding doc](./test-sharding) to learn more about sharding and to see a [GitHub actions example](./test-sharding.mdx#github-actions-example) of how to configure a job to run your tests on multiple machines as well as how to merge the HTML reports.
+GitHub Actions поддерживает [шардинг тестов между несколькими заданиями](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs). Ознакомьтесь с нашей [документацией по шардированию](./test-sharding), чтобы узнать больше о шардировании и увидеть [пример GitHub Actions](./test-sharding.mdx#github-actions-example) о том, как настроить задание для запуска ваших тестов на нескольких машинах, а также как объединить HTML-отчеты.
 
-#### Via Containers
+#### Через контейнеры
 
-GitHub Actions support [running jobs in a container](https://docs.github.com/en/actions/using-jobs/running-jobs-in-a-container) by using the [`jobs.<job_id>.container`](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idcontainer) option. This is useful to not pollute the host environment with dependencies and to have a consistent environment for e.g. screenshots/visual regression testing across different operating systems.
+GitHub Actions поддерживает [запуск заданий в контейнере](https://docs.github.com/en/actions/using-jobs/running-jobs-in-a-container) с помощью опции [`jobs.<job_id>.container`](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idcontainer). Это полезно, чтобы не загрязнять хост-окружение зависимостями и иметь согласованное окружение для, например, тестирования скриншотов/визуальной регрессии на разных операционных системах.
 
 ```yml title=".github/workflows/playwright.yml"
 name: Playwright Tests
@@ -108,15 +108,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
-      - name: Install dependencies
+      - name: Установить зависимости
         run: npm ci
-      - name: Run your tests
+      - name: Запустить ваши тесты
         run: npx playwright test
 ```
 
-#### On deployment
+#### При развертывании
 
-This will start the tests after a [GitHub Deployment](https://developer.github.com/v3/repos/deployments/) went into the `success` state. Services like Vercel use this pattern so you can run your end-to-end tests on their deployed environment.
+Это запустит тесты после того, как [развертывание GitHub](https://developer.github.com/v3/repos/deployments/) перейдет в состояние `success`. Сервисы, такие как Vercel, используют этот шаблон, чтобы вы могли запускать свои end-to-end тесты в их развернутом окружении.
 
 ```yml title=".github/workflows/playwright.yml"
 name: Playwright Tests
@@ -132,11 +132,11 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
-    - name: Install dependencies
+    - name: Установить зависимости
       run: npm ci
-    - name: Install Playwright
+    - name: Установить Playwright
       run: npx playwright install --with-deps
-    - name: Run Playwright tests
+    - name: Запустить тесты Playwright
       run: npx playwright test
       env:
         PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
@@ -144,7 +144,7 @@ jobs:
 
 #### Fail-Fast
 
-Large test suites can take very long to execute. By executing a preliminary test run with the `--only-changed` flag, you can run test files that are likely to fail first. This will give you a faster feedback loop and slightly lower CI consumption while working on Pull Requests. To detect test files affected by your changeset, `--only-changed` analyses your suites' dependency graph. This is a heuristic and might miss tests, so it's important that you always run the full test suite after the preliminary test run.
+Большие наборы тестов могут занимать очень много времени для выполнения. Выполняя предварительный запуск тестов с флагом `--only-changed`, вы можете сначала запустить файлы тестов, которые, вероятно, провалятся. Это даст вам более быстрый цикл обратной связи и немного снизит потребление CI во время работы с Pull Requests. Чтобы обнаружить файлы тестов, затронутые вашим изменением, `--only-changed` анализирует граф зависимостей ваших наборов. Это эвристика и может пропустить тесты, поэтому важно всегда запускать полный набор тестов после предварительного запуска тестов.
 
 ```yml title=".github/workflows/playwright.yml" {24-26}
 name: Playwright Tests
@@ -160,20 +160,20 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        # Force a non-shallow checkout, so that we can reference $GITHUB_BASE_REF.
-        # See https://github.com/actions/checkout for more details.
+        # Принудительно выполнить неповерхностный checkout, чтобы мы могли ссылаться на $GITHUB_BASE_REF.
+        # См. https://github.com/actions/checkout для получения дополнительной информации.
         fetch-depth: 0
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
-    - name: Install dependencies
+    - name: Установить зависимости
       run: npm ci
-    - name: Install Playwright Browsers
+    - name: Установить браузеры Playwright
       run: npx playwright install --with-deps
-    - name: Run changed Playwright tests
+    - name: Запустить измененные тесты Playwright
       run: npx playwright test --only-changed=$GITHUB_BASE_REF
       if: github.event_name == 'pull_request'
-    - name: Run Playwright tests
+    - name: Запустить тесты Playwright
       run: npx playwright test
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
@@ -185,20 +185,20 @@ jobs:
 
 ### Docker
 
-We have a [pre-built Docker image](./docker.mdx) which can either be used directly or as a reference to update your existing Docker definitions.
+У нас есть [предварительно собранный образ Docker](./docker.mdx), который можно использовать напрямую или как ссылку для обновления ваших существующих определений Docker.
 
-Suggested configuration
-1. Using `--ipc=host` is also recommended when using Chromium. Without it Chromium can run out of memory and crash. Learn more about this option in [Docker docs](https://docs.docker.com/reference/cli/docker/container/run/#ipc).
-1. Seeing other weird errors when launching Chromium? Try running your container with `docker run --cap-add=SYS_ADMIN` when developing locally.
-1. Using `--init` Docker flag or [dumb-init](https://github.com/Yelp/dumb-init) is recommended to avoid special treatment for processes with PID=1. This is a common reason for zombie processes.
+Рекомендуемая конфигурация
+1. Использование `--ipc=host` также рекомендуется при использовании Chromium. Без этого Chromium может исчерпать память и аварийно завершиться. Узнайте больше об этой опции в [документации Docker](https://docs.docker.com/reference/cli/docker/container/run/#ipc).
+1. Видите другие странные ошибки при запуске Chromium? Попробуйте запустить ваш контейнер с `docker run --cap-add=SYS_ADMIN`, когда разрабатываете локально.
+1. Рекомендуется использовать флаг Docker `--init` или [dumb-init](https://github.com/Yelp/dumb-init), чтобы избежать специального обращения с процессами с PID=1. Это распространенная причина появления зомби-процессов.
 
 ### Azure Pipelines
 
-For Windows or macOS agents, no additional configuration is required, just install Playwright and run your tests.
+Для агентов Windows или macOS дополнительная конфигурация не требуется, просто установите Playwright и запустите ваши тесты.
 
-For Linux agents, you can use [our Docker container](./docker.mdx) with Azure Pipelines support [running containerized jobs](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/container-phases?view=azure-devops). Alternatively, you can use [Command line tools](./browsers#install-system-dependencies) to install all necessary dependencies.
+Для агентов Linux вы можете использовать [наш контейнер Docker](./docker.mdx) с поддержкой Azure Pipelines [запуска контейнеризованных заданий](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/container-phases?view=azure-devops). В качестве альтернативы вы можете использовать [инструменты командной строки](./browsers#install-system-dependencies) для установки всех необходимых зависимостей.
 
-For running the Playwright tests use this pipeline task:
+Для запуска тестов Playwright используйте эту задачу конвейера:
 
 ```yml
 trigger:
@@ -211,20 +211,20 @@ steps:
 - task: NodeTool@0
   inputs:
     versionSpec: '18'
-  displayName: 'Install Node.js'
+  displayName: 'Установить Node.js'
 - script: npm ci
   displayName: 'npm ci'
 - script: npx playwright install --with-deps
-  displayName: 'Install Playwright browsers'
+  displayName: 'Установить браузеры Playwright'
 - script: npx playwright test
-  displayName: 'Run Playwright tests'
+  displayName: 'Запустить тесты Playwright'
   env:
     CI: 'true'
 ```
 
-#### Uploading playwright-report folder with Azure Pipelines
+#### Загрузка папки playwright-report с Azure Pipelines
 
-This will make the pipeline run fail if any of the playwright tests fails. If you also want to integrate the test results with Azure DevOps, use the task `PublishTestResults` task like so:
+Это приведет к сбою выполнения конвейера, если любой из тестов Playwright провалится. Если вы также хотите интегрировать результаты тестов с Azure DevOps, используйте задачу `PublishTestResults` следующим образом:
 
 ```yml
 trigger:
@@ -237,25 +237,25 @@ steps:
 - task: NodeTool@0
   inputs:
     versionSpec: '18'
-  displayName: 'Install Node.js'
+  displayName: 'Установить Node.js'
 
 - script: npm ci
   displayName: 'npm ci'
 - script: npx playwright install --with-deps
-  displayName: 'Install Playwright browsers'
+  displayName: 'Установить браузеры Playwright'
 - script: npx playwright test
-  displayName: 'Run Playwright tests'
+  displayName: 'Запустить тесты Playwright'
   env:
     CI: 'true'
 - task: PublishTestResults@2
-  displayName: 'Publish test results'
+  displayName: 'Опубликовать результаты тестов'
   inputs:
     searchFolder: 'test-results'
     testResultsFormat: 'JUnit'
     testResultsFiles: 'e2e-junit-results.xml'
     mergeTestResults: true
     failTaskOnFailedTests: true
-    testRunTitle: 'My End-To-End Tests'
+    testRunTitle: 'Мои End-To-End тесты'
   condition: succeededOrFailed()
 - task: PublishPipelineArtifact@1
   inputs:
@@ -266,7 +266,7 @@ steps:
 
 ```
 
-Note: The JUnit reporter needs to be configured accordingly via
+Примечание: Репортер JUnit необходимо настроить соответствующим образом через
 
 ```js
 import { defineConfig } from '@playwright/test';
@@ -276,9 +276,9 @@ export default defineConfig({
 });
 ```
 
-in `playwright.config.ts`.
+в `playwright.config.ts`.
 
-#### Azure Pipelines (sharded)
+#### Azure Pipelines (шардинг)
 
 ```yaml
 trigger:
@@ -320,19 +320,19 @@ steps:
 - task: NodeTool@0
   inputs:
     versionSpec: '18'
-  displayName: 'Install Node.js'
+  displayName: 'Установить Node.js'
 
 - script: npm ci
   displayName: 'npm ci'
 - script: npx playwright install --with-deps
-  displayName: 'Install Playwright browsers'
+  displayName: 'Установить браузеры Playwright'
 - script: npx playwright test --project=$(project) --shard=$(shard)
-  displayName: 'Run Playwright tests'
+  displayName: 'Запустить тесты Playwright'
   env:
     CI: 'true'
 ```
 
-#### Azure Pipelines (containerized)
+#### Azure Pipelines (контейнеризированный)
 
 ```yml
 trigger:
@@ -346,19 +346,19 @@ steps:
 - task: NodeTool@0
   inputs:
     versionSpec: '18'
-  displayName: 'Install Node.js'
+  displayName: 'Установить Node.js'
 
 - script: npm ci
   displayName: 'npm ci'
 - script: npx playwright test
-  displayName: 'Run Playwright tests'
+  displayName: 'Запустить тесты Playwright'
   env:
     CI: 'true'
 ```
 
 ### CircleCI
 
-Running Playwright on CircleCI is very similar to running on GitHub Actions. In order to specify the pre-built Playwright [Docker image](./docker.mdx), simply modify the agent definition with `docker:` in your config like so:
+Запуск Playwright на CircleCI очень похож на запуск на GitHub Actions. Чтобы указать предварительно собранный [образ Docker](./docker.mdx) Playwright, просто измените определение агента с `docker:` в вашей конфигурации следующим образом:
 
 ```yml
 executors:
@@ -367,11 +367,11 @@ executors:
       - image: mcr.microsoft.com/playwright:v1.51.0-noble
 ```
 
-Note: When using the docker agent definition, you are specifying the resource class of where playwright runs to the 'medium' tier [here](https://circleci.com/docs/configuration-reference?#docker-execution-environment). The default behavior of Playwright is to set the number of workers to the detected core count (2 in the case of the medium tier). Overriding the number of workers to greater than this number will cause unnecessary timeouts and failures.
+Примечание: При использовании определения агента docker вы указываете класс ресурсов, в котором выполняется playwright, на уровне 'medium' [здесь](https://circleci.com/docs/configuration-reference?#docker-execution-environment). Поведение по умолчанию для Playwright - установить количество рабочих процессов в соответствии с обнаруженным количеством ядер (2 в случае среднего уровня). Переопределение количества рабочих процессов на большее значение приведет к ненужным тайм-аутам и сбоям.
 
-#### Sharding in CircleCI
+#### Шардинг в CircleCI
 
-Sharding in CircleCI is indexed with 0 which means that you will need to override the default parallelism ENV VARS. The following example demonstrates how to run Playwright with a CircleCI Parallelism of 4 by adding 1 to the `CIRCLE_NODE_INDEX` to pass into the `--shard` cli arg.
+Шардинг в CircleCI индексируется с 0, что означает, что вам нужно будет переопределить переменные окружения по умолчанию для параллелизма. Следующий пример демонстрирует, как запустить Playwright с параллелизмом CircleCI 4, добавив 1 к `CIRCLE_NODE_INDEX`, чтобы передать в аргумент `--shard` cli.
 
 ```yml
   playwright-job-name:
@@ -383,7 +383,7 @@ Sharding in CircleCI is indexed with 0 which means that you will need to overrid
 
 ### Jenkins
 
-Jenkins supports Docker agents for pipelines. Use the [Playwright Docker image](./docker.mdx) to run tests on Jenkins.
+Jenkins поддерживает Docker-агенты для конвейеров. Используйте [образ Docker Playwright](./docker.mdx) для запуска тестов на Jenkins.
 
 ```groovy
 pipeline {
@@ -401,7 +401,7 @@ pipeline {
 
 ### Bitbucket Pipelines
 
-Bitbucket Pipelines can use public [Docker images as build environments](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). To run Playwright tests on Bitbucket, use our public Docker image ([see Dockerfile](./docker.mdx)).
+Bitbucket Pipelines может использовать публичные [образы Docker в качестве сред сборки](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). Чтобы запустить тесты Playwright на Bitbucket, используйте наш публичный образ Docker ([см. Dockerfile](./docker.mdx)).
 
 ```yml
 image: mcr.microsoft.com/playwright:v1.51.0-noble
@@ -409,7 +409,7 @@ image: mcr.microsoft.com/playwright:v1.51.0-noble
 
 ### GitLab CI
 
-To run Playwright tests on GitLab, use our public Docker image ([see Dockerfile](./docker.mdx)).
+Чтобы запустить тесты Playwright на GitLab, используйте наш публичный образ Docker ([см. Dockerfile](./docker.mdx)).
 
 ```yml
 stages:
@@ -422,9 +422,9 @@ tests:
   ...
 ```
 
-#### Sharding
+#### Шардинг
 
-GitLab CI supports [sharding tests between multiple jobs](https://docs.gitlab.com/ee/ci/jobs/job_control.html#parallelize-large-jobs) using the [parallel](https://docs.gitlab.com/ee/ci/yaml/index.html#parallel) keyword. The test job will be split into multiple smaller jobs that run in parallel. Parallel jobs are named sequentially from `job_name 1/N` to `job_name N/N`.
+GitLab CI поддерживает [шардинг тестов между несколькими заданиями](https://docs.gitlab.com/ee/ci/jobs/job_control.html#parallelize-large-jobs) с использованием ключевого слова [parallel](https://docs.gitlab.com/ee/ci/yaml/index.html#parallel). Тестовое задание будет разделено на несколько меньших заданий, которые выполняются параллельно. Параллельные задания именуются последовательно от `job_name 1/N` до `job_name N/N`.
 
 ```yml
 stages:
@@ -439,7 +439,7 @@ tests:
     - npx playwright test --shard=$CI_NODE_INDEX/$CI_NODE_TOTAL
 ```
 
-GitLab CI also supports sharding tests between multiple jobs using the [parallel:matrix](https://docs.gitlab.com/ee/ci/yaml/index.html#parallelmatrix) option. The test job will run multiple times in parallel in a single pipeline, but with different variable values for each instance of the job. In the example below, we have 2 `PROJECT` values and 10 `SHARD` values, resulting in a total of 20 jobs to be run.
+GitLab CI также поддерживает шардирование тестов между несколькими заданиями с использованием опции [parallel:matrix](https://docs.gitlab.com/ee/ci/yaml/index.html#parallelmatrix). Тестовое задание будет выполняться несколько раз параллельно в одном конвейере, но с разными значениями переменных для каждого экземпляра задания. В приведенном ниже примере у нас есть 2 значения `PROJECT` и 10 значений `SHARD`, что приводит к общему количеству 20 выполняемых заданий.
 
 ```yml
 stages:
@@ -459,7 +459,7 @@ tests:
 
 ### Google Cloud Build
 
-To run Playwright tests on Google Cloud Build, use our public Docker image ([see Dockerfile](./docker.mdx)).
+Чтобы запустить тесты Playwright на Google Cloud Build, используйте наш публичный образ Docker ([см. Dockerfile](./docker.mdx)).
 
 ```yml
 steps:
@@ -472,7 +472,7 @@ steps:
 
 ### Drone
 
-To run Playwright tests on Drone, use our public Docker image ([see Dockerfile](./docker.mdx)).
+Чтобы запустить тесты Playwright на Drone, используйте наш публичный образ Docker ([см. Dockerfile](./docker.mdx)).
 
 ```yml
 kind: pipeline
@@ -486,25 +486,25 @@ steps:
       - npx playwright test
 ```
 
-## Caching browsers
+## Кэширование браузеров
 
-Caching browser binaries is not recommended, since the amount of time it takes to restore the cache is comparable to the time it takes to download the binaries. Especially under Linux, [operating system dependencies](./browsers.mdx#install-system-dependencies) need to be installed, which are not cacheable.
+Кэширование бинарных файлов браузеров не рекомендуется, так как время, необходимое для восстановления кэша, сопоставимо с временем, необходимым для загрузки бинарных файлов. Особенно в Linux, [зависимости операционной системы](./browsers.mdx#install-system-dependencies) необходимо установить, которые не могут быть закэшированы.
 
-If you still want to cache the browser binaries between CI runs, cache [these directories](./browsers.mdx#managing-browser-binaries) in your CI configuration, against a hash of the Playwright version.
+Если вы все же хотите кэшировать бинарные файлы браузеров между запусками CI, кэшируйте [эти директории](./browsers.mdx#managing-browser-binaries) в вашей конфигурации CI, основываясь на хэше версии Playwright.
 
-## Debugging browser launches
+## Отладка запуска браузера
 
-Playwright supports the `DEBUG` environment variable to output debug logs during execution. Setting it to `pw:browser` is helpful while debugging `Error: Failed to launch browser` errors.
+Playwright поддерживает переменную окружения `DEBUG` для вывода отладочных логов во время выполнения. Установка ее в `pw:browser` полезна при отладке ошибок `Error: Failed to launch browser`.
 
 ```bash
 DEBUG=pw:browser npx playwright test
 ```
 
-## Running headed
+## Запуск в обычном режиме
 
-By default, Playwright launches browsers in headless mode. See in our [Running tests](./running-tests.mdx#run-tests-in-headed-mode) guide how to run tests in headed mode.
+По умолчанию Playwright запускает браузеры в безголовом режиме. Смотрите в нашем [руководстве по запуску тестов](./running-tests.mdx#run-tests-in-headed-mode), как запустить тесты в обычном режиме.
 
-On Linux agents, headed execution requires [Xvfb](https://en.wikipedia.org/wiki/Xvfb) to be installed. Our [Docker image](./docker.mdx) and GitHub Action have Xvfb pre-installed. To run browsers in headed mode with Xvfb, add `xvfb-run` before the actual command.
+На Linux-агентах выполнение в обычном режиме требует установки [Xvfb](https://en.wikipedia.org/wiki/Xvfb). Наш [образ Docker](./docker.mdx) и GitHub Action имеют предустановленный Xvfb. Чтобы запустить браузеры в обычном режиме с Xvfb, добавьте `xvfb-run` перед фактической командой.
 
 ```bash
 xvfb-run npx playwright test

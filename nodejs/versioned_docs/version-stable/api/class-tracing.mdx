@@ -6,10 +6,9 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+API для сбора и сохранения трассировок Playwright. Трассировки Playwright можно открыть в [Trace Viewer](../trace-viewer.mdx) после выполнения скрипта Playwright.
 
-API for collecting and saving Playwright traces. Playwright traces can be opened in [Trace Viewer](../trace-viewer.mdx) after Playwright script runs.
-
-Start recording a trace before performing actions. At the end, stop tracing and save it to a file.
+Начните запись трассировки перед выполнением действий. В конце остановите трассировку и сохраните ее в файл.
 
 ```js
 const browser = await chromium.launch();
@@ -20,77 +19,76 @@ await page.goto('https://playwright.dev');
 await context.tracing.stop({ path: 'trace.zip' });
 ```
 
-
 ---
 
-## Methods
+## Методы
 
 ### group {#tracing-group}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.49</font><x-search>tracing.group</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.49</font><x-search>tracing.group</x-search>
 
 :::caution
 
-Use `test.step` instead when available.
+Используйте `test.step` вместо этого, когда это возможно.
 :::
 
-Creates a new group within the trace, assigning any subsequent API calls to this group, until [tracing.groupEnd()](/api/class-tracing.mdx#tracing-group-end) is called. Groups can be nested and will be visible in the trace viewer.
+Создает новую группу в трассировке, присваивая любые последующие вызовы API этой группе, пока не будет вызван [tracing.groupEnd()](/api/class-tracing.mdx#tracing-group-end). Группы могут быть вложенными и будут видны в просмотрщике трассировок.
 
-**Usage**
+**Использование**
 
 ```js
-// use test.step instead
-await test.step('Log in', async () => {
+// используйте test.step вместо
+await test.step('Войти в систему', async () => {
   // ...
 });
 ```
 
-**Arguments**
+**Аргументы**
 - `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-group-option-name"/><a href="#tracing-group-option-name" class="list-anchor">#</a>
   
-  Group name shown in the trace viewer.
-- `options` [Object] *(optional)*
-  - `location` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-group-option-location"/><a href="#tracing-group-option-location" class="list-anchor">#</a>
+  Имя группы, отображаемое в просмотрщике трассировок.
+- `options` [Object] *(необязательно)*
+  - `location` [Object] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-group-option-location"/><a href="#tracing-group-option-location" class="list-anchor">#</a>
     - `file` [string]
       
       
-    - `line` [number] *(optional)*
+    - `line` [number] *(необязательно)*
       
       
-    - `column` [number] *(optional)*
+    - `column` [number] *(необязательно)*
       
       
-    Specifies a custom location for the group to be shown in the trace viewer. Defaults to the location of the [tracing.group()](/api/class-tracing.mdx#tracing-group) call.
+    Указывает на пользовательское местоположение для отображения группы в просмотрщике трассировок. По умолчанию используется местоположение вызова [tracing.group()](/api/class-tracing.mdx#tracing-group).
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-group-return"/><a href="#tracing-group-return" class="list-anchor">#</a>
 
 ---
 
 ### groupEnd {#tracing-group-end}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.49</font><x-search>tracing.groupEnd</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.49</font><x-search>tracing.groupEnd</x-search>
 
-Closes the last group created by [tracing.group()](/api/class-tracing.mdx#tracing-group).
+Закрывает последнюю группу, созданную с помощью [tracing.group()](/api/class-tracing.mdx#tracing-group).
 
-**Usage**
+**Использование**
 
 ```js
 await tracing.groupEnd();
 ```
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-group-end-return"/><a href="#tracing-group-end-return" class="list-anchor">#</a>
 
 ---
 
 ### start {#tracing-start}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>tracing.start</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>tracing.start</x-search>
 
-Start tracing.
+Начать трассировку.
 
-**Usage**
+**Использование**
 
 ```js
 await context.tracing.start({ screenshots: true, snapshots: true });
@@ -99,38 +97,38 @@ await page.goto('https://playwright.dev');
 await context.tracing.stop({ path: 'trace.zip' });
 ```
 
-**Arguments**
-- `options` [Object] *(optional)*
-  - `name` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-name"/><a href="#tracing-start-option-name" class="list-anchor">#</a>
+**Аргументы**
+- `options` [Object] *(необязательно)*
+  - `name` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-name"/><a href="#tracing-start-option-name" class="list-anchor">#</a>
     
-    If specified, intermediate trace files are going to be saved into the files with the given name prefix inside the [tracesDir](/api/class-browsertype.mdx#browser-type-launch-option-traces-dir) directory specified in [browserType.launch()](/api/class-browsertype.mdx#browser-type-launch). To specify the final trace zip file name, you need to pass `path` option to [tracing.stop()](/api/class-tracing.mdx#tracing-stop) instead.
-  - `screenshots` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-screenshots"/><a href="#tracing-start-option-screenshots" class="list-anchor">#</a>
+    Если указано, промежуточные файлы трассировки будут сохранены в файлы с данным префиксом имени в директории [tracesDir](/api/class-browsertype.mdx#browser-type-launch-option-traces-dir), указанной в [browserType.launch()](/api/class-browsertype.mdx#browser-type-launch). Чтобы указать имя конечного zip-файла трассировки, необходимо передать параметр `path` в [tracing.stop()](/api/class-tracing.mdx#tracing-stop).
+  - `screenshots` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-screenshots"/><a href="#tracing-start-option-screenshots" class="list-anchor">#</a>
     
-    Whether to capture screenshots during tracing. Screenshots are used to build a timeline preview.
-  - `snapshots` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-snapshots"/><a href="#tracing-start-option-snapshots" class="list-anchor">#</a>
+    Указывает, следует ли захватывать скриншоты во время трассировки. Скриншоты используются для построения предварительного просмотра временной шкалы.
+  - `snapshots` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-snapshots"/><a href="#tracing-start-option-snapshots" class="list-anchor">#</a>
     
-    If this option is true tracing will
-    * capture DOM snapshot on every action
-    * record network activity
-  - `sources` [boolean] *(optional)* <font size="2">Added in: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-sources"/><a href="#tracing-start-option-sources" class="list-anchor">#</a>
+    Если этот параметр установлен в true, трассировка будет
+    * захватывать снимок DOM при каждом действии
+    * записывать сетевую активность
+  - `sources` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-sources"/><a href="#tracing-start-option-sources" class="list-anchor">#</a>
     
-    Whether to include source files for trace actions.
-  - `title` [string] *(optional)* <font size="2">Added in: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-title"/><a href="#tracing-start-option-title" class="list-anchor">#</a>
+    Указывает, следует ли включать исходные файлы для действий трассировки.
+  - `title` [string] *(необязательно)* <font size="2">Добавлено в: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-title"/><a href="#tracing-start-option-title" class="list-anchor">#</a>
     
-    Trace name to be shown in the Trace Viewer.
+    Имя трассировки, которое будет отображаться в просмотрщике трассировок.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-return"/><a href="#tracing-start-return" class="list-anchor">#</a>
 
 ---
 
 ### startChunk {#tracing-start-chunk}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>tracing.startChunk</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.15</font><x-search>tracing.startChunk</x-search>
 
-Start a new trace chunk. If you'd like to record multiple traces on the same [BrowserContext], use [tracing.start()](/api/class-tracing.mdx#tracing-start) once, and then create multiple trace chunks with [tracing.startChunk()](/api/class-tracing.mdx#tracing-start-chunk) and [tracing.stopChunk()](/api/class-tracing.mdx#tracing-stop-chunk).
+Начать новый фрагмент трассировки. Если вы хотите записать несколько трассировок в одном [BrowserContext], используйте [tracing.start()](/api/class-tracing.mdx#tracing-start) один раз, а затем создайте несколько фрагментов трассировки с помощью [tracing.startChunk()](/api/class-tracing.mdx#tracing-start-chunk) и [tracing.stopChunk()](/api/class-tracing.mdx#tracing-stop-chunk).
 
-**Usage**
+**Использование**
 
 ```js
 await context.tracing.start({ screenshots: true, snapshots: true });
@@ -139,77 +137,76 @@ await page.goto('https://playwright.dev');
 
 await context.tracing.startChunk();
 await page.getByText('Get Started').click();
-// Everything between startChunk and stopChunk will be recorded in the trace.
+// Все, что между startChunk и stopChunk, будет записано в трассировку.
 await context.tracing.stopChunk({ path: 'trace1.zip' });
 
 await context.tracing.startChunk();
 await page.goto('http://example.com');
-// Save a second trace file with different actions.
+// Сохраните второй файл трассировки с другими действиями.
 await context.tracing.stopChunk({ path: 'trace2.zip' });
 ```
 
-**Arguments**
-- `options` [Object] *(optional)*
-  - `name` [string] *(optional)* <font size="2">Added in: v1.32</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-chunk-option-name"/><a href="#tracing-start-chunk-option-name" class="list-anchor">#</a>
+**Аргументы**
+- `options` [Object] *(необязательно)*
+  - `name` [string] *(необязательно)* <font size="2">Добавлено в: v1.32</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-chunk-option-name"/><a href="#tracing-start-chunk-option-name" class="list-anchor">#</a>
     
-    If specified, intermediate trace files are going to be saved into the files with the given name prefix inside the [tracesDir](/api/class-browsertype.mdx#browser-type-launch-option-traces-dir) directory specified in [browserType.launch()](/api/class-browsertype.mdx#browser-type-launch). To specify the final trace zip file name, you need to pass `path` option to [tracing.stopChunk()](/api/class-tracing.mdx#tracing-stop-chunk) instead.
-  - `title` [string] *(optional)* <font size="2">Added in: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-chunk-option-title"/><a href="#tracing-start-chunk-option-title" class="list-anchor">#</a>
+    Если указано, промежуточные файлы трассировки будут сохранены в файлы с данным префиксом имени в директории [tracesDir](/api/class-browsertype.mdx#browser-type-launch-option-traces-dir), указанной в [browserType.launch()](/api/class-browsertype.mdx#browser-type-launch). Чтобы указать имя конечного zip-файла трассировки, необходимо передать параметр `path` в [tracing.stopChunk()](/api/class-tracing.mdx#tracing-stop-chunk) вместо этого.
+  - `title` [string] *(необязательно)* <font size="2">Добавлено в: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-chunk-option-title"/><a href="#tracing-start-chunk-option-title" class="list-anchor">#</a>
     
-    Trace name to be shown in the Trace Viewer.
+    Имя трассировки, которое будет отображаться в просмотрщике трассировок.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-chunk-return"/><a href="#tracing-start-chunk-return" class="list-anchor">#</a>
 
 ---
 
 ### stop {#tracing-stop}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>tracing.stop</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>tracing.stop</x-search>
 
-Stop tracing.
+Остановить трассировку.
 
-**Usage**
+**Использование**
 
 ```js
 await tracing.stop();
 await tracing.stop(options);
 ```
 
-**Arguments**
-- `options` [Object] *(optional)*
-  - `path` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-stop-option-path"/><a href="#tracing-stop-option-path" class="list-anchor">#</a>
+**Аргументы**
+- `options` [Object] *(необязательно)*
+  - `path` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-stop-option-path"/><a href="#tracing-stop-option-path" class="list-anchor">#</a>
     
-    Export trace into the file with the given path.
+    Экспортировать трассировку в файл с указанным путем.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-stop-return"/><a href="#tracing-stop-return" class="list-anchor">#</a>
 
 ---
 
 ### stopChunk {#tracing-stop-chunk}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>tracing.stopChunk</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.15</font><x-search>tracing.stopChunk</x-search>
 
-Stop the trace chunk. See [tracing.startChunk()](/api/class-tracing.mdx#tracing-start-chunk) for more details about multiple trace chunks.
+Остановить фрагмент трассировки. См. [tracing.startChunk()](/api/class-tracing.mdx#tracing-start-chunk) для получения дополнительной информации о нескольких фрагментах трассировки.
 
-**Usage**
+**Использование**
 
 ```js
 await tracing.stopChunk();
 await tracing.stopChunk(options);
 ```
 
-**Arguments**
-- `options` [Object] *(optional)*
-  - `path` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-stop-chunk-option-path"/><a href="#tracing-stop-chunk-option-path" class="list-anchor">#</a>
+**Аргументы**
+- `options` [Object] *(необязательно)*
+  - `path` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-stop-chunk-option-path"/><a href="#tracing-stop-chunk-option-path" class="list-anchor">#</a>
     
-    Export trace collected since the last [tracing.startChunk()](/api/class-tracing.mdx#tracing-start-chunk) call into the file with the given path.
+    Экспортировать трассировку, собранную с момента последнего вызова [tracing.startChunk()](/api/class-tracing.mdx#tracing-start-chunk), в файл с указанным путем.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-stop-chunk-return"/><a href="#tracing-stop-chunk-return" class="list-anchor">#</a>
 
-
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+[Accessibility]: /api/class-accessibility.mdx "Доступность"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
@@ -277,13 +274,13 @@ await tracing.stopChunk(options);
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
 [TestStep]: /api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Элемент"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Итератор"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Происхождение"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "селектор"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Сериализуемый"
 [UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
@@ -311,6 +308,6 @@ await tracing.stopChunk(options);
 [URL]: https://nodejs.org/api/url.html "URL"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
+[все доступные теги изображений]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"
+[Реестр артефактов Microsoft]: https://mcr.microsoft.com/en-us/product/playwright/about "Реестр артефактов Microsoft"
 [Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

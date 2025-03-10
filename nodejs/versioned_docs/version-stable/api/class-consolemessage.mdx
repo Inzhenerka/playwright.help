@@ -6,126 +6,123 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-
-[ConsoleMessage] objects are dispatched by page via the [page.on('console')](/api/class-page.mdx#page-event-console) event. For each console message logged in the page there will be corresponding event in the Playwright context.
+Объекты [ConsoleMessage] отправляются страницей через событие [page.on('console')](/api/class-page.mdx#page-event-console). Для каждого сообщения консоли, записанного на странице, будет соответствующее событие в контексте Playwright.
 
 ```js
-// Listen for all console logs
+// Слушаем все логи консоли
 page.on('console', msg => console.log(msg.text()));
 
-// Listen for all console events and handle errors
+// Слушаем все события консоли и обрабатываем ошибки
 page.on('console', msg => {
   if (msg.type() === 'error')
-    console.log(`Error text: "${msg.text()}"`);
+    console.log(`Текст ошибки: "${msg.text()}"`);
 });
 
-// Get the next console log
+// Получаем следующее сообщение консоли
 const msgPromise = page.waitForEvent('console');
 await page.evaluate(() => {
-  console.log('hello', 42, { foo: 'bar' });  // Issue console.log inside the page
+  console.log('hello', 42, { foo: 'bar' });  // Вызываем console.log внутри страницы
 });
 const msg = await msgPromise;
 
-// Deconstruct console log arguments
+// Деконструируем аргументы лога консоли
 await msg.args()[0].jsonValue(); // hello
 await msg.args()[1].jsonValue(); // 42
 ```
 
-
 ---
 
-## Methods
+## Методы
 
 ### args {#console-message-args}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>consoleMessage.args</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>consoleMessage.args</x-search>
 
-List of arguments passed to a `console` function call. See also [page.on('console')](/api/class-page.mdx#page-event-console).
+Список аргументов, переданных в вызов функции `console`. См. также [page.on('console')](/api/class-page.mdx#page-event-console).
 
-**Usage**
+**Использование**
 
 ```js
 consoleMessage.args();
 ```
 
-**Returns**
+**Возвращает**
 - [Array]&lt;[JSHandle]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="console-message-args-return"/><a href="#console-message-args-return" class="list-anchor">#</a>
 
 ---
 
 ### location {#console-message-location}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>consoleMessage.location</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>consoleMessage.location</x-search>
 
-**Usage**
+**Использование**
 
 ```js
 consoleMessage.location();
 ```
 
-**Returns**
+**Возвращает**
 - [Object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="console-message-location-return"/><a href="#console-message-location-return" class="list-anchor">#</a>
   - `url` [string]
     
-    URL of the resource.
+    URL ресурса.
   - `lineNumber` [number]
     
-    0-based line number in the resource.
+    Номер строки в ресурсе, начиная с 0.
   - `columnNumber` [number]
     
-    0-based column number in the resource.
+    Номер столбца в ресурсе, начиная с 0.
 
 ---
 
 ### page {#console-message-page}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.34</font><x-search>consoleMessage.page</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.34</font><x-search>consoleMessage.page</x-search>
 
-The page that produced this console message, if any.
+Страница, которая создала это сообщение консоли, если таковая имеется.
 
-**Usage**
+**Использование**
 
 ```js
 consoleMessage.page();
 ```
 
-**Returns**
+**Возвращает**
 - [null] | [Page]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="console-message-page-return"/><a href="#console-message-page-return" class="list-anchor">#</a>
 
 ---
 
 ### text {#console-message-text}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>consoleMessage.text</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>consoleMessage.text</x-search>
 
-The text of the console message.
+Текст сообщения консоли.
 
-**Usage**
+**Использование**
 
 ```js
 consoleMessage.text();
 ```
 
-**Returns**
+**Возвращает**
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="console-message-text-return"/><a href="#console-message-text-return" class="list-anchor">#</a>
 
 ---
 
 ### type {#console-message-type}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>consoleMessage.type</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>consoleMessage.type</x-search>
 
-One of the following values: `'log'`, `'debug'`, `'info'`, `'error'`, `'warning'`, `'dir'`, `'dirxml'`, `'table'`, `'trace'`, `'clear'`, `'startGroup'`, `'startGroupCollapsed'`, `'endGroup'`, `'assert'`, `'profile'`, `'profileEnd'`, `'count'`, `'timeEnd'`.
+Одно из следующих значений: `'log'`, `'debug'`, `'info'`, `'error'`, `'warning'`, `'dir'`, `'dirxml'`, `'table'`, `'trace'`, `'clear'`, `'startGroup'`, `'startGroupCollapsed'`, `'endGroup'`, `'assert'`, `'profile'`, `'profileEnd'`, `'count'`, `'timeEnd'`.
 
-**Usage**
+**Использование**
 
 ```js
 consoleMessage.type();
 ```
 
-**Returns**
+**Возвращает**
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="console-message-type-return"/><a href="#console-message-type-return" class="list-anchor">#</a>
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"

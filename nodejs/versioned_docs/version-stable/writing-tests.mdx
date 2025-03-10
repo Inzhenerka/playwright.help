@@ -1,33 +1,33 @@
 ---
 id: writing-tests
-title: "Writing tests"
+title: "Написание тестов"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright tests are simple, they
-- **perform actions**, and
-- **assert the state** against expectations.
+Тесты Playwright просты, они
+- **выполняют действия**, и
+- **проверяют состояние** на соответствие ожиданиям.
 
-There is no need to wait for anything prior to performing an action: Playwright automatically waits for the wide range of [actionability](./actionability.mdx) checks to pass prior to performing each action.
+Нет необходимости ждать чего-либо перед выполнением действия: Playwright автоматически ждет, пока пройдет широкий спектр проверок [доступности](./actionability.mdx) перед выполнением каждого действия.
 
-There is also no need to deal with the race conditions when performing the checks - Playwright assertions are designed in a way that they describe the expectations that need to be eventually met.
+Также нет необходимости иметь дело с условиями гонки при выполнении проверок - утверждения Playwright разработаны таким образом, что они описывают ожидания, которые в конечном итоге должны быть выполнены.
 
-That's it! These design choices allow Playwright users to forget about flaky timeouts and racy checks in their tests altogether.
+Вот и все! Эти дизайнерские решения позволяют пользователям Playwright забыть о ненадежных таймаутах и гонках в своих тестах.
 
-**You will learn**
-- [How to write the first test](/writing-tests.mdx#first-test)
-- [How to perform actions](/writing-tests.mdx#actions)
-- [How to use assertions](/writing-tests.mdx#assertions)
-- [How tests run in isolation](/writing-tests.mdx#test-isolation)
-- [How to use test hooks](/writing-tests.mdx#using-test-hooks)
+**Вы узнаете**
+- [Как написать первый тест](/writing-tests.mdx#first-test)
+- [Как выполнять действия](/writing-tests.mdx#actions)
+- [Как использовать утверждения](/writing-tests.mdx#assertions)
+- [Как тесты выполняются изолированно](/writing-tests.mdx#test-isolation)
+- [Как использовать хуки тестов](/writing-tests.mdx#using-test-hooks)
 
-## First test
+## Первый тест
 
-Take a look at the following example to see how to write a test.
+Посмотрите на следующий пример, чтобы увидеть, как написать тест.
 
 ```js title="tests/example.spec.ts"
 import { test, expect } from '@playwright/test';
@@ -35,144 +35,144 @@ import { test, expect } from '@playwright/test';
 test('has title', async ({ page }) => {
   await page.goto('https://playwright.dev/');
 
-  // Expect a title "to contain" a substring.
+  // Ожидаем, что заголовок "содержит" подстроку.
   await expect(page).toHaveTitle(/Playwright/);
 });
 
 test('get started link', async ({ page }) => {
   await page.goto('https://playwright.dev/');
 
-  // Click the get started link.
+  // Нажимаем на ссылку "Начать".
   await page.getByRole('link', { name: 'Get started' }).click();
 
-  // Expects page to have a heading with the name of Installation.
+  // Ожидаем, что на странице есть заголовок с именем "Установка".
   await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
 });
 ```
 
 :::note
-Add `// @ts-check` at the start of each test file when using JavaScript in VS Code to get automatic type checking.
+Добавьте `// @ts-check` в начале каждого тестового файла при использовании JavaScript в VS Code, чтобы получить автоматическую проверку типов.
 :::
 
-## Actions
+## Действия
 
-### Navigation
+### Навигация
 
-Most of the tests will start with navigating page to the URL. After that, test will be able to interact with the page elements.
+Большинство тестов начинается с навигации страницы по URL. После этого тест сможет взаимодействовать с элементами страницы.
 
 ```js
 await page.goto('https://playwright.dev/');
 ```
 
-Playwright will wait for page to reach the load state prior to moving forward. Learn more about the [page.goto()](/api/class-page.mdx#page-goto) options.
+Playwright будет ждать, пока страница достигнет состояния загрузки, прежде чем продолжить. Узнайте больше о параметрах [page.goto()](/api/class-page.mdx#page-goto).
 
-### Interactions
+### Взаимодействия
 
-Performing actions starts with locating the elements. Playwright uses [Locators API](./locators.mdx) for that. Locators represent a way to find element(s) on the page at any moment, learn more about the [different types](./locators.mdx) of locators available. Playwright will wait for the element to be [actionable](./actionability.mdx) prior to performing the action, so there is no need to wait for it to become available.
+Выполнение действий начинается с поиска элементов. Playwright использует [API локаторов](./locators.mdx) для этого. Локаторы представляют собой способ находить элемент(ы) на странице в любой момент, узнайте больше о [разных типах](./locators.mdx) доступных локаторов. Playwright будет ждать, пока элемент станет [доступным для действий](./actionability.mdx), прежде чем выполнять действие, поэтому нет необходимости ждать, пока он станет доступным.
 
 ```js
-// Create a locator.
+// Создаем локатор.
 const getStarted = page.getByRole('link', { name: 'Get started' });
 
-// Click it.
+// Нажимаем на него.
 await getStarted.click();
 ```
 
-In most cases, it'll be written in one line:
+В большинстве случаев это будет записано в одну строку:
 
 ```js
 await page.getByRole('link', { name: 'Get started' }).click();
 ```
 
-### Basic actions
+### Основные действия
 
-This is the list of the most popular Playwright actions. Note that there are many more, so make sure to check the [Locator API](./api/class-locator.mdx) section to learn more about them.
+Это список самых популярных действий Playwright. Обратите внимание, что их гораздо больше, поэтому обязательно ознакомьтесь с разделом [API локаторов](./api/class-locator.mdx), чтобы узнать о них больше.
 
-| Action | Description |
+| Действие | Описание |
 | :- | :- |
-| [locator.check()](/api/class-locator.mdx#locator-check) | Check the input checkbox |
-| [locator.click()](/api/class-locator.mdx#locator-click) | Click the element |
-| [locator.uncheck()](/api/class-locator.mdx#locator-uncheck) | Uncheck the input checkbox |
-| [locator.hover()](/api/class-locator.mdx#locator-hover) | Hover mouse over the element |
-| [locator.fill()](/api/class-locator.mdx#locator-fill) | Fill the form field, input text |
-| [locator.focus()](/api/class-locator.mdx#locator-focus) | Focus the element |
-| [locator.press()](/api/class-locator.mdx#locator-press) | Press single key |
-| [locator.setInputFiles()](/api/class-locator.mdx#locator-set-input-files) | Pick files to upload |
-| [locator.selectOption()](/api/class-locator.mdx#locator-select-option) | Select option in the drop down |
+| [locator.check()](/api/class-locator.mdx#locator-check) | Установить флажок в поле ввода |
+| [locator.click()](/api/class-locator.mdx#locator-click) | Нажать на элемент |
+| [locator.uncheck()](/api/class-locator.mdx#locator-uncheck) | Снять флажок с поля ввода |
+| [locator.hover()](/api/class-locator.mdx#locator-hover) | Навести курсор на элемент |
+| [locator.fill()](/api/class-locator.mdx#locator-fill) | Заполнить поле формы, ввести текст |
+| [locator.focus()](/api/class-locator.mdx#locator-focus) | Установить фокус на элемент |
+| [locator.press()](/api/class-locator.mdx#locator-press) | Нажать на одну клавишу |
+| [locator.setInputFiles()](/api/class-locator.mdx#locator-set-input-files) | Выбрать файлы для загрузки |
+| [locator.selectOption()](/api/class-locator.mdx#locator-select-option) | Выбрать опцию в выпадающем списке |
 
-## Assertions
+## Утверждения
 
-Playwright includes [test assertions](./test-assertions.mdx) in the form of `expect` function. To make an assertion, call `expect(value)` and choose a matcher that reflects the expectation.
+Playwright включает [тестовые утверждения](./test-assertions.mdx) в виде функции `expect`. Чтобы сделать утверждение, вызовите `expect(value)` и выберите сопоставитель, который отражает ожидание.
 
-There are many generic matchers like `toEqual`, `toContain`, `toBeTruthy` that can be used to assert any conditions.
+Существует множество универсальных сопоставителей, таких как `toEqual`, `toContain`, `toBeTruthy`, которые можно использовать для утверждения любых условий.
 
 ```js
 expect(success).toBeTruthy();
 ```
 
-Playwright also includes async matchers that will wait until the expected condition is met. Using these matchers allows making the tests non-flaky and resilient. For example, this code will wait until the page gets the title containing "Playwright":
+Playwright также включает асинхронные сопоставители, которые будут ждать, пока ожидаемое условие не будет выполнено. Использование этих сопоставителей позволяет сделать тесты ненадежными и устойчивыми. Например, этот код будет ждать, пока страница не получит заголовок, содержащий "Playwright":
 
 ```js
 await expect(page).toHaveTitle(/Playwright/);
 ```
 
-Here is the list of the most popular async assertions. Note that there are [many more](./test-assertions.mdx) to get familiar with:
+Вот список самых популярных асинхронных утверждений. Обратите внимание, что существует [много других](./test-assertions.mdx), с которыми стоит ознакомиться:
 
-| Assertion | Description |
+| Утверждение | Описание |
 | :- | :- |
-| [expect(locator).toBeChecked()](/api/class-locatorassertions.mdx#locator-assertions-to-be-checked) | Checkbox is checked |
-| [expect(locator).toBeEnabled()](/api/class-locatorassertions.mdx#locator-assertions-to-be-enabled) | Control is enabled |
-| [expect(locator).toBeVisible()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible) | Element is visible |
-| [expect(locator).toContainText()](/api/class-locatorassertions.mdx#locator-assertions-to-contain-text) | Element contains text |
-| [expect(locator).toHaveAttribute()](/api/class-locatorassertions.mdx#locator-assertions-to-have-attribute) | Element has attribute |
-| [expect(locator).toHaveCount()](/api/class-locatorassertions.mdx#locator-assertions-to-have-count) | List of elements has given length |
-| [expect(locator).toHaveText()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text) | Element matches text |
-| [expect(locator).toHaveValue()](/api/class-locatorassertions.mdx#locator-assertions-to-have-value) | Input element has value |
-| [expect(page).toHaveTitle()](/api/class-pageassertions.mdx#page-assertions-to-have-title) | Page has title |
-| [expect(page).toHaveURL()](/api/class-pageassertions.mdx#page-assertions-to-have-url) | Page has URL |
+| [expect(locator).toBeChecked()](/api/class-locatorassertions.mdx#locator-assertions-to-be-checked) | Флажок установлен |
+| [expect(locator).toBeEnabled()](/api/class-locatorassertions.mdx#locator-assertions-to-be-enabled) | Элемент включен |
+| [expect(locator).toBeVisible()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible) | Элемент видим |
+| [expect(locator).toContainText()](/api/class-locatorassertions.mdx#locator-assertions-to-contain-text) | Элемент содержит текст |
+| [expect(locator).toHaveAttribute()](/api/class-locatorassertions.mdx#locator-assertions-to-have-attribute) | Элемент имеет атрибут |
+| [expect(locator).toHaveCount()](/api/class-locatorassertions.mdx#locator-assertions-to-have-count) | Список элементов имеет заданную длину |
+| [expect(locator).toHaveText()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text) | Элемент соответствует тексту |
+| [expect(locator).toHaveValue()](/api/class-locatorassertions.mdx#locator-assertions-to-have-value) | Элемент ввода имеет значение |
+| [expect(page).toHaveTitle()](/api/class-pageassertions.mdx#page-assertions-to-have-title) | У страницы есть заголовок |
+| [expect(page).toHaveURL()](/api/class-pageassertions.mdx#page-assertions-to-have-url) | У страницы есть URL |
 
-### Test Isolation
+### Изоляция тестов
 
-Playwright Test is based on the concept of [test fixtures](./test-fixtures.mdx) such as the [built in page fixture](./test-fixtures#built-in-fixtures), which is passed into your test. Pages are [isolated between tests due to the Browser Context](./browser-contexts), which is equivalent to a brand new browser profile, where every test gets a fresh environment, even when multiple tests run in a single Browser.
+Playwright Test основан на концепции [тестовых фикстур](./test-fixtures.mdx), таких как [встроенная фикстура страницы](./test-fixtures#built-in-fixtures), которая передается в ваш тест. Страницы [изолированы между тестами благодаря контексту браузера](./browser-contexts), который эквивалентен совершенно новому профилю браузера, где каждый тест получает свежую среду, даже когда несколько тестов выполняются в одном браузере.
 
 ```js title="tests/example.spec.ts"
 import { test } from '@playwright/test';
 
 test('example test', async ({ page }) => {
-  // "page" belongs to an isolated BrowserContext, created for this specific test.
+  // "page" принадлежит изолированному контексту браузера, созданному для этого конкретного теста.
 });
 
 test('another test', async ({ page }) => {
-  // "page" in this second test is completely isolated from the first test.
+  // "page" во втором тесте полностью изолирован от первого теста.
 });
 ```
 
-### Using Test Hooks
+### Использование хуков тестов
 
-You can use various [test hooks](./api/class-test.mdx) such as `test.describe` to declare a group of tests and `test.beforeEach` and `test.afterEach` which are executed before/after each test. Other hooks include the `test.beforeAll` and `test.afterAll` which are executed once per worker before/after all tests.
+Вы можете использовать различные [хуки тестов](./api/class-test.mdx), такие как `test.describe`, чтобы объявить группу тестов, и `test.beforeEach` и `test.afterEach`, которые выполняются перед/после каждого теста. Другие хуки включают `test.beforeAll` и `test.afterAll`, которые выполняются один раз для каждого рабочего процесса перед/после всех тестов.
 
 ```js title="tests/example.spec.ts"
 import { test, expect } from '@playwright/test';
 
 test.describe('navigation', () => {
   test.beforeEach(async ({ page }) => {
-    // Go to the starting url before each test.
+    // Переходим на начальный URL перед каждым тестом.
     await page.goto('https://playwright.dev/');
   });
 
   test('main navigation', async ({ page }) => {
-    // Assertions use the expect API.
+    // Утверждения используют API expect.
     await expect(page).toHaveURL('https://playwright.dev/');
   });
 });
 ```
 
-## What's Next
-- [Run single test, multiple tests, headed mode](./running-tests.mdx)
-- [Generate tests with Codegen](./codegen-intro.mdx)
-- [See a trace of your tests](./trace-viewer-intro.mdx)
-- [Explore UI Mode](./test-ui-mode.mdx)
-- [Run tests on CI with GitHub Actions](./ci-intro.mdx)
+## Что дальше
+- [Запуск одного теста, нескольких тестов, режим с графическим интерфейсом](./running-tests.mdx)
+- [Генерация тестов с помощью Codegen](./codegen-intro.mdx)
+- [Просмотр трассировки ваших тестов](./trace-viewer-intro.mdx)
+- [Изучение режима пользовательского интерфейса](./test-ui-mode.mdx)
+- [Запуск тестов в CI с помощью GitHub Actions](./ci-intro.mdx)
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"

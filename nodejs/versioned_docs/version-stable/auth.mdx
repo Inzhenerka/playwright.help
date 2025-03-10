@@ -1,20 +1,20 @@
 ---
 id: auth
-title: "Authentication"
+title: "Аутентификация"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright executes tests in isolated environments called [browser contexts](./browser-contexts.mdx). This isolation model improves reproducibility and prevents cascading test failures. Tests can load existing authenticated state. This eliminates the need to authenticate in every test and speeds up test execution.
+Playwright выполняет тесты в изолированных средах, называемых [контекстами браузера](./browser-contexts.mdx). Эта модель изоляции улучшает воспроизводимость и предотвращает каскадные сбои тестов. Тесты могут загружать существующее состояние аутентификации. Это устраняет необходимость аутентификации в каждом тесте и ускоряет выполнение тестов.
 
-## Core concepts
+## Основные концепции
 
-Regardless of the authentication strategy you choose, you are likely to store authenticated browser state on the file system.
+Независимо от выбранной стратегии аутентификации, вы, вероятно, будете хранить аутентифицированное состояние браузера в файловой системе.
 
-We recommend to create `playwright/.auth` directory and add it to your `.gitignore`. Your authentication routine will produce authenticated browser state and save it to a file in this `playwright/.auth` directory. Later on, tests will reuse this state and start already authenticated.
+Рекомендуем создать директорию `playwright/.auth` и добавить ее в ваш `.gitignore`. Ваша процедура аутентификации будет создавать аутентифицированное состояние браузера и сохранять его в файл в этой директории `playwright/.auth`. Позже тесты будут повторно использовать это состояние и начинать уже аутентифицированными.
 
 <Tabs
   groupId="bash-flavor"
@@ -52,20 +52,20 @@ echo "playwright/.auth" >> .gitignore
 </TabItem>
 </Tabs>
 
-## Basic: shared account in all tests
+## Основной: общий аккаунт для всех тестов
 
-This is the **recommended** approach for tests **without server-side state**. Authenticate once in the **setup project**, save the authentication state, and then reuse it to bootstrap each test already authenticated.
+Это **рекомендуемый** подход для тестов **без состояния на стороне сервера**. Аутентифицируйтесь один раз в **проекте настройки**, сохраните состояние аутентификации, а затем повторно используйте его для инициализации каждого теста уже аутентифицированным.
 
-**When to use**
-- When you can imagine all your tests running at the same time with the same account, without affecting each other.
+**Когда использовать**
+- Когда вы можете представить, что все ваши тесты выполняются одновременно с одной и той же учетной записью, не влияя друг на друга.
 
-**When not to use**
-- Your tests modify server-side state. For example, one test checks the rendering of the settings page, while the other test is changing the setting, and you run tests in parallel. In this case, tests must use different accounts.
-- Your authentication is browser-specific.
+**Когда не использовать**
+- Ваши тесты изменяют состояние на стороне сервера. Например, один тест проверяет рендеринг страницы настроек, в то время как другой тест изменяет настройки, и вы запускаете тесты параллельно. В этом случае тесты должны использовать разные учетные записи.
+- Ваша аутентификация специфична для браузера.
 
-**Details**
+**Подробности**
 
-Create `tests/auth.setup.ts` that will prepare authenticated browser state for all other tests.
+Создайте файл `tests/auth.setup.ts`, который подготовит аутентифицированное состояние браузера для всех остальных тестов.
 
 ```js title="tests/auth.setup.ts"
 import { test as setup, expect } from '@playwright/test';
@@ -74,40 +74,40 @@ import path from 'path';
 const authFile = path.join(__dirname, '../playwright/.auth/user.json');
 
 setup('authenticate', async ({ page }) => {
-  // Perform authentication steps. Replace these actions with your own.
+  // Выполните шаги аутентификации. Замените эти действия на свои собственные.
   await page.goto('https://github.com/login');
   await page.getByLabel('Username or email address').fill('username');
   await page.getByLabel('Password').fill('password');
   await page.getByRole('button', { name: 'Sign in' }).click();
-  // Wait until the page receives the cookies.
+  // Подождите, пока страница получит куки.
   //
-  // Sometimes login flow sets cookies in the process of several redirects.
-  // Wait for the final URL to ensure that the cookies are actually set.
+  // Иногда процесс входа устанавливает куки в процессе нескольких перенаправлений.
+  // Подождите, пока не будет достигнут конечный URL, чтобы убедиться, что куки действительно установлены.
   await page.waitForURL('https://github.com/');
-  // Alternatively, you can wait until the page reaches a state where all cookies are set.
+  // В качестве альтернативы вы можете дождаться, пока страница не достигнет состояния, когда все куки установлены.
   await expect(page.getByRole('button', { name: 'View profile and more' })).toBeVisible();
 
-  // End of authentication steps.
+  // Конец шагов аутентификации.
 
   await page.context().storageState({ path: authFile });
 });
 ```
 
-Create a new `setup` project in the config and declare it as a [dependency](./test-projects.mdx#dependencies) for all your testing projects. This project will always run and authenticate before all the tests. All testing projects should use the authenticated state as `storageState`.
+Создайте новый проект `setup` в конфигурации и объявите его как [зависимость](./test-projects.mdx#dependencies) для всех ваших тестовых проектов. Этот проект всегда будет запускаться и аутентифицироваться перед всеми тестами. Все тестовые проекты должны использовать аутентифицированное состояние как `storageState`.
 
 ```js title="playwright.config.ts"
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   projects: [
-    // Setup project
+    // Проект настройки
     { name: 'setup', testMatch: /.*\.setup\.ts/ },
 
     {
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        // Use prepared auth state.
+        // Используйте подготовленное состояние аутентификации.
         storageState: 'playwright/.auth/user.json',
       },
       dependencies: ['setup'],
@@ -117,7 +117,7 @@ export default defineConfig({
       name: 'firefox',
       use: {
         ...devices['Desktop Firefox'],
-        // Use prepared auth state.
+        // Используйте подготовленное состояние аутентификации.
         storageState: 'playwright/.auth/user.json',
       },
       dependencies: ['setup'],
@@ -126,39 +126,39 @@ export default defineConfig({
 });
 ```
 
-Tests start already authenticated because we specified `storageState` in the config.
+Тесты начинают уже аутентифицированными, потому что мы указали `storageState` в конфигурации.
 
 ```js title="tests/example.spec.ts"
 import { test } from '@playwright/test';
 
 test('test', async ({ page }) => {
-  // page is authenticated
+  // страница аутентифицирована
 });
 ```
 
-Note that you need to delete the stored state when it expires. If you don't need to keep the state between test runs, write the browser state under [testProject.outputDir](/api/class-testproject.mdx#test-project-output-dir), which is automatically cleaned up before every test run.
+Обратите внимание, что вам нужно удалить сохраненное состояние, когда оно истекает. Если вам не нужно сохранять состояние между запусками тестов, запишите состояние браузера в [testProject.outputDir](/api/class-testproject.mdx#test-project-output-dir), которое автоматически очищается перед каждым запуском тестов.
 
-### Authenticating in UI mode
+### Аутентификация в режиме UI
 
-UI mode will not run the `setup` project by default to improve testing speed. We recommend to authenticate by manually running the `auth.setup.ts` from time to time, whenever existing authentication expires.
+Режим UI по умолчанию не запускает проект `setup`, чтобы улучшить скорость тестирования. Рекомендуем аутентифицироваться, периодически вручную запуская `auth.setup.ts`, когда существующая аутентификация истекает.
 
-First [enable the `setup` project in the filters](./test-ui-mode#filtering-tests), then click the triangle button next to `auth.setup.ts` file, and then disable the `setup` project in the filters again.
+Сначала [включите проект `setup` в фильтрах](./test-ui-mode#filtering-tests), затем нажмите на треугольную кнопку рядом с файлом `auth.setup.ts`, а затем снова отключите проект `setup` в фильтрах.
 
-## Moderate: one account per parallel worker
+## Умеренный: один аккаунт на параллельный рабочий процесс
 
-This is the **recommended** approach for tests that **modify server-side state**. In Playwright, worker processes run in parallel. In this approach, each parallel worker is authenticated once. All tests ran by worker are reusing the same authentication state. We will need multiple testing accounts, one per each parallel worker.
+Это **рекомендуемый** подход для тестов, которые **изменяют состояние на стороне сервера**. В Playwright рабочие процессы выполняются параллельно. В этом подходе каждый параллельный рабочий процесс аутентифицируется один раз. Все тесты, выполняемые рабочим процессом, повторно используют одно и то же состояние аутентификации. Нам понадобятся несколько тестовых учетных записей, по одной для каждого параллельного рабочего процесса.
 
-**When to use**
-- Your tests modify shared server-side state. For example, one test checks the rendering of the settings page, while the other test is changing the setting.
+**Когда использовать**
+- Ваши тесты изменяют общее состояние на стороне сервера. Например, один тест проверяет рендеринг страницы настроек, в то время как другой тест изменяет настройки.
 
-**When not to use**
-- Your tests do not modify any shared server-side state. In this case, all tests can use a single shared account.
+**Когда не использовать**
+- Ваши тесты не изменяют никакое общее состояние на стороне сервера. В этом случае все тесты могут использовать одну общую учетную запись.
 
-**Details**
+**Подробности**
 
-We will authenticate once per [worker process](./test-parallel.mdx#worker-processes), each with a unique account.
+Мы будем аутентифицироваться один раз на каждый [рабочий процесс](./test-parallel.mdx#worker-processes), каждый с уникальной учетной записью.
 
-Create `playwright/fixtures.ts` file that will [override `storageState` fixture](./test-fixtures.mdx#overriding-fixtures) to authenticate once per worker. Use [testInfo.parallelIndex](/api/class-testinfo.mdx#test-info-parallel-index) to differentiate between workers.
+Создайте файл `playwright/fixtures.ts`, который будет [переопределять фикстуру `storageState`](./test-fixtures.mdx#overriding-fixtures) для аутентификации один раз на рабочий процесс. Используйте [testInfo.parallelIndex](/api/class-testinfo.mdx#test-info-parallel-index) для различения между рабочими процессами.
 
 ```js title="playwright/fixtures.ts"
 import { test as baseTest, expect } from '@playwright/test';
@@ -167,44 +167,44 @@ import path from 'path';
 
 export * from '@playwright/test';
 export const test = baseTest.extend<{}, { workerStorageState: string }>({
-  // Use the same storage state for all tests in this worker.
+  // Используйте одно и то же состояние хранения для всех тестов в этом рабочем процессе.
   storageState: ({ workerStorageState }, use) => use(workerStorageState),
 
-  // Authenticate once per worker with a worker-scoped fixture.
+  // Аутентифицируйтесь один раз на рабочий процесс с помощью фикстуры, ограниченной рабочим процессом.
   workerStorageState: [async ({ browser }, use) => {
-    // Use parallelIndex as a unique identifier for each worker.
+    // Используйте parallelIndex как уникальный идентификатор для каждого рабочего процесса.
     const id = test.info().parallelIndex;
     const fileName = path.resolve(test.info().project.outputDir, `.auth/${id}.json`);
 
     if (fs.existsSync(fileName)) {
-      // Reuse existing authentication state if any.
+      // Повторно используйте существующее состояние аутентификации, если оно есть.
       await use(fileName);
       return;
     }
 
-    // Important: make sure we authenticate in a clean environment by unsetting storage state.
+    // Важно: убедитесь, что мы аутентифицируемся в чистой среде, сбросив состояние хранения.
     const page = await browser.newPage({ storageState: undefined });
 
-    // Acquire a unique account, for example create a new one.
-    // Alternatively, you can have a list of precreated accounts for testing.
-    // Make sure that accounts are unique, so that multiple team members
-    // can run tests at the same time without interference.
+    // Получите уникальную учетную запись, например создайте новую.
+    // В качестве альтернативы вы можете иметь список заранее созданных учетных записей для тестирования.
+    // Убедитесь, что учетные записи уникальны, чтобы несколько членов команды
+    // могли запускать тесты одновременно без вмешательства.
     const account = await acquireAccount(id);
 
-    // Perform authentication steps. Replace these actions with your own.
+    // Выполните шаги аутентификации. Замените эти действия на свои собственные.
     await page.goto('https://github.com/login');
     await page.getByLabel('Username or email address').fill(account.username);
     await page.getByLabel('Password').fill(account.password);
     await page.getByRole('button', { name: 'Sign in' }).click();
-    // Wait until the page receives the cookies.
+    // Подождите, пока страница получит куки.
     //
-    // Sometimes login flow sets cookies in the process of several redirects.
-    // Wait for the final URL to ensure that the cookies are actually set.
+    // Иногда процесс входа устанавливает куки в процессе нескольких перенаправлений.
+    // Подождите, пока не будет достигнут конечный URL, чтобы убедиться, что куки действительно установлены.
     await page.waitForURL('https://github.com/');
-    // Alternatively, you can wait until the page reaches a state where all cookies are set.
+    // В качестве альтернативы вы можете дождаться, пока страница не достигнет состояния, когда все куки установлены.
     await expect(page.getByRole('button', { name: 'View profile and more' })).toBeVisible();
 
-    // End of authentication steps.
+    // Конец шагов аутентификации.
 
     await page.context().storageState({ path: fileName });
     await page.close();
@@ -213,29 +213,29 @@ export const test = baseTest.extend<{}, { workerStorageState: string }>({
 });
 ```
 
-Now, each test file should import `test` from our fixtures file instead of `@playwright/test`. No changes are needed in the config.
+Теперь каждый тестовый файл должен импортировать `test` из нашего файла фикстур вместо `@playwright/test`. Изменения в конфигурации не требуются.
 
 ```js title="tests/example.spec.ts"
-// Important: import our fixtures.
+// Важно: импортируйте наши фикстуры.
 import { test, expect } from '../playwright/fixtures';
 
 test('test', async ({ page }) => {
-  // page is authenticated
+  // страница аутентифицирована
 });
 ```
 
-## Advanced scenarios
+## Расширенные сценарии
 
-### Authenticate with API request
+### Аутентификация с помощью API-запроса
 
-**When to use**
-- Your web application supports authenticating via API that is easier/faster than interacting with the app UI.
+**Когда использовать**
+- Ваше веб-приложение поддерживает аутентификацию через API, что проще/быстрее, чем взаимодействие с интерфейсом приложения.
 
-**Details**
+**Подробности**
 
-We will send the API request with [APIRequestContext] and then save authenticated state as usual.
+Мы отправим API-запрос с помощью [APIRequestContext] и затем сохраним аутентифицированное состояние, как обычно.
 
-In the [setup project](#basic-shared-account-in-all-tests):
+В [проекте настройки](#basic-shared-account-in-all-tests):
 
 ```js title="tests/auth.setup.ts"
 import { test as setup } from '@playwright/test';
@@ -243,7 +243,7 @@ import { test as setup } from '@playwright/test';
 const authFile = 'playwright/.auth/user.json';
 
 setup('authenticate', async ({ request }) => {
-  // Send authentication request. Replace with your own.
+  // Отправьте запрос аутентификации. Замените на свой.
   await request.post('https://github.com/login', {
     form: {
       'user': 'user',
@@ -254,7 +254,7 @@ setup('authenticate', async ({ request }) => {
 });
 ```
 
-Alternatively, in a [worker fixture](#moderate-one-account-per-parallel-worker):
+В качестве альтернативы, в [фикстуре рабочего процесса](#moderate-one-account-per-parallel-worker):
 
 ```js title="playwright/fixtures.ts"
 import { test as baseTest, request } from '@playwright/test';
@@ -263,31 +263,31 @@ import path from 'path';
 
 export * from '@playwright/test';
 export const test = baseTest.extend<{}, { workerStorageState: string }>({
-  // Use the same storage state for all tests in this worker.
+  // Используйте одно и то же состояние хранения для всех тестов в этом рабочем процессе.
   storageState: ({ workerStorageState }, use) => use(workerStorageState),
 
-  // Authenticate once per worker with a worker-scoped fixture.
+  // Аутентифицируйтесь один раз на рабочий процесс с помощью фикстуры, ограниченной рабочим процессом.
   workerStorageState: [async ({}, use) => {
-    // Use parallelIndex as a unique identifier for each worker.
+    // Используйте parallelIndex как уникальный идентификатор для каждого рабочего процесса.
     const id = test.info().parallelIndex;
     const fileName = path.resolve(test.info().project.outputDir, `.auth/${id}.json`);
 
     if (fs.existsSync(fileName)) {
-      // Reuse existing authentication state if any.
+      // Повторно используйте существующее состояние аутентификации, если оно есть.
       await use(fileName);
       return;
     }
 
-    // Important: make sure we authenticate in a clean environment by unsetting storage state.
+    // Важно: убедитесь, что мы аутентифицируемся в чистой среде, сбросив состояние хранения.
     const context = await request.newContext({ storageState: undefined });
 
-    // Acquire a unique account, for example create a new one.
-    // Alternatively, you can have a list of precreated accounts for testing.
-    // Make sure that accounts are unique, so that multiple team members
-    // can run tests at the same time without interference.
+    // Получите уникальную учетную запись, например создайте новую.
+    // В качестве альтернативы вы можете иметь список заранее созданных учетных записей для тестирования.
+    // Убедитесь, что учетные записи уникальны, чтобы несколько членов команды
+    // могли запускать тесты одновременно без вмешательства.
     const account = await acquireAccount(id);
 
-    // Send authentication request. Replace with your own.
+    // Отправьте запрос аутентификации. Замените на свой.
     await context.post('https://github.com/login', {
       form: {
         'user': 'user',
@@ -302,14 +302,14 @@ export const test = baseTest.extend<{}, { workerStorageState: string }>({
 });
 ```
 
-### Multiple signed in roles
+### Несколько ролей с аутентификацией
 
-**When to use**
-- You have more than one role in your end to end tests, but you can reuse accounts across all tests.
+**Когда использовать**
+- У вас есть более одной роли в ваших тестах, но вы можете повторно использовать учетные записи во всех тестах.
 
-**Details**
+**Подробности**
 
-We will authenticate multiple times in the setup project.
+Мы будем аутентифицироваться несколько раз в проекте настройки.
 
 ```js title="tests/auth.setup.ts"
 import { test as setup, expect } from '@playwright/test';
@@ -317,20 +317,20 @@ import { test as setup, expect } from '@playwright/test';
 const adminFile = 'playwright/.auth/admin.json';
 
 setup('authenticate as admin', async ({ page }) => {
-  // Perform authentication steps. Replace these actions with your own.
+  // Выполните шаги аутентификации. Замените эти действия на свои собственные.
   await page.goto('https://github.com/login');
   await page.getByLabel('Username or email address').fill('admin');
   await page.getByLabel('Password').fill('password');
   await page.getByRole('button', { name: 'Sign in' }).click();
-  // Wait until the page receives the cookies.
+  // Подождите, пока страница получит куки.
   //
-  // Sometimes login flow sets cookies in the process of several redirects.
-  // Wait for the final URL to ensure that the cookies are actually set.
+  // Иногда процесс входа устанавливает куки в процессе нескольких перенаправлений.
+  // Подождите, пока не будет достигнут конечный URL, чтобы убедиться, что куки действительно установлены.
   await page.waitForURL('https://github.com/');
-  // Alternatively, you can wait until the page reaches a state where all cookies are set.
+  // В качестве альтернативы вы можете дождаться, пока страница не достигнет состояния, когда все куки установлены.
   await expect(page.getByRole('button', { name: 'View profile and more' })).toBeVisible();
 
-  // End of authentication steps.
+  // Конец шагов аутентификации.
 
   await page.context().storageState({ path: adminFile });
 });
@@ -338,26 +338,26 @@ setup('authenticate as admin', async ({ page }) => {
 const userFile = 'playwright/.auth/user.json';
 
 setup('authenticate as user', async ({ page }) => {
-  // Perform authentication steps. Replace these actions with your own.
+  // Выполните шаги аутентификации. Замените эти действия на свои собственные.
   await page.goto('https://github.com/login');
   await page.getByLabel('Username or email address').fill('user');
   await page.getByLabel('Password').fill('password');
   await page.getByRole('button', { name: 'Sign in' }).click();
-  // Wait until the page receives the cookies.
+  // Подождите, пока страница получит куки.
   //
-  // Sometimes login flow sets cookies in the process of several redirects.
-  // Wait for the final URL to ensure that the cookies are actually set.
+  // Иногда процесс входа устанавливает куки в процессе нескольких перенаправлений.
+  // Подождите, пока не будет достигнут конечный URL, чтобы убедиться, что куки действительно установлены.
   await page.waitForURL('https://github.com/');
-  // Alternatively, you can wait until the page reaches a state where all cookies are set.
+  // В качестве альтернативы вы можете дождаться, пока страница не достигнет состояния, когда все куки установлены.
   await expect(page.getByRole('button', { name: 'View profile and more' })).toBeVisible();
 
-  // End of authentication steps.
+  // Конец шагов аутентификации.
 
   await page.context().storageState({ path: userFile });
 });
 ```
 
-After that, specify `storageState` for each test file or test group, **instead of** setting it in the config.
+После этого укажите `storageState` для каждого тестового файла или группы тестов, **вместо** того, чтобы устанавливать его в конфигурации.
 
 ```js title="tests/example.spec.ts"
 import { test } from '@playwright/test';
@@ -365,69 +365,69 @@ import { test } from '@playwright/test';
 test.use({ storageState: 'playwright/.auth/admin.json' });
 
 test('admin test', async ({ page }) => {
-  // page is authenticated as admin
+  // страница аутентифицирована как администратор
 });
 
 test.describe(() => {
   test.use({ storageState: 'playwright/.auth/user.json' });
 
   test('user test', async ({ page }) => {
-    // page is authenticated as a user
+    // страница аутентифицирована как пользователь
   });
 });
 ```
 
-See also about [authenticating in the UI mode](#authenticating-in-ui-mode).
+Смотрите также о [аутентификации в режиме UI](#authenticating-in-ui-mode).
 
-### Testing multiple roles together
+### Тестирование нескольких ролей вместе
 
-**When to use**
-- You need to test how multiple authenticated roles interact together, in a single test.
+**Когда использовать**
+- Вам нужно протестировать, как несколько аутентифицированных ролей взаимодействуют друг с другом в одном тесте.
 
-**Details**
+**Подробности**
 
-Use multiple [BrowserContext]s and [Page]s with different storage states in the same test.
+Используйте несколько [BrowserContext] и [Page] с разными состояниями хранения в одном тесте.
 
 ```js title="tests/example.spec.ts"
 import { test } from '@playwright/test';
 
 test('admin and user', async ({ browser }) => {
-  // adminContext and all pages inside, including adminPage, are signed in as "admin".
+  // adminContext и все страницы внутри, включая adminPage, аутентифицированы как "администратор".
   const adminContext = await browser.newContext({ storageState: 'playwright/.auth/admin.json' });
   const adminPage = await adminContext.newPage();
 
-  // userContext and all pages inside, including userPage, are signed in as "user".
+  // userContext и все страницы внутри, включая userPage, аутентифицированы как "пользователь".
   const userContext = await browser.newContext({ storageState: 'playwright/.auth/user.json' });
   const userPage = await userContext.newPage();
 
-  // ... interact with both adminPage and userPage ...
+  // ... взаимодействуйте как с adminPage, так и с userPage ...
 
   await adminContext.close();
   await userContext.close();
 });
 ```
 
-### Testing multiple roles with POM fixtures
+### Тестирование нескольких ролей с фикстурами POM
 
-**When to use**
-- You need to test how multiple authenticated roles interact together, in a single test.
+**Когда использовать**
+- Вам нужно протестировать, как несколько аутентифицированных ролей взаимодействуют друг с другом в одном тесте.
 
-**Details**
+**Подробности**
 
-You can introduce fixtures that will provide a page authenticated as each role.
+Вы можете ввести фикстуры, которые будут предоставлять страницу, аутентифицированную как каждая роль.
 
-Below is an example that [creates fixtures](./test-fixtures.mdx#creating-a-fixture) for two [Page Object Models](./pom.mdx) - admin POM and user POM. It assumes `adminStorageState.json` and `userStorageState.json` files were created in the global setup.
+Ниже приведен пример, который [создает фикстуры](./test-fixtures.mdx#creating-a-fixture) для двух [Моделей Объектов Страниц](./pom.mdx) - POM администратора и POM пользователя. Предполагается, что файлы `adminStorageState.json` и `userStorageState.json` были созданы в глобальной настройке.
 
 ```js title="playwright/fixtures.ts"
 import { test as base, type Page, type Locator } from '@playwright/test';
 
-// Page Object Model for the "admin" page.
-// Here you can add locators and helper methods specific to the admin page.
+// Модель объекта страницы для страницы "администратора".
+// Здесь вы можете добавить локаторы и вспомогательные методы, специфичные для страницы администратора.
 class AdminPage {
-  // Page signed in as "admin".
+  // Страница, аутентифицированная как "администратор".
   page: Page;
 
-  // Example locator pointing to "Welcome, Admin" greeting.
+  // Пример локатора, указывающего на приветствие "Добро пожаловать, Администратор".
   greeting: Locator;
 
   constructor(page: Page) {
@@ -436,13 +436,13 @@ class AdminPage {
   }
 }
 
-// Page Object Model for the "user" page.
-// Here you can add locators and helper methods specific to the user page.
+// Модель объекта страницы для страницы "пользователя".
+// Здесь вы можете добавить локаторы и вспомогательные методы, специфичные для страницы пользователя.
 class UserPage {
-  // Page signed in as "user".
+  // Страница, аутентифицированная как "пользователь".
   page: Page;
 
-  // Example locator pointing to "Welcome, User" greeting.
+  // Пример локатора, указывающего на приветствие "Добро пожаловать, Пользователь".
   greeting: Locator;
 
   constructor(page: Page) {
@@ -451,7 +451,7 @@ class UserPage {
   }
 }
 
-// Declare the types of your fixtures.
+// Объявите типы ваших фикстур.
 type MyFixtures = {
   adminPage: AdminPage;
   userPage: UserPage;
@@ -472,31 +472,30 @@ export const test = base.extend<MyFixtures>({
     await context.close();
   },
 });
-
 ```
 
 ```js title="tests/example.spec.ts"
-// Import test with our new fixtures.
+// Импортируйте тест с нашими новыми фиктурами.
 import { test, expect } from '../playwright/fixtures';
 
-// Use adminPage and userPage fixtures in the test.
+// Используйте фикстуры adminPage и userPage в тесте.
 test('admin and user', async ({ adminPage, userPage }) => {
-  // ... interact with both adminPage and userPage ...
-  await expect(adminPage.greeting).toHaveText('Welcome, Admin');
-  await expect(userPage.greeting).toHaveText('Welcome, User');
+  // ... взаимодействуйте как с adminPage, так и с userPage ...
+  await expect(adminPage.greeting).toHaveText('Добро пожаловать, Администратор');
+  await expect(userPage.greeting).toHaveText('Добро пожаловать, Пользователь');
 });
 ```
 
-### Session storage
+### Хранение сессии
 
-Reusing authenticated state covers [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies), [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage) and [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) based authentication. Rarely, [session storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) is used for storing information associated with the signed-in state. Session storage is specific to a particular domain and is not persisted across page loads. Playwright does not provide API to persist session storage, but the following snippet can be used to save/load session storage.
+Повторное использование аутентифицированного состояния охватывает [куки](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies), [локальное хранилище](https://developer.mozilla.org/en-US/docs/Web/API/Storage) и [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) на основе аутентификации. Редко [сессионное хранилище](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) используется для хранения информации, связанной с состоянием входа. Сессионное хранилище специфично для конкретного домена и не сохраняется между загрузками страниц. Playwright не предоставляет API для сохранения сессионного хранилища, но следующий фрагмент может быть использован для сохранения/загрузки сессионного хранилища.
 
 ```js
-// Get session storage and store as env variable
+// Получите сессионное хранилище и сохраните как переменную окружения
 const sessionStorage = await page.evaluate(() => JSON.stringify(sessionStorage));
 fs.writeFileSync('playwright/.auth/session.json', sessionStorage, 'utf-8');
 
-// Set session storage in a new context
+// Установите сессионное хранилище в новом контексте
 const sessionStorage = JSON.parse(fs.readFileSync('playwright/.auth/session.json', 'utf-8'));
 await context.addInitScript(storage => {
   if (window.location.hostname === 'example.com') {
@@ -506,14 +505,14 @@ await context.addInitScript(storage => {
 }, sessionStorage);
 ```
 
-### Avoid authentication in some tests
+### Избегание аутентификации в некоторых тестах
 
-You can reset storage state in a test file to avoid authentication that was set up for the whole project.
+Вы можете сбросить состояние хранения в тестовом файле, чтобы избежать аутентификации, которая была настроена для всего проекта.
 
 ```js title="not-signed-in.spec.ts"
 import { test } from '@playwright/test';
 
-// Reset storage state for this file to avoid being authenticated
+// Сбросьте состояние хранения для этого файла, чтобы избежать аутентификации
 test.use({ storageState: { cookies: [], origins: [] } });
 
 test('not signed in test', async ({ page }) => {
@@ -521,8 +520,7 @@ test('not signed in test', async ({ page }) => {
 });
 ```
 
-
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+[Accessibility]: /api/class-accessibility.mdx "Доступность"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
@@ -590,40 +588,36 @@ test('not signed in test', async ({ page }) => {
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
 [TestStep]: /api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Элемент"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Итератор"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Происхождение"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "селектор"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Сериализуемый"
 [UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
-[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Массив"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Логический"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Буфер"
+[ChildProcess]: https://nodejs.org/api/child_process.html "Дочерний процесс"
+[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Дата"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Ошибка"
 [EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Функция"
 [FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Карта"
+[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Объект&lt;строка, любой&gt;"
 [null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Число"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Объект"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Читаемый"
+[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "Читаемый поток"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "Регулярное выражение"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "строка"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
-
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
-[Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

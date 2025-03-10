@@ -1,18 +1,18 @@
 ---
 id: touch-events
-title: "Touch events (legacy)"
+title: "События касания (устаревшие)"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Web applications that handle legacy [touch events](https://developer.mozilla.org/en-US/docs/Web/API/Touch_events) to respond to gestures like swipe, pinch, and tap can be tested by manually dispatching [TouchEvent](https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/TouchEvent)s to the page. The examples below demonstrate how to use [locator.dispatchEvent()](/api/class-locator.mdx#locator-dispatch-event) and pass [Touch](https://developer.mozilla.org/en-US/docs/Web/API/Touch) points as arguments.
+Веб-приложения, которые обрабатывают устаревшие [события касания](https://developer.mozilla.org/en-US/docs/Web/API/Touch_events) для реагирования на жесты, такие как смахивание, сжатие и нажатие, могут быть протестированы путем ручной отправки [TouchEvent](https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/TouchEvent)s на страницу. Примеры ниже демонстрируют, как использовать [locator.dispatchEvent()](/api/class-locator.mdx#locator-dispatch-event) и передавать [Touch](https://developer.mozilla.org/en-US/docs/Web/API/Touch) точки в качестве аргументов.
 
-### Emulating pan gesture
+### Эмуляция жеста панорамирования
 
-In the example below, we emulate pan gesture that is expected to move the map. The app under test only uses `clientX/clientY` coordinates of the touch point, so we initialize just that. In a more complex scenario you may need to also set `pageX/pageY/screenX/screenY`, if your app needs them.
+В приведенном ниже примере мы эмулируем жест панорамирования, который должен переместить карту. Приложение, которое мы тестируем, использует только координаты `clientX/clientY` точки касания, поэтому мы инициализируем только их. В более сложном сценарии вам может потребоваться также установить `pageX/pageY/screenX/screenY`, если ваше приложение требует их.
 
 ```js
 import { test, expect, devices, type Locator } from '@playwright/test';
@@ -27,7 +27,7 @@ async function pan(locator: Locator, deltaX?: number, deltaY?: number, steps?: n
     return { centerX, centerY };
   });
 
-  // Providing only clientX and clientY as the app only cares about those.
+  // Предоставляем только clientX и clientY, так как приложение заботится только об этом.
   const touches = [{
     identifier: 0,
     clientX: centerX,
@@ -52,23 +52,23 @@ async function pan(locator: Locator, deltaX?: number, deltaY?: number, steps?: n
   await locator.dispatchEvent('touchend');
 }
 
-test(`pan gesture to move the map`, async ({ page }) => {
+test(`жест панорамирования для перемещения карты`, async ({ page }) => {
   await page.goto('https://www.google.com/maps/place/@37.4117722,-122.0713234,15z',
       { waitUntil: 'commit' });
-  await page.getByRole('button', { name: 'Keep using web' }).click();
-  await expect(page.getByRole('button', { name: 'Keep using web' })).not.toBeVisible();
-  // Get the map element.
+  await page.getByRole('button', { name: 'Продолжить использование веба' }).click();
+  await expect(page.getByRole('button', { name: 'Продолжить использование веба' })).not.toBeVisible();
+  // Получаем элемент карты.
   const met = page.locator('[data-test-id="met"]');
   for (let i = 0; i < 5; i++)
     await pan(met, 200, 100);
-  // Ensure the map has been moved.
+  // Убедитесь, что карта была перемещена.
   await expect(met).toHaveScreenshot();
 });
 ```
 
-### Emulating pinch gesture
+### Эмуляция жеста сжатия
 
-In the example below, we emulate pinch gesture, i.e. two touch points moving closer to each other. It is expected to zoom out the map. The app under test only uses `clientX/clientY` coordinates of touch points, so we initialize just that. In a more complex scenario you may need to also set `pageX/pageY/screenX/screenY`, if your app needs them.
+В приведенном ниже примере мы эмулируем жест сжатия, т.е. два касания, которые приближаются друг к другу. Ожидается, что это уменьшит масштаб карты. Приложение, которое мы тестируем, использует только координаты `clientX/clientY` точек касания, поэтому мы инициализируем только их. В более сложном сценарии вам может потребоваться также установить `pageX/pageY/screenX/screenY`, если ваше приложение требует их.
 
 ```js
 import { test, expect, devices, type Locator } from '@playwright/test';
@@ -88,7 +88,7 @@ async function pinch(locator: Locator,
   const steps = arg.steps ?? 5;
   const stepDeltaX = deltaX / (steps + 1);
 
-  // Two touch points equally distant from the center of the element.
+  // Два касания, равномерно удаленные от центра элемента.
   const touches = [
     {
       identifier: 0,
@@ -104,7 +104,7 @@ async function pinch(locator: Locator,
   await locator.dispatchEvent('touchstart',
       { touches, changedTouches: touches, targetTouches: touches });
 
-  // Move the touch points towards or away from each other.
+  // Перемещаем точки касания ближе или дальше друг от друга.
   for (let i = 1; i <= steps; i++) {
     const offset = (arg.direction === 'in' ? (deltaX - i * stepDeltaX) : (stepDeltaX * (i + 1)));
     const touches = [
@@ -114,7 +114,7 @@ async function pinch(locator: Locator,
         clientY: centerY,
       },
       {
-        identifier: 0,
+        identifier: 1,
         clientX: centerX + offset,
         clientY: centerY,
       },
@@ -126,22 +126,22 @@ async function pinch(locator: Locator,
   await locator.dispatchEvent('touchend', { touches: [], changedTouches: [], targetTouches: [] });
 }
 
-test(`pinch in gesture to zoom out the map`, async ({ page }) => {
+test(`жест сжатия для уменьшения масштаба карты`, async ({ page }) => {
   await page.goto('https://www.google.com/maps/place/@37.4117722,-122.0713234,15z',
       { waitUntil: 'commit' });
-  await page.getByRole('button', { name: 'Keep using web' }).click();
-  await expect(page.getByRole('button', { name: 'Keep using web' })).not.toBeVisible();
-  // Get the map element.
+  await page.getByRole('button', { name: 'Продолжить использование веба' }).click();
+  await expect(page.getByRole('button', { name: 'Продолжить использование веба' })).not.toBeVisible();
+  // Получаем элемент карты.
   const met = page.locator('[data-test-id="met"]');
   for (let i = 0; i < 5; i++)
     await pinch(met, { deltaX: 40, direction: 'in' });
-  // Ensure the map has been zoomed out.
+  // Убедитесь, что карта была уменьшена.
   await expect(met).toHaveScreenshot();
 });
 ```
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+[Accessibility]: /api/class-accessibility.mdx "Доступность"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
@@ -209,13 +209,13 @@ test(`pinch in gesture to zoom out the map`, async ({ page }) => {
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
 [TestStep]: /api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Элемент"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Итератор"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Происхождение"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "селектор"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Сериализуемый"
 [UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
@@ -243,6 +243,6 @@ test(`pinch in gesture to zoom out the map`, async ({ page }) => {
 [URL]: https://nodejs.org/api/url.html "URL"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
+[все доступные теги изображений]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"
 [Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
 [Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

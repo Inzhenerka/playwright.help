@@ -6,10 +6,9 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+Тестовый раннер уведомляет репортер о различных событиях во время выполнения тестов. Все методы репортера являются необязательными.
 
-Test runner notifies the reporter about various events during test execution. All methods of the reporter are optional.
-
-You can create a custom reporter by implementing a class with some of the reporter methods. Make sure to export this class as default.
+Вы можете создать пользовательский репортер, реализовав класс с некоторыми методами репортера. Убедитесь, что вы экспортируете этот класс по умолчанию.
 
 <Tabs
   groupId="js-flavor"
@@ -28,23 +27,23 @@ import type {
 
 class MyReporter implements Reporter {
   constructor(options: { customOption?: string } = {}) {
-    console.log(`my-awesome-reporter setup with customOption set to ${options.customOption}`);
+    console.log(`my-awesome-reporter настроен с customOption равным ${options.customOption}`);
   }
 
   onBegin(config: FullConfig, suite: Suite) {
-    console.log(`Starting the run with ${suite.allTests().length} tests`);
+    console.log(`Запуск с ${suite.allTests().length} тестами`);
   }
 
   onTestBegin(test: TestCase) {
-    console.log(`Starting test ${test.title}`);
+    console.log(`Запуск теста ${test.title}`);
   }
 
   onTestEnd(test: TestCase, result: TestResult) {
-    console.log(`Finished test ${test.title}: ${result.status}`);
+    console.log(`Завершен тест ${test.title}: ${result.status}`);
   }
 
   onEnd(result: FullResult) {
-    console.log(`Finished the run: ${result.status}`);
+    console.log(`Завершен запуск: ${result.status}`);
   }
 }
 export default MyReporter;
@@ -59,23 +58,23 @@ export default MyReporter;
 /** @implements {import('@playwright/test/reporter').Reporter} */
 class MyReporter {
   constructor(options) {
-    console.log(`my-awesome-reporter setup with customOption set to ${options.customOption}`);
+    console.log(`my-awesome-reporter настроен с customOption равным ${options.customOption}`);
   }
 
   onBegin(config, suite) {
-    console.log(`Starting the run with ${suite.allTests().length} tests`);
+    console.log(`Запуск с ${suite.allTests().length} тестами`);
   }
 
   onTestBegin(test) {
-    console.log(`Starting test ${test.title}`);
+    console.log(`Запуск теста ${test.title}`);
   }
 
   onTestEnd(test, result) {
-    console.log(`Finished test ${test.title}: ${result.status}`);
+    console.log(`Завершен тест ${test.title}: ${result.status}`);
   }
 
   onEnd(result) {
-    console.log(`Finished the run: ${result.status}`);
+    console.log(`Завершен запуск: ${result.status}`);
   }
 }
 
@@ -85,7 +84,7 @@ module.exports = MyReporter;
 </TabItem>
 </Tabs>
 
-Now use this reporter with [testConfig.reporter](/api/class-testconfig.mdx#test-config-reporter). Learn more about [using reporters](../test-reporters.mdx).
+Теперь используйте этот репортер с [testConfig.reporter](/api/class-testconfig.mdx#test-config-reporter). Узнайте больше о [использовании репортеров](../test-reporters.mdx).
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -95,282 +94,279 @@ export default defineConfig({
 });
 ```
 
-Here is a typical order of reporter calls:
-* [reporter.onBegin()](/api/class-reporter.mdx#reporter-on-begin) is called once with a root suite that contains all other suites and tests. Learn more about [suites hierarchy][Suite].
-* [reporter.onTestBegin()](/api/class-reporter.mdx#reporter-on-test-begin) is called for each test run. It is given a [TestCase] that is executed, and a [TestResult] that is almost empty. Test result will be populated while the test runs (for example, with steps and stdio) and will get final `status` once the test finishes.
-* [reporter.onStepBegin()](/api/class-reporter.mdx#reporter-on-step-begin) and [reporter.onStepEnd()](/api/class-reporter.mdx#reporter-on-step-end) are called for each executed step inside the test. When steps are executed, test run has not finished yet.
-* [reporter.onTestEnd()](/api/class-reporter.mdx#reporter-on-test-end) is called when test run has finished. By this time, [TestResult] is complete and you can use [testResult.status](/api/class-testresult.mdx#test-result-status), [testResult.error](/api/class-testresult.mdx#test-result-error) and more.
-* [reporter.onEnd()](/api/class-reporter.mdx#reporter-on-end) is called once after all tests that should run had finished.
-* [reporter.onExit()](/api/class-reporter.mdx#reporter-on-exit) is called immediately before the test runner exits.
+Вот типичный порядок вызовов репортера:
+* [reporter.onBegin()](/api/class-reporter.mdx#reporter-on-begin) вызывается один раз с корневым набором, который содержит все остальные наборы и тесты. Узнайте больше о [иерархии наборов][Suite].
+* [reporter.onTestBegin()](/api/class-reporter.mdx#reporter-on-test-begin) вызывается для каждого запуска теста. Ему передается [TestCase], который выполняется, и [TestResult], который почти пуст. Результат теста будет заполняться во время выполнения теста (например, шагами и стандартным выводом) и получит окончательный `status`, как только тест завершится.
+* [reporter.onStepBegin()](/api/class-reporter.mdx#reporter-on-step-begin) и [reporter.onStepEnd()](/api/class-reporter.mdx#reporter-on-step-end) вызываются для каждого выполненного шага внутри теста. Когда шаги выполняются, запуск теста еще не завершен.
+* [reporter.onTestEnd()](/api/class-reporter.mdx#reporter-on-test-end) вызывается, когда запуск теста завершен. К этому времени [TestResult] завершен, и вы можете использовать [testResult.status](/api/class-testresult.mdx#test-result-status), [testResult.error](/api/class-testresult.mdx#test-result-error) и другие.
+* [reporter.onEnd()](/api/class-reporter.mdx#reporter-on-end) вызывается один раз после завершения всех тестов, которые должны были выполниться.
+* [reporter.onExit()](/api/class-reporter.mdx#reporter-on-exit) вызывается немедленно перед выходом тестового раннера.
 
-Additionally, [reporter.onStdOut()](/api/class-reporter.mdx#reporter-on-std-out) and [reporter.onStdErr()](/api/class-reporter.mdx#reporter-on-std-err) are called when standard output is produced in the worker process, possibly during a test execution, and [reporter.onError()](/api/class-reporter.mdx#reporter-on-error) is called when something went wrong outside of the test execution.
+Кроме того, [reporter.onStdOut()](/api/class-reporter.mdx#reporter-on-std-out) и [reporter.onStdErr()](/api/class-reporter.mdx#reporter-on-std-err) вызываются, когда стандартный вывод производится в рабочем процессе, возможно, во время выполнения теста, а [reporter.onError()](/api/class-reporter.mdx#reporter-on-error) вызывается, когда что-то пошло не так вне выполнения теста.
 
-If your custom reporter does not print anything to the terminal, implement [reporter.printsToStdio()](/api/class-reporter.mdx#reporter-prints-to-stdio) and return `false`. This way, Playwright will use one of the standard terminal reporters in addition to your custom reporter to enhance user experience.
+Если ваш пользовательский репортер ничего не выводит в терминал, реализуйте [reporter.printsToStdio()](/api/class-reporter.mdx#reporter-prints-to-stdio) и верните `false`. Таким образом, Playwright будет использовать один из стандартных терминальных репортеров в дополнение к вашему пользовательскому репортеру для улучшения пользовательского опыта.
 
-**Merged report API notes**
+**Примечания по API объединенного отчета**
 
-When merging multiple [`blob`](../test-reporters#blob-reporter) reports via [`merge-reports`](../test-sharding#merge-reports-cli) CLI command, the same [Reporter] API is called to produce final reports and all existing reporters should work without any changes. There some subtle differences though which might affect some custom reporters.
-* Projects from different shards are always kept as separate [TestProject] objects. E.g. if project 'Desktop Chrome' was sharded across 5 machines then there will be 5 instances of projects with the same name in the config passed to [reporter.onBegin()](/api/class-reporter.mdx#reporter-on-begin).
-
+При объединении нескольких [`blob`](../test-reporters#blob-reporter) отчетов через команду CLI [`merge-reports`](../test-sharding#merge-reports-cli) вызывается тот же [Reporter] API для создания окончательных отчетов, и все существующие репортеры должны работать без каких-либо изменений. Однако есть некоторые тонкие различия, которые могут повлиять на некоторые пользовательские репортеры.
+* Проекты из разных шардов всегда остаются отдельными [TestProject] объектами. Например, если проект 'Desktop Chrome' был разделен на 5 машин, то в конфигурации, переданной в [reporter.onBegin()](/api/class-reporter.mdx#reporter-on-begin), будет 5 экземпляров проектов с одинаковым именем.
 
 ---
 
-## Methods
+## Методы
 
 ### onBegin {#reporter-on-begin}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>reporter.onBegin</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onBegin</x-search>
 
-Called once before running tests. All tests have been already discovered and put into a hierarchy of [Suite]s.
+Вызывается один раз перед запуском тестов. Все тесты уже были обнаружены и помещены в иерархию [Suite]ов.
 
-**Usage**
+**Использование**
 
 ```js
 reporter.onBegin(config, suite);
 ```
 
-**Arguments**
+**Аргументы**
 - `config` [FullConfig]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-begin-option-config"/><a href="#reporter-on-begin-option-config" class="list-anchor">#</a>
   
-  Resolved configuration.
+  Разрешенная конфигурация.
 - `suite` [Suite]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-begin-option-suite"/><a href="#reporter-on-begin-option-suite" class="list-anchor">#</a>
   
-  The root suite that contains all projects, files and test cases.
+  Корневой набор, который содержит все проекты, файлы и тестовые случаи.
 
 ---
 
 ### onEnd {#reporter-on-end}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>reporter.onEnd</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onEnd</x-search>
 
-Called after all tests have been run, or testing has been interrupted. Note that this method may return a [Promise] and Playwright Test will await it. Reporter is allowed to override the status and hence affect the exit code of the test runner.
+Вызывается после того, как все тесты были выполнены, или тестирование было прервано. Обратите внимание, что этот метод может возвращать [Promise], и Playwright Test будет ожидать его. Репортер может переопределить статус и, таким образом, повлиять на код выхода тестового раннера.
 
-**Usage**
+**Использование**
 
 ```js
 await reporter.onEnd(result);
 ```
 
-**Arguments**
+**Аргументы**
 - `result` [Object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-end-option-result"/><a href="#reporter-on-end-option-result" class="list-anchor">#</a>
   - `status` "passed" | "failed" | "timedout" | "interrupted"
     
-    Test run status.
+    Статус выполнения теста.
   - `startTime` [Date]
     
-    Test run start wall time.
+    Время начала выполнения теста.
   - `duration` [number]
     
-    Test run duration in milliseconds.
+    Длительность выполнения теста в миллисекундах.
   
-  Result of the full test run, `status` can be one of:
-  * `'passed'` - Everything went as expected.
-  * `'failed'` - Any test has failed.
-  * `'timedout'` - The [testConfig.globalTimeout](/api/class-testconfig.mdx#test-config-global-timeout) has been reached.
-  * `'interrupted'` - Interrupted by the user.
+  Результат полного выполнения теста, `status` может быть одним из:
+  * `'passed'` - Все прошло как ожидалось.
+  * `'failed'` - Любой тест не прошел.
+  * `'timedout'` - Достигнут [testConfig.globalTimeout](/api/class-testconfig.mdx#test-config-global-timeout).
+  * `'interrupted'` - Прерван пользователем.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-end-return"/><a href="#reporter-on-end-return" class="list-anchor">#</a>
-  - `status` "passed" | "failed" | "timedout" | "interrupted" *(optional)*
-    
-    
+  - `status` "passed" | "failed" | "timedout" | "interrupted" *(необязательно)*
+
 ---
 
 ### onError {#reporter-on-error}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>reporter.onError</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onError</x-search>
 
-Called on some global error, for example unhandled exception in the worker process.
+Вызывается при возникновении глобальной ошибки, например, необработанного исключения в рабочем процессе.
 
-**Usage**
+**Использование**
 
 ```js
 reporter.onError(error);
 ```
 
-**Arguments**
+**Аргументы**
 - `error` [TestError]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-error-option-error"/><a href="#reporter-on-error-option-error" class="list-anchor">#</a>
   
-  The error.
+  Ошибка.
 
 ---
 
 ### onExit {#reporter-on-exit}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.33</font><x-search>reporter.onExit</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.33</font><x-search>reporter.onExit</x-search>
 
-Called immediately before test runner exists. At this point all the reporters have received the [reporter.onEnd()](/api/class-reporter.mdx#reporter-on-end) signal, so all the reports should be build. You can run the code that uploads the reports in this hook.
+Вызывается немедленно перед выходом тестового раннера. На этом этапе все репортеры получили сигнал [reporter.onEnd()](/api/class-reporter.mdx#reporter-on-end), поэтому все отчеты должны быть собраны. Вы можете выполнить код, который загружает отчеты в этом хуке.
 
-**Usage**
+**Использование**
 
 ```js
 await reporter.onExit();
 ```
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-exit-return"/><a href="#reporter-on-exit-return" class="list-anchor">#</a>
 
 ---
 
 ### onStdErr {#reporter-on-std-err}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>reporter.onStdErr</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onStdErr</x-search>
 
-Called when something has been written to the standard error in the worker process.
+Вызывается, когда что-то было записано в стандартный поток ошибок в рабочем процессе.
 
-**Usage**
+**Использование**
 
 ```js
 reporter.onStdErr(chunk, test, result);
 ```
 
-**Arguments**
+**Аргументы**
 - `chunk` [string] | [Buffer]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-std-err-option-chunk"/><a href="#reporter-on-std-err-option-chunk" class="list-anchor">#</a>
   
-  Output chunk.
+  Часть вывода.
 - `test` [void] | [TestCase]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-std-err-option-test"/><a href="#reporter-on-std-err-option-test" class="list-anchor">#</a>
   
-  Test that was running. Note that output may happen when no test is running, in which case this will be [void].
+  Тест, который выполнялся. Обратите внимание, что вывод может происходить, когда ни один тест не выполняется, в этом случае это будет [void].
 - `result` [void] | [TestResult]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-std-err-option-result"/><a href="#reporter-on-std-err-option-result" class="list-anchor">#</a>
   
-  Result of the test run, this object gets populated while the test runs.
+  Результат выполнения теста, этот объект заполняется во время выполнения теста.
 
 ---
 
 ### onStdOut {#reporter-on-std-out}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>reporter.onStdOut</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onStdOut</x-search>
 
-Called when something has been written to the standard output in the worker process.
+Вызывается, когда что-то было записано в стандартный поток вывода в рабочем процессе.
 
-**Usage**
+**Использование**
 
 ```js
 reporter.onStdOut(chunk, test, result);
 ```
 
-**Arguments**
+**Аргументы**
 - `chunk` [string] | [Buffer]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-std-out-option-chunk"/><a href="#reporter-on-std-out-option-chunk" class="list-anchor">#</a>
   
-  Output chunk.
+  Часть вывода.
 - `test` [void] | [TestCase]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-std-out-option-test"/><a href="#reporter-on-std-out-option-test" class="list-anchor">#</a>
   
-  Test that was running. Note that output may happen when no test is running, in which case this will be [void].
+  Тест, который выполнялся. Обратите внимание, что вывод может происходить, когда ни один тест не выполняется, в этом случае это будет [void].
 - `result` [void] | [TestResult]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-std-out-option-result"/><a href="#reporter-on-std-out-option-result" class="list-anchor">#</a>
   
-  Result of the test run, this object gets populated while the test runs.
+  Результат выполнения теста, этот объект заполняется во время выполнения теста.
 
 ---
 
 ### onStepBegin {#reporter-on-step-begin}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>reporter.onStepBegin</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onStepBegin</x-search>
 
-Called when a test step started in the worker process.
+Вызывается, когда шаг теста начался в рабочем процессе.
 
-**Usage**
+**Использование**
 
 ```js
 reporter.onStepBegin(test, result, step);
 ```
 
-**Arguments**
+**Аргументы**
 - `test` [TestCase]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-step-begin-option-test"/><a href="#reporter-on-step-begin-option-test" class="list-anchor">#</a>
   
-  Test that the step belongs to.
+  Тест, к которому принадлежит шаг.
 - `result` [TestResult]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-step-begin-option-result"/><a href="#reporter-on-step-begin-option-result" class="list-anchor">#</a>
   
-  Result of the test run, this object gets populated while the test runs.
+  Результат выполнения теста, этот объект заполняется во время выполнения теста.
 - `step` [TestStep]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-step-begin-option-step"/><a href="#reporter-on-step-begin-option-step" class="list-anchor">#</a>
   
-  Test step instance that has started.
+  Экземпляр шага теста, который начался.
 
 ---
 
 ### onStepEnd {#reporter-on-step-end}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>reporter.onStepEnd</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onStepEnd</x-search>
 
-Called when a test step finished in the worker process.
+Вызывается, когда шаг теста завершен в рабочем процессе.
 
-**Usage**
+**Использование**
 
 ```js
 reporter.onStepEnd(test, result, step);
 ```
 
-**Arguments**
+**Аргументы**
 - `test` [TestCase]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-step-end-option-test"/><a href="#reporter-on-step-end-option-test" class="list-anchor">#</a>
   
-  Test that the step belongs to.
+  Тест, к которому принадлежит шаг.
 - `result` [TestResult]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-step-end-option-result"/><a href="#reporter-on-step-end-option-result" class="list-anchor">#</a>
   
-  Result of the test run.
+  Результат выполнения теста.
 - `step` [TestStep]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-step-end-option-step"/><a href="#reporter-on-step-end-option-step" class="list-anchor">#</a>
   
-  Test step instance that has finished.
+  Экземпляр шага теста, который завершился.
 
 ---
 
 ### onTestBegin {#reporter-on-test-begin}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>reporter.onTestBegin</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onTestBegin</x-search>
 
-Called after a test has been started in the worker process.
+Вызывается после того, как тест был запущен в рабочем процессе.
 
-**Usage**
+**Использование**
 
 ```js
 reporter.onTestBegin(test, result);
 ```
 
-**Arguments**
+**Аргументы**
 - `test` [TestCase]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-test-begin-option-test"/><a href="#reporter-on-test-begin-option-test" class="list-anchor">#</a>
   
-  Test that has been started.
+  Тест, который был запущен.
 - `result` [TestResult]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-test-begin-option-result"/><a href="#reporter-on-test-begin-option-result" class="list-anchor">#</a>
   
-  Result of the test run, this object gets populated while the test runs.
+  Результат выполнения теста, этот объект заполняется во время выполнения теста.
 
 ---
 
 ### onTestEnd {#reporter-on-test-end}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>reporter.onTestEnd</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onTestEnd</x-search>
 
-Called after a test has been finished in the worker process.
+Вызывается после того, как тест был завершен в рабочем процессе.
 
-**Usage**
+**Использование**
 
 ```js
 reporter.onTestEnd(test, result);
 ```
 
-**Arguments**
+**Аргументы**
 - `test` [TestCase]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-test-end-option-test"/><a href="#reporter-on-test-end-option-test" class="list-anchor">#</a>
   
-  Test that has been finished.
+  Тест, который был завершен.
 - `result` [TestResult]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-test-end-option-result"/><a href="#reporter-on-test-end-option-result" class="list-anchor">#</a>
   
-  Result of the test run.
+  Результат выполнения теста.
 
 ---
 
 ### printsToStdio {#reporter-prints-to-stdio}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>reporter.printsToStdio</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.printsToStdio</x-search>
 
-Whether this reporter uses stdio for reporting. When it does not, Playwright Test could add some output to enhance user experience. If your reporter does not print to the terminal, it is strongly recommended to return `false`.
+Указывает, использует ли этот репортер стандартный ввод-вывод для отчетности. Если он этого не делает, Playwright Test может добавить некоторый вывод для улучшения пользовательского опыта. Если ваш репортер не выводит в терминал, настоятельно рекомендуется вернуть `false`.
 
-**Usage**
+**Использование**
 
 ```js
 reporter.printsToStdio();
 ```
 
-**Returns**
+**Возвращает**
 - [boolean]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-prints-to-stdio-return"/><a href="#reporter-prints-to-stdio-return" class="list-anchor">#</a>
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
@@ -474,6 +470,6 @@ reporter.printsToStdio();
 [URL]: https://nodejs.org/api/url.html "URL"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
+[все доступные теги изображений]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"
+[Регистр артефактов Microsoft]: https://mcr.microsoft.com/en-us/product/playwright/about "Регистр артефактов Microsoft"
 [Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

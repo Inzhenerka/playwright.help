@@ -1,18 +1,18 @@
 ---
 id: dialogs
-title: "Dialogs"
+title: "Диалоги"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright can interact with the web page dialogs such as [`alert`](https://developer.mozilla.org/en-US/docs/Web/API/Window/alert), [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm), [`prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt) as well as [`beforeunload`](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event) confirmation. For print dialogs, see [Print](#print-dialogs).
+Playwright может взаимодействовать с диалогами веб-страницы, такими как [`alert`](https://developer.mozilla.org/en-US/docs/Web/API/Window/alert), [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm), [`prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt), а также с подтверждением [`beforeunload`](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event). Для диалогов печати см. [Печать](#print-dialogs).
 
-## alert(), confirm(), prompt() dialogs
+## Диалоги alert(), confirm(), prompt()
 
-By default, dialogs are auto-dismissed by Playwright, so you don't have to handle them. However, you can register a dialog handler before the action that triggers the dialog to either [dialog.accept()](/api/class-dialog.mdx#dialog-accept) or [dialog.dismiss()](/api/class-dialog.mdx#dialog-dismiss) it.
+По умолчанию диалоги автоматически закрываются Playwright, поэтому вам не нужно их обрабатывать. Однако вы можете зарегистрировать обработчик диалогов перед действием, которое вызывает диалог, чтобы либо [dialog.accept()](/api/class-dialog.mdx#dialog-accept), либо [dialog.dismiss()](/api/class-dialog.mdx#dialog-dismiss) его.
 
 ```js
 page.on('dialog', dialog => dialog.accept());
@@ -20,30 +20,30 @@ await page.getByRole('button').click();
 ```
 
 :::note
-[page.on('dialog')](/api/class-page.mdx#page-event-dialog) listener **must handle** the dialog. Otherwise your action will stall, be it [locator.click()](/api/class-locator.mdx#locator-click) or something else. That's because dialogs in Web are modals and therefore block further page execution until they are handled.
+Слушатель [page.on('dialog')](/api/class-page.mdx#page-event-dialog) **должен обрабатывать** диалог. В противном случае ваше действие будет зависать, будь то [locator.click()](/api/class-locator.mdx#locator-click) или что-то другое. Это связано с тем, что диалоги в вебе являются модальными и, следовательно, блокируют дальнейшее выполнение страницы, пока они не будут обработаны.
 :::
 
-As a result, the following snippet will never resolve:
+В результате следующий фрагмент кода никогда не завершится:
 
 :::warning
 
-WRONG!
+НЕПРАВИЛЬНО!
 :::
 
 ```js
 page.on('dialog', dialog => console.log(dialog.message()));
-await page.getByRole('button').click(); // Will hang here
+await page.getByRole('button').click(); // Здесь будет зависание
 ```
 
 :::note
-If there is no listener for [page.on('dialog')](/api/class-page.mdx#page-event-dialog), all dialogs are automatically dismissed.
+Если для [page.on('dialog')](/api/class-page.mdx#page-event-dialog) нет слушателя, все диалоги автоматически закрываются.
 :::
 
-## beforeunload dialog
+## Диалог beforeunload
 
-When [page.close()](/api/class-page.mdx#page-close) is invoked with the truthy [runBeforeUnload](/api/class-page.mdx#page-close-option-run-before-unload) value, the page runs its unload handlers. This is the only case when [page.close()](/api/class-page.mdx#page-close) does not wait for the page to actually close, because it might be that the page stays open in the end of the operation.
+Когда вызывается [page.close()](/api/class-page.mdx#page-close) с истинным значением [runBeforeUnload](/api/class-page.mdx#page-close-option-run-before-unload), страница выполняет свои обработчики выгрузки. Это единственный случай, когда [page.close()](/api/class-page.mdx#page-close) не ждет фактического закрытия страницы, потому что в конце операции страница может остаться открытой.
 
-You can register a dialog handler to handle the `beforeunload` dialog yourself:
+Вы можете зарегистрировать обработчик диалогов, чтобы самостоятельно обработать диалог `beforeunload`:
 
 ```js
 page.on('dialog', async dialog => {
@@ -53,9 +53,9 @@ page.on('dialog', async dialog => {
 await page.close({ runBeforeUnload: true });
 ```
 
-## Print dialogs
+## Диалоги печати
 
-In order to assert that a print dialog via [`window.print`](https://developer.mozilla.org/en-US/docs/Web/API/Window/print) was triggered, you can use the following snippet:
+Чтобы подтвердить, что диалог печати через [`window.print`](https://developer.mozilla.org/en-US/docs/Web/API/Window/print) был вызван, вы можете использовать следующий фрагмент кода:
 
 ```js
 await page.goto('<url>');
@@ -66,111 +66,4 @@ await page.getByText('Print it!').click();
 await page.waitForFunction('window.waitForPrintDialog');
 ```
 
-This will wait for the print dialog to be opened after the button is clicked. Make sure to evaluate the script before clicking the button / after the page is loaded.
-
-
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
-[APIRequest]: /api/class-apirequest.mdx "APIRequest"
-[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
-[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
-[Browser]: /api/class-browser.mdx "Browser"
-[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
-[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
-[BrowserType]: /api/class-browsertype.mdx "BrowserType"
-[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
-[Clock]: /api/class-clock.mdx "Clock"
-[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
-[Coverage]: /api/class-coverage.mdx "Coverage"
-[Dialog]: /api/class-dialog.mdx "Dialog"
-[Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
-[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
-[FileChooser]: /api/class-filechooser.mdx "FileChooser"
-[Frame]: /api/class-frame.mdx "Frame"
-[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
-[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
-[JSHandle]: /api/class-jshandle.mdx "JSHandle"
-[Keyboard]: /api/class-keyboard.mdx "Keyboard"
-[Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
-[Logger]: /api/class-logger.mdx "Logger"
-[Mouse]: /api/class-mouse.mdx "Mouse"
-[Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
-[Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
-[Request]: /api/class-request.mdx "Request"
-[Response]: /api/class-response.mdx "Response"
-[Route]: /api/class-route.mdx "Route"
-[Selectors]: /api/class-selectors.mdx "Selectors"
-[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
-[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
-[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: /api/class-tracing.mdx "Tracing"
-[Video]: /api/class-video.mdx "Video"
-[WebError]: /api/class-weberror.mdx "WebError"
-[WebSocket]: /api/class-websocket.mdx "WebSocket"
-[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
-[Worker]: /api/class-worker.mdx "Worker"
-[Fixtures]: /api/class-fixtures.mdx "Fixtures"
-[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
-[FullProject]: /api/class-fullproject.mdx "FullProject"
-[Location]: /api/class-location.mdx "Location"
-[Test]: /api/class-test.mdx "Test"
-[TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestInfo]: /api/class-testinfo.mdx "TestInfo"
-[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
-[TestOptions]: /api/class-testoptions.mdx "TestOptions"
-[TestProject]: /api/class-testproject.mdx "TestProject"
-[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
-[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
-[Reporter]: /api/class-reporter.mdx "Reporter"
-[Suite]: /api/class-suite.mdx "Suite"
-[TestCase]: /api/class-testcase.mdx "TestCase"
-[TestError]: /api/class-testerror.mdx "TestError"
-[TestResult]: /api/class-testresult.mdx "TestResult"
-[TestStep]: /api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
-
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
-[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
-[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
-[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
-[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
-[URL]: https://nodejs.org/api/url.html "URL"
-[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
-
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
-[Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"
+Это будет ждать открытия диалога печати после нажатия кнопки. Убедитесь, что вы оценили скрипт перед нажатием кнопки / после загрузки страницы.

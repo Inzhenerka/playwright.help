@@ -6,118 +6,116 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+Этот API используется для тестирования веб-API. Вы можете использовать его для вызова API-эндпоинтов, настройки микросервисов, подготовки окружения или сервиса для вашего e2e теста.
 
-This API is used for the Web API testing. You can use it to trigger API endpoints, configure micro-services, prepare environment or the service to your e2e test.
+Каждый контекст браузера Playwright связан с экземпляром [APIRequestContext], который разделяет хранилище куки с контекстом браузера и может быть доступен через [browserContext.request](/api/class-browsercontext.mdx#browser-context-request) или [page.request](/api/class-page.mdx#page-request). Также возможно вручную создать новый экземпляр APIRequestContext, вызвав [apiRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context).
 
-Each Playwright browser context has associated with it [APIRequestContext] instance which shares cookie storage with the browser context and can be accessed via [browserContext.request](/api/class-browsercontext.mdx#browser-context-request) or [page.request](/api/class-page.mdx#page-request). It is also possible to create a new APIRequestContext instance manually by calling [apiRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context).
+**Управление куки**
 
-**Cookie management**
+[APIRequestContext], возвращаемый [browserContext.request](/api/class-browsercontext.mdx#browser-context-request) и [page.request](/api/class-page.mdx#page-request), разделяет хранилище куки с соответствующим [BrowserContext]. Каждый API-запрос будет иметь заголовок `Cookie`, заполненный значениями из контекста браузера. Если ответ API содержит заголовок `Set-Cookie`, он автоматически обновит куки [BrowserContext], и запросы, сделанные со страницы, будут их учитывать. Это означает, что если вы войдете в систему с помощью этого API, ваш e2e тест будет также авторизован и наоборот.
 
-[APIRequestContext] returned by [browserContext.request](/api/class-browsercontext.mdx#browser-context-request) and [page.request](/api/class-page.mdx#page-request) shares cookie storage with the corresponding [BrowserContext]. Each API request will have `Cookie` header populated with the values from the browser context. If the API response contains `Set-Cookie` header it will automatically update [BrowserContext] cookies and requests made from the page will pick them up. This means that if you log in using this API, your e2e test will be logged in and vice versa.
-
-If you want API requests to not interfere with the browser cookies you should create a new [APIRequestContext] by calling [apiRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context). Such `APIRequestContext` object will have its own isolated cookie storage.
-
+Если вы хотите, чтобы API-запросы не мешали куки браузера, вам следует создать новый [APIRequestContext], вызвав [apiRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context). Такой объект `APIRequestContext` будет иметь свое собственное изолированное хранилище куки.
 
 ---
 
-## Methods
+## Методы
 
 ### delete {#api-request-context-delete}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.delete</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.delete</x-search>
 
-Sends HTTP(S) [DELETE](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+Отправляет HTTP(S) [DELETE](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE) запрос и возвращает его ответ. Метод заполнит куки запроса из контекста и обновит куки контекста из ответа. Метод автоматически будет следовать за перенаправлениями.
 
-**Usage**
+**Использование**
 
 ```js
 await apiRequestContext.delete(url);
 await apiRequestContext.delete(url, options);
 ```
 
-**Arguments**
+**Аргументы**
 - `url` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-url"/><a href="#api-request-context-delete-option-url" class="list-anchor">#</a>
   
-  Target URL.
-- `options` [Object] *(optional)*
-  - `data` [string] | [Buffer] | [Serializable] *(optional)* <font size="2">Added in: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-data"/><a href="#api-request-context-delete-option-data" class="list-anchor">#</a>
+  Целевой URL.
+- `options` [Object] *(необязательно)*
+  - `data` [string] | [Buffer] | [Serializable] *(необязательно)* <font size="2">Добавлено в: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-data"/><a href="#api-request-context-delete-option-data" class="list-anchor">#</a>
     
-    Allows to set post data of the request. If the data parameter is an object, it will be serialized to json string and `content-type` header will be set to `application/json` if not explicitly set. Otherwise the `content-type` header will be set to `application/octet-stream` if not explicitly set.
-  - `failOnStatusCode` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-fail-on-status-code"/><a href="#api-request-context-delete-option-fail-on-status-code" class="list-anchor">#</a>
+    Позволяет установить данные поста запроса. Если параметр data является объектом, он будет сериализован в json-строку, и заголовок `content-type` будет установлен в `application/json`, если не установлен явно. В противном случае заголовок `content-type` будет установлен в `application/octet-stream`, если не установлен явно.
+  - `failOnStatusCode` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-fail-on-status-code"/><a href="#api-request-context-delete-option-fail-on-status-code" class="list-anchor">#</a>
     
-    Whether to throw on response codes other than 2xx and 3xx. By default response object is returned for all status codes.
-  - `form` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [FormData] *(optional)* <font size="2">Added in: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-form"/><a href="#api-request-context-delete-option-form" class="list-anchor">#</a>
+    Указывает, следует ли выбрасывать исключение при кодах ответа, отличных от 2xx и 3xx. По умолчанию объект ответа возвращается для всех кодов состояния.
+  - `form` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [FormData] *(необязательно)* <font size="2">Добавлено в: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-form"/><a href="#api-request-context-delete-option-form" class="list-anchor">#</a>
     
-    Provides an object that will be serialized as html form using `application/x-www-form-urlencoded` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `application/x-www-form-urlencoded` unless explicitly provided.
-  - `headers` [Object]&lt;[string], [string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-headers"/><a href="#api-request-context-delete-option-headers" class="list-anchor">#</a>
+    Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `application/x-www-form-urlencoded` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `application/x-www-form-urlencoded`, если не предоставлен явно.
+  - `headers` [Object]&lt;[string], [string]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-headers"/><a href="#api-request-context-delete-option-headers" class="list-anchor">#</a>
     
-    Allows to set HTTP headers. These headers will apply to the fetched request as well as any redirects initiated by it.
-  - `ignoreHTTPSErrors` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-ignore-https-errors"/><a href="#api-request-context-delete-option-ignore-https-errors" class="list-anchor">#</a>
+    Позволяет установить HTTP-заголовки. Эти заголовки будут применяться к запрашиваемому запросу, а также ко всем перенаправлениям, инициированным им.
+  - `ignoreHTTPSErrors` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-ignore-https-errors"/><a href="#api-request-context-delete-option-ignore-https-errors" class="list-anchor">#</a>
     
-    Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
-  - `maxRedirects` [number] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-max-redirects"/><a href="#api-request-context-delete-option-max-redirects" class="list-anchor">#</a>
+    Указывает, следует ли игнорировать ошибки HTTPS при отправке сетевых запросов. По умолчанию `false`.
+  - `maxRedirects` [number] *(необязательно)* <font size="2">Добавлено в: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-max-redirects"/><a href="#api-request-context-delete-option-max-redirects" class="list-anchor">#</a>
     
-    Maximum number of request redirects that will be followed automatically. An error will be thrown if the number is exceeded. Defaults to `20`. Pass `0` to not follow redirects.
-  - `maxRetries` [number] *(optional)* <font size="2">Added in: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-max-retries"/><a href="#api-request-context-delete-option-max-retries" class="list-anchor">#</a>
+    Максимальное количество перенаправлений запросов, которые будут автоматически выполнены. Ошибка будет выброшена, если количество превышено. По умолчанию `20`. Передайте `0`, чтобы не следовать за перенаправлениями.
+  - `maxRetries` [number] *(необязательно)* <font size="2">Добавлено в: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-max-retries"/><a href="#api-request-context-delete-option-max-retries" class="list-anchor">#</a>
     
-    Maximum number of times network errors should be retried. Currently only `ECONNRESET` error is retried. Does not retry based on HTTP response codes. An error will be thrown if the limit is exceeded. Defaults to `0` - no retries.
-  - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(optional)* <font size="2">Added in: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-multipart"/><a href="#api-request-context-delete-option-multipart" class="list-anchor">#</a>
+    Максимальное количество раз, которое следует повторить сетевые ошибки. В настоящее время повторяется только ошибка `ECONNRESET`. Не повторяет на основе кодов ответа HTTP. Ошибка будет выброшена, если лимит превышен. По умолчанию `0` - без повторов.
+  - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(необязательно)* <font size="2">Добавлено в: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-multipart"/><a href="#api-request-context-delete-option-multipart" class="list-anchor">#</a>
     - `name` [string]
       
-      File name
+      Имя файла
     - `mimeType` [string]
       
-      File type
+      Тип файла
     - `buffer` [Buffer]
       
-      File content
+      Содержимое файла
     
-    Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content.
-  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-params"/><a href="#api-request-context-delete-option-params" class="list-anchor">#</a>
+    Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `multipart/form-data` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `multipart/form-data`, если не предоставлен явно. Значения файлов могут быть переданы либо как [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream), либо как объект, похожий на файл, содержащий имя файла, mime-тип и его содержимое.
+  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-params"/><a href="#api-request-context-delete-option-params" class="list-anchor">#</a>
     
-    Query parameters to be sent with the URL.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-timeout"/><a href="#api-request-context-delete-option-timeout" class="list-anchor">#</a>
+    Параметры запроса, которые будут отправлены с URL.
+  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-timeout"/><a href="#api-request-context-delete-option-timeout" class="list-anchor">#</a>
     
-    Request timeout in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
+    Таймаут запроса в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить таймаут.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[APIResponse]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-return"/><a href="#api-request-context-delete-return" class="list-anchor">#</a>
 
 ---
 
 ### dispose {#api-request-context-dispose}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.dispose</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.dispose</x-search>
 
-All responses returned by [apiRequestContext.get()](/api/class-apirequestcontext.mdx#api-request-context-get) and similar methods are stored in the memory, so that you can later call [apiResponse.body()](/api/class-apiresponse.mdx#api-response-body).This method discards all its resources, calling any method on disposed [APIRequestContext] will throw an exception.
+Все ответы, возвращаемые [apiRequestContext.get()](/api/class-apirequestcontext.mdx#api-request-context-get) и аналогичными методами, хранятся в памяти, чтобы вы могли позже вызвать [apiResponse.body()](/api/class-apiresponse.mdx#api-response-body). Этот метод отбрасывает все свои ресурсы, вызов любого метода на утилизированном [APIRequestContext] вызовет исключение.
 
-**Usage**
+**Использование**
 
 ```js
 await apiRequestContext.dispose();
 await apiRequestContext.dispose(options);
 ```
 
-**Arguments**
-- `options` [Object] *(optional)*
-  - `reason` [string] *(optional)* <font size="2">Added in: v1.45</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-dispose-option-reason"/><a href="#api-request-context-dispose-option-reason" class="list-anchor">#</a>
+**Аргументы**
+- `options` [Object] *(необязательно)*
+  - `reason` [string] *(необязательно)* <font size="2">Добавлено в: v1.45</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-dispose-option-reason"/><a href="#api-request-context-dispose-option-reason" class="list-anchor">#</a>
     
-    The reason to be reported to the operations interrupted by the context disposal.
+    Причина, которая будет сообщена о действиях, прерванных утилизацией контекста.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-dispose-return"/><a href="#api-request-context-dispose-return" class="list-anchor">#</a>
 
 ---
 
 ### fetch {#api-request-context-fetch}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.fetch</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.fetch</x-search>
 
-Sends HTTP(S) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+Отправляет HTTP(S) запрос и возвращает его ответ. Метод заполнит куки запроса из контекста и обновит куки контекста из ответа. Метод автоматически будет следовать за перенаправлениями.
 
-**Usage**
+**Использование**
 
-JSON objects can be passed directly to the request:
+JSON-объекты могут быть переданы напрямую в запрос:
 
 ```js
 await request.fetch('https://example.com/api/createBook', {
@@ -129,13 +127,13 @@ await request.fetch('https://example.com/api/createBook', {
 });
 ```
 
-The common way to send file(s) in the body of a request is to upload them as form fields with `multipart/form-data` encoding, by specifiying the `multipart` parameter:
+Общий способ отправки файла(ов) в теле запроса - это загрузка их в качестве полей формы с кодировкой `multipart/form-data`, указав параметр `multipart`:
 
 ```js
 const form = new FormData();
 form.set('name', 'John');
 form.append('name', 'Doe');
-// Send two file fields with the same name.
+// Отправить два поля файла с одним и тем же именем.
 form.append('file', new File(['console.log(2024);'], 'f1.js', { type: 'text/javascript' }));
 form.append('file', new File(['hello'], 'f2.txt', { type: 'text/plain' }));
 await request.fetch('https://example.com/api/uploadForm', {
@@ -143,71 +141,71 @@ await request.fetch('https://example.com/api/uploadForm', {
 });
 ```
 
-**Arguments**
+**Аргументы**
 - `urlOrRequest` [string] | [Request]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-url-or-request"/><a href="#api-request-context-fetch-option-url-or-request" class="list-anchor">#</a>
   
-  Target URL or Request to get all parameters from.
-- `options` [Object] *(optional)*
-  - `data` [string] | [Buffer] | [Serializable] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-data"/><a href="#api-request-context-fetch-option-data" class="list-anchor">#</a>
+  Целевой URL или запрос, из которого будут получены все параметры.
+- `options` [Object] *(необязательно)*
+  - `data` [string] | [Buffer] | [Serializable] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-data"/><a href="#api-request-context-fetch-option-data" class="list-anchor">#</a>
     
-    Allows to set post data of the request. If the data parameter is an object, it will be serialized to json string and `content-type` header will be set to `application/json` if not explicitly set. Otherwise the `content-type` header will be set to `application/octet-stream` if not explicitly set.
-  - `failOnStatusCode` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-fail-on-status-code"/><a href="#api-request-context-fetch-option-fail-on-status-code" class="list-anchor">#</a>
+    Позволяет установить данные поста запроса. Если параметр data является объектом, он будет сериализован в json-строку, и заголовок `content-type` будет установлен в `application/json`, если не установлен явно. В противном случае заголовок `content-type` будет установлен в `application/octet-stream`, если не установлен явно.
+  - `failOnStatusCode` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-fail-on-status-code"/><a href="#api-request-context-fetch-option-fail-on-status-code" class="list-anchor">#</a>
     
-    Whether to throw on response codes other than 2xx and 3xx. By default response object is returned for all status codes.
-  - `form` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [FormData] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-form"/><a href="#api-request-context-fetch-option-form" class="list-anchor">#</a>
+    Указывает, следует ли выбрасывать исключение при кодах ответа, отличных от 2xx и 3xx. По умолчанию объект ответа возвращается для всех кодов состояния.
+  - `form` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [FormData] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-form"/><a href="#api-request-context-fetch-option-form" class="list-anchor">#</a>
     
-    Provides an object that will be serialized as html form using `application/x-www-form-urlencoded` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `application/x-www-form-urlencoded` unless explicitly provided.
-  - `headers` [Object]&lt;[string], [string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-headers"/><a href="#api-request-context-fetch-option-headers" class="list-anchor">#</a>
+    Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `application/x-www-form-urlencoded` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `application/x-www-form-urlencoded`, если не предоставлен явно.
+  - `headers` [Object]&lt;[string], [string]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-headers"/><a href="#api-request-context-fetch-option-headers" class="list-anchor">#</a>
     
-    Allows to set HTTP headers. These headers will apply to the fetched request as well as any redirects initiated by it.
-  - `ignoreHTTPSErrors` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-ignore-https-errors"/><a href="#api-request-context-fetch-option-ignore-https-errors" class="list-anchor">#</a>
+    Позволяет установить HTTP-заголовки. Эти заголовки будут применяться к запрашиваемому запросу, а также ко всем перенаправлениям, инициированным им.
+  - `ignoreHTTPSErrors` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-ignore-https-errors"/><a href="#api-request-context-fetch-option-ignore-https-errors" class="list-anchor">#</a>
     
-    Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
-  - `maxRedirects` [number] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-max-redirects"/><a href="#api-request-context-fetch-option-max-redirects" class="list-anchor">#</a>
+    Указывает, следует ли игнорировать ошибки HTTPS при отправке сетевых запросов. По умолчанию `false`.
+  - `maxRedirects` [number] *(необязательно)* <font size="2">Добавлено в: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-max-redirects"/><a href="#api-request-context-fetch-option-max-redirects" class="list-anchor">#</a>
     
-    Maximum number of request redirects that will be followed automatically. An error will be thrown if the number is exceeded. Defaults to `20`. Pass `0` to not follow redirects.
-  - `maxRetries` [number] *(optional)* <font size="2">Added in: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-max-retries"/><a href="#api-request-context-fetch-option-max-retries" class="list-anchor">#</a>
+    Максимальное количество перенаправлений запросов, которые будут автоматически выполнены. Ошибка будет выброшена, если количество превышено. По умолчанию `20`. Передайте `0`, чтобы не следовать за перенаправлениями.
+  - `maxRetries` [number] *(необязательно)* <font size="2">Добавлено в: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-max-retries"/><a href="#api-request-context-fetch-option-max-retries" class="list-anchor">#</a>
     
-    Maximum number of times network errors should be retried. Currently only `ECONNRESET` error is retried. Does not retry based on HTTP response codes. An error will be thrown if the limit is exceeded. Defaults to `0` - no retries.
-  - `method` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-method"/><a href="#api-request-context-fetch-option-method" class="list-anchor">#</a>
+    Максимальное количество раз, которое следует повторить сетевые ошибки. В настоящее время повторяется только ошибка `ECONNRESET`. Не повторяет на основе кодов ответа HTTP. Ошибка будет выброшена, если лимит превышен. По умолчанию `0` - без повторов.
+  - `method` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-method"/><a href="#api-request-context-fetch-option-method" class="list-anchor">#</a>
     
-    If set changes the fetch method (e.g. [PUT](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PUT) or [POST](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST)). If not specified, GET method is used.
-  - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-multipart"/><a href="#api-request-context-fetch-option-multipart" class="list-anchor">#</a>
+    Если установлен, изменяет метод запроса (например, [PUT](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PUT) или [POST](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST)). Если не указано, используется метод GET.
+  - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-multipart"/><a href="#api-request-context-fetch-option-multipart" class="list-anchor">#</a>
     - `name` [string]
       
-      File name
+      Имя файла
     - `mimeType` [string]
       
-      File type
+      Тип файла
     - `buffer` [Buffer]
       
-      File content
+      Содержимое файла
     
-    Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content.
-  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-params"/><a href="#api-request-context-fetch-option-params" class="list-anchor">#</a>
+    Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `multipart/form-data` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `multipart/form-data`, если не предоставлен явно. Значения файлов могут быть переданы либо как [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream), либо как объект, похожий на файл, содержащий имя файла, mime-тип и его содержимое.
+  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-params"/><a href="#api-request-context-fetch-option-params" class="list-anchor">#</a>
     
-    Query parameters to be sent with the URL.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-timeout"/><a href="#api-request-context-fetch-option-timeout" class="list-anchor">#</a>
+    Параметры запроса, которые будут отправлены с URL.
+  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-timeout"/><a href="#api-request-context-fetch-option-timeout" class="list-anchor">#</a>
     
-    Request timeout in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
+    Таймаут запроса в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить таймаут.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[APIResponse]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-return"/><a href="#api-request-context-fetch-return" class="list-anchor">#</a>
 
 ---
 
 ### get {#api-request-context-get}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.get</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.get</x-search>
 
-Sends HTTP(S) [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+Отправляет HTTP(S) [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET) запрос и возвращает его ответ. Метод заполнит куки запроса из контекста и обновит куки контекста из ответа. Метод автоматически будет следовать за перенаправлениями.
 
-**Usage**
+**Использование**
 
-Request parameters can be configured with `params` option, they will be serialized into the URL search parameters:
+Параметры запроса могут быть настроены с помощью параметра `params`, они будут сериализованы в параметры поиска URL:
 
 ```js
-// Passing params as object
+// Передача параметров в виде объекта
 await request.get('https://example.com/api/getText', {
   params: {
     'isbn': '1234',
@@ -215,203 +213,203 @@ await request.get('https://example.com/api/getText', {
   }
 });
 
-// Passing params as URLSearchParams
+// Передача параметров в виде URLSearchParams
 const searchParams = new URLSearchParams();
 searchParams.set('isbn', '1234');
 searchParams.append('page', 23);
 searchParams.append('page', 24);
 await request.get('https://example.com/api/getText', { params: searchParams });
 
-// Passing params as string
+// Передача параметров в виде строки
 const queryString = 'isbn=1234&page=23&page=24';
 await request.get('https://example.com/api/getText', { params: queryString });
 ```
 
-**Arguments**
+**Аргументы**
 - `url` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-url"/><a href="#api-request-context-get-option-url" class="list-anchor">#</a>
   
-  Target URL.
-- `options` [Object] *(optional)*
-  - `data` [string] | [Buffer] | [Serializable] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-data"/><a href="#api-request-context-get-option-data" class="list-anchor">#</a>
+  Целевой URL.
+- `options` [Object] *(необязательно)*
+  - `data` [string] | [Buffer] | [Serializable] *(необязательно)* <font size="2">Добавлено в: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-data"/><a href="#api-request-context-get-option-data" class="list-anchor">#</a>
     
-    Allows to set post data of the request. If the data parameter is an object, it will be serialized to json string and `content-type` header will be set to `application/json` if not explicitly set. Otherwise the `content-type` header will be set to `application/octet-stream` if not explicitly set.
-  - `failOnStatusCode` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-fail-on-status-code"/><a href="#api-request-context-get-option-fail-on-status-code" class="list-anchor">#</a>
+    Позволяет установить данные поста запроса. Если параметр data является объектом, он будет сериализован в json-строку, и заголовок `content-type` будет установлен в `application/json`, если не установлен явно. В противном случае заголовок `content-type` будет установлен в `application/octet-stream`, если не установлен явно.
+  - `failOnStatusCode` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-fail-on-status-code"/><a href="#api-request-context-get-option-fail-on-status-code" class="list-anchor">#</a>
     
-    Whether to throw on response codes other than 2xx and 3xx. By default response object is returned for all status codes.
-  - `form` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [FormData] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-form"/><a href="#api-request-context-get-option-form" class="list-anchor">#</a>
+    Указывает, следует ли выбрасывать исключение при кодах ответа, отличных от 2xx и 3xx. По умолчанию объект ответа возвращается для всех кодов состояния.
+  - `form` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [FormData] *(необязательно)* <font size="2">Добавлено в: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-form"/><a href="#api-request-context-get-option-form" class="list-anchor">#</a>
     
-    Provides an object that will be serialized as html form using `application/x-www-form-urlencoded` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `application/x-www-form-urlencoded` unless explicitly provided.
-  - `headers` [Object]&lt;[string], [string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-headers"/><a href="#api-request-context-get-option-headers" class="list-anchor">#</a>
+    Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `application/x-www-form-urlencoded` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `application/x-www-form-urlencoded`, если не предоставлен явно.
+  - `headers` [Object]&lt;[string], [string]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-headers"/><a href="#api-request-context-get-option-headers" class="list-anchor">#</a>
     
-    Allows to set HTTP headers. These headers will apply to the fetched request as well as any redirects initiated by it.
-  - `ignoreHTTPSErrors` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-ignore-https-errors"/><a href="#api-request-context-get-option-ignore-https-errors" class="list-anchor">#</a>
+    Позволяет установить HTTP-заголовки. Эти заголовки будут применяться к запрашиваемому запросу, а также ко всем перенаправлениям, инициированным им.
+  - `ignoreHTTPSErrors` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-ignore-https-errors"/><a href="#api-request-context-get-option-ignore-https-errors" class="list-anchor">#</a>
     
-    Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
-  - `maxRedirects` [number] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-max-redirects"/><a href="#api-request-context-get-option-max-redirects" class="list-anchor">#</a>
+    Указывает, следует ли игнорировать ошибки HTTPS при отправке сетевых запросов. По умолчанию `false`.
+  - `maxRedirects` [number] *(необязательно)* <font size="2">Добавлено в: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-max-redirects"/><a href="#api-request-context-get-option-max-redirects" class="list-anchor">#</a>
     
-    Maximum number of request redirects that will be followed automatically. An error will be thrown if the number is exceeded. Defaults to `20`. Pass `0` to not follow redirects.
-  - `maxRetries` [number] *(optional)* <font size="2">Added in: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-max-retries"/><a href="#api-request-context-get-option-max-retries" class="list-anchor">#</a>
+    Максимальное количество перенаправлений запросов, которые будут автоматически выполнены. Ошибка будет выброшена, если количество превышено. По умолчанию `20`. Передайте `0`, чтобы не следовать за перенаправлениями.
+  - `maxRetries` [number] *(необязательно)* <font size="2">Добавлено в: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-max-retries"/><a href="#api-request-context-get-option-max-retries" class="list-anchor">#</a>
     
-    Maximum number of times network errors should be retried. Currently only `ECONNRESET` error is retried. Does not retry based on HTTP response codes. An error will be thrown if the limit is exceeded. Defaults to `0` - no retries.
-  - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-multipart"/><a href="#api-request-context-get-option-multipart" class="list-anchor">#</a>
+    Максимальное количество раз, которое следует повторить сетевые ошибки. В настоящее время повторяется только ошибка `ECONNRESET`. Не повторяет на основе кодов ответа HTTP. Ошибка будет выброшена, если лимит превышен. По умолчанию `0` - без повторов.
+  - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(необязательно)* <font size="2">Добавлено в: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-multipart"/><a href="#api-request-context-get-option-multipart" class="list-anchor">#</a>
     - `name` [string]
       
-      File name
+      Имя файла
     - `mimeType` [string]
       
-      File type
+      Тип файла
     - `buffer` [Buffer]
       
-      File content
+      Содержимое файла
     
-    Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content.
-  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-params"/><a href="#api-request-context-get-option-params" class="list-anchor">#</a>
+    Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `multipart/form-data` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `multipart/form-data`, если не предоставлен явно. Значения файлов могут быть переданы либо как [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream), либо как объект, похожий на файл, содержащий имя файла, mime-тип и его содержимое.
+  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-params"/><a href="#api-request-context-get-option-params" class="list-anchor">#</a>
     
-    Query parameters to be sent with the URL.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-timeout"/><a href="#api-request-context-get-option-timeout" class="list-anchor">#</a>
+    Параметры запроса, которые будут отправлены с URL.
+  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-timeout"/><a href="#api-request-context-get-option-timeout" class="list-anchor">#</a>
     
-    Request timeout in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
+    Таймаут запроса в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить таймаут.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[APIResponse]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-return"/><a href="#api-request-context-get-return" class="list-anchor">#</a>
 
 ---
 
 ### head {#api-request-context-head}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.head</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.head</x-search>
 
-Sends HTTP(S) [HEAD](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+Отправляет HTTP(S) [HEAD](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD) запрос и возвращает его ответ. Метод заполнит куки запроса из контекста и обновит куки контекста из ответа. Метод автоматически будет следовать за перенаправлениями.
 
-**Usage**
+**Использование**
 
 ```js
 await apiRequestContext.head(url);
 await apiRequestContext.head(url, options);
 ```
 
-**Arguments**
+**Аргументы**
 - `url` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-url"/><a href="#api-request-context-head-option-url" class="list-anchor">#</a>
   
-  Target URL.
-- `options` [Object] *(optional)*
-  - `data` [string] | [Buffer] | [Serializable] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-data"/><a href="#api-request-context-head-option-data" class="list-anchor">#</a>
+  Целевой URL.
+- `options` [Object] *(необязательно)*
+  - `data` [string] | [Buffer] | [Serializable] *(необязательно)* <font size="2">Добавлено в: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-data"/><a href="#api-request-context-head-option-data" class="list-anchor">#</a>
     
-    Allows to set post data of the request. If the data parameter is an object, it will be serialized to json string and `content-type` header will be set to `application/json` if not explicitly set. Otherwise the `content-type` header will be set to `application/octet-stream` if not explicitly set.
-  - `failOnStatusCode` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-fail-on-status-code"/><a href="#api-request-context-head-option-fail-on-status-code" class="list-anchor">#</a>
+    Позволяет установить данные поста запроса. Если параметр data является объектом, он будет сериализован в json-строку, и заголовок `content-type` будет установлен в `application/json`, если не установлен явно. В противном случае заголовок `content-type` будет установлен в `application/octet-stream`, если не установлен явно.
+  - `failOnStatusCode` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-fail-on-status-code"/><a href="#api-request-context-head-option-fail-on-status-code" class="list-anchor">#</a>
     
-    Whether to throw on response codes other than 2xx and 3xx. By default response object is returned for all status codes.
-  - `form` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [FormData] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-form"/><a href="#api-request-context-head-option-form" class="list-anchor">#</a>
+    Указывает, следует ли выбрасывать исключение при кодах ответа, отличных от 2xx и 3xx. По умолчанию объект ответа возвращается для всех кодов состояния.
+  - `form` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [FormData] *(необязательно)* <font size="2">Добавлено в: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-form"/><a href="#api-request-context-head-option-form" class="list-anchor">#</a>
     
-    Provides an object that will be serialized as html form using `application/x-www-form-urlencoded` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `application/x-www-form-urlencoded` unless explicitly provided.
-  - `headers` [Object]&lt;[string], [string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-headers"/><a href="#api-request-context-head-option-headers" class="list-anchor">#</a>
+    Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `application/x-www-form-urlencoded` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `application/x-www-form-urlencoded`, если не предоставлен явно.
+  - `headers` [Object]&lt;[string], [string]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-headers"/><a href="#api-request-context-head-option-headers" class="list-anchor">#</a>
     
-    Allows to set HTTP headers. These headers will apply to the fetched request as well as any redirects initiated by it.
-  - `ignoreHTTPSErrors` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-ignore-https-errors"/><a href="#api-request-context-head-option-ignore-https-errors" class="list-anchor">#</a>
+    Позволяет установить HTTP-заголовки. Эти заголовки будут применяться к запрашиваемому запросу, а также ко всем перенаправлениям, инициированным им.
+  - `ignoreHTTPSErrors` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-ignore-https-errors"/><a href="#api-request-context-head-option-ignore-https-errors" class="list-anchor">#</a>
     
-    Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
-  - `maxRedirects` [number] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-max-redirects"/><a href="#api-request-context-head-option-max-redirects" class="list-anchor">#</a>
+    Указывает, следует ли игнорировать ошибки HTTPS при отправке сетевых запросов. По умолчанию `false`.
+  - `maxRedirects` [number] *(необязательно)* <font size="2">Добавлено в: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-max-redirects"/><a href="#api-request-context-head-option-max-redirects" class="list-anchor">#</a>
     
-    Maximum number of request redirects that will be followed automatically. An error will be thrown if the number is exceeded. Defaults to `20`. Pass `0` to not follow redirects.
-  - `maxRetries` [number] *(optional)* <font size="2">Added in: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-max-retries"/><a href="#api-request-context-head-option-max-retries" class="list-anchor">#</a>
+    Максимальное количество перенаправлений запросов, которые будут автоматически выполнены. Ошибка будет выброшена, если количество превышено. По умолчанию `20`. Передайте `0`, чтобы не следовать за перенаправлениями.
+  - `maxRetries` [number] *(необязательно)* <font size="2">Добавлено в: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-max-retries"/><a href="#api-request-context-head-option-max-retries" class="list-anchor">#</a>
     
-    Maximum number of times network errors should be retried. Currently only `ECONNRESET` error is retried. Does not retry based on HTTP response codes. An error will be thrown if the limit is exceeded. Defaults to `0` - no retries.
-  - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-multipart"/><a href="#api-request-context-head-option-multipart" class="list-anchor">#</a>
+    Максимальное количество раз, которое следует повторить сетевые ошибки. В настоящее время повторяется только ошибка `ECONNRESET`. Не повторяет на основе кодов ответа HTTP. Ошибка будет выброшена, если лимит превышен. По умолчанию `0` - без повторов.
+  - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(необязательно)* <font size="2">Добавлено в: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-multipart"/><a href="#api-request-context-head-option-multipart" class="list-anchor">#</a>
     - `name` [string]
       
-      File name
+      Имя файла
     - `mimeType` [string]
       
-      File type
+      Тип файла
     - `buffer` [Buffer]
       
-      File content
+      Содержимое файла
     
-    Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content.
-  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-params"/><a href="#api-request-context-head-option-params" class="list-anchor">#</a>
+    Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `multipart/form-data` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `multipart/form-data`, если не предоставлен явно. Значения файлов могут быть переданы либо как [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream), либо как объект, похожий на файл, содержащий имя файла, mime-тип и его содержимое.
+  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-params"/><a href="#api-request-context-head-option-params" class="list-anchor">#</a>
     
-    Query parameters to be sent with the URL.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-timeout"/><a href="#api-request-context-head-option-timeout" class="list-anchor">#</a>
+    Параметры запроса, которые будут отправлены с URL.
+  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-timeout"/><a href="#api-request-context-head-option-timeout" class="list-anchor">#</a>
     
-    Request timeout in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
+    Таймаут запроса в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить таймаут.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[APIResponse]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-return"/><a href="#api-request-context-head-return" class="list-anchor">#</a>
 
 ---
 
 ### patch {#api-request-context-patch}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.patch</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.patch</x-search>
 
-Sends HTTP(S) [PATCH](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PATCH) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+Отправляет HTTP(S) [PATCH](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PATCH) запрос и возвращает его ответ. Метод заполнит куки запроса из контекста и обновит куки контекста из ответа. Метод автоматически будет следовать за перенаправлениями.
 
-**Usage**
+**Использование**
 
 ```js
 await apiRequestContext.patch(url);
 await apiRequestContext.patch(url, options);
 ```
 
-**Arguments**
+**Аргументы**
 - `url` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-url"/><a href="#api-request-context-patch-option-url" class="list-anchor">#</a>
   
-  Target URL.
-- `options` [Object] *(optional)*
-  - `data` [string] | [Buffer] | [Serializable] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-data"/><a href="#api-request-context-patch-option-data" class="list-anchor">#</a>
+  Целевой URL.
+- `options` [Object] *(необязательно)*
+  - `data` [string] | [Buffer] | [Serializable] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-data"/><a href="#api-request-context-patch-option-data" class="list-anchor">#</a>
     
-    Allows to set post data of the request. If the data parameter is an object, it will be serialized to json string and `content-type` header will be set to `application/json` if not explicitly set. Otherwise the `content-type` header will be set to `application/octet-stream` if not explicitly set.
-  - `failOnStatusCode` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-fail-on-status-code"/><a href="#api-request-context-patch-option-fail-on-status-code" class="list-anchor">#</a>
+    Позволяет установить данные поста запроса. Если параметр data является объектом, он будет сериализован в json-строку, и заголовок `content-type` будет установлен в `application/json`, если не установлен явно. В противном случае заголовок `content-type` будет установлен в `application/octet-stream`, если не установлен явно.
+  - `failOnStatusCode` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-fail-on-status-code"/><a href="#api-request-context-patch-option-fail-on-status-code" class="list-anchor">#</a>
     
-    Whether to throw on response codes other than 2xx and 3xx. By default response object is returned for all status codes.
-  - `form` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [FormData] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-form"/><a href="#api-request-context-patch-option-form" class="list-anchor">#</a>
+    Указывает, следует ли выбрасывать исключение при кодах ответа, отличных от 2xx и 3xx. По умолчанию объект ответа возвращается для всех кодов состояния.
+  - `form` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [FormData] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-form"/><a href="#api-request-context-patch-option-form" class="list-anchor">#</a>
     
-    Provides an object that will be serialized as html form using `application/x-www-form-urlencoded` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `application/x-www-form-urlencoded` unless explicitly provided.
-  - `headers` [Object]&lt;[string], [string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-headers"/><a href="#api-request-context-patch-option-headers" class="list-anchor">#</a>
+    Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `application/x-www-form-urlencoded` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `application/x-www-form-urlencoded`, если не предоставлен явно.
+  - `headers` [Object]&lt;[string], [string]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-headers"/><a href="#api-request-context-patch-option-headers" class="list-anchor">#</a>
     
-    Allows to set HTTP headers. These headers will apply to the fetched request as well as any redirects initiated by it.
-  - `ignoreHTTPSErrors` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-ignore-https-errors"/><a href="#api-request-context-patch-option-ignore-https-errors" class="list-anchor">#</a>
+    Позволяет установить HTTP-заголовки. Эти заголовки будут применяться к запрашиваемому запросу, а также ко всем перенаправлениям, инициированным им.
+  - `ignoreHTTPSErrors` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-ignore-https-errors"/><a href="#api-request-context-patch-option-ignore-https-errors" class="list-anchor">#</a>
     
-    Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
-  - `maxRedirects` [number] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-max-redirects"/><a href="#api-request-context-patch-option-max-redirects" class="list-anchor">#</a>
+    Указывает, следует ли игнорировать ошибки HTTPS при отправке сетевых запросов. По умолчанию `false`.
+  - `maxRedirects` [number] *(необязательно)* <font size="2">Добавлено в: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-max-redirects"/><a href="#api-request-context-patch-option-max-redirects" class="list-anchor">#</a>
     
-    Maximum number of request redirects that will be followed automatically. An error will be thrown if the number is exceeded. Defaults to `20`. Pass `0` to not follow redirects.
-  - `maxRetries` [number] *(optional)* <font size="2">Added in: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-max-retries"/><a href="#api-request-context-patch-option-max-retries" class="list-anchor">#</a>
+    Максимальное количество перенаправлений запросов, которые будут автоматически выполнены. Ошибка будет выброшена, если количество превышено. По умолчанию `20`. Передайте `0`, чтобы не следовать за перенаправлениями.
+  - `maxRetries` [number] *(необязательно)* <font size="2">Добавлено в: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-max-retries"/><a href="#api-request-context-patch-option-max-retries" class="list-anchor">#</a>
     
-    Maximum number of times network errors should be retried. Currently only `ECONNRESET` error is retried. Does not retry based on HTTP response codes. An error will be thrown if the limit is exceeded. Defaults to `0` - no retries.
-  - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-multipart"/><a href="#api-request-context-patch-option-multipart" class="list-anchor">#</a>
+    Максимальное количество раз, которое следует повторить сетевые ошибки. В настоящее время повторяется только ошибка `ECONNRESET`. Не повторяет на основе кодов ответа HTTP. Ошибка будет выброшена, если лимит превышен. По умолчанию `0` - без повторов.
+  - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-multipart"/><a href="#api-request-context-patch-option-multipart" class="list-anchor">#</a>
     - `name` [string]
       
-      File name
+      Имя файла
     - `mimeType` [string]
       
-      File type
+      Тип файла
     - `buffer` [Buffer]
       
-      File content
+      Содержимое файла
     
-    Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content.
-  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-params"/><a href="#api-request-context-patch-option-params" class="list-anchor">#</a>
+    Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `multipart/form-data` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `multipart/form-data`, если не предоставлен явно. Значения файлов могут быть переданы либо как [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream), либо как объект, похожий на файл, содержащий имя файла, mime-тип и его содержимое.
+  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-params"/><a href="#api-request-context-patch-option-params" class="list-anchor">#</a>
     
-    Query parameters to be sent with the URL.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-timeout"/><a href="#api-request-context-patch-option-timeout" class="list-anchor">#</a>
+    Параметры запроса, которые будут отправлены с URL.
+  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-timeout"/><a href="#api-request-context-patch-option-timeout" class="list-anchor">#</a>
     
-    Request timeout in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
+    Таймаут запроса в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить таймаут.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[APIResponse]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-return"/><a href="#api-request-context-patch-return" class="list-anchor">#</a>
 
 ---
 
 ### post {#api-request-context-post}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.post</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.post</x-search>
 
-Sends HTTP(S) [POST](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+Отправляет HTTP(S) [POST](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST) запрос и возвращает его ответ. Метод заполнит куки запроса из контекста и обновит куки контекста из ответа. Метод автоматически будет следовать за перенаправлениями.
 
-**Usage**
+**Использование**
 
-JSON objects can be passed directly to the request:
+JSON-объекты могут быть переданы напрямую в запрос:
 
 ```js
 await request.post('https://example.com/api/createBook', {
@@ -422,7 +420,7 @@ await request.post('https://example.com/api/createBook', {
 });
 ```
 
-To send form data to the server use `form` option. Its value will be encoded into the request body with `application/x-www-form-urlencoded` encoding (see below how to use `multipart/form-data` form encoding to send files):
+Чтобы отправить данные формы на сервер, используйте параметр `form`. Его значение будет закодировано в тело запроса с кодировкой `application/x-www-form-urlencoded` (см. ниже, как использовать кодировку формы `multipart/form-data` для отправки файлов):
 
 ```js
 await request.post('https://example.com/api/findBook', {
@@ -433,13 +431,13 @@ await request.post('https://example.com/api/findBook', {
 });
 ```
 
-The common way to send file(s) in the body of a request is to upload them as form fields with `multipart/form-data` encoding. Use [FormData] to construct request body and pass it to the request as `multipart` parameter:
+Общий способ отправки файла(ов) в теле запроса - это загрузка их в качестве полей формы с кодировкой `multipart/form-data`. Используйте [FormData], чтобы создать тело запроса и передать его в запрос в качестве параметра `multipart`:
 
 ```js
 const form = new FormData();
 form.set('name', 'John');
 form.append('name', 'Doe');
-// Send two file fields with the same name.
+// Отправить два поля файла с одним и тем же именем.
 form.append('file', new File(['console.log(2024);'], 'f1.js', { type: 'text/javascript' }));
 form.append('file', new File(['hello'], 'f2.txt', { type: 'text/plain' }));
 await request.post('https://example.com/api/uploadForm', {
@@ -447,142 +445,142 @@ await request.post('https://example.com/api/uploadForm', {
 });
 ```
 
-**Arguments**
+**Аргументы**
 - `url` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-url"/><a href="#api-request-context-post-option-url" class="list-anchor">#</a>
   
-  Target URL.
-- `options` [Object] *(optional)*
-  - `data` [string] | [Buffer] | [Serializable] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-data"/><a href="#api-request-context-post-option-data" class="list-anchor">#</a>
+  Целевой URL.
+- `options` [Object] *(необязательно)*
+  - `data` [string] | [Buffer] | [Serializable] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-data"/><a href="#api-request-context-post-option-data" class="list-anchor">#</a>
     
-    Allows to set post data of the request. If the data parameter is an object, it will be serialized to json string and `content-type` header will be set to `application/json` if not explicitly set. Otherwise the `content-type` header will be set to `application/octet-stream` if not explicitly set.
-  - `failOnStatusCode` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-fail-on-status-code"/><a href="#api-request-context-post-option-fail-on-status-code" class="list-anchor">#</a>
+    Позволяет установить данные поста запроса. Если параметр data является объектом, он будет сериализован в json-строку, и заголовок `content-type` будет установлен в `application/json`, если не установлен явно. В противном случае заголовок `content-type` будет установлен в `application/octet-stream`, если не установлен явно.
+  - `failOnStatusCode` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-fail-on-status-code"/><a href="#api-request-context-post-option-fail-on-status-code" class="list-anchor">#</a>
     
-    Whether to throw on response codes other than 2xx and 3xx. By default response object is returned for all status codes.
-  - `form` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [FormData] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-form"/><a href="#api-request-context-post-option-form" class="list-anchor">#</a>
+    Указывает, следует ли выбрасывать исключение при кодах ответа, отличных от 2xx и 3xx. По умолчанию объект ответа возвращается для всех кодов состояния.
+  - `form` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [FormData] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-form"/><a href="#api-request-context-post-option-form" class="list-anchor">#</a>
     
-    Provides an object that will be serialized as html form using `application/x-www-form-urlencoded` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `application/x-www-form-urlencoded` unless explicitly provided.
-  - `headers` [Object]&lt;[string], [string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-headers"/><a href="#api-request-context-post-option-headers" class="list-anchor">#</a>
+    Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `application/x-www-form-urlencoded` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `application/x-www-form-urlencoded`, если не предоставлен явно.
+  - `headers` [Object]&lt;[string], [string]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-headers"/><a href="#api-request-context-post-option-headers" class="list-anchor">#</a>
     
-    Allows to set HTTP headers. These headers will apply to the fetched request as well as any redirects initiated by it.
-  - `ignoreHTTPSErrors` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-ignore-https-errors"/><a href="#api-request-context-post-option-ignore-https-errors" class="list-anchor">#</a>
+    Позволяет установить HTTP-заголовки. Эти заголовки будут применяться к запрашиваемому запросу, а также ко всем перенаправлениям, инициированным им.
+  - `ignoreHTTPSErrors` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-ignore-https-errors"/><a href="#api-request-context-post-option-ignore-https-errors" class="list-anchor">#</a>
     
-    Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
-  - `maxRedirects` [number] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-max-redirects"/><a href="#api-request-context-post-option-max-redirects" class="list-anchor">#</a>
+    Указывает, следует ли игнорировать ошибки HTTPS при отправке сетевых запросов. По умолчанию `false`.
+  - `maxRedirects` [number] *(необязательно)* <font size="2">Добавлено в: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-max-redirects"/><a href="#api-request-context-post-option-max-redirects" class="list-anchor">#</a>
     
-    Maximum number of request redirects that will be followed automatically. An error will be thrown if the number is exceeded. Defaults to `20`. Pass `0` to not follow redirects.
-  - `maxRetries` [number] *(optional)* <font size="2">Added in: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-max-retries"/><a href="#api-request-context-post-option-max-retries" class="list-anchor">#</a>
+    Максимальное количество перенаправлений запросов, которые будут автоматически выполнены. Ошибка будет выброшена, если количество превышено. По умолчанию `20`. Передайте `0`, чтобы не следовать за перенаправлениями.
+  - `maxRetries` [number] *(необязательно)* <font size="2">Добавлено в: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-max-retries"/><a href="#api-request-context-post-option-max-retries" class="list-anchor">#</a>
     
-    Maximum number of times network errors should be retried. Currently only `ECONNRESET` error is retried. Does not retry based on HTTP response codes. An error will be thrown if the limit is exceeded. Defaults to `0` - no retries.
-  - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-multipart"/><a href="#api-request-context-post-option-multipart" class="list-anchor">#</a>
+    Максимальное количество раз, которое следует повторить сетевые ошибки. В настоящее время повторяется только ошибка `ECONNRESET`. Не повторяет на основе кодов ответа HTTP. Ошибка будет выброшена, если лимит превышен. По умолчанию `0` - без повторов.
+  - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-multipart"/><a href="#api-request-context-post-option-multipart" class="list-anchor">#</a>
     - `name` [string]
       
-      File name
+      Имя файла
     - `mimeType` [string]
       
-      File type
+      Тип файла
     - `buffer` [Buffer]
       
-      File content
+      Содержимое файла
     
-    Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content.
-  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-params"/><a href="#api-request-context-post-option-params" class="list-anchor">#</a>
+    Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `multipart/form-data` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `multipart/form-data`, если не предоставлен явно. Значения файлов могут быть переданы либо как [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream), либо как объект, похожий на файл, содержащий имя файла, mime-тип и его содержимое.
+  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-params"/><a href="#api-request-context-post-option-params" class="list-anchor">#</a>
     
-    Query parameters to be sent with the URL.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-timeout"/><a href="#api-request-context-post-option-timeout" class="list-anchor">#</a>
+    Параметры запроса, которые будут отправлены с URL.
+  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-timeout"/><a href="#api-request-context-post-option-timeout" class="list-anchor">#</a>
     
-    Request timeout in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
+    Таймаут запроса в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить таймаут.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[APIResponse]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-return"/><a href="#api-request-context-post-return" class="list-anchor">#</a>
 
 ---
 
 ### put {#api-request-context-put}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.put</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.put</x-search>
 
-Sends HTTP(S) [PUT](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PUT) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+Отправляет HTTP(S) [PUT](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PUT) запрос и возвращает его ответ. Метод заполнит куки запроса из контекста и обновит куки контекста из ответа. Метод автоматически будет следовать за перенаправлениями.
 
-**Usage**
+**Использование**
 
 ```js
 await apiRequestContext.put(url);
 await apiRequestContext.put(url, options);
 ```
 
-**Arguments**
+**Аргументы**
 - `url` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-url"/><a href="#api-request-context-put-option-url" class="list-anchor">#</a>
   
-  Target URL.
-- `options` [Object] *(optional)*
-  - `data` [string] | [Buffer] | [Serializable] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-data"/><a href="#api-request-context-put-option-data" class="list-anchor">#</a>
+  Целевой URL.
+- `options` [Object] *(необязательно)*
+  - `data` [string] | [Buffer] | [Serializable] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-data"/><a href="#api-request-context-put-option-data" class="list-anchor">#</a>
     
-    Allows to set post data of the request. If the data parameter is an object, it will be serialized to json string and `content-type` header will be set to `application/json` if not explicitly set. Otherwise the `content-type` header will be set to `application/octet-stream` if not explicitly set.
-  - `failOnStatusCode` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-fail-on-status-code"/><a href="#api-request-context-put-option-fail-on-status-code" class="list-anchor">#</a>
+    Позволяет установить данные поста запроса. Если параметр data является объектом, он будет сериализован в json-строку, и заголовок `content-type` будет установлен в `application/json`, если не установлен явно. В противном случае заголовок `content-type` будет установлен в `application/octet-stream`, если не установлен явно.
+  - `failOnStatusCode` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-fail-on-status-code"/><a href="#api-request-context-put-option-fail-on-status-code" class="list-anchor">#</a>
     
-    Whether to throw on response codes other than 2xx and 3xx. By default response object is returned for all status codes.
-  - `form` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [FormData] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-form"/><a href="#api-request-context-put-option-form" class="list-anchor">#</a>
+    Указывает, следует ли выбрасывать исключение при кодах ответа, отличных от 2xx и 3xx. По умолчанию объект ответа возвращается для всех кодов состояния.
+  - `form` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [FormData] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-form"/><a href="#api-request-context-put-option-form" class="list-anchor">#</a>
     
-    Provides an object that will be serialized as html form using `application/x-www-form-urlencoded` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `application/x-www-form-urlencoded` unless explicitly provided.
-  - `headers` [Object]&lt;[string], [string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-headers"/><a href="#api-request-context-put-option-headers" class="list-anchor">#</a>
+    Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `application/x-www-form-urlencoded` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `application/x-www-form-urlencoded`, если не предоставлен явно.
+  - `headers` [Object]&lt;[string], [string]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-headers"/><a href="#api-request-context-put-option-headers" class="list-anchor">#</a>
     
-    Allows to set HTTP headers. These headers will apply to the fetched request as well as any redirects initiated by it.
-  - `ignoreHTTPSErrors` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-ignore-https-errors"/><a href="#api-request-context-put-option-ignore-https-errors" class="list-anchor">#</a>
+    Позволяет установить HTTP-заголовки. Эти заголовки будут применяться к запрашиваемому запросу, а также ко всем перенаправлениям, инициированным им.
+  - `ignoreHTTPSErrors` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-ignore-https-errors"/><a href="#api-request-context-put-option-ignore-https-errors" class="list-anchor">#</a>
     
-    Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
-  - `maxRedirects` [number] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-max-redirects"/><a href="#api-request-context-put-option-max-redirects" class="list-anchor">#</a>
+    Указывает, следует ли игнорировать ошибки HTTPS при отправке сетевых запросов. По умолчанию `false`.
+  - `maxRedirects` [number] *(необязательно)* <font size="2">Добавлено в: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-max-redirects"/><a href="#api-request-context-put-option-max-redirects" class="list-anchor">#</a>
     
-    Maximum number of request redirects that will be followed automatically. An error will be thrown if the number is exceeded. Defaults to `20`. Pass `0` to not follow redirects.
-  - `maxRetries` [number] *(optional)* <font size="2">Added in: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-max-retries"/><a href="#api-request-context-put-option-max-retries" class="list-anchor">#</a>
+    Максимальное количество перенаправлений запросов, которые будут автоматически выполнены. Ошибка будет выброшена, если количество превышено. По умолчанию `20`. Передайте `0`, чтобы не следовать за перенаправлениями.
+  - `maxRetries` [number] *(необязательно)* <font size="2">Добавлено в: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-max-retries"/><a href="#api-request-context-put-option-max-retries" class="list-anchor">#</a>
     
-    Maximum number of times network errors should be retried. Currently only `ECONNRESET` error is retried. Does not retry based on HTTP response codes. An error will be thrown if the limit is exceeded. Defaults to `0` - no retries.
-  - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-multipart"/><a href="#api-request-context-put-option-multipart" class="list-anchor">#</a>
+    Максимальное количество раз, которое следует повторить сетевые ошибки. В настоящее время повторяется только ошибка `ECONNRESET`. Не повторяет на основе кодов ответа HTTP. Ошибка будет выброшена, если лимит превышен. По умолчанию `0` - без повторов.
+  - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-multipart"/><a href="#api-request-context-put-option-multipart" class="list-anchor">#</a>
     - `name` [string]
       
-      File name
+      Имя файла
     - `mimeType` [string]
       
-      File type
+      Тип файла
     - `buffer` [Buffer]
       
-      File content
+      Содержимое файла
     
-    Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content.
-  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-params"/><a href="#api-request-context-put-option-params" class="list-anchor">#</a>
+    Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `multipart/form-data` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `multipart/form-data`, если не предоставлен явно. Значения файлов могут быть переданы либо как [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream), либо как объект, похожий на файл, содержащий имя файла, mime-тип и его содержимое.
+  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-params"/><a href="#api-request-context-put-option-params" class="list-anchor">#</a>
     
-    Query parameters to be sent with the URL.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-timeout"/><a href="#api-request-context-put-option-timeout" class="list-anchor">#</a>
+    Параметры запроса, которые будут отправлены с URL.
+  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-timeout"/><a href="#api-request-context-put-option-timeout" class="list-anchor">#</a>
     
-    Request timeout in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
+    Таймаут запроса в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить таймаут.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[APIResponse]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-return"/><a href="#api-request-context-put-return" class="list-anchor">#</a>
 
 ---
 
 ### storageState {#api-request-context-storage-state}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.storageState</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.storageState</x-search>
 
-Returns storage state for this request context, contains current cookies and local storage snapshot if it was passed to the constructor.
+Возвращает состояние хранилища для этого контекста запроса, содержит текущие куки и снимок локального хранилища, если он был передан в конструктор.
 
-**Usage**
+**Использование**
 
 ```js
 await apiRequestContext.storageState();
 await apiRequestContext.storageState(options);
 ```
 
-**Arguments**
-- `options` [Object] *(optional)*
-  - `indexedDB` [boolean] *(optional)* <font size="2">Added in: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-indexed-db"/><a href="#api-request-context-storage-state-option-indexed-db" class="list-anchor">#</a>
+**Аргументы**
+- `options` [Object] *(необязательно)*
+  - `indexedDB` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-indexed-db"/><a href="#api-request-context-storage-state-option-indexed-db" class="list-anchor">#</a>
     
-    Set to `true` to include IndexedDB in the storage state snapshot.
-  - `path` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-path"/><a href="#api-request-context-storage-state-option-path" class="list-anchor">#</a>
+    Установите в `true`, чтобы включить IndexedDB в снимок состояния хранилища.
+  - `path` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-path"/><a href="#api-request-context-storage-state-option-path" class="list-anchor">#</a>
     
-    The file path to save the storage state to. If [path](/api/class-apirequestcontext.mdx#api-request-context-storage-state-option-path) is a relative path, then it is resolved relative to current working directory. If no path is provided, storage state is still returned, but won't be saved to the disk.
+    Путь к файлу для сохранения состояния хранилища. Если [path](/api/class-apirequestcontext.mdx#api-request-context-storage-state-option-path) является относительным путем, он будет разрешен относительно текущего рабочего каталога. Если путь не предоставлен, состояние хранилища все равно будет возвращено, но не будет сохранено на диске.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-return"/><a href="#api-request-context-storage-state-return" class="list-anchor">#</a>
   - `cookies` [Array]&lt;[Object]&gt;
     - `name` [string]
@@ -599,7 +597,7 @@ await apiRequestContext.storageState(options);
       
     - `expires` [number]
       
-      Unix time in seconds.
+      Время Unix в секундах.
     - `httpOnly` [boolean]
       
       
@@ -623,7 +621,6 @@ await apiRequestContext.storageState(options);
         
       
     
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
@@ -727,6 +724,6 @@ await apiRequestContext.storageState(options);
 [URL]: https://nodejs.org/api/url.html "URL"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
+[все доступные теги изображений]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"
+[Реестр артефактов Microsoft]: https://mcr.microsoft.com/en-us/product/playwright/about "Реестр артефактов Microsoft"
 [Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

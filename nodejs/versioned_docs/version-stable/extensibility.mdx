@@ -1,47 +1,47 @@
 ---
 id: extensibility
-title: "Extensibility"
+title: "Расширяемость"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Custom selector engines
+## Пользовательские движки селекторов
 
-Playwright supports custom selector engines, registered with [selectors.register()](/api/class-selectors.mdx#selectors-register).
+Playwright поддерживает пользовательские движки селекторов, зарегистрированные с помощью [selectors.register()](/api/class-selectors.mdx#selectors-register).
 
-Selector engine should have the following properties:
-- `query` function to query first element matching `selector` relative to the `root`.
-- `queryAll` function to query all elements matching `selector` relative to the `root`.
+Движок селекторов должен иметь следующие свойства:
+- Функция `query`, которая ищет первый элемент, соответствующий `selector`, относительно `root`.
+- Функция `queryAll`, которая ищет все элементы, соответствующие `selector`, относительно `root`.
 
-By default the engine is run directly in the frame's JavaScript context and, for example, can call an application-defined function. To isolate the engine from any JavaScript in the frame, but leave access to the DOM, register the engine with `{contentScript: true}` option. Content script engine is safer because it is protected from any tampering with the global objects, for example altering `Node.prototype` methods. All built-in selector engines run as content scripts. Note that running as a content script is not guaranteed when the engine is used together with other custom engines.
+По умолчанию движок выполняется непосредственно в контексте JavaScript фрейма и, например, может вызывать определенные пользователем функции. Чтобы изолировать движок от любого JavaScript в фрейме, но оставить доступ к DOM, зарегистрируйте движок с опцией `{contentScript: true}`. Движок контентного скрипта более безопасен, так как он защищен от любых манипуляций с глобальными объектами, например, изменения методов `Node.prototype`. Все встроенные движки селекторов работают как контентные скрипты. Обратите внимание, что выполнение в качестве контентного скрипта не гарантируется, когда движок используется вместе с другими пользовательскими движками.
 
-Selectors must be registered before creating the page.
+Селекторы должны быть зарегистрированы до создания страницы.
 
-An example of registering selector engine that queries elements based on a tag name:
+Пример регистрации движка селекторов, который ищет элементы по имени тега:
 
 ```js title="baseTest.ts"
 import { test as base } from '@playwright/test';
 
 export { expect } from '@playwright/test';
 
-// Must be a function that evaluates to a selector engine instance.
+// Должна быть функцией, которая возвращает экземпляр движка селекторов.
 const createTagNameEngine = () => ({
-  // Returns the first element matching given selector in the root's subtree.
+  // Возвращает первый элемент, соответствующий данному селектору в поддереве root.
   query(root, selector) {
     return root.querySelector(selector);
   },
 
-  // Returns all elements matching given selector in the root's subtree.
+  // Возвращает все элементы, соответствующие данному селектору в поддереве root.
   queryAll(root, selector) {
     return Array.from(root.querySelectorAll(selector));
   }
 });
 
 export const test = base.extend<{}, { selectorRegistration: void }>({
-  // Register selectors once per worker.
+  // Регистрируем селекторы один раз на рабочий процесс.
   selectorRegistration: [async ({ playwright }, use) => {
-    // Register the engine. Selectors will be prefixed with "tag=".
+    // Регистрируем движок. Селекторы будут иметь префикс "tag=".
     await playwright.selectors.register('tag', createTagNameEngine);
     await use();
   }, { scope: 'worker', auto: true }],
@@ -51,21 +51,20 @@ export const test = base.extend<{}, { selectorRegistration: void }>({
 ```js title="example.spec.ts"
 import { test, expect } from './baseTest';
 
-test('selector engine test', async ({ page }) => {
-  // Now we can use 'tag=' selectors.
+test('тест движка селекторов', async ({ page }) => {
+  // Теперь мы можем использовать селекторы 'tag='.
   const button = page.locator('tag=button');
   await button.click();
 
-  // We can combine it with built-in locators.
-  await page.locator('tag=div').getByText('Click me').click();
+  // Мы можем комбинировать это с встроенными локаторами.
+  await page.locator('tag=div').getByText('Нажми на меня').click();
 
-  // We can use it in any methods supporting selectors.
+  // Мы можем использовать это в любых методах, поддерживающих селекторы.
   await expect(page.locator('tag=button')).toHaveCount(3);
 });
 ```
 
-
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+[Accessibility]: /api/class-accessibility.mdx "Доступность"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
@@ -167,6 +166,6 @@ test('selector engine test', async ({ page }) => {
 [URL]: https://nodejs.org/api/url.html "URL"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"
 [Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
 [Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

@@ -1,39 +1,39 @@
 ---
 id: test-snapshots
-title: "Visual comparisons"
+title: "Визуальные сравнения"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright Test includes the ability to produce and visually compare screenshots using `await expect(page).toHaveScreenshot()`. On first execution, Playwright test will generate reference screenshots. Subsequent runs will compare against the reference.
+Playwright Test включает возможность создания и визуального сравнения скриншотов с помощью `await expect(page).toHaveScreenshot()`. При первом выполнении Playwright Test сгенерирует эталонные скриншоты. Последующие запуски будут сравнивать с эталоном.
 
 ```js title="example.spec.ts"
 import { test, expect } from '@playwright/test';
 
-test('example test', async ({ page }) => {
+test('пример теста', async ({ page }) => {
   await page.goto('https://playwright.dev');
   await expect(page).toHaveScreenshot();
 });
 ```
 
 :::warning
-Browser rendering can vary based on the host OS, version, settings, hardware, power source (battery vs. power adapter), headless mode, and other factors. For consistent screenshots, run tests in the same environment where the baseline screenshots were generated.
+Отображение в браузере может варьироваться в зависимости от операционной системы, версии, настроек, аппаратного обеспечения, источника питания (батарея или адаптер питания), режима безголовости и других факторов. Для получения последовательных скриншотов запускайте тесты в той же среде, где были сгенерированы базовые скриншоты.
 :::
 
-## Generating screenshots
+## Генерация скриншотов
 
-When you run above for the first time, test runner will say:
+Когда вы запустите вышеуказанный код в первый раз, тестовый раннер сообщит:
 
 ```txt
-Error: A snapshot doesn't exist at example.spec.ts-snapshots/example-test-1-chromium-darwin.png, writing actual.
+Ошибка: Снимок не существует по адресу example.spec.ts-snapshots/example-test-1-chromium-darwin.png, записываю фактический.
 ```
 
-That's because there was no golden file yet. This method took a bunch of screenshots until two consecutive screenshots matched, and saved the last screenshot to file system. It is now ready to be added to the repository.
+Это происходит потому, что золотого файла еще не было. Этот метод сделал несколько скриншотов, пока два последовательных скриншота не совпали, и сохранил последний скриншот в файловую систему. Теперь он готов к добавлению в репозиторий.
 
-The name of the folder with the golden expectations starts with the name of your test file:
+Имя папки с золотыми ожиданиями начинается с имени вашего тестового файла:
 
 ```bash
 drwxr-xr-x  5 user  group  160 Jun  4 11:46 .
@@ -42,44 +42,44 @@ drwxr-xr-x  6 user  group  192 Jun  4 11:45 ..
 drwxr-xr-x  3 user  group   96 Jun  4 11:46 example.spec.ts-snapshots
 ```
 
-The snapshot name `example-test-1-chromium-darwin.png` consists of a few parts:
-- `example-test-1.png` - an auto-generated name of the snapshot. Alternatively you can specify snapshot name as the first argument of the `toHaveScreenshot()` method:
+Имя снимка `example-test-1-chromium-darwin.png` состоит из нескольких частей:
+- `example-test-1.png` - автоматически сгенерированное имя снимка. В качестве альтернативы вы можете указать имя снимка в качестве первого аргумента метода `toHaveScreenshot()`:
   
   ```js
   await expect(page).toHaveScreenshot('landing.png');
   ```
   
-- `chromium-darwin` - the browser name and the platform. Screenshots differ between browsers and platforms due to different rendering, fonts and more, so you will need different snapshots for them. If you use multiple projects in your [configuration file](./test-configuration.mdx), project name will be used instead of `chromium`.
+- `chromium-darwin` - имя браузера и платформа. Скриншоты различаются между браузерами и платформами из-за различного рендеринга, шрифтов и других факторов, поэтому вам понадобятся разные снимки для них. Если вы используете несколько проектов в вашем [файле конфигурации](./test-configuration.mdx), имя проекта будет использоваться вместо `chromium`.
 
-The snapshot name and path can be configured with [testConfig.snapshotPathTemplate](/api/class-testconfig.mdx#test-config-snapshot-path-template) in the playwright config.
+Имя и путь к снимку можно настроить с помощью [testConfig.snapshotPathTemplate](/api/class-testconfig.mdx#test-config-snapshot-path-template) в конфигурации playwright.
 
-## Updating screenshots
+## Обновление скриншотов
 
-Sometimes you need to update the reference screenshot, for example when the page has changed. Do this with the  `--update-snapshots` flag.
+Иногда вам нужно обновить эталонный скриншот, например, когда страница изменилась. Сделайте это с помощью флага `--update-snapshots`.
 
 ```bash
 npx playwright test --update-snapshots
 ```
 
-> Note that `snapshotName` also accepts an array of path segments to the snapshot file such as `expect().toHaveScreenshot(['relative', 'path', 'to', 'snapshot.png'])`.
-> However, this path must stay within the snapshots directory for each test file (i.e. `a.spec.js-snapshots`), otherwise it will throw.
+> Обратите внимание, что `snapshotName` также принимает массив сегментов пути к файлу снимка, например `expect().toHaveScreenshot(['relative', 'path', 'to', 'snapshot.png'])`.
+> Однако этот путь должен оставаться в директории снимков для каждого тестового файла (т.е. `a.spec.js-snapshots`), иначе будет выброшено исключение.
 
-## Options
+## Опции
 
 ### maxDiffPixels
 
-Playwright Test uses the [pixelmatch](https://github.com/mapbox/pixelmatch) library. You can [pass various options](./api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1) to modify its behavior:
+Playwright Test использует библиотеку [pixelmatch](https://github.com/mapbox/pixelmatch). Вы можете [передать различные параметры](./api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1) для изменения ее поведения:
 
 ```js title="example.spec.ts"
 import { test, expect } from '@playwright/test';
 
-test('example test', async ({ page }) => {
+test('пример теста', async ({ page }) => {
   await page.goto('https://playwright.dev');
   await expect(page).toHaveScreenshot({ maxDiffPixels: 100 });
 });
 ```
 
-If you'd like to share the default value among all the tests in the project, you can specify it in the playwright config, either globally or per project:
+Если вы хотите использовать значение по умолчанию для всех тестов в проекте, вы можете указать его в конфигурации playwright, либо глобально, либо для каждого проекта:
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -92,7 +92,7 @@ export default defineConfig({
 
 ### stylePath
 
-You can apply a custom stylesheet to your page while taking screenshot. This allows filtering out dynamic or volatile elements, hence improving the screenshot determinism.
+Вы можете применить пользовательский стиль к вашей странице во время создания скриншота. Это позволяет фильтровать динамические или изменчивые элементы, тем самым улучшая детерминированность скриншота.
 
 ```css title="screenshot.css"
 iframe {
@@ -103,13 +103,13 @@ iframe {
 ```js title="example.spec.ts"
 import { test, expect } from '@playwright/test';
 
-test('example test', async ({ page }) => {
+test('пример теста', async ({ page }) => {
   await page.goto('https://playwright.dev');
   await expect(page).toHaveScreenshot({ stylePath: path.join(__dirname, 'screenshot.css') });
 });
 ```
 
-If you'd like to share the default value among all the tests in the project, you can specify it in the playwright config, either globally or per project:
+Если вы хотите использовать значение по умолчанию для всех тестов в проекте, вы можете указать его в конфигурации playwright, либо глобально, либо для каждого проекта:
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -122,126 +122,19 @@ export default defineConfig({
 });
 ```
 
-## Non-image snapshots
+## Ненадежные снимки
 
-Apart from screenshots, you can use `expect(value).toMatchSnapshot(snapshotName)` to compare text or arbitrary binary data. Playwright Test auto-detects the content type and uses the appropriate comparison algorithm.
+Помимо скриншотов, вы можете использовать `expect(value).toMatchSnapshot(snapshotName)` для сравнения текста или произвольных двоичных данных. Playwright Test автоматически определяет тип содержимого и использует соответствующий алгоритм сравнения.
 
-Here we compare text content against the reference.
+Здесь мы сравниваем текстовое содержимое с эталоном.
 
 ```js title="example.spec.ts"
 import { test, expect } from '@playwright/test';
 
-test('example test', async ({ page }) => {
+test('пример теста', async ({ page }) => {
   await page.goto('https://playwright.dev');
   expect(await page.textContent('.hero__title')).toMatchSnapshot('hero.txt');
 });
 ```
 
-Snapshots are stored next to the test file, in a separate directory. For example, `my.spec.ts` file will produce and store snapshots in the `my.spec.ts-snapshots` directory. You should commit this directory to your version control (e.g. `git`), and review any changes to it.
-
-
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
-[APIRequest]: /api/class-apirequest.mdx "APIRequest"
-[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
-[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
-[Browser]: /api/class-browser.mdx "Browser"
-[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
-[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
-[BrowserType]: /api/class-browsertype.mdx "BrowserType"
-[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
-[Clock]: /api/class-clock.mdx "Clock"
-[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
-[Coverage]: /api/class-coverage.mdx "Coverage"
-[Dialog]: /api/class-dialog.mdx "Dialog"
-[Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
-[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
-[FileChooser]: /api/class-filechooser.mdx "FileChooser"
-[Frame]: /api/class-frame.mdx "Frame"
-[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
-[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
-[JSHandle]: /api/class-jshandle.mdx "JSHandle"
-[Keyboard]: /api/class-keyboard.mdx "Keyboard"
-[Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
-[Logger]: /api/class-logger.mdx "Logger"
-[Mouse]: /api/class-mouse.mdx "Mouse"
-[Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
-[Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
-[Request]: /api/class-request.mdx "Request"
-[Response]: /api/class-response.mdx "Response"
-[Route]: /api/class-route.mdx "Route"
-[Selectors]: /api/class-selectors.mdx "Selectors"
-[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
-[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
-[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: /api/class-tracing.mdx "Tracing"
-[Video]: /api/class-video.mdx "Video"
-[WebError]: /api/class-weberror.mdx "WebError"
-[WebSocket]: /api/class-websocket.mdx "WebSocket"
-[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
-[Worker]: /api/class-worker.mdx "Worker"
-[Fixtures]: /api/class-fixtures.mdx "Fixtures"
-[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
-[FullProject]: /api/class-fullproject.mdx "FullProject"
-[Location]: /api/class-location.mdx "Location"
-[Test]: /api/class-test.mdx "Test"
-[TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestInfo]: /api/class-testinfo.mdx "TestInfo"
-[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
-[TestOptions]: /api/class-testoptions.mdx "TestOptions"
-[TestProject]: /api/class-testproject.mdx "TestProject"
-[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
-[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
-[Reporter]: /api/class-reporter.mdx "Reporter"
-[Suite]: /api/class-suite.mdx "Suite"
-[TestCase]: /api/class-testcase.mdx "TestCase"
-[TestError]: /api/class-testerror.mdx "TestError"
-[TestResult]: /api/class-testresult.mdx "TestResult"
-[TestStep]: /api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
-
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
-[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
-[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
-[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
-[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
-[URL]: https://nodejs.org/api/url.html "URL"
-[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
-
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
-[Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"
+Снимки хранятся рядом с тестовым файлом в отдельной директории. Например, файл `my.spec.ts` создаст и сохранит снимки в директории `my.spec.ts-snapshots`. Вы должны закоммитить эту директорию в вашу систему контроля версий (например, `git`) и просмотреть любые изменения в ней.

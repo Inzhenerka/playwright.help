@@ -6,186 +6,183 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+Объекты [Download] отправляются страницей через событие [page.on('download')](/api/class-page.mdx#page-event-download).
 
-[Download] objects are dispatched by page via the [page.on('download')](/api/class-page.mdx#page-event-download) event.
+Все загруженные файлы, принадлежащие контексту браузера, удаляются при закрытии этого контекста.
 
-All the downloaded files belonging to the browser context are deleted when the browser context is closed.
-
-Download event is emitted once the download starts. Download path becomes available once download completes.
+Событие загрузки генерируется, как только загрузка начинается. Путь загрузки становится доступным после завершения загрузки.
 
 ```js
-// Start waiting for download before clicking. Note no await.
+// Начинаем ожидать загрузку перед кликом. Обратите внимание, что нет await.
 const downloadPromise = page.waitForEvent('download');
 await page.getByText('Download file').click();
 const download = await downloadPromise;
 
-// Wait for the download process to complete and save the downloaded file somewhere.
+// Ждем завершения процесса загрузки и сохраняем загруженный файл в указанное место.
 await download.saveAs('/path/to/save/at/' + download.suggestedFilename());
 ```
 
-
 ---
 
-## Methods
+## Методы
 
 ### cancel {#download-cancel}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.13</font><x-search>download.cancel</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.13</font><x-search>download.cancel</x-search>
 
-Cancels a download. Will not fail if the download is already finished or canceled. Upon successful cancellations, `download.failure()` would resolve to `'canceled'`.
+Отменяет загрузку. Не вызовет ошибку, если загрузка уже завершена или отменена. При успешной отмене `download.failure()` вернет `'canceled'`.
 
-**Usage**
+**Использование**
 
 ```js
 await download.cancel();
 ```
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-cancel-return"/><a href="#download-cancel-return" class="list-anchor">#</a>
 
 ---
 
 ### createReadStream {#download-create-read-stream}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>download.createReadStream</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>download.createReadStream</x-search>
 
-Returns a readable stream for a successful download, or throws for a failed/canceled download.
+Возвращает читаемый поток для успешной загрузки или вызывает ошибку для неудачной/отмененной загрузки.
 
-**Usage**
+**Использование**
 
 ```js
 await download.createReadStream();
 ```
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[Readable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-create-read-stream-return"/><a href="#download-create-read-stream-return" class="list-anchor">#</a>
 
 ---
 
 ### delete {#download-delete}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>download.delete</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>download.delete</x-search>
 
-Deletes the downloaded file. Will wait for the download to finish if necessary.
+Удаляет загруженный файл. Будет ждать завершения загрузки, если это необходимо.
 
-**Usage**
+**Использование**
 
 ```js
 await download.delete();
 ```
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-delete-return"/><a href="#download-delete-return" class="list-anchor">#</a>
 
 ---
 
 ### failure {#download-failure}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>download.failure</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>download.failure</x-search>
 
-Returns download error if any. Will wait for the download to finish if necessary.
+Возвращает ошибку загрузки, если таковая имеется. Будет ждать завершения загрузки, если это необходимо.
 
-**Usage**
+**Использование**
 
 ```js
 await download.failure();
 ```
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[null] | [string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-failure-return"/><a href="#download-failure-return" class="list-anchor">#</a>
 
 ---
 
 ### page {#download-page}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>download.page</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>download.page</x-search>
 
-Get the page that the download belongs to.
+Получает страницу, к которой принадлежит загрузка.
 
-**Usage**
+**Использование**
 
 ```js
 download.page();
 ```
 
-**Returns**
+**Возвращает**
 - [Page]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-page-return"/><a href="#download-page-return" class="list-anchor">#</a>
 
 ---
 
 ### path {#download-path}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>download.path</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>download.path</x-search>
 
-Returns path to the downloaded file for a successful download, or throws for a failed/canceled download. The method will wait for the download to finish if necessary. The method throws when connected remotely.
+Возвращает путь к загруженному файлу для успешной загрузки или вызывает ошибку для неудачной/отмененной загрузки. Метод будет ждать завершения загрузки, если это необходимо. Метод вызывает ошибку, когда подключен удаленно.
 
-Note that the download's file name is a random GUID, use [download.suggestedFilename()](/api/class-download.mdx#download-suggested-filename) to get suggested file name.
+Обратите внимание, что имя файла загрузки является случайным GUID, используйте [download.suggestedFilename()](/api/class-download.mdx#download-suggested-filename), чтобы получить предложенное имя файла.
 
-**Usage**
+**Использование**
 
 ```js
 await download.path();
 ```
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-path-return"/><a href="#download-path-return" class="list-anchor">#</a>
 
 ---
 
 ### saveAs {#download-save-as}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>download.saveAs</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>download.saveAs</x-search>
 
-Copy the download to a user-specified path. It is safe to call this method while the download is still in progress. Will wait for the download to finish if necessary.
+Копирует загрузку в указанное пользователем место. Безопасно вызывать этот метод, пока загрузка все еще продолжается. Будет ждать завершения загрузки, если это необходимо.
 
-**Usage**
+**Использование**
 
 ```js
 await download.saveAs('/path/to/save/at/' + download.suggestedFilename());
 ```
 
-**Arguments**
+**Аргументы**
 - `path` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-save-as-option-path"/><a href="#download-save-as-option-path" class="list-anchor">#</a>
   
-  Path where the download should be copied.
+  Путь, по которому загрузка должна быть скопирована.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-save-as-return"/><a href="#download-save-as-return" class="list-anchor">#</a>
 
 ---
 
 ### suggestedFilename {#download-suggested-filename}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>download.suggestedFilename</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>download.suggestedFilename</x-search>
 
-Returns suggested filename for this download. It is typically computed by the browser from the [`Content-Disposition`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition) response header or the `download` attribute. See the spec on [whatwg](https://html.spec.whatwg.org/#downloading-resources). Different browsers can use different logic for computing it.
+Возвращает предложенное имя файла для этой загрузки. Обычно оно вычисляется браузером из заголовка ответа [`Content-Disposition`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition) или атрибута `download`. См. спецификацию на [whatwg](https://html.spec.whatwg.org/#downloading-resources). Разные браузеры могут использовать разную логику для его вычисления.
 
-**Usage**
+**Использование**
 
 ```js
 download.suggestedFilename();
 ```
 
-**Returns**
+**Возвращает**
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-suggested-filename-return"/><a href="#download-suggested-filename-return" class="list-anchor">#</a>
 
 ---
 
 ### url {#download-url}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>download.url</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>download.url</x-search>
 
-Returns downloaded url.
+Возвращает загруженный URL.
 
-**Usage**
+**Использование**
 
 ```js
 download.url();
 ```
 
-**Returns**
+**Возвращает**
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-url-return"/><a href="#download-url-return" class="list-anchor">#</a>
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
@@ -289,6 +286,6 @@ download.url();
 [URL]: https://nodejs.org/api/url.html "URL"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
+[все доступные теги изображений]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"
+[Регистр артефактов Microsoft]: https://mcr.microsoft.com/en-us/product/playwright/about "Регистр артефактов Microsoft"
 [Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

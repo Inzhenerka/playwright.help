@@ -1,24 +1,24 @@
 ---
 id: test-webserver
-title: "Web server"
+title: "Веб-сервер"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright comes with a `webserver` option in the config file which gives you the ability to launch a local dev server before running your tests. This is ideal for when writing your tests during development and when you don't have a staging or production url to test against.
+Playwright предоставляет опцию `webserver` в файле конфигурации, которая позволяет запустить локальный сервер разработки перед выполнением ваших тестов. Это идеально подходит для написания тестов во время разработки, когда у вас нет URL для тестирования на промежуточной или производственной среде.
 
-## Configuring a web server
+## Настройка веб-сервера
 
-Use the `webserver` property in your Playwright config to launch a development web server during the tests.
+Используйте свойство `webserver` в вашей конфигурации Playwright, чтобы запустить веб-сервер разработки во время тестов.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  // Run your local dev server before starting the tests
+  // Запустите ваш локальный сервер разработки перед началом тестов
   webServer: {
     command: 'npm run start',
     url: 'http://localhost:3000',
@@ -29,30 +29,30 @@ export default defineConfig({
 });
 ```
 
-| Property | Description |
+| Свойство | Описание |
 | :- | :- |
-| [testConfig.webServer](/api/class-testconfig.mdx#test-config-web-server) | Launch a development web server (or multiple) during the tests. |
-| `command`| Shell command to start the local dev server of your app. |
-| `url`| URL of your http server that is expected to return a 2xx, 3xx, 400, 401, 402, or 403 status code when the server is ready to accept connections. |
-| `reuseExistingServer`| If `true`, it will re-use an existing server on the url when available. If no server is running on that url, it will run the command to start a new server. If `false`, it will throw if an existing process is listening on the url. To see the stdout, you can set the `DEBUG=pw:webserver` environment variable. |
-| `ignoreHTTPSErrors` | Whether to ignore HTTPS errors when fetching the `url`. Defaults to `false`. |
-| `cwd` | Current working directory of the spawned process, defaults to the directory of the configuration file. |
-| `stdout` | If `"pipe"`, it will pipe the stdout of the command to the process stdout. If `"ignore"`, it will ignore the stdout of the command. Default to `"ignore"`. |
-| `stderr` | Whether to pipe the stderr of the command to the process stderr or ignore it. Defaults to `"pipe"`. |
-| `timeout` | How long to wait for the process to start up and be available in milliseconds. Defaults to 60000. |
-| `gracefulShutdown` | How to shut down the process. If unspecified, the process group is forcefully `SIGKILL`ed. If set to `{ signal: 'SIGTERM', timeout: 500 }`, the process group is sent a `SIGTERM` signal, followed by `SIGKILL` if it doesn't exit within 500ms. You can also use `SIGINT` as the signal instead. A `0` timeout means no `SIGKILL` will be sent. Windows doesn't support `SIGTERM` and `SIGINT` signals, so this option is ignored on Windows. Note that shutting down a Docker container requires `SIGTERM`. |
+| [testConfig.webServer](/api/class-testconfig.mdx#test-config-web-server) | Запускает веб-сервер разработки (или несколько) во время тестов. |
+| `command`| Команда оболочки для запуска локального сервера разработки вашего приложения. |
+| `url`| URL вашего HTTP-сервера, который должен возвращать статус 2xx, 3xx, 400, 401, 402 или 403, когда сервер готов принимать соединения. |
+| `reuseExistingServer`| Если `true`, будет повторно использовать существующий сервер по указанному URL, если он доступен. Если на этом URL нет работающего сервера, будет выполнена команда для запуска нового сервера. Если `false`, будет выброшено исключение, если существующий процесс слушает указанный URL. Чтобы увидеть stdout, вы можете установить переменную окружения `DEBUG=pw:webserver`. |
+| `ignoreHTTPSErrors` | Указывает, следует ли игнорировать ошибки HTTPS при получении `url`. По умолчанию `false`. |
+| `cwd` | Текущий рабочий каталог запущенного процесса, по умолчанию соответствует каталогу файла конфигурации. |
+| `stdout` | Если `"pipe"`, будет перенаправлен stdout команды в stdout процесса. Если `"ignore"`, будет проигнорирован stdout команды. По умолчанию `"ignore"`. |
+| `stderr` | Указывает, следует ли перенаправлять stderr команды в stderr процесса или игнорировать его. По умолчанию `"pipe"`. |
+| `timeout` | Время ожидания запуска процесса и его доступности в миллисекундах. По умолчанию 60000. |
+| `gracefulShutdown` | Способ завершения работы процесса. Если не указано, группа процессов будет принудительно завершена с помощью `SIGKILL`. Если установлено в `{ signal: 'SIGTERM', timeout: 500 }`, группе процессов будет отправлен сигнал `SIGTERM`, за которым последует `SIGKILL`, если она не завершится в течение 500 мс. Вы также можете использовать `SIGINT` в качестве сигнала. Таймаут `0` означает, что сигнал `SIGKILL` не будет отправлен. Windows не поддерживает сигналы `SIGTERM` и `SIGINT`, поэтому этот параметр игнорируется в Windows. Обратите внимание, что завершение работы контейнера Docker требует `SIGTERM`. |
 
-## Adding a server timeout
+## Добавление таймаута для сервера
 
-Webservers can sometimes take longer to boot up. In this case, you can increase the timeout to wait for the server to start.
+Веб-серверам иногда требуется больше времени для запуска. В этом случае вы можете увеличить таймаут, чтобы дождаться старта сервера.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  // Rest of your config...
+  // Остальная часть вашей конфигурации...
 
-  // Run your local dev server before starting the tests
+  // Запустите ваш локальный сервер разработки перед началом тестов
   webServer: {
     command: 'npm run start',
     url: 'http://localhost:3000',
@@ -62,19 +62,19 @@ export default defineConfig({
 });
 ```
 
-## Adding a baseURL
+## Добавление baseURL
 
-It is also recommended to specify the `baseURL` in the `use: {}` section of your config, so that tests can use relative urls and you don't have to specify the full URL over and over again. 
+Также рекомендуется указать `baseURL` в секции `use: {}` вашей конфигурации, чтобы тесты могли использовать относительные URL и вам не приходилось постоянно указывать полный URL.
 
-When using [page.goto()](/api/class-page.mdx#page-goto), [page.route()](/api/class-page.mdx#page-route), [page.waitForURL()](/api/class-page.mdx#page-wait-for-url), [page.waitForRequest()](/api/class-page.mdx#page-wait-for-request), or [page.waitForResponse()](/api/class-page.mdx#page-wait-for-response) it takes the base URL in consideration by using the [`URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor for building the corresponding URL. For Example, by setting the baseURL to `http://localhost:3000` and navigating to `/login` in your tests, Playwright will run the test using `http://localhost:3000/login`.
+При использовании [page.goto()](/api/class-page.mdx#page-goto), [page.route()](/api/class-page.mdx#page-route), [page.waitForURL()](/api/class-page.mdx#page-wait-for-url), [page.waitForRequest()](/api/class-page.mdx#page-wait-for-request) или [page.waitForResponse()](/api/class-page.mdx#page-wait-for-response) учитывается базовый URL с помощью конструктора [`URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) для построения соответствующего URL. Например, установив baseURL на `http://localhost:3000` и переходя к `/login` в ваших тестах, Playwright выполнит тест, используя `http://localhost:3000/login`.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  // Rest of your config...
+  // Остальная часть вашей конфигурации...
 
-  // Run your local dev server before starting the tests
+  // Запустите ваш локальный сервер разработки перед началом тестов
   webServer: {
     command: 'npm run start',
     url: 'http://localhost:3000',
@@ -86,20 +86,20 @@ export default defineConfig({
 });
 ```
 
-Now you can use a relative path when navigating the page:
+Теперь вы можете использовать относительный путь при навигации по странице:
 
 ```js title="test.spec.ts"
 import { test } from '@playwright/test';
 
 test('test', async ({ page }) => {
-  // This will navigate to http://localhost:3000/login
+  // Это приведет к переходу на http://localhost:3000/login
   await page.goto('./login');
 });
 ```
 
-## Multiple web servers
+## Несколько веб-серверов
 
-Multiple web servers (or background processes) can be launched simultaneously by providing an array of `webServer` configurations. See [testConfig.webServer](/api/class-testconfig.mdx#test-config-web-server) for more info.
+Несколько веб-серверов (или фоновых процессов) могут быть запущены одновременно, предоставив массив конфигураций `webServer`. См. [testConfig.webServer](/api/class-testconfig.mdx#test-config-web-server) для получения дополнительной информации.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -124,110 +124,3 @@ export default defineConfig({
   },
 });
 ```
-
-
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
-[APIRequest]: /api/class-apirequest.mdx "APIRequest"
-[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
-[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
-[Browser]: /api/class-browser.mdx "Browser"
-[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
-[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
-[BrowserType]: /api/class-browsertype.mdx "BrowserType"
-[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
-[Clock]: /api/class-clock.mdx "Clock"
-[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
-[Coverage]: /api/class-coverage.mdx "Coverage"
-[Dialog]: /api/class-dialog.mdx "Dialog"
-[Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
-[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
-[FileChooser]: /api/class-filechooser.mdx "FileChooser"
-[Frame]: /api/class-frame.mdx "Frame"
-[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
-[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
-[JSHandle]: /api/class-jshandle.mdx "JSHandle"
-[Keyboard]: /api/class-keyboard.mdx "Keyboard"
-[Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
-[Logger]: /api/class-logger.mdx "Logger"
-[Mouse]: /api/class-mouse.mdx "Mouse"
-[Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
-[Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
-[Request]: /api/class-request.mdx "Request"
-[Response]: /api/class-response.mdx "Response"
-[Route]: /api/class-route.mdx "Route"
-[Selectors]: /api/class-selectors.mdx "Selectors"
-[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
-[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
-[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: /api/class-tracing.mdx "Tracing"
-[Video]: /api/class-video.mdx "Video"
-[WebError]: /api/class-weberror.mdx "WebError"
-[WebSocket]: /api/class-websocket.mdx "WebSocket"
-[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
-[Worker]: /api/class-worker.mdx "Worker"
-[Fixtures]: /api/class-fixtures.mdx "Fixtures"
-[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
-[FullProject]: /api/class-fullproject.mdx "FullProject"
-[Location]: /api/class-location.mdx "Location"
-[Test]: /api/class-test.mdx "Test"
-[TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestInfo]: /api/class-testinfo.mdx "TestInfo"
-[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
-[TestOptions]: /api/class-testoptions.mdx "TestOptions"
-[TestProject]: /api/class-testproject.mdx "TestProject"
-[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
-[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
-[Reporter]: /api/class-reporter.mdx "Reporter"
-[Suite]: /api/class-suite.mdx "Suite"
-[TestCase]: /api/class-testcase.mdx "TestCase"
-[TestError]: /api/class-testerror.mdx "TestError"
-[TestResult]: /api/class-testresult.mdx "TestResult"
-[TestStep]: /api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
-
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
-[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
-[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
-[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
-[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
-[URL]: https://nodejs.org/api/url.html "URL"
-[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
-
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
-[Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

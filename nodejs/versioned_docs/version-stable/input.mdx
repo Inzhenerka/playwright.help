@@ -1,156 +1,156 @@
 ---
 id: input
-title: "Actions"
+title: "Действия"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright can interact with HTML Input elements such as text inputs, checkboxes, radio buttons, select options, mouse clicks, type characters, keys and shortcuts as well as upload files and focus elements.
+Playwright может взаимодействовать с HTML элементами ввода, такими как текстовые поля, флажки, радиокнопки, варианты выбора, клики мышью, ввод символов, клавиш и сочетаний клавиш, а также загружать файлы и фокусироваться на элементах.
 
-## Text input
+## Текстовый ввод
 
-Using [locator.fill()](/api/class-locator.mdx#locator-fill) is the easiest way to fill out the form fields. It focuses the element and triggers an `input` event with the entered text. It works for `<input>`, `<textarea>` and `[contenteditable]` elements.
+Использование [locator.fill()](/api/class-locator.mdx#locator-fill) — это самый простой способ заполнить поля формы. Он фокусируется на элементе и вызывает событие `input` с введенным текстом. Это работает для элементов `<input>`, `<textarea>` и `[contenteditable]`.
 
 ```js
-// Text input
+// Текстовый ввод
 await page.getByRole('textbox').fill('Peter');
 
-// Date input
+// Ввод даты
 await page.getByLabel('Birth date').fill('2020-02-02');
 
-// Time input
+// Ввод времени
 await page.getByLabel('Appointment time').fill('13:15');
 
-// Local datetime input
+// Ввод локального времени
 await page.getByLabel('Local time').fill('2020-03-02T05:15');
 ```
 
-## Checkboxes and radio buttons
+## Флажки и радиокнопки
 
-Using [locator.setChecked()](/api/class-locator.mdx#locator-set-checked) is the easiest way to check and uncheck a checkbox or a radio button. This method can be used with `input[type=checkbox]`, `input[type=radio]` and `[role=checkbox]` elements.
+Использование [locator.setChecked()](/api/class-locator.mdx#locator-set-checked) — это самый простой способ установить или снять отметку с флажка или радиокнопки. Этот метод можно использовать с элементами `input[type=checkbox]`, `input[type=radio]` и `[role=checkbox]`.
 
 ```js
-// Check the checkbox
+// Установить отметку в флажке
 await page.getByLabel('I agree to the terms above').check();
 
-// Assert the checked state
+// Проверить состояние отметки
 expect(page.getByLabel('Subscribe to newsletter')).toBeChecked();
 
-// Select the radio button
+// Выбрать радиокнопку
 await page.getByLabel('XL').check();
 ```
 
-## Select options
+## Выбор вариантов
 
-Selects one or multiple options in the `<select>` element with [locator.selectOption()](/api/class-locator.mdx#locator-select-option). You can specify option `value`, or `label` to select. Multiple options can be selected.
+Выбирает один или несколько вариантов в элементе `<select>` с помощью [locator.selectOption()](/api/class-locator.mdx#locator-select-option). Вы можете указать значение `value` или `label` для выбора. Можно выбрать несколько вариантов.
 
 ```js
-// Single selection matching the value or label
+// Один выбор, соответствующий значению или метке
 await page.getByLabel('Choose a color').selectOption('blue');
 
-// Single selection matching the label
+// Один выбор, соответствующий метке
 await page.getByLabel('Choose a color').selectOption({ label: 'Blue' });
 
-// Multiple selected items
+// Несколько выбранных элементов
 await page.getByLabel('Choose multiple colors').selectOption(['red', 'green', 'blue']);
 ```
 
-## Mouse click
+## Клик мышью
 
-Performs a simple human click.
+Выполняет простой клик, как это делает человек.
 
 ```js
-// Generic click
+// Обычный клик
 await page.getByRole('button').click();
 
-// Double click
+// Двойной клик
 await page.getByText('Item').dblclick();
 
-// Right click
+// Правый клик
 await page.getByText('Item').click({ button: 'right' });
 
-// Shift + click
+// Shift + клик
 await page.getByText('Item').click({ modifiers: ['Shift'] });
 
-// Ctrl + click on Windows and Linux
-// Meta + click on macOS
+// Ctrl + клик на Windows и Linux
+// Meta + клик на macOS
 await page.getByText('Item').click({ modifiers: ['ControlOrMeta'] });
 
-// Hover over element
+// Наведение на элемент
 await page.getByText('Item').hover();
 
-// Click the top left corner
+// Клик в верхний левый угол
 await page.getByText('Item').click({ position: { x: 0, y: 0 } });
 ```
 
-Under the hood, this and other pointer-related methods:
-- wait for element with given selector to be in DOM
-- wait for it to become displayed, i.e. not empty, no `display:none`, no `visibility:hidden`
-- wait for it to stop moving, for example, until css transition finishes
-- scroll the element into view
-- wait for it to receive pointer events at the action point, for example, waits until element becomes non-obscured by other elements
-- retry if the element is detached during any of the above checks
+Внутри, этот и другие методы, связанные с указателем:
+- ждут, пока элемент с заданным селектором появится в DOM
+- ждут, пока он станет видимым, т.е. не пустым, без `display:none`, без `visibility:hidden`
+- ждут, пока он перестанет двигаться, например, пока не завершится CSS-переход
+- прокручивают элемент в видимую область
+- ждут, пока он получит события указателя в точке действия, например, ждут, пока элемент не будет закрыт другими элементами
+- повторяют попытку, если элемент был отсоединен во время любой из вышеуказанных проверок
 
-#### Forcing the click
+#### Принудительный клик
 
-Sometimes, apps use non-trivial logic where hovering the element overlays it with another element that intercepts the click. This behavior is indistinguishable from a bug where element gets covered and the click is dispatched elsewhere. If you know this is taking place, you can bypass the [actionability](./actionability.mdx) checks and force the click:
+Иногда приложения используют нетривиальную логику, при которой наведение на элемент накрывает его другим элементом, который перехватывает клик. Это поведение неотличимо от ошибки, когда элемент закрыт, и клик отправляется в другое место. Если вы знаете, что это происходит, вы можете обойти проверки [доступности](./actionability.mdx) и принудительно выполнить клик:
 
 ```js
 await page.getByRole('button').click({ force: true });
 ```
 
-#### Programmatic click
+#### Программный клик
 
-If you are not interested in testing your app under the real conditions and want to simulate the click by any means possible, you can trigger the [`HTMLElement.click()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click) behavior via simply dispatching a click event on the element with [locator.dispatchEvent()](/api/class-locator.mdx#locator-dispatch-event):
+Если вы не заинтересованы в тестировании вашего приложения в реальных условиях и хотите смоделировать клик любыми возможными способами, вы можете вызвать поведение [`HTMLElement.click()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click), просто отправив событие клика на элемент с помощью [locator.dispatchEvent()](/api/class-locator.mdx#locator-dispatch-event):
 
 ```js
 await page.getByRole('button').dispatchEvent('click');
 ```
 
-## Type characters
+## Ввод символов
 
 :::caution
 
-Most of the time, you should input text with [locator.fill()](/api/class-locator.mdx#locator-fill). See the [Text input](#text-input) section above. You only need to type characters if there is special keyboard handling on the page.
+Чаще всего вы должны вводить текст с помощью [locator.fill()](/api/class-locator.mdx#locator-fill). См. раздел [Текстовый ввод](#text-input) выше. Вам нужно вводить символы только в том случае, если на странице есть специальная обработка клавиатуры.
 :::
 
-Type into the field character by character, as if it was a user with a real keyboard with [locator.pressSequentially()](/api/class-locator.mdx#locator-press-sequentially).
+Вводите в поле символ за символом, как если бы это делал пользователь с настоящей клавиатурой с помощью [locator.pressSequentially()](/api/class-locator.mdx#locator-press-sequentially).
 
 ```js
-// Press keys one by one
+// Нажимайте клавиши по одной
 await page.locator('#area').pressSequentially('Hello World!');
 ```
 
-This method will emit all the necessary keyboard events, with all the `keydown`, `keyup`, `keypress` events in place. You can even specify the optional `delay` between the key presses to simulate real user behavior.
+Этот метод будет генерировать все необходимые события клавиатуры, с событиями `keydown`, `keyup`, `keypress` на месте. Вы даже можете указать необязательную `delay` между нажатиями клавиш, чтобы смоделировать поведение реального пользователя.
 
-## Keys and shortcuts
+## Клавиши и сочетания клавиш
 
 ```js
-// Hit Enter
+// Нажать Enter
 await page.getByText('Submit').press('Enter');
 
-// Dispatch Control+Right
+// Отправить Control+Right
 await page.getByRole('textbox').press('Control+ArrowRight');
 
-// Press $ sign on keyboard
+// Нажать знак $ на клавиатуре
 await page.getByRole('textbox').press('$');
 ```
 
-The [locator.press()](/api/class-locator.mdx#locator-press) method focuses the selected element and produces a single keystroke. It accepts the logical key names that are emitted in the [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) property of the keyboard events:
+Метод [locator.press()](/api/class-locator.mdx#locator-press) фокусируется на выбранном элементе и производит одно нажатие клавиши. Он принимает логические имена клавиш, которые передаются в свойстве [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) событий клавиатуры:
 
 ```txt
 Backquote, Minus, Equal, Backslash, Backspace, Tab, Delete, Escape,
 ArrowDown, End, Enter, Home, Insert, PageDown, PageUp, ArrowRight,
-ArrowUp, F1 - F12, Digit0 - Digit9, KeyA - KeyZ, etc.
+ArrowUp, F1 - F12, Digit0 - Digit9, KeyA - KeyZ и т.д.
 ```
 
-- You can alternatively specify a single character you'd like to produce such as `"a"` or `"#"`.
-- Following modification shortcuts are also supported: `Shift, Control, Alt, Meta`.
+- Вы также можете указать один символ, который хотите получить, например, `"a"` или `"#"`.
+- Поддерживаются следующие модификаторы: `Shift, Control, Alt, Meta`.
 
-Simple version produces a single character. This character is case-sensitive, so `"a"` and `"A"` will produce different results.
+Простая версия производит один символ. Этот символ чувствителен к регистру, поэтому `"a"` и `"A"` будут давать разные результаты.
 
 ```js
 // <input id=name>
@@ -160,31 +160,31 @@ await page.locator('#name').press('Shift+A');
 await page.locator('#name').press('Shift+ArrowLeft');
 ```
 
-Shortcuts such as `"Control+o"` or `"Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
+Сочетания клавиш, такие как `"Control+o"` или `"Control+Shift+T"`, также поддерживаются. Когда указано с модификатором, модификатор удерживается нажатым, пока нажимается последующая клавиша.
 
-Note that you still need to specify the capital `A` in `Shift-A` to produce the capital character. `Shift-a` produces a lower-case one as if you had the `CapsLock` toggled.
+Обратите внимание, что вам все равно нужно указывать заглавную `A` в `Shift-A`, чтобы получить заглавный символ. `Shift-a` производит строчную букву, как если бы у вас был переключен `CapsLock`.
 
-## Upload files
+## Загрузка файлов
 
-You can select input files for upload using the [locator.setInputFiles()](/api/class-locator.mdx#locator-set-input-files) method. It expects first argument to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input) with the type `"file"`. Multiple files can be passed in the array. If some of the file paths are relative, they are resolved relative to the current working directory. Empty array clears the selected files.
+Вы можете выбрать файлы для загрузки с помощью метода [locator.setInputFiles()](/api/class-locator.mdx#locator-set-input-files). Он ожидает, что первый аргумент указывает на [элемент input](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input) с типом `"file"`. В массив можно передать несколько файлов. Если некоторые из путей к файлам относительные, они разрешаются относительно текущего рабочего каталога. Пустой массив очищает выбранные файлы.
 
 ```js
-// Select one file
+// Выбрать один файл
 await page.getByLabel('Upload file').setInputFiles(path.join(__dirname, 'myfile.pdf'));
 
-// Select multiple files
+// Выбрать несколько файлов
 await page.getByLabel('Upload files').setInputFiles([
   path.join(__dirname, 'file1.txt'),
   path.join(__dirname, 'file2.txt'),
 ]);
 
-// Select a directory
+// Выбрать директорию
 await page.getByLabel('Upload directory').setInputFiles(path.join(__dirname, 'mydir'));
 
-// Remove all the selected files
+// Удалить все выбранные файлы
 await page.getByLabel('Upload file').setInputFiles([]);
 
-// Upload buffer from memory
+// Загрузить буфер из памяти
 await page.getByLabel('Upload file').setInputFiles({
   name: 'file.txt',
   mimeType: 'text/plain',
@@ -192,39 +192,39 @@ await page.getByLabel('Upload file').setInputFiles({
 });
 ```
 
-If you don't have input element in hand (it is created dynamically), you can handle the [page.on('filechooser')](/api/class-page.mdx#page-event-file-chooser) event or use a corresponding waiting method upon your action:
+Если у вас нет элемента input под рукой (он создается динамически), вы можете обработать событие [page.on('filechooser')](/api/class-page.mdx#page-event-file-chooser) или использовать соответствующий метод ожидания перед вашим действием:
 
 ```js
-// Start waiting for file chooser before clicking. Note no await.
+// Начните ожидать выбора файла перед кликом. Обратите внимание, что нет await.
 const fileChooserPromise = page.waitForEvent('filechooser');
 await page.getByLabel('Upload file').click();
 const fileChooser = await fileChooserPromise;
 await fileChooser.setFiles(path.join(__dirname, 'myfile.pdf'));
 ```
 
-## Focus element
+## Фокус на элементе
 
-For the dynamic pages that handle focus events, you can focus the given element with [locator.focus()](/api/class-locator.mdx#locator-focus).
+Для динамических страниц, которые обрабатывают события фокуса, вы можете установить фокус на данный элемент с помощью [locator.focus()](/api/class-locator.mdx#locator-focus).
 
 ```js
 await page.getByLabel('Password').focus();
 ```
 
-## Drag and Drop
+## Перетаскивание и сброс
 
-You can perform drag&drop operation with [locator.dragTo()](/api/class-locator.mdx#locator-drag-to). This method will:
-- Hover the element that will be dragged.
-- Press left mouse button.
-- Move mouse to the element that will receive the drop.
-- Release left mouse button.
+Вы можете выполнить операцию перетаскивания и сброса с помощью [locator.dragTo()](/api/class-locator.mdx#locator-drag-to). Этот метод:
+- Наводит указатель на элемент, который будет перетаскиваться.
+- Нажимает левую кнопку мыши.
+- Перемещает указатель на элемент, который будет принимать сброс.
+- Отпускает левую кнопку мыши.
 
 ```js
 await page.locator('#item-to-be-dragged').dragTo(page.locator('#item-to-drop-at'));
 ```
 
-### Dragging manually
+### Ручное перетаскивание
 
-If you want precise control over the drag operation, use lower-level methods like [locator.hover()](/api/class-locator.mdx#locator-hover), [mouse.down()](/api/class-mouse.mdx#mouse-down), [mouse.move()](/api/class-mouse.mdx#mouse-move) and [mouse.up()](/api/class-mouse.mdx#mouse-up).
+Если вам нужен точный контроль над операцией перетаскивания, используйте более низкоуровневые методы, такие как [locator.hover()](/api/class-locator.mdx#locator-hover), [mouse.down()](/api/class-mouse.mdx#mouse-down), [mouse.move()](/api/class-mouse.mdx#mouse-move) и [mouse.up()](/api/class-mouse.mdx#mouse-up).
 
 ```js
 await page.locator('#item-to-be-dragged').hover();
@@ -234,36 +234,35 @@ await page.mouse.up();
 ```
 
 :::note
-If your page relies on the `dragover` event being dispatched, you need at least two mouse moves to trigger it in all browsers. To reliably issue the second mouse move, repeat your [mouse.move()](/api/class-mouse.mdx#mouse-move) or [locator.hover()](/api/class-locator.mdx#locator-hover) twice. The sequence of operations would be: hover the drag element, mouse down, hover the drop element, hover the drop element second time, mouse up.
+Если ваша страница зависит от события `dragover`, которое должно быть отправлено, вам нужно как минимум два перемещения мыши, чтобы вызвать его во всех браузерах. Чтобы надежно выполнить второе перемещение мыши, повторите ваше [mouse.move()](/api/class-mouse.mdx#mouse-move) или [locator.hover()](/api/class-locator.mdx#locator-hover) дважды. Последовательность операций будет следующей: наведите указатель на элемент перетаскивания, нажмите кнопку мыши, наведите указатель на элемент сброса, наведите указатель на элемент сброса второй раз, отпустите кнопку мыши.
 :::
 
-## Scrolling
+## Прокрутка
 
-Most of the time, Playwright will automatically scroll for you before doing any actions. Therefore, you do not need to scroll explicitly.
+Чаще всего Playwright будет автоматически прокручивать для вас перед выполнением любых действий. Поэтому вам не нужно прокручивать явно.
 
 ```js
-// Scrolls automatically so that button is visible
+// Автоматически прокручивает, чтобы кнопка была видна
 await page.getByRole('button').click();
 ```
 
-However, in rare cases you might need to manually scroll. For example, you might want to force an "infinite list" to load more elements, or position the page for a specific screenshot. In such a case, the most reliable way is to find an element that you want to make visible at the bottom, and scroll it into view.
+Однако в редких случаях вам может понадобиться прокрутить вручную. Например, вы можете захотеть заставить "бесконечный список" загрузить больше элементов или позиционировать страницу для конкретного скриншота. В таком случае самым надежным способом будет найти элемент, который вы хотите сделать видимым внизу, и прокрутить его в видимую область.
 
 ```js
-// Scroll the footer into view, forcing an "infinite list" to load more content
+// Прокрутить нижний колонтитул в видимую область, заставляя "бесконечный список" загружать больше контента
 await page.getByText('Footer text').scrollIntoViewIfNeeded();
 ```
 
-If you would like to control the scrolling more precisely, use [mouse.wheel()](/api/class-mouse.mdx#mouse-wheel) or [locator.evaluate()](/api/class-locator.mdx#locator-evaluate):
+Если вы хотите более точно контролировать прокрутку, используйте [mouse.wheel()](/api/class-mouse.mdx#mouse-wheel) или [locator.evaluate()](/api/class-locator.mdx#locator-evaluate):
 
 ```js
-// Position the mouse and scroll with the mouse wheel
+// Позиционируйте указатель мыши и прокручивайте с помощью колеса мыши
 await page.getByTestId('scrolling-container').hover();
 await page.mouse.wheel(0, 10);
 
-// Alternatively, programmatically scroll a specific element
+// Либо программно прокрутите конкретный элемент
 await page.getByTestId('scrolling-container').evaluate(e => e.scrollTop += 100);
 ```
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"

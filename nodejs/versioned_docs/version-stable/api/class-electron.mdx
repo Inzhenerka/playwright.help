@@ -6,179 +6,176 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-
-Playwright has **experimental** support for Electron automation. You can access electron namespace via:
+Playwright имеет **экспериментальную** поддержку автоматизации Electron. Вы можете получить доступ к пространству имен electron через:
 
 ```js
 const { _electron } = require('playwright');
 ```
 
-An example of the Electron automation script would be:
+Пример скрипта автоматизации Electron может выглядеть следующим образом:
 
 ```js
 const { _electron: electron } = require('playwright');
 
 (async () => {
-  // Launch Electron app.
+  // Запуск приложения Electron.
   const electronApp = await electron.launch({ args: ['main.js'] });
 
-  // Evaluation expression in the Electron context.
+  // Оценка выражения в контексте Electron.
   const appPath = await electronApp.evaluate(async ({ app }) => {
-    // This runs in the main Electron process, parameter here is always
-    // the result of the require('electron') in the main app script.
+    // Это выполняется в основном процессе Electron, параметр здесь всегда
+    // является результатом require('electron') в основном скрипте приложения.
     return app.getAppPath();
   });
   console.log(appPath);
 
-  // Get the first window that the app opens, wait if necessary.
+  // Получите первое окно, которое открывает приложение, подождите, если необходимо.
   const window = await electronApp.firstWindow();
-  // Print the title.
+  // Выведите заголовок.
   console.log(await window.title());
-  // Capture a screenshot.
+  // Сделайте скриншот.
   await window.screenshot({ path: 'intro.png' });
-  // Direct Electron console to Node terminal.
+  // Направьте консоль Electron в терминал Node.
   window.on('console', console.log);
-  // Click button.
+  // Нажмите кнопку.
   await window.click('text=Click me');
-  // Exit app.
+  // Закройте приложение.
   await electronApp.close();
 })();
 ```
 
-**Supported Electron versions are:**
+**Поддерживаемые версии Electron:**
 * v12.2.0+
 * v13.4.0+
 * v14+
 
-**Known issues:**
+**Известные проблемы:**
 
-If you are not able to launch Electron and it will end up in timeouts during launch, try the following:
-* Ensure that `nodeCliInspect` ([FuseV1Options.EnableNodeCliInspectArguments](https://www.electronjs.org/docs/latest/tutorial/fuses#nodecliinspect)) fuse is **not** set to `false`.
-
+Если вы не можете запустить Electron и он заканчивается тайм-аутами во время запуска, попробуйте следующее:
+* Убедитесь, что `nodeCliInspect` ([FuseV1Options.EnableNodeCliInspectArguments](https://www.electronjs.org/docs/latest/tutorial/fuses#nodecliinspect)) не установлен в `false`.
 
 ---
 
-## Methods
+## Методы
 
 ### launch {#electron-launch}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>electron.launch</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>electron.launch</x-search>
 
-Launches electron application specified with the [executablePath](/api/class-electron.mdx#electron-launch-option-executable-path).
+Запускает приложение electron, указанное с помощью [executablePath](/api/class-electron.mdx#electron-launch-option-executable-path).
 
-**Usage**
+**Использование**
 
 ```js
 await electron.launch();
 await electron.launch(options);
 ```
 
-**Arguments**
-- `options` [Object] *(optional)*
-  - `acceptDownloads` [boolean] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-accept-downloads"/><a href="#electron-launch-option-accept-downloads" class="list-anchor">#</a>
+**Аргументы**
+- `options` [Object] *(необязательно)*
+  - `acceptDownloads` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-accept-downloads"/><a href="#electron-launch-option-accept-downloads" class="list-anchor">#</a>
     
-    Whether to automatically download all the attachments. Defaults to `true` where all the downloads are accepted.
-  - `args` [Array]&lt;[string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-args"/><a href="#electron-launch-option-args" class="list-anchor">#</a>
+    Указывает, следует ли автоматически загружать все вложения. По умолчанию `true`, при этом все загрузки принимаются.
+  - `args` [Array]&lt;[string]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-args"/><a href="#electron-launch-option-args" class="list-anchor">#</a>
     
-    Additional arguments to pass to the application when launching. You typically pass the main script name here.
-  - `bypassCSP` [boolean] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-bypass-csp"/><a href="#electron-launch-option-bypass-csp" class="list-anchor">#</a>
+    Дополнительные аргументы, которые передаются приложению при запуске. Обычно здесь передается имя основного скрипта.
+  - `bypassCSP` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-bypass-csp"/><a href="#electron-launch-option-bypass-csp" class="list-anchor">#</a>
     
-    Toggles bypassing page's Content-Security-Policy. Defaults to `false`.
-  - `colorScheme` [null] | "light" | "dark" | "no-preference" *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-color-scheme"/><a href="#electron-launch-option-color-scheme" class="list-anchor">#</a>
+    Переключает обход политики безопасности контента страницы. По умолчанию `false`.
+  - `colorScheme` [null] | "light" | "dark" | "no-preference" *(необязательно)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-color-scheme"/><a href="#electron-launch-option-color-scheme" class="list-anchor">#</a>
     
-    Emulates [prefers-colors-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme) media feature, supported values are `'light'` and `'dark'`. See [page.emulateMedia()](/api/class-page.mdx#page-emulate-media) for more details. Passing `null` resets emulation to system defaults. Defaults to `'light'`.
-  - `cwd` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-cwd"/><a href="#electron-launch-option-cwd" class="list-anchor">#</a>
+    Эмулирует медиа-функцию [prefers-colors-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme), поддерживаемые значения: `'light'` и `'dark'`. См. [page.emulateMedia()](/api/class-page.mdx#page-emulate-media) для получения дополнительных сведений. Передача `null` сбрасывает эмуляцию на системные настройки по умолчанию. По умолчанию `'light'`.
+  - `cwd` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-cwd"/><a href="#electron-launch-option-cwd" class="list-anchor">#</a>
     
-    Current working directory to launch application from.
-  - `env` [Object]&lt;[string], [string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-env"/><a href="#electron-launch-option-env" class="list-anchor">#</a>
+    Текущий рабочий каталог для запуска приложения.
+  - `env` [Object]&lt;[string], [string]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-env"/><a href="#electron-launch-option-env" class="list-anchor">#</a>
     
-    Specifies environment variables that will be visible to Electron. Defaults to `process.env`.
-  - `executablePath` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-executable-path"/><a href="#electron-launch-option-executable-path" class="list-anchor">#</a>
+    Указывает переменные окружения, которые будут видны Electron. По умолчанию `process.env`.
+  - `executablePath` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-executable-path"/><a href="#electron-launch-option-executable-path" class="list-anchor">#</a>
     
-    Launches given Electron application. If not specified, launches the default Electron executable installed in this package, located at `node_modules/.bin/electron`.
-  - `extraHTTPHeaders` [Object]&lt;[string], [string]&gt; *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-extra-http-headers"/><a href="#electron-launch-option-extra-http-headers" class="list-anchor">#</a>
+    Запускает указанное приложение Electron. Если не указано, запускается исполняемый файл Electron по умолчанию, установленный в этом пакете, расположенный по адресу `node_modules/.bin/electron`.
+  - `extraHTTPHeaders` [Object]&lt;[string], [string]&gt; *(необязательно)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-extra-http-headers"/><a href="#electron-launch-option-extra-http-headers" class="list-anchor">#</a>
     
-    An object containing additional HTTP headers to be sent with every request. Defaults to none.
-  - `geolocation` [Object] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-geolocation"/><a href="#electron-launch-option-geolocation" class="list-anchor">#</a>
+    Объект, содержащий дополнительные HTTP-заголовки, которые будут отправлены с каждым запросом. По умолчанию отсутствуют.
+  - `geolocation` [Object] *(необязательно)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-geolocation"/><a href="#electron-launch-option-geolocation" class="list-anchor">#</a>
     - `latitude` [number]
       
-      Latitude between -90 and 90.
+      Широта от -90 до 90.
     - `longitude` [number]
       
-      Longitude between -180 and 180.
-    - `accuracy` [number] *(optional)*
+      Долгота от -180 до 180.
+    - `accuracy` [number] *(необязательно)*
       
-      Non-negative accuracy value. Defaults to `0`.
-  - `httpCredentials` [Object] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-http-credentials"/><a href="#electron-launch-option-http-credentials" class="list-anchor">#</a>
+      Ненегативное значение точности. По умолчанию `0`.
+  - `httpCredentials` [Object] *(необязательно)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-http-credentials"/><a href="#electron-launch-option-http-credentials" class="list-anchor">#</a>
     - `username` [string]
       
       
     - `password` [string]
       
       
-    - `origin` [string] *(optional)*
+    - `origin` [string] *(необязательно)*
       
-      Restrain sending http credentials on specific origin (scheme://host:port).
-    - `send` "unauthorized" | "always" *(optional)*
+      Ограничивает отправку http-учетных данных на конкретный источник (scheme://host:port).
+    - `send` "unauthorized" | "always" *(необязательно)*
       
-      This option only applies to the requests sent from corresponding [APIRequestContext] and does not affect requests sent from the browser. `'always'` - `Authorization` header with basic authentication credentials will be sent with the each API request. `'unauthorized` - the credentials are only sent when 401 (Unauthorized) response with `WWW-Authenticate` header is received. Defaults to `'unauthorized'`.
+      Эта опция применяется только к запросам, отправленным из соответствующего [APIRequestContext], и не влияет на запросы, отправленные из браузера. `'always'` - заголовок `Authorization` с учетными данными базовой аутентификации будет отправлен с каждым API-запросом. `'unauthorized` - учетные данные отправляются только при получении ответа 401 (Unauthorized) с заголовком `WWW-Authenticate`. По умолчанию `'unauthorized'`.
     
-    Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). If no origin is specified, the username and password are sent to any servers upon unauthorized responses.
-  - `ignoreHTTPSErrors` [boolean] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-ignore-https-errors"/><a href="#electron-launch-option-ignore-https-errors" class="list-anchor">#</a>
+    Учетные данные для [HTTP аутентификации](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Если источник не указан, имя пользователя и пароль отправляются на любые серверы при несанкционированных ответах.
+  - `ignoreHTTPSErrors` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-ignore-https-errors"/><a href="#electron-launch-option-ignore-https-errors" class="list-anchor">#</a>
     
-    Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
-  - `locale` [string] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-locale"/><a href="#electron-launch-option-locale" class="list-anchor">#</a>
+    Указывает, следует ли игнорировать ошибки HTTPS при отправке сетевых запросов. По умолчанию `false`.
+  - `locale` [string] *(необязательно)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-locale"/><a href="#electron-launch-option-locale" class="list-anchor">#</a>
     
-    Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules. Defaults to the system default locale. Learn more about emulation in our [emulation guide](../emulation.mdx#locale--timezone).
-  - `offline` [boolean] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-offline"/><a href="#electron-launch-option-offline" class="list-anchor">#</a>
+    Укажите локаль пользователя, например `en-GB`, `de-DE` и т.д. Локаль повлияет на значение `navigator.language`, значение заголовка запроса `Accept-Language`, а также на правила форматирования чисел и дат. По умолчанию используется локаль по умолчанию системы. Узнайте больше о эмуляции в нашем [руководстве по эмуляции](../emulation.mdx#locale--timezone).
+  - `offline` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-offline"/><a href="#electron-launch-option-offline" class="list-anchor">#</a>
     
-    Whether to emulate network being offline. Defaults to `false`. Learn more about [network emulation](../emulation.mdx#offline).
-  - `recordHar` [Object] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-record-har"/><a href="#electron-launch-option-record-har" class="list-anchor">#</a>
-    - `omitContent` [boolean] *(optional)*
+    Указывает, следует ли эмулировать отсутствие сети. По умолчанию `false`. Узнайте больше о [эмуляции сети](../emulation.mdx#offline).
+  - `recordHar` [Object] *(необязательно)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-record-har"/><a href="#electron-launch-option-record-har" class="list-anchor">#</a>
+    - `omitContent` [boolean] *(необязательно)*
       
-      Optional setting to control whether to omit request content from the HAR. Defaults to `false`. Deprecated, use `content` policy instead.
-    - `content` "omit" | "embed" | "attach" *(optional)*
+      Необязательная настройка для управления тем, следует ли исключать содержимое запроса из HAR. По умолчанию `false`. Устарело, используйте политику `content` вместо этого.
+    - `content` "omit" | "embed" | "attach" *(необязательно)*
       
-      Optional setting to control resource content management. If `omit` is specified, content is not persisted. If `attach` is specified, resources are persisted as separate files or entries in the ZIP archive. If `embed` is specified, content is stored inline the HAR file as per HAR specification. Defaults to `attach` for `.zip` output files and to `embed` for all other file extensions.
+      Необязательная настройка для управления управлением содержимым ресурсов. Если указано `omit`, содержимое не сохраняется. Если указано `attach`, ресурсы сохраняются как отдельные файлы или записи в ZIP-архиве. Если указано `embed`, содержимое хранится встроенным в файл HAR в соответствии со спецификацией HAR. По умолчанию `attach` для файлов вывода `.zip` и `embed` для всех других расширений файлов.
     - `path` [string]
       
-      Path on the filesystem to write the HAR file to. If the file name ends with `.zip`, `content: 'attach'` is used by default.
-    - `mode` "full" | "minimal" *(optional)*
+      Путь в файловой системе для записи файла HAR. Если имя файла заканчивается на `.zip`, по умолчанию используется `content: 'attach'`.
+    - `mode` "full" | "minimal" *(необязательно)*
       
-      When set to `minimal`, only record information necessary for routing from HAR. This omits sizes, timing, page, cookies, security and other types of HAR information that are not used when replaying from HAR. Defaults to `full`.
-    - `urlFilter` [string] | [RegExp] *(optional)*
+      При установке в `minimal` записывается только информация, необходимая для маршрутизации из HAR. Это исключает размеры, время, страницу, куки, безопасность и другие типы информации HAR, которые не используются при воспроизведении из HAR. По умолчанию `full`.
+    - `urlFilter` [string] | [RegExp] *(необязательно)*
       
-      A glob or regex pattern to filter requests that are stored in the HAR. When a [baseURL](/api/class-browser.mdx#browser-new-context-option-base-url) via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor. Defaults to none.
+      Шаблон glob или regex для фильтрации запросов, которые сохраняются в HAR. Когда был предоставлен [baseURL](/api/class-browser.mdx#browser-new-context-option-base-url) через параметры контекста, и переданный URL является путем, он объединяется через конструктор [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL). По умолчанию отсутствует.
     
-    Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into `recordHar.path` file. If not specified, the HAR is not recorded. Make sure to await [browserContext.close()](/api/class-browsercontext.mdx#browser-context-close) for the HAR to be saved.
-  - `recordVideo` [Object] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-record-video"/><a href="#electron-launch-option-record-video" class="list-anchor">#</a>
+    Включает запись [HAR](http://www.softwareishard.com/blog/har-12-spec) для всех страниц в файл `recordHar.path`. Если не указано, HAR не записывается. Убедитесь, что вы дождались [browserContext.close()](/api/class-browsercontext.mdx#browser-context-close) для сохранения HAR.
+  - `recordVideo` [Object] *(необязательно)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-record-video"/><a href="#electron-launch-option-record-video" class="list-anchor">#</a>
     - `dir` [string]
       
-      Path to the directory to put videos into.
-    - `size` [Object] *(optional)*
+      Путь к директории для сохранения видео.
+    - `size` [Object] *(необязательно)*
       - `width` [number]
         
-        Video frame width.
+        Ширина видеофрейма.
       - `height` [number]
         
-        Video frame height.
+        Высота видеофрейма.
       
-      Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport` scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
+      Необязательные размеры записанных видео. Если не указаны, размер будет равен `viewport`, уменьшенному для соответствия 800x800. Если `viewport` не настроен явно, размер видео по умолчанию составляет 800x450. Фактическое изображение каждой страницы будет уменьшено, если это необходимо, чтобы соответствовать указанному размеру.
     
-    Enables video recording for all pages into `recordVideo.dir` directory. If not specified videos are not recorded. Make sure to await [browserContext.close()](/api/class-browsercontext.mdx#browser-context-close) for videos to be saved.
-  - `timeout` [number] *(optional)* <font size="2">Added in: v1.15</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-timeout"/><a href="#electron-launch-option-timeout" class="list-anchor">#</a>
+    Включает запись видео для всех страниц в директорию `recordVideo.dir`. Если не указано, видео не записываются. Убедитесь, что вы дождались [browserContext.close()](/api/class-browsercontext.mdx#browser-context-close) для сохранения видео.
+  - `timeout` [number] *(необязательно)* <font size="2">Добавлено в: v1.15</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-timeout"/><a href="#electron-launch-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds to wait for the application to start. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
-  - `timezoneId` [string] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-timezone-id"/><a href="#electron-launch-option-timezone-id" class="list-anchor">#</a>
+    Максимальное время в миллисекундах для ожидания запуска приложения. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут.
+  - `timezoneId` [string] *(необязательно)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-timezone-id"/><a href="#electron-launch-option-timezone-id" class="list-anchor">#</a>
     
-    Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs. Defaults to the system timezone.
-  - `tracesDir` [string] *(optional)* <font size="2">Added in: v1.36</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-traces-dir"/><a href="#electron-launch-option-traces-dir" class="list-anchor">#</a>
+    Изменяет часовой пояс контекста. См. [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) для списка поддерживаемых идентификаторов часовых поясов. По умолчанию используется часовой пояс системы.
+  - `tracesDir` [string] *(необязательно)* <font size="2">Добавлено в: v1.36</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-traces-dir"/><a href="#electron-launch-option-traces-dir" class="list-anchor">#</a>
     
-    If specified, traces are saved into this directory.
+    Если указано, трассировки сохраняются в эту директорию.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[ElectronApplication]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-return"/><a href="#electron-launch-return" class="list-anchor">#</a>
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"

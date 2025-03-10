@@ -1,38 +1,38 @@
 ---
 id: browser-contexts
-title: "Isolation"
+title: "Изоляция"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Tests written with Playwright execute in isolated clean-slate environments called browser contexts. This isolation model improves reproducibility and prevents cascading test failures. 
+Тесты, написанные с помощью Playwright, выполняются в изолированных чистых средах, называемых контекстами браузера. Эта модель изоляции улучшает воспроизводимость и предотвращает каскадные сбои тестов.
 
-## What is Test Isolation? 
+## Что такое изоляция тестов?
 
-Test Isolation is when each test is completely isolated from another test. Every test runs independently from any other test. This means that each test has its own local storage, session storage, cookies etc. Playwright achieves this using [BrowserContext]s which are equivalent to incognito-like profiles. They are fast and cheap to create and are completely isolated, even when running in a single browser. Playwright creates a context for each test, and provides a default [Page] in that context.
+Изоляция тестов — это когда каждый тест полностью изолирован от другого теста. Каждый тест выполняется независимо от любого другого теста. Это означает, что каждый тест имеет свое собственное локальное хранилище, хранилище сессий, куки и т.д. Playwright достигает этого с помощью [BrowserContext], которые эквивалентны профилям в режиме инкогнито. Их быстро и недорого создавать, и они полностью изолированы, даже при выполнении в одном браузере. Playwright создает контекст для каждого теста и предоставляет по умолчанию [Page] в этом контексте.
 
-## Why is Test Isolation Important? 
-- No failure carry-over. If one test fails it doesn't affect the other test.
-- Easy to debug errors or flakiness, because you can run just a single test as many times as you'd like. 
-- Don't have to think about the order when running in parallel, sharding, etc.
+## Почему изоляция тестов важна?
+- Нет переноса ошибок. Если один тест не проходит, это не влияет на другой тест.
+- Легко отлаживать ошибки или нестабильность, потому что вы можете запускать только один тест столько раз, сколько захотите.
+- Не нужно думать о порядке выполнения при параллельном запуске, шардировании и т.д.
 
-## Two Ways of Test Isolation
+## Два способа изоляции тестов
 
-There are two different strategies when it comes to Test Isolation: start from scratch or cleanup in between. The problem with cleaning up in between tests is that it can be easy to forget to clean up and some things are impossible to clean up such as "visited links". State from one test can leak into the next test which could cause your test to fail and make debugging harder as the problem comes from another test. Starting from scratch means everything is new, so if the test fails you only have to look within that test to debug.
+Существует две разные стратегии, когда речь идет об изоляции тестов: начинать с нуля или очищать между тестами. Проблема с очисткой между тестами заключается в том, что легко забыть очистить, и некоторые вещи невозможно очистить, такие как "посещенные ссылки". Состояние одного теста может просочиться в следующий тест, что может привести к сбою теста и усложнить отладку, так как проблема исходит от другого теста. Начинать с нуля означает, что все новое, поэтому, если тест не проходит, вам нужно искать проблему только в этом тесте.
 
-## How Playwright Achieves Test Isolation
+## Как Playwright достигает изоляции тестов
 
-Playwright uses browser contexts to achieve Test Isolation. Each test has its own Browser Context. Running the test creates a new browser context each time.  When using Playwright as a Test Runner, browser contexts are created by default. Otherwise, you can create browser contexts manually.
+Playwright использует контексты браузера для достижения изоляции тестов. Каждый тест имеет свой собственный контекст браузера. Запуск теста создает новый контекст браузера каждый раз. При использовании Playwright в качестве тестового раннера контексты браузера создаются по умолчанию. В противном случае вы можете создавать контексты браузера вручную.
 
 <Tabs
   groupId="js-flavor"
   defaultValue="test"
   values={[
-    {label: 'Test', value: 'test'},
-    {label: 'Library', value: 'library'}
+    {label: 'Тест', value: 'test'},
+    {label: 'Библиотека', value: 'library'}
   ]
 }>
 <TabItem value="test">
@@ -40,14 +40,14 @@ Playwright uses browser contexts to achieve Test Isolation. Each test has its ow
 ```js
 import { test } from '@playwright/test';
 
-test('example test', async ({ page, context }) => {
-  // "context" is an isolated BrowserContext, created for this specific test.
-  // "page" belongs to this context.
+test('пример теста', async ({ page, context }) => {
+  // "context" — это изолированный BrowserContext, созданный для этого конкретного теста.
+  // "page" принадлежит этому контексту.
 });
 
-test('another test', async ({ page, context }) => {
-  // "context" and "page" in this second test are completely
-  // isolated from the first test.
+test('другой тест', async ({ page, context }) => {
+  // "context" и "page" во втором тесте полностью
+  // изолированы от первого теста.
 });
 ```
 
@@ -63,18 +63,18 @@ const page = await context.newPage();
 </TabItem>
 </Tabs>
 
-Browser contexts can also be used to emulate multi-page scenarios involving mobile devices, permissions, locale and color scheme. Check out our [Emulation](./emulation.mdx) guide for more details.
+Контексты браузера также могут использоваться для эмуляции сценариев с несколькими страницами, включая мобильные устройства, разрешения, локализацию и цветовую схему. Ознакомьтесь с нашим руководством по [Эмуляции](./emulation.mdx) для получения дополнительных сведений.
 
-## Multiple Contexts in a Single Test
+## Несколько контекстов в одном тесте
 
-Playwright can create multiple browser contexts within a single scenario. This is useful when you want to test for multi-user functionality, like a chat.
+Playwright может создавать несколько контекстов браузера в рамках одного сценария. Это полезно, когда вы хотите протестировать функциональность для нескольких пользователей, например, чат.
 
 <Tabs
   groupId="js-flavor"
   defaultValue="test"
   values={[
-    {label: 'Test', value: 'test'},
-    {label: 'Library', value: 'library'}
+    {label: 'Тест', value: 'test'},
+    {label: 'Библиотека', value: 'library'}
   ]
 }>
 <TabItem value="test">
@@ -82,12 +82,12 @@ Playwright can create multiple browser contexts within a single scenario. This i
 ```js
 import { test } from '@playwright/test';
 
-test('admin and user', async ({ browser }) => {
-  // Create two isolated browser contexts
+test('администратор и пользователь', async ({ browser }) => {
+  // Создайте два изолированных контекста браузера
   const adminContext = await browser.newContext();
   const userContext = await browser.newContext();
 
-  // Create pages and interact with contexts independently
+  // Создайте страницы и взаимодействуйте с контекстами независимо
   const adminPage = await adminContext.newPage();
   const userPage = await userContext.newPage();
 });
@@ -99,14 +99,14 @@ test('admin and user', async ({ browser }) => {
 ```js
 const { chromium } = require('playwright');
 
-// Create a Chromium browser instance
+// Создайте экземпляр браузера Chromium
 const browser = await chromium.launch();
 
-// Create two isolated browser contexts
+// Создайте два изолированных контекста браузера
 const userContext = await browser.newContext();
 const adminContext = await browser.newContext();
 
-// Create pages and interact with contexts independently
+// Создайте страницы и взаимодействуйте с контекстами независимо
 const adminPage = await adminContext.newPage();
 const userPage = await userContext.newPage();
 ```
@@ -217,6 +217,6 @@ const userPage = await userContext.newPage();
 [URL]: https://nodejs.org/api/url.html "URL"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
+[все доступные теги изображений]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"
+[Регистр артефактов Microsoft]: https://mcr.microsoft.com/en-us/product/playwright/about "Регистр артефактов Microsoft"
 [Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

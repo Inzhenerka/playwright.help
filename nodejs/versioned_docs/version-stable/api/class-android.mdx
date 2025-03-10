@@ -6,45 +6,44 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+Playwright имеет **экспериментальную** поддержку автоматизации Android. Это включает Chrome для Android и Android WebView.
 
-Playwright has **experimental** support for Android automation. This includes Chrome for Android and Android WebView.
+*Требования*
+* Устройство Android или эмулятор AVD.
+* Запущенный и аутентифицированный [демон ADB](https://developer.android.com/studio/command-line/adb) с вашим устройством. Обычно достаточно выполнить `adb devices`.
+* Установленный на устройстве [`Chrome 87`](https://play.google.com/store/apps/details?id=com.android.chrome) или более новой версии.
+* Включена опция "Enable command line on non-rooted devices" в `chrome://flags`.
 
-*Requirements*
-* Android device or AVD Emulator.
-* [ADB daemon](https://developer.android.com/studio/command-line/adb) running and authenticated with your device. Typically running `adb devices` is all you need to do.
-* [`Chrome 87`](https://play.google.com/store/apps/details?id=com.android.chrome) or newer installed on the device
-* "Enable command line on non-rooted devices" enabled in `chrome://flags`.
+*Известные ограничения*
+* Прямые операции с USB пока не поддерживаются, поэтому вам нужен ADB.
+* Устройство должно быть разбужено для создания скриншотов. Включение режима разработчика "Stay awake" поможет.
+* Мы не запускали все тесты на устройстве, поэтому не все функции могут работать.
 
-*Known limitations*
-* Raw USB operation is not yet supported, so you need ADB.
-* Device needs to be awake to produce screenshots. Enabling "Stay awake" developer mode will help.
-* We didn't run all the tests against the device, so not everything works.
+*Как запустить*
 
-*How to run*
-
-An example of the Android automation script would be:
+Пример скрипта автоматизации для Android:
 
 ```js
 const { _android: android } = require('playwright');
 
 (async () => {
-  // Connect to the device.
+  // Подключение к устройству.
   const [device] = await android.devices();
-  console.log(`Model: ${device.model()}`);
-  console.log(`Serial: ${device.serial()}`);
-  // Take screenshot of the whole device.
+  console.log(`Модель: ${device.model()}`);
+  console.log(`Серийный номер: ${device.serial()}`);
+  // Сделать скриншот всего устройства.
   await device.screenshot({ path: 'device.png' });
 
   {
     // --------------------- WebView -----------------------
 
-    // Launch an application with WebView.
+    // Запуск приложения с WebView.
     await device.shell('am force-stop org.chromium.webview_shell');
     await device.shell('am start org.chromium.webview_shell/.WebViewBrowserActivity');
-    // Get the WebView.
+    // Получить WebView.
     const webview = await device.webView({ pkg: 'org.chromium.webview_shell' });
 
-    // Fill the input box.
+    // Заполнить поле ввода.
     await device.fill({
       res: 'org.chromium.webview_shell:id/url_field',
     }, 'github.com/microsoft/playwright');
@@ -52,20 +51,20 @@ const { _android: android } = require('playwright');
       res: 'org.chromium.webview_shell:id/url_field',
     }, 'Enter');
 
-    // Work with WebView's page as usual.
+    // Работать с страницей WebView как обычно.
     const page = await webview.page();
     await page.waitForNavigation({ url: /.*microsoft\/playwright.*/ });
     console.log(await page.title());
   }
 
   {
-    // --------------------- Browser -----------------------
+    // --------------------- Браузер -----------------------
 
-    // Launch Chrome browser.
+    // Запуск браузера Chrome.
     await device.shell('am force-stop com.android.chrome');
     const context = await device.launchBrowser();
 
-    // Use BrowserContext as usual.
+    // Использовать BrowserContext как обычно.
     const page = await context.newPage();
     await page.goto('https://webkit.org/');
     console.log(await page.evaluate(() => window.location.href));
@@ -74,95 +73,94 @@ const { _android: android } = require('playwright');
     await context.close();
   }
 
-  // Close the device.
+  // Закрыть устройство.
   await device.close();
 })();
 ```
 
-
 ---
 
-## Methods
+## Методы
 
 ### connect {#android-connect}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.28</font><x-search>android.connect</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.28</font><x-search>android.connect</x-search>
 
-This methods attaches Playwright to an existing Android device. Use [android.launchServer()](/api/class-android.mdx#android-launch-server) to launch a new Android server instance.
+Этот метод подключает Playwright к существующему устройству Android. Используйте [android.launchServer()](/api/class-android.mdx#android-launch-server) для запуска нового экземпляра сервера Android.
 
-**Usage**
+**Использование**
 
 ```js
 await android.connect(wsEndpoint);
 await android.connect(wsEndpoint, options);
 ```
 
-**Arguments**
+**Аргументы**
 - `wsEndpoint` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-connect-option-ws-endpoint"/><a href="#android-connect-option-ws-endpoint" class="list-anchor">#</a>
   
-  A browser websocket endpoint to connect to.
-- `options` [Object] *(optional)*
-  - `headers` [Object]&lt;[string], [string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-connect-option-headers"/><a href="#android-connect-option-headers" class="list-anchor">#</a>
+  Веб-сокет конечная точка браузера для подключения.
+- `options` [Object] *(необязательно)*
+  - `headers` [Object]&lt;[string], [string]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-connect-option-headers"/><a href="#android-connect-option-headers" class="list-anchor">#</a>
     
-    Additional HTTP headers to be sent with web socket connect request. Optional.
-  - `slowMo` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-connect-option-slow-mo"/><a href="#android-connect-option-slow-mo" class="list-anchor">#</a>
+    Дополнительные HTTP заголовки, которые будут отправлены с запросом на подключение веб-сокета. Необязательно.
+  - `slowMo` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-connect-option-slow-mo"/><a href="#android-connect-option-slow-mo" class="list-anchor">#</a>
     
-    Slows down Playwright operations by the specified amount of milliseconds. Useful so that you can see what is going on. Defaults to `0`.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-connect-option-timeout"/><a href="#android-connect-option-timeout" class="list-anchor">#</a>
+    Замедляет операции Playwright на указанное количество миллисекунд. Полезно, чтобы вы могли видеть, что происходит. По умолчанию `0`.
+  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-connect-option-timeout"/><a href="#android-connect-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds to wait for the connection to be established. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
+    Максимальное время в миллисекундах для ожидания установления соединения. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[AndroidDevice]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-connect-return"/><a href="#android-connect-return" class="list-anchor">#</a>
 
 ---
 
 ### devices {#android-devices}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>android.devices</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>android.devices</x-search>
 
-Returns the list of detected Android devices.
+Возвращает список обнаруженных устройств Android.
 
-**Usage**
+**Использование**
 
 ```js
 await android.devices();
 await android.devices(options);
 ```
 
-**Arguments**
-- `options` [Object] *(optional)*
-  - `host` [string] *(optional)* <font size="2">Added in: v1.22</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-devices-option-host"/><a href="#android-devices-option-host" class="list-anchor">#</a>
+**Аргументы**
+- `options` [Object] *(необязательно)*
+  - `host` [string] *(необязательно)* <font size="2">Добавлено в: v1.22</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-devices-option-host"/><a href="#android-devices-option-host" class="list-anchor">#</a>
     
-    Optional host to establish ADB server connection. Default to `127.0.0.1`.
-  - `omitDriverInstall` [boolean] *(optional)* <font size="2">Added in: v1.21</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-devices-option-omit-driver-install"/><a href="#android-devices-option-omit-driver-install" class="list-anchor">#</a>
+    Необязательный хост для установления соединения с сервером ADB. По умолчанию `127.0.0.1`.
+  - `omitDriverInstall` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.21</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-devices-option-omit-driver-install"/><a href="#android-devices-option-omit-driver-install" class="list-anchor">#</a>
     
-    Prevents automatic playwright driver installation on attach. Assumes that the drivers have been installed already.
-  - `port` [number] *(optional)* <font size="2">Added in: v1.20</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-devices-option-port"/><a href="#android-devices-option-port" class="list-anchor">#</a>
+    Предотвращает автоматическую установку драйвера playwright при подключении. Предполагается, что драйверы уже установлены.
+  - `port` [number] *(необязательно)* <font size="2">Добавлено в: v1.20</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-devices-option-port"/><a href="#android-devices-option-port" class="list-anchor">#</a>
     
-    Optional port to establish ADB server connection. Default to `5037`.
+    Необязательный порт для установления соединения с сервером ADB. По умолчанию `5037`.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[Array]&lt;[AndroidDevice]&gt;&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-devices-return"/><a href="#android-devices-return" class="list-anchor">#</a>
 
 ---
 
 ### launchServer {#android-launch-server}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.28</font><x-search>android.launchServer</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.28</font><x-search>android.launchServer</x-search>
 
-Launches Playwright Android server that clients can connect to. See the following example:
+Запускает сервер Playwright Android, к которому могут подключаться клиенты. См. следующий пример:
 
-**Usage**
+**Использование**
 
-Server Side:
+Сторона сервера:
 
 ```js
 const { _android } = require('playwright');
 
 (async () => {
   const browserServer = await _android.launchServer({
-    // If you have multiple devices connected and want to use a specific one.
+    // Если у вас подключено несколько устройств и вы хотите использовать конкретное.
     // deviceSerialNumber: '<deviceSerialNumber>',
   });
   const wsEndpoint = browserServer.wsEndpoint();
@@ -170,7 +168,7 @@ const { _android } = require('playwright');
 })();
 ```
 
-Client Side:
+Сторона клиента:
 
 ```js
 const { _android } = require('playwright');
@@ -192,57 +190,56 @@ const { _android } = require('playwright');
 })();
 ```
 
-**Arguments**
-- `options` [Object] *(optional)*
-  - `adbHost` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-launch-server-option-adb-host"/><a href="#android-launch-server-option-adb-host" class="list-anchor">#</a>
+**Аргументы**
+- `options` [Object] *(необязательно)*
+  - `adbHost` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-launch-server-option-adb-host"/><a href="#android-launch-server-option-adb-host" class="list-anchor">#</a>
     
-    Optional host to establish ADB server connection. Default to `127.0.0.1`.
-  - `adbPort` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-launch-server-option-adb-port"/><a href="#android-launch-server-option-adb-port" class="list-anchor">#</a>
+    Необязательный хост для установления соединения с сервером ADB. По умолчанию `127.0.0.1`.
+  - `adbPort` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-launch-server-option-adb-port"/><a href="#android-launch-server-option-adb-port" class="list-anchor">#</a>
     
-    Optional port to establish ADB server connection. Default to `5037`.
-  - `deviceSerialNumber` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-launch-server-option-device-serial-number"/><a href="#android-launch-server-option-device-serial-number" class="list-anchor">#</a>
+    Необязательный порт для установления соединения с сервером ADB. По умолчанию `5037`.
+  - `deviceSerialNumber` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-launch-server-option-device-serial-number"/><a href="#android-launch-server-option-device-serial-number" class="list-anchor">#</a>
     
-    Optional device serial number to launch the browser on. If not specified, it will throw if multiple devices are connected.
-  - `host` [string] *(optional)* <font size="2">Added in: v1.45</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-launch-server-option-host"/><a href="#android-launch-server-option-host" class="list-anchor">#</a>
+    Необязательный серийный номер устройства для запуска браузера. Если не указано, будет выдано исключение, если подключено несколько устройств.
+  - `host` [string] *(необязательно)* <font size="2">Добавлено в: v1.45</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-launch-server-option-host"/><a href="#android-launch-server-option-host" class="list-anchor">#</a>
     
-    Host to use for the web socket. It is optional and if it is omitted, the server will accept connections on the unspecified IPv6 address (::) when IPv6 is available, or the unspecified IPv4 address (0.0.0.0) otherwise. Consider hardening it with picking a specific interface.
-  - `omitDriverInstall` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-launch-server-option-omit-driver-install"/><a href="#android-launch-server-option-omit-driver-install" class="list-anchor">#</a>
+    Хост для использования для веб-сокета. Это необязательно, и если оно опущено, сервер будет принимать соединения на неопределенном IPv6 адресе (::), когда доступен IPv6, или на неопределенном IPv4 адресе (0.0.0.0) в противном случае. Рассмотрите возможность усиления безопасности, выбрав конкретный интерфейс.
+  - `omitDriverInstall` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-launch-server-option-omit-driver-install"/><a href="#android-launch-server-option-omit-driver-install" class="list-anchor">#</a>
     
-    Prevents automatic playwright driver installation on attach. Assumes that the drivers have been installed already.
-  - `port` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-launch-server-option-port"/><a href="#android-launch-server-option-port" class="list-anchor">#</a>
+    Предотвращает автоматическую установку драйвера playwright при подключении. Предполагается, что драйверы уже установлены.
+  - `port` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-launch-server-option-port"/><a href="#android-launch-server-option-port" class="list-anchor">#</a>
     
-    Port to use for the web socket. Defaults to 0 that picks any available port.
-  - `wsPath` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-launch-server-option-ws-path"/><a href="#android-launch-server-option-ws-path" class="list-anchor">#</a>
+    Порт для использования для веб-сокета. По умолчанию 0, что выбирает любой доступный порт.
+  - `wsPath` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-launch-server-option-ws-path"/><a href="#android-launch-server-option-ws-path" class="list-anchor">#</a>
     
-    Path at which to serve the Android Server. For security, this defaults to an unguessable string.
+    Путь, по которому будет обслуживаться сервер Android. Для безопасности по умолчанию используется строка, которую трудно угадать.
     
     :::warning
     
-    Any process or web page (including those running in Playwright) with knowledge of the `wsPath` can take control of the OS user. For this reason, you should use an unguessable token when using this option.
+    Любой процесс или веб-страница (включая те, которые работают в Playwright), знающие о `wsPath`, могут взять под контроль пользователя ОС. По этой причине вы должны использовать строку, которую трудно угадать, при использовании этой опции.
     :::
-    
-**Returns**
-- [Promise]&lt;[BrowserServer]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-launch-server-return"/><a href="#android-launch-server-return" class="list-anchor">#</a>
+
+**Возвращает**
+- [Promise]&lt;[BrowserServer]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-launch-server-return"/><a href="#android-launch-server-option-ws-path" class="list-anchor">#</a>
 
 ---
 
 ### setDefaultTimeout {#android-set-default-timeout}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>android.setDefaultTimeout</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>android.setDefaultTimeout</x-search>
 
-This setting will change the default maximum time for all the methods accepting [timeout](/api/class-android.mdx#android-set-default-timeout-option-timeout) option.
+Эта настройка изменит максимальное время по умолчанию для всех методов, принимающих опцию [timeout](/api/class-android.mdx#android-set-default-timeout-option-timeout).
 
-**Usage**
+**Использование**
 
 ```js
 android.setDefaultTimeout(timeout);
 ```
 
-**Arguments**
+**Аргументы**
 - `timeout` [number]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="android-set-default-timeout-option-timeout"/><a href="#android-set-default-timeout-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds
-
+  Максимальное время в миллисекундах
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"

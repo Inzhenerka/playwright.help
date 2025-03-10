@@ -1,25 +1,25 @@
 ---
 id: locators
-title: "Locators"
+title: "Локаторы"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-[Locator]s are the central piece of Playwright's auto-waiting and retry-ability. In a nutshell, locators represent a way to find element(s) on the page at any moment.
+[Локаторы] являются центральным элементом автоматического ожидания и возможности повторной попытки в Playwright. В двух словах, локаторы представляют собой способ находить элемент(ы) на странице в любой момент времени.
 
-### Quick Guide
+### Быстрый справочник
 
-These are the recommended built-in locators.
-- [page.getByRole()](#locate-by-role) to locate by explicit and implicit accessibility attributes.
-- [page.getByText()](#locate-by-text) to locate by text content.
-- [page.getByLabel()](#locate-by-label) to locate a form control by associated label's text.
-- [page.getByPlaceholder()](#locate-by-placeholder) to locate an input by placeholder.
-- [page.getByAltText()](#locate-by-alt-text) to locate an element, usually image, by its text alternative.
-- [page.getByTitle()](#locate-by-title) to locate an element by its title attribute.
-- [page.getByTestId()](#locate-by-test-id) to locate an element based on its `data-testid` attribute (other attributes can be configured).
+Это рекомендуемые встроенные локаторы.
+- [page.getByRole()](#locate-by-role) для поиска по явным и неявным атрибутам доступности.
+- [page.getByText()](#locate-by-text) для поиска по текстовому содержимому.
+- [page.getByLabel()](#locate-by-label) для поиска элемента управления формы по связанному тексту метки.
+- [page.getByPlaceholder()](#locate-by-placeholder) для поиска поля ввода по плейсхолдеру.
+- [page.getByAltText()](#locate-by-alt-text) для поиска элемента, обычно изображения, по его альтернативному тексту.
+- [page.getByTitle()](#locate-by-title) для поиска элемента по его атрибуту title.
+- [page.getByTestId()](#locate-by-test-id) для поиска элемента на основе его атрибута `data-testid` (другие атрибуты могут быть настроены).
 
 ```js
 await page.getByLabel('User Name').fill('John');
@@ -31,11 +31,11 @@ await page.getByRole('button', { name: 'Sign in' }).click();
 await expect(page.getByText('Welcome, John!')).toBeVisible();
 ```
 
-## Locating elements
+## Поиск элементов
 
-Playwright comes with multiple built-in locators. To make tests resilient, we recommend prioritizing user-facing attributes and explicit contracts such as [page.getByRole()](/api/class-page.mdx#page-get-by-role).
+Playwright предоставляет несколько встроенных локаторов. Чтобы сделать тесты более устойчивыми, мы рекомендуем приоритизировать атрибуты, видимые пользователю, и явные контракты, такие как [page.getByRole()](/api/class-page.mdx#page-get-by-role).
 
-For example, consider the following DOM structure.
+Например, рассмотрим следующую структуру DOM.
 
 <HTMLCard>
 <div>
@@ -47,17 +47,17 @@ For example, consider the following DOM structure.
 ```
 </HTMLCard>
 
-Locate the element by its role of `button` with name "Sign in".
+Найдите элемент по его роли `button` с именем "Sign in".
 
 ```js
 await page.getByRole('button', { name: 'Sign in' }).click();
 ```
 
 :::note
-Use the [code generator](./codegen.mdx) to generate a locator, and then edit it as you'd like.
+Используйте [генератор кода](./codegen.mdx), чтобы сгенерировать локатор, а затем отредактируйте его по своему усмотрению.
 :::
 
-Every time a locator is used for an action, an up-to-date DOM element is located in the page. In the snippet below, the underlying DOM element will be located twice, once prior to every action. This means that if the DOM changes in between the calls due to re-render, the new element corresponding to the locator will be used.
+Каждый раз, когда локатор используется для действия, на странице находится актуальный элемент DOM. В приведенном ниже фрагменте кода элемент DOM будет найден дважды, один раз перед каждым действием. Это означает, что если DOM изменится между вызовами из-за повторного рендеринга, будет использован новый элемент, соответствующий локатору.
 
 ```js
 const locator = page.getByRole('button', { name: 'Sign in' });
@@ -66,7 +66,7 @@ await locator.hover();
 await locator.click();
 ```
 
-Note that all methods that create a locator, such as [page.getByLabel()](/api/class-page.mdx#page-get-by-label), are also available on the [Locator] and [FrameLocator] classes, so you can chain them and iteratively narrow down your locator.
+Обратите внимание, что все методы, создающие локатор, такие как [page.getByLabel()](/api/class-page.mdx#page-get-by-label), также доступны в классах [Locator] и [FrameLocator], поэтому вы можете связывать их и итеративно уточнять ваш локатор.
 
 ```js
 const locator = page
@@ -76,11 +76,11 @@ const locator = page
 await locator.click();
 ```
 
-### Locate by role
+### Поиск по роли
 
-The [page.getByRole()](/api/class-page.mdx#page-get-by-role) locator reflects how users and assistive technology perceive the page, for example whether some element is a button or a checkbox. When locating by role, you should usually pass the accessible name as well, so that the locator pinpoints the exact element.
+Локатор [page.getByRole()](/api/class-page.mdx#page-get-by-role) отражает то, как пользователи и вспомогательные технологии воспринимают страницу, например, является ли некоторый элемент кнопкой или флажком. При поиске по роли вы обычно должны также передавать доступное имя, чтобы локатор точно указывал на нужный элемент.
 
-For example, consider the following DOM structure.
+Например, рассмотрим следующую структуру DOM.
 
 <HTMLCard>
 <div>
@@ -102,7 +102,7 @@ For example, consider the following DOM structure.
 ```
 </HTMLCard>
 
-You can locate each element by its implicit role:
+Вы можете найти каждый элемент по его неявной роли:
 
 ```js
 await expect(page.getByRole('heading', { name: 'Sign up' })).toBeVisible();
@@ -112,20 +112,20 @@ await page.getByRole('checkbox', { name: 'Subscribe' }).check();
 await page.getByRole('button', { name: /submit/i }).click();
 ```
 
-Role locators include [buttons, checkboxes, headings, links, lists, tables, and many more](https://www.w3.org/TR/html-aria/#docconformance) and follow W3C specifications for [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name). Note that many html elements like `<button>` have an [implicitly defined role](https://w3c.github.io/html-aam/#html-element-role-mappings) that is recognized by the role locator.
+Локаторы по ролям включают [кнопки, флажки, заголовки, ссылки, списки, таблицы и многие другие](https://www.w3.org/TR/html-aria/#docconformance) и следуют спецификациям W3C для [ARIA ролей](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA атрибутов](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) и [доступного имени](https://w3c.github.io/accname/#dfn-accessible-name). Обратите внимание, что многие HTML элементы, такие как `<button>`, имеют [неявно определенную роль](https://w3c.github.io/html-aam/#html-element-role-mappings), которая распознается локатором по роли.
 
-Note that role locators **do not replace** accessibility audits and conformance tests, but rather give early feedback about the ARIA guidelines.
+Обратите внимание, что локаторы по ролям **не заменяют** аудиты доступности и тесты на соответствие, а скорее предоставляют раннюю обратную связь о руководящих принципах ARIA.
 
-:::note[When to use role locators]
+:::note[Когда использовать локаторы по ролям]
 
-We recommend prioritizing role locators to locate elements, as it is the closest way to how users and assistive technology perceive the page.
+Мы рекомендуем приоритизировать локаторы по ролям для поиска элементов, так как это наиболее близкий способ к тому, как пользователи и вспомогательные технологии воспринимают страницу.
 :::
 
-### Locate by label
+### Поиск по метке
 
-Most form controls usually have dedicated labels that could be conveniently used to interact with the form. In this case, you can locate the control by its associated label using [page.getByLabel()](/api/class-page.mdx#page-get-by-label).
+Большинство элементов управления формами обычно имеют специальные метки, которые можно удобно использовать для взаимодействия с формой. В этом случае вы можете найти элемент управления по его связанной метке, используя [page.getByLabel()](/api/class-page.mdx#page-get-by-label).
 
-For example, consider the following DOM structure.
+Например, рассмотрим следующую структуру DOM.
 
 <HTMLCard>
 <div>
@@ -139,21 +139,21 @@ For example, consider the following DOM structure.
 ```
 </HTMLCard>
 
-You can fill the input after locating it by the label text:
+Вы можете заполнить поле ввода после его нахождения по тексту метки:
 
 ```js
 await page.getByLabel('Password').fill('secret');
 ```
 
-:::note[When to use label locators]
-Use this locator when locating form fields.
+:::note[Когда использовать локаторы по меткам]
+Используйте этот локатор при поиске полей формы.
 :::
 
-### Locate by placeholder
+### Поиск по плейсхолдеру
 
-Inputs may have a placeholder attribute to hint to the user what value should be entered. You can locate such an input using [page.getByPlaceholder()](/api/class-page.mdx#page-get-by-placeholder).
+Поля ввода могут иметь атрибут плейсхолдера, чтобы подсказать пользователю, какое значение следует ввести. Вы можете найти такое поле ввода, используя [page.getByPlaceholder()](/api/class-page.mdx#page-get-by-placeholder).
 
-For example, consider the following DOM structure.
+Например, рассмотрим следующую структуру DOM.
 
 <HTMLCard>
 <div>
@@ -165,7 +165,7 @@ For example, consider the following DOM structure.
 ```
 </HTMLCard>
 
-You can fill the input after locating it by the placeholder text:
+Вы можете заполнить поле ввода после его нахождения по тексту плейсхолдера:
 
 ```js
 await page
@@ -173,15 +173,15 @@ await page
     .fill('playwright@microsoft.com');
 ```
 
-:::note[When to use placeholder locators]
-Use this locator when locating form elements that do not have labels but do have placeholder texts.
+:::note[Когда использовать локаторы по плейсхолдеру]
+Используйте этот локатор при поиске элементов формы, которые не имеют меток, но имеют текст плейсхолдера.
 :::
 
-### Locate by text
+### Поиск по тексту
 
-Find an element by the text it contains. You can match by a substring, exact string, or a regular expression when using [page.getByText()](/api/class-page.mdx#page-get-by-text).
+Найдите элемент по тексту, который он содержит. Вы можете сопоставить подстроку, точную строку или регулярное выражение, используя [page.getByText()](/api/class-page.mdx#page-get-by-text).
 
-For example, consider the following DOM structure.
+Например, рассмотрим следующую структуру DOM.
 
 <HTMLCard>
 <div>
@@ -193,39 +193,39 @@ For example, consider the following DOM structure.
 ```
 </HTMLCard>
 
-You can locate the element by the text it contains:
+Вы можете найти элемент по тексту, который он содержит:
 
 ```js
 await expect(page.getByText('Welcome, John')).toBeVisible();
 ```
 
-Set an exact match:
+Установите точное совпадение:
 
 ```js
 await expect(page.getByText('Welcome, John', { exact: true })).toBeVisible();
 ```
 
-Match with a regular expression:
+Сопоставьте с помощью регулярного выражения:
 
 ```js
 await expect(page.getByText(/welcome, [A-Za-z]+$/i)).toBeVisible();
 ```
 
 :::note
-Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
+Сопоставление по тексту всегда нормализует пробелы, даже при точном совпадении. Например, оно превращает несколько пробелов в один, заменяет переносы строк на пробелы и игнорирует начальные и конечные пробелы.
 :::
 
-:::note[When to use text locators]
-We recommend using text locators to find non interactive elements like `div`, `span`, `p`, etc. For interactive elements like `button`, `a`, `input`, etc. use [role locators](#locate-by-role).
+:::note[Когда использовать текстовые локаторы]
+Мы рекомендуем использовать текстовые локаторы для поиска не интерактивных элементов, таких как `div`, `span`, `p` и т.д. Для интерактивных элементов, таких как `button`, `a`, `input` и т.д., используйте [локаторы по ролям](#locate-by-role).
 :::
 
-You can also [filter by text](#filter-by-text) which can be useful when trying to find a particular item in a list.
+Вы также можете [фильтровать по тексту](#filter-by-text), что может быть полезно при попытке найти конкретный элемент в списке.
 
-### Locate by alt text
+### Поиск по альтернативному тексту
 
-All images should have an `alt` attribute that describes the image. You can locate an image based on the text alternative using [page.getByAltText()](/api/class-page.mdx#page-get-by-alt-text).
+Все изображения должны иметь атрибут `alt`, который описывает изображение. Вы можете найти изображение на основе альтернативного текста, используя [page.getByAltText()](/api/class-page.mdx#page-get-by-alt-text).
 
-For example, consider the following DOM structure.
+Например, рассмотрим следующую структуру DOM.
 
 <HTMLCard>
 <div>
@@ -237,21 +237,21 @@ For example, consider the following DOM structure.
 ```
 </HTMLCard>
 
-You can click on the image after locating it by the text alternative:
+Вы можете кликнуть на изображение после его нахождения по альтернативному тексту:
 
 ```js
 await page.getByAltText('playwright logo').click();
 ```
 
-:::note[When to use alt locators]
-Use this locator when your element supports alt text such as `img` and `area` elements.
+:::note[Когда использовать локаторы по альтернативному тексту]
+Используйте этот локатор, когда ваш элемент поддерживает альтернативный текст, такой как элементы `img` и `area`.
 :::
 
-### Locate by title
+### Поиск по заголовку
 
-Locate an element with a matching title attribute using [page.getByTitle()](/api/class-page.mdx#page-get-by-title).
+Найдите элемент с совпадающим атрибутом title, используя [page.getByTitle()](/api/class-page.mdx#page-get-by-title).
 
-For example, consider the following DOM structure.
+Например, рассмотрим следующую структуру DOM.
 
 <HTMLCard>
 <div>
@@ -263,21 +263,21 @@ For example, consider the following DOM structure.
 ```
 </HTMLCard>
 
-You can check the issues count after locating it by the title text:
+Вы можете проверить количество проблем после его нахождения по тексту заголовка:
 
 ```js
 await expect(page.getByTitle('Issues count')).toHaveText('25 issues');
 ```
 
-:::note[When to use title locators]
-Use this locator when your element has the `title` attribute.
+:::note[Когда использовать локаторы по заголовку]
+Используйте этот локатор, когда ваш элемент имеет атрибут `title`.
 :::
 
-### Locate by test id
+### Поиск по тестовому идентификатору
 
-Testing by test ids is the most resilient way of testing as even if your text or role of the attribute changes, the test will still pass. QA's and developers should define explicit test ids and query them with [page.getByTestId()](/api/class-page.mdx#page-get-by-test-id). However testing by test ids is not user facing. If the role or text value is important to you then consider using user facing locators such as [role](#locate-by-role) and [text locators](#locate-by-text).
+Тестирование по тестовым идентификаторам является наиболее устойчивым способом тестирования, так как даже если ваш текст или роль атрибута изменится, тест все равно пройдет. QA и разработчики должны определять явные тестовые идентификаторы и запрашивать их с помощью [page.getByTestId()](/api/class-page.mdx#page-get-by-test-id). Однако тестирование по тестовым идентификаторам не является ориентированным на пользователя. Если роль или значение текста важны для вас, то рассмотрите возможность использования ориентированных на пользователя локаторов, таких как [роль](#locate-by-role) и [текстовые локаторы](#locate-by-text).
 
-For example, consider the following DOM structure.
+Например, рассмотрим следующую структуру DOM.
 
 <HTMLCard>
 <div>
@@ -289,21 +289,21 @@ For example, consider the following DOM structure.
 ```
 </HTMLCard>
 
-You can locate the element by its test id:
+Вы можете найти элемент по его тестовому идентификатору:
 
 ```js
 await page.getByTestId('directions').click();
 ```
 
-:::note[When to use testid locators]
-You can also use test ids when you choose to use the test id methodology or when you can't locate by [role](#locate-by-role) or [text](#locate-by-text).
+:::note[Когда использовать локаторы по тестовому идентификатору]
+Вы также можете использовать тестовые идентификаторы, когда вы выбираете методологию тестового идентификатора или когда не можете найти по [ролям](#locate-by-role) или [тексту](#locate-by-text).
 :::
 
-#### Set a custom test id attribute
+#### Установка пользовательского атрибута тестового идентификатора
 
-By default, [page.getByTestId()](/api/class-page.mdx#page-get-by-test-id) will locate elements based on the `data-testid` attribute, but you can configure it in your test config or by calling [selectors.setTestIdAttribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute).
+По умолчанию [page.getByTestId()](/api/class-page.mdx#page-get-by-test-id) будет находить элементы на основе атрибута `data-testid`, но вы можете настроить его в конфигурации вашего теста или вызвав [selectors.setTestIdAttribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute).
 
-Set the test id to use a custom data attribute for your tests.
+Установите тестовый идентификатор для использования пользовательского атрибута данных в ваших тестах.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -315,7 +315,7 @@ export default defineConfig({
 });
 ```
 
-In your html you can now use `data-pw` as your test id instead of the default `data-testid`.
+В вашем HTML вы теперь можете использовать `data-pw` в качестве вашего тестового идентификатора вместо стандартного `data-testid`.
 
 <HTMLCard>
 <div>
@@ -327,15 +327,15 @@ In your html you can now use `data-pw` as your test id instead of the default `d
 ```
 </HTMLCard>
 
-And then locate the element as you would normally do:
+А затем находите элемент так, как вы обычно это делаете:
 
 ```js
 await page.getByTestId('directions').click();
 ```
 
-### Locate by CSS or XPath
+### Поиск по CSS или XPath
 
-If you absolutely must use CSS or XPath locators, you can use [page.locator()](/api/class-page.mdx#page-locator) to create a locator that takes a selector describing how to find an element in the page. Playwright supports CSS and XPath selectors, and auto-detects them if you omit `css=` or `xpath=` prefix.
+Если вам абсолютно необходимо использовать локаторы CSS или XPath, вы можете использовать [page.locator()](/api/class-page.mdx#page-locator), чтобы создать локатор, который принимает селектор, описывающий, как найти элемент на странице. Playwright поддерживает селекторы CSS и XPath и автоматически определяет их, если вы опустите префикс `css=` или `xpath=`.
 
 ```js
 await page.locator('css=button').click();
@@ -345,7 +345,7 @@ await page.locator('button').click();
 await page.locator('//button').click();
 ```
 
-XPath and CSS selectors can be tied to the DOM structure or implementation. These selectors can break when the DOM structure changes. Long CSS or XPath chains below are an example of a **bad practice** that leads to unstable tests:
+Селекторы XPath и CSS могут быть связаны со структурой DOM или реализацией. Эти селекторы могут сломаться, когда структура DOM изменится. Длинные цепочки CSS или XPath ниже являются примером **плохой практики**, которая приводит к нестабильным тестам:
 
 ```js
 await page.locator(
@@ -357,17 +357,17 @@ await page
     .click();
 ```
 
-:::note[When to use this]
-CSS and XPath are not recommended as the DOM can often change leading to non resilient tests. Instead, try to come up with a locator that is close to how the user perceives the page such as [role locators](#locate-by-role) or [define an explicit testing contract](#locate-by-test-id) using test ids.
+:::note[Когда использовать это]
+CSS и XPath не рекомендуются, так как DOM может часто изменяться, что приводит к нестабильным тестам. Вместо этого постарайтесь придумать локатор, который будет близок к тому, как пользователь воспринимает страницу, например, [локаторы по ролям](#locate-by-role) или [определите явный тестовый контракт](#locate-by-test-id) с использованием тестовых идентификаторов.
 :::
 
-## Locate in Shadow DOM
+## Поиск в Shadow DOM
 
-All locators in Playwright **by default** work with elements in Shadow DOM. The exceptions are:
-- Locating by XPath does not pierce shadow roots.
-- [Closed-mode shadow roots](https://developer.mozilla.org/en-US/docs/Web/API/Element/attachShadow#parameters) are not supported.
+Все локаторы в Playwright **по умолчанию** работают с элементами в Shadow DOM. Исключения составляют:
+- Поиск по XPath не проникает в корни теней.
+- [Закрытые корни теней](https://developer.mozilla.org/en-US/docs/Web/API/Element/attachShadow#parameters) не поддерживаются.
 
-Consider the following example with a custom web component:
+Рассмотрим следующий пример с пользовательским веб-компонентом:
 
 ```html
 <x-details role=button aria-expanded=true aria-controls=inner-details>
@@ -377,9 +377,9 @@ Consider the following example with a custom web component:
 </x-details>
 ```
 
-You can locate in the same way as if the shadow root was not present at all.
+Вы можете находить элементы так же, как если бы корень теней вообще не присутствовал.
 
-To click `<div>Details</div>`:
+Чтобы кликнуть на `<div>Details</div>`:
 
 ```js
 await page.getByText('Details').click();
@@ -393,7 +393,7 @@ await page.getByText('Details').click();
 </x-details>
 ```
 
-To click `<x-details>`:
+Чтобы кликнуть на `<x-details>`:
 
 ```js
 await page.locator('x-details', { hasText: 'Details' }).click();
@@ -407,15 +407,15 @@ await page.locator('x-details', { hasText: 'Details' }).click();
 </x-details>
 ```
 
-To ensure that `<x-details>` contains the text "Details":
+Чтобы убедиться, что `<x-details>` содержит текст "Details":
 
 ```js
 await expect(page.locator('x-details')).toContainText('Details');
 ```
 
-## Filtering Locators
+## Фильтрация локаторов
 
-Consider the following DOM structure where we want to click on the buy button of the second product card. We have a few options in order to filter the locators to get the right one.
+Рассмотрим следующую структуру DOM, где мы хотим кликнуть на кнопку покупки второго карточки товара. У нас есть несколько вариантов, чтобы отфильтровать локаторы и получить нужный.
 
 <HTMLCard>
 <div>
@@ -445,9 +445,9 @@ Consider the following DOM structure where we want to click on the buy button of
 ```
 </HTMLCard>
 
-### Filter by text
+### Фильтрация по тексту
 
-Locators can be filtered by text with the [locator.filter()](/api/class-locator.mdx#locator-filter) method. It will search for a particular string somewhere inside the element, possibly in a descendant element, case-insensitively. You can also pass a regular expression.
+Локаторы могут быть отфильтрованы по тексту с помощью метода [locator.filter()](/api/class-locator.mdx#locator-filter). Он будет искать определенную строку где-то внутри элемента, возможно, в дочернем элементе, без учета регистра. Вы также можете передать регулярное выражение.
 
 ```js
 await page
@@ -457,7 +457,7 @@ await page
     .click();
 ```
 
-Use a regular expression:
+Используйте регулярное выражение:
 
 ```js
 await page
@@ -467,18 +467,18 @@ await page
     .click();
 ```
 
-### Filter by not having text
+### Фильтрация по отсутствию текста
 
-Alternatively, filter by **not having** text:
+В качестве альтернативы, фильтруйте по **отсутствию** текста:
 
 ```js
-// 5 in-stock items
+// 5 доступных товаров
 await expect(page.getByRole('listitem').filter({ hasNotText: 'Out of stock' })).toHaveCount(5);
 ```
 
-### Filter by child/descendant
+### Фильтрация по дочернему/потомственному элементу
 
-Locators support an option to only select elements that have or have not a descendant matching another locator. You can therefore filter by any other locator such as a [locator.getByRole()](/api/class-locator.mdx#locator-get-by-role), [locator.getByTestId()](/api/class-locator.mdx#locator-get-by-test-id), [locator.getByText()](/api/class-locator.mdx#locator-get-by-text) etc.
+Локаторы поддерживают опцию выбора только тех элементов, которые имеют или не имеют потомка, соответствующего другому локатору. Вы можете фильтровать по любому другому локатору, такому как [locator.getByRole()](/api/class-locator.mdx#locator-get-by-role), [locator.getByTestId()](/api/class-locator.mdx#locator-get-by-test-id), [locator.getByText()](/api/class-locator.mdx#locator-get-by-text) и т.д.
 
 <HTMLCard>
 <div>
@@ -516,7 +516,7 @@ await page
     .click();
 ```
 
-We can also assert the product card to make sure there is only one:
+Мы также можем утверждать, что карточка товара содержит только один элемент:
 
 ```js
 await expect(page
@@ -525,19 +525,19 @@ await expect(page
     .toHaveCount(1);
 ```
 
-The filtering locator **must be relative** to the original locator and is queried starting with the original locator match, not the document root. Therefore, the following will not work, because the filtering locator starts matching from the `<ul>` list element that is outside of the `<li>` list item matched by the original locator:
+Фильтрующий локатор **должен быть относительным** к исходному локатору и запрашивается, начиная с совпадения исходного локатора, а не с корня документа. Поэтому следующее не сработает, потому что фильтрующий локатор начинает совпадать с элемента списка `<ul>`, который находится вне элемента списка `<li>`, совпавшего с исходным локатором:
 
 ```js
-// ✖ WRONG
+// ✖ Неправильно
 await expect(page
     .getByRole('listitem')
     .filter({ has: page.getByRole('list').getByText('Product 2') }))
     .toHaveCount(1);
 ```
 
-### Filter by not having child/descendant
+### Фильтрация по отсутствию дочернего/потомственного элемента
 
-We can also filter by **not having** a matching element inside.
+Мы также можем фильтровать по **отсутствию** соответствующего элемента внутри.
 
 ```js
 await expect(page
@@ -546,15 +546,15 @@ await expect(page
     .toHaveCount(1);
 ```
 
-Note that the inner locator is matched starting from the outer one, not from the document root.
+Обратите внимание, что внутренний локатор совпадает, начиная с внешнего, а не с корня документа.
 
-## Locator operators
+## Операторы локаторов
 
-### Matching inside a locator
+### Совпадение внутри локатора
 
-You can chain methods that create a locator, like [page.getByText()](/api/class-page.mdx#page-get-by-text) or [locator.getByRole()](/api/class-locator.mdx#locator-get-by-role), to narrow down the search to a particular part of the page.
+Вы можете связывать методы, создающие локатор, такие как [page.getByText()](/api/class-page.mdx#page-get-by-text) или [locator.getByRole()](/api/class-locator.mdx#locator-get-by-role), чтобы уточнить поиск до определенной части страницы.
 
-In this example we first create a locator called product by locating its role of `listitem`. We then filter by text. We can use the product locator again to get by role of button and click it and then use an assertion to make sure there is only one product with the text "Product 2".
+В этом примере мы сначала создаем локатор, называемый продуктом, находя его роль `listitem`. Затем мы фильтруем по тексту. Мы можем снова использовать локатор продукта, чтобы получить по роли кнопки и кликнуть на нее, а затем использовать утверждение, чтобы убедиться, что существует только один продукт с текстом "Product 2".
 
 ```js
 const product = page.getByRole('listitem').filter({ hasText: 'Product 2' });
@@ -564,7 +564,7 @@ await product.getByRole('button', { name: 'Add to cart' }).click();
 await expect(product).toHaveCount(1);
 ```
 
-You can also chain two locators together, for example to find a "Save" button inside a particular dialog:
+Вы также можете связывать два локатора вместе, например, чтобы найти кнопку "Сохранить" внутри определенного диалога:
 
 ```js
 const saveButton = page.getByRole('button', { name: 'Save' });
@@ -573,23 +573,23 @@ const dialog = page.getByTestId('settings-dialog');
 await dialog.locator(saveButton).click();
 ```
 
-### Matching two locators simultaneously
+### Совпадение двух локаторов одновременно
 
-Method [locator.and()](/api/class-locator.mdx#locator-and) narrows down an existing locator by matching an additional locator. For example, you can combine [page.getByRole()](/api/class-page.mdx#page-get-by-role) and [page.getByTitle()](/api/class-page.mdx#page-get-by-title) to match by both role and title.
+Метод [locator.and()](/api/class-locator.mdx#locator-and) уточняет существующий локатор, совпадая с дополнительным локатором. Например, вы можете комбинировать [page.getByRole()](/api/class-page.mdx#page-get-by-role) и [page.getByTitle()](/api/class-page.mdx#page-get-by-title), чтобы совпадать по роли и заголовку.
 
 ```js
 const button = page.getByRole('button').and(page.getByTitle('Subscribe'));
 ```
 
-### Matching one of the two alternative locators
+### Совпадение одного из двух альтернативных локаторов
 
-If you'd like to target one of the two or more elements, and you don't know which one it will be, use [locator.or()](/api/class-locator.mdx#locator-or) to create a locator that matches any one or both of the alternatives.
+Если вы хотите нацелиться на один из двух или более элементов, и не знаете, какой из них будет, используйте [locator.or()](/api/class-locator.mdx#locator-or), чтобы создать локатор, который совпадает с любым из альтернатив.
 
-For example, consider a scenario where you'd like to click on a "New email" button, but sometimes a security settings dialog shows up instead. In this case, you can wait for either a "New email" button, or a dialog and act accordingly.
+Например, рассмотрим сценарий, когда вы хотите кликнуть на кнопку "Новое письмо", но иногда вместо этого появляется диалог безопасности. В этом случае вы можете ожидать либо кнопку "Новое письмо", либо диалог и действовать соответственно.
 
 :::note
 
-If both "New email" button and security dialog appear on screen, the "or" locator will match both of them, possibly throwing the ["strict mode violation" error](#strictness). In this case, you can use [locator.first()](/api/class-locator.mdx#locator-first) to only match one of them.
+Если и кнопка "Новое письмо", и диалог безопасности появляются на экране, локатор "или" совпадет с обоими, возможно, вызвав ошибку ["нарушения строгого режима"](./locators.mdx#strictness). В этом случае вы можете использовать [locator.first()](/api/class-locator.mdx#locator-first), чтобы совпадать только с одним из них.
 :::
 
 ```js
@@ -601,39 +601,39 @@ if (await dialog.isVisible())
 await newEmail.click();
 ```
 
-### Matching only visible elements
+### Совпадение только видимых элементов
 
 :::note
 
-It's usually better to find a [more reliable way](./locators.mdx#quick-guide) to uniquely identify the element instead of checking the visibility.
+Обычно лучше найти [более надежный способ](./locators.mdx#quick-guide) уникально идентифицировать элемент, вместо того чтобы проверять видимость.
 :::
 
-Consider a page with two buttons, the first invisible and the second [visible](./actionability.mdx#visible).
+Рассмотрим страницу с двумя кнопками, первая невидима, а вторая [видима](./actionability.mdx#visible).
 
 ```html
 <button style='display: none'>Invisible</button>
 <button>Visible</button>
 ```
 
-* This will find both buttons and throw a [strictness](./locators.mdx#strictness) violation error:
+* Это найдет обе кнопки и вызовет ошибку [строгости](./locators.mdx#strictness):
   
   ```js
   await page.locator('button').click();
   ```
   
-* This will only find a second button, because it is visible, and then click it.
+* Это найдет только вторую кнопку, потому что она видима, и затем кликнет на нее.
   
   ```js
   await page.locator('button').filter({ visible: true }).click();
   ```
   
-## Lists
+## Списки
 
-### Count items in a list
+### Подсчет элементов в списке
 
-You can assert locators in order to count the items in a list.
+Вы можете утверждать локаторы, чтобы подсчитать элементы в списке.
 
-For example, consider the following DOM structure:
+Например, рассмотрим следующую структуру DOM:
 
 <HTMLCard>
 <div>
@@ -653,17 +653,17 @@ For example, consider the following DOM structure:
 ```
 </HTMLCard>
 
-Use the count assertion to ensure that the list has 3 items.
+Используйте утверждение count, чтобы убедиться, что в списке 3 элемента.
 
 ```js
 await expect(page.getByRole('listitem')).toHaveCount(3);
 ```
 
-### Assert all text in a list
+### Утверждение всего текста в списке
 
-You can assert locators in order to find all the text in a list.
+Вы можете утверждать локаторы, чтобы найти весь текст в списке.
 
-For example, consider the following DOM structure:
+Например, рассмотрим следующую структуру DOM:
 
 <HTMLCard>
 <div>
@@ -683,7 +683,7 @@ For example, consider the following DOM structure:
 ```
 </HTMLCard>
 
-Use [expect(locator).toHaveText()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text) to ensure that the list has the text "apple", "banana" and "orange".
+Используйте [expect(locator).toHaveText()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text), чтобы убедиться, что в списке есть текст "apple", "banana" и "orange".
 
 ```js
 await expect(page
@@ -691,15 +691,15 @@ await expect(page
     .toHaveText(['apple', 'banana', 'orange']);
 ```
 
-### Get a specific item
+### Получение конкретного элемента
 
-There are many ways to get a specific item in a list.
+Существует множество способов получить конкретный элемент в списке.
 
-#### Get by text
+#### Получение по тексту
 
-Use the [page.getByText()](/api/class-page.mdx#page-get-by-text) method to locate an element in a list by its text content and then click on it.
+Используйте метод [page.getByText()](/api/class-page.mdx#page-get-by-text), чтобы найти элемент в списке по его текстовому содержимому, а затем кликнуть на него.
 
-For example, consider the following DOM structure:
+Например, рассмотрим следующую структуру DOM:
 
 <HTMLCard>
 <div>
@@ -719,17 +719,17 @@ For example, consider the following DOM structure:
 ```
 </HTMLCard>
 
-Locate an item by its text content and click it.
+Найдите элемент по его текстовому содержимому и кликните на него.
 
 ```js
 await page.getByText('orange').click();
 ```
 
-#### Filter by text
+#### Фильтрация по тексту
 
-Use the [locator.filter()](/api/class-locator.mdx#locator-filter) to locate a specific item in a list.
+Используйте [locator.filter()](/api/class-locator.mdx#locator-filter), чтобы найти конкретный элемент в списке.
 
-For example, consider the following DOM structure:
+Например, рассмотрим следующую структуру DOM:
 
 <HTMLCard>
 <div>
@@ -749,7 +749,7 @@ For example, consider the following DOM structure:
 ```
 </HTMLCard>
 
-Locate an item by the role of "listitem" and then filter by the text of "orange" and then click it.
+Найдите элемент по роли "listitem", а затем отфильтруйте по тексту "orange" и кликните на него.
 
 ```js
 await page
@@ -758,11 +758,11 @@ await page
     .click();
 ```
 
-#### Get by test id
+#### Получение по тестовому идентификатору
 
-Use the [page.getByTestId()](/api/class-page.mdx#page-get-by-test-id) method to locate an element in a list. You may need to modify the html and add a test id if you don't already have a test id.
+Используйте метод [page.getByTestId()](/api/class-page.mdx#page-get-by-test-id), чтобы найти элемент в списке. Вам может потребоваться изменить HTML и добавить тестовый идентификатор, если у вас его еще нет.
 
-For example, consider the following DOM structure:
+Например, рассмотрим следующую структуру DOM:
 
 <HTMLCard>
 <div>
@@ -782,27 +782,27 @@ For example, consider the following DOM structure:
 ```
 </HTMLCard>
 
-Locate an item by its test id of "orange" and then click it.
+Найдите элемент по его тестовому идентификатору "orange" и затем кликните на него.
 
 ```js
 await page.getByTestId('orange').click();
 ```
 
-#### Get by nth item
+#### Получение по порядковому номеру
 
-If you have a list of identical elements, and the only way to distinguish between them is the order, you can choose a specific element from a list with [locator.first()](/api/class-locator.mdx#locator-first), [locator.last()](/api/class-locator.mdx#locator-last) or [locator.nth()](/api/class-locator.mdx#locator-nth).
+Если у вас есть список идентичных элементов, и единственный способ различить их — это порядок, вы можете выбрать конкретный элемент из списка с помощью [locator.first()](/api/class-locator.mdx#locator-first), [locator.last()](/api/class-locator.mdx#locator-last) или [locator.nth()](/api/class-locator.mdx#locator-nth).
 
 ```js
 const banana = await page.getByRole('listitem').nth(1);
 ```
 
-However, use this method with caution. Often times, the page might change, and the locator will point to a completely different element from the one you expected. Instead, try to come up with a unique locator that will pass the [strictness criteria](#strictness).
+Однако используйте этот метод с осторожностью. Часто страница может измениться, и локатор укажет на совершенно другой элемент, чем вы ожидали. Вместо этого постарайтесь придумать уникальный локатор, который будет соответствовать [критериям строгости](#strictness).
 
-### Chaining filters
+### Цепочка фильтров
 
-When you have elements with various similarities, you can use the [locator.filter()](/api/class-locator.mdx#locator-filter) method to select the right one. You can also chain multiple filters to narrow down the selection.
+Когда у вас есть элементы с различными сходствами, вы можете использовать метод [locator.filter()](/api/class-locator.mdx#locator-filter), чтобы выбрать нужный. Вы также можете связывать несколько фильтров, чтобы уточнить выбор.
 
-For example, consider the following DOM structure:
+Например, рассмотрим следующую структуру DOM:
 
 <HTMLCard>
 <div>
@@ -848,7 +848,7 @@ For example, consider the following DOM structure:
 ```
 </HTMLCard>
 
-To take a screenshot of the row with "Mary" and "Say goodbye":
+Чтобы сделать снимок строки с "Mary" и "Say goodbye":
 
 ```js
 const rowLocator = page.getByRole('listitem');
@@ -859,20 +859,20 @@ await rowLocator
     .screenshot({ path: 'screenshot.png' });
 ```
 
-You should now have a "screenshot.png" file in your project's root directory.
+Теперь у вас должен быть файл "screenshot.png" в корневом каталоге вашего проекта.
 
-### Rare use cases
+### Редкие случаи использования
 
-#### Do something with each element in the list
+#### Выполнение действий с каждым элементом в списке
 
-Iterate elements:
+Итерация по элементам:
 
 ```js
 for (const row of await page.getByRole('listitem').all())
   console.log(await row.textContent());
 ```
 
-Iterate using regular for loop:
+Итерация с использованием обычного цикла for:
 
 ```js
 const rows = page.getByRole('listitem');
@@ -881,9 +881,9 @@ for (let i = 0; i < count; ++i)
   console.log(await rows.nth(i).textContent());
 ```
 
-#### Evaluate in the page
+#### Оценка на странице
 
-The code inside [locator.evaluateAll()](/api/class-locator.mdx#locator-evaluate-all) runs in the page, you can call any DOM apis there.
+Код внутри [locator.evaluateAll()](/api/class-locator.mdx#locator-evaluate-all) выполняется на странице, вы можете вызывать любые API DOM там.
 
 ```js
 const rows = page.getByRole('listitem');
@@ -891,133 +891,26 @@ const texts = await rows.evaluateAll(
     list => list.map(element => element.textContent));
 ```
 
-## Strictness
+## Строгость
 
-Locators are strict. This means that all operations on locators that imply some target DOM element will throw an exception if more than one element matches. For example, the following call throws if there are several buttons in the DOM:
+Локаторы строгие. Это означает, что все операции с локаторами, которые подразумевают некоторый целевой элемент DOM, вызовут исключение, если совпадет более одного элемента. Например, следующий вызов вызывает ошибку, если в DOM несколько кнопок:
 
-#### Throws an error if more than one
+#### Вызывает ошибку, если более одного
 
 ```js
 await page.getByRole('button').click();
 ```
 
-On the other hand, Playwright understands when you perform a multiple-element operation, so the following call works perfectly fine when the locator resolves to multiple elements.
+С другой стороны, Playwright понимает, когда вы выполняете операцию с несколькими элементами, поэтому следующий вызов работает совершенно нормально, когда локатор разрешается в несколько элементов.
 
-#### Works fine with multiple elements
+#### Работает нормально с несколькими элементами
 
 ```js
 await page.getByRole('button').count();
 ```
 
-You can explicitly opt-out from strictness check by telling Playwright which element to use when multiple elements match, through [locator.first()](/api/class-locator.mdx#locator-first), [locator.last()](/api/class-locator.mdx#locator-last), and [locator.nth()](/api/class-locator.mdx#locator-nth). These methods are **not recommended** because when your page changes, Playwright may click on an element you did not intend. Instead, follow best practices above to create a locator that uniquely identifies the target element.
+Вы можете явно отказаться от проверки строгости, указав Playwright, какой элемент использовать, когда совпадает несколько элементов, через [locator.first()](/api/class-locator.mdx#locator-first), [locator.last()](/api/class-locator.mdx#locator-last) и [locator.nth()](/api/class-locator.mdx#locator-nth). Эти методы **не рекомендуются**, потому что, когда ваша страница изменяется, Playwright может кликнуть на элемент, который вы не намеревались выбрать. Вместо этого следуйте приведенным выше лучшим практикам, чтобы создать локатор, который уникально идентифицирует целевой элемент.
 
-## More Locators
+## Другие локаторы
 
-For less commonly used locators, look at the [other locators](./other-locators.mdx) guide.
-
-
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
-[APIRequest]: /api/class-apirequest.mdx "APIRequest"
-[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
-[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
-[Browser]: /api/class-browser.mdx "Browser"
-[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
-[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
-[BrowserType]: /api/class-browsertype.mdx "BrowserType"
-[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
-[Clock]: /api/class-clock.mdx "Clock"
-[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
-[Coverage]: /api/class-coverage.mdx "Coverage"
-[Dialog]: /api/class-dialog.mdx "Dialog"
-[Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
-[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
-[FileChooser]: /api/class-filechooser.mdx "FileChooser"
-[Frame]: /api/class-frame.mdx "Frame"
-[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
-[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
-[JSHandle]: /api/class-jshandle.mdx "JSHandle"
-[Keyboard]: /api/class-keyboard.mdx "Keyboard"
-[Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
-[Logger]: /api/class-logger.mdx "Logger"
-[Mouse]: /api/class-mouse.mdx "Mouse"
-[Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
-[Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
-[Request]: /api/class-request.mdx "Request"
-[Response]: /api/class-response.mdx "Response"
-[Route]: /api/class-route.mdx "Route"
-[Selectors]: /api/class-selectors.mdx "Selectors"
-[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
-[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
-[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: /api/class-tracing.mdx "Tracing"
-[Video]: /api/class-video.mdx "Video"
-[WebError]: /api/class-weberror.mdx "WebError"
-[WebSocket]: /api/class-websocket.mdx "WebSocket"
-[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
-[Worker]: /api/class-worker.mdx "Worker"
-[Fixtures]: /api/class-fixtures.mdx "Fixtures"
-[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
-[FullProject]: /api/class-fullproject.mdx "FullProject"
-[Location]: /api/class-location.mdx "Location"
-[Test]: /api/class-test.mdx "Test"
-[TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestInfo]: /api/class-testinfo.mdx "TestInfo"
-[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
-[TestOptions]: /api/class-testoptions.mdx "TestOptions"
-[TestProject]: /api/class-testproject.mdx "TestProject"
-[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
-[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
-[Reporter]: /api/class-reporter.mdx "Reporter"
-[Suite]: /api/class-suite.mdx "Suite"
-[TestCase]: /api/class-testcase.mdx "TestCase"
-[TestError]: /api/class-testerror.mdx "TestError"
-[TestResult]: /api/class-testresult.mdx "TestResult"
-[TestStep]: /api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
-
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
-[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
-[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
-[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
-[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
-[URL]: https://nodejs.org/api/url.html "URL"
-[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
-
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
-[Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"
+Для менее часто используемых локаторов смотрите руководство [другие локаторы](./other-locators.mdx).

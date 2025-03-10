@@ -1,21 +1,21 @@
 ---
 id: chrome-extensions
-title: "Chrome extensions"
+title: "Расширения Chrome"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
 :::note
 
-Extensions only work in Chrome / Chromium launched with a persistent context. Use custom browser args at your own risk, as some of them may break Playwright functionality.
+Расширения работают только в Chrome / Chromium, запущенном с постоянным контекстом. Используйте пользовательские аргументы браузера на свой страх и риск, так как некоторые из них могут нарушить функциональность Playwright.
 :::
 
-The snippet below retrieves the [background page](https://developer.chrome.com/extensions/background_pages) of a [Manifest v2](https://developer.chrome.com/docs/extensions/mv2/) extension whose source is located in `./my-extension`.
+Приведенный ниже фрагмент кода получает [фоновую страницу](https://developer.chrome.com/extensions/background_pages) расширения [Manifest v2](https://developer.chrome.com/docs/extensions/mv2/), исходный код которого находится в `./my-extension`.
 
-Note the use of the `chromium` channel that allows to run extensions in headless mode. Alternatively, you can launch the browser in headed mode.
+Обратите внимание на использование канала `chromium`, который позволяет запускать расширения в безголовом режиме. В качестве альтернативы вы можете запустить браузер в обычном режиме.
 
 ```js
 const { chromium } = require('playwright');
@@ -34,18 +34,18 @@ const { chromium } = require('playwright');
   if (!backgroundPage)
     backgroundPage = await browserContext.waitForEvent('backgroundpage');
 
-  // Test the background page as you would any other page.
+  // Тестируйте фоновую страницу так же, как и любую другую страницу.
   await browserContext.close();
 })();
 ```
 
-## Testing
+## Тестирование
 
-To have the extension loaded when running tests you can use a test fixture to set the context. You can also dynamically retrieve the extension id and use it to load and test the popup page for example.
+Чтобы расширение было загружено при запуске тестов, вы можете использовать тестовый фикстур для установки контекста. Вы также можете динамически получить идентификатор расширения и использовать его для загрузки и тестирования всплывающей страницы, например.
 
-Note the use of the `chromium` channel that allows to run extensions in headless mode. Alternatively, you can launch the browser in headed mode.
+Обратите внимание на использование канала `chromium`, который позволяет запускать расширения в безголовом режиме. В качестве альтернативы вы можете запустить браузер в обычном режиме.
 
-First, add fixtures that will load the extension:
+Сначала добавьте фикстуры, которые загрузят расширение:
 
 ```js title="fixtures.ts"
 import { test as base, chromium, type BrowserContext } from '@playwright/test';
@@ -69,13 +69,13 @@ export const test = base.extend<{
   },
   extensionId: async ({ context }, use) => {
     /*
-    // for manifest v2:
+    // для manifest v2:
     let [background] = context.backgroundPages()
     if (!background)
       background = await context.waitForEvent('backgroundpage')
     */
 
-    // for manifest v3:
+    // для manifest v3:
     let [background] = context.serviceWorkers();
     if (!background)
       background = await context.waitForEvent('serviceworker');
@@ -87,22 +87,21 @@ export const test = base.extend<{
 export const expect = test.expect;
 ```
 
-Then use these fixtures in a test:
+Затем используйте эти фикстуры в тесте:
 
 ```js
 import { test, expect } from './fixtures';
 
-test('example test', async ({ page }) => {
+test('пример теста', async ({ page }) => {
   await page.goto('https://example.com');
-  await expect(page.locator('body')).toHaveText('Changed by my-extension');
+  await expect(page.locator('body')).toHaveText('Изменено my-extension');
 });
 
-test('popup page', async ({ page, extensionId }) => {
+test('всплывающая страница', async ({ page, extensionId }) => {
   await page.goto(`chrome-extension://${extensionId}/popup.html`);
-  await expect(page.locator('body')).toHaveText('my-extension popup');
+  await expect(page.locator('body')).toHaveText('всплывающее окно my-extension');
 });
 ```
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
@@ -206,6 +205,6 @@ test('popup page', async ({ page, extensionId }) => {
 [URL]: https://nodejs.org/api/url.html "URL"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Реестр артефактов Microsoft"
 [Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

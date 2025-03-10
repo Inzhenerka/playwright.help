@@ -6,12 +6,11 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+Класс Keyboard предоставляет API для управления виртуальной клавиатурой. Высокоуровневый API — это [keyboard.type()](/api/class-keyboard.mdx#keyboard-type), который принимает необработанные символы и генерирует соответствующие события `keydown`, `keypress`/`input` и `keyup` на вашей странице.
 
-Keyboard provides an api for managing a virtual keyboard. The high level api is [keyboard.type()](/api/class-keyboard.mdx#keyboard-type), which takes raw characters and generates proper `keydown`, `keypress`/`input`, and `keyup` events on your page.
+Для более тонкого управления вы можете использовать [keyboard.down()](/api/class-keyboard.mdx#keyboard-down), [keyboard.up()](/api/class-keyboard.mdx#keyboard-up) и [keyboard.insertText()](/api/class-keyboard.mdx#keyboard-insert-text), чтобы вручную вызывать события, как если бы они были сгенерированы с реальной клавиатуры.
 
-For finer control, you can use [keyboard.down()](/api/class-keyboard.mdx#keyboard-down), [keyboard.up()](/api/class-keyboard.mdx#keyboard-up), and [keyboard.insertText()](/api/class-keyboard.mdx#keyboard-insert-text) to manually fire events as if they were generated from a real keyboard.
-
-An example of holding down `Shift` in order to select and delete some text:
+Пример удерживания `Shift` для выбора и удаления текста:
 
 ```js
 await page.keyboard.type('Hello World!');
@@ -23,117 +22,116 @@ for (let i = 0; i < ' World'.length; i++)
 await page.keyboard.up('Shift');
 
 await page.keyboard.press('Backspace');
-// Result text will end up saying 'Hello!'
+// Результирующий текст будет 'Hello!'
 ```
 
-An example of pressing uppercase `A`
+Пример нажатия заглавной `A`:
 
 ```js
 await page.keyboard.press('Shift+KeyA');
-// or
+// или
 await page.keyboard.press('Shift+A');
 ```
 
-An example to trigger select-all with the keyboard
+Пример для вызова выбора всего с помощью клавиатуры:
 
 ```js
 await page.keyboard.press('ControlOrMeta+A');
 ```
 
-
 ---
 
-## Methods
+## Методы
 
 ### down {#keyboard-down}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>keyboard.down</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>keyboard.down</x-search>
 
-Dispatches a `keydown` event.
+Отправляет событие `keydown`.
 
-[key](/api/class-keyboard.mdx#keyboard-down-option-key) can specify the intended [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) value or a single character to generate the text for. A superset of the [key](/api/class-keyboard.mdx#keyboard-down-option-key) values can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values). Examples of the keys are:
+[key](/api/class-keyboard.mdx#keyboard-down-option-key) может указывать на предполагаемое значение [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) или один символ для генерации текста. Расширенный набор значений [key](/api/class-keyboard.mdx#keyboard-down-option-key) можно найти [здесь](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values). Примеры клавиш:
 
-`F1` - `F12`, `Digit0`- `Digit9`, `KeyA`- `KeyZ`, `Backquote`, `Minus`, `Equal`, `Backslash`, `Backspace`, `Tab`, `Delete`, `Escape`, `ArrowDown`, `End`, `Enter`, `Home`, `Insert`, `PageDown`, `PageUp`, `ArrowRight`, `ArrowUp`, etc.
+`F1` - `F12`, `Digit0`- `Digit9`, `KeyA`- `KeyZ`, `Backquote`, `Minus`, `Equal`, `Backslash`, `Backspace`, `Tab`, `Delete`, `Escape`, `ArrowDown`, `End`, `Enter`, `Home`, `Insert`, `PageDown`, `PageUp`, `ArrowRight`, `ArrowUp` и т.д.
 
-Following modification shortcuts are also supported: `Shift`, `Control`, `Alt`, `Meta`, `ShiftLeft`, `ControlOrMeta`. `ControlOrMeta` resolves to `Control` on Windows and Linux and to `Meta` on macOS.
+Также поддерживаются следующие модификаторы: `Shift`, `Control`, `Alt`, `Meta`, `ShiftLeft`, `ControlOrMeta`. `ControlOrMeta` разрешается в `Control` на Windows и Linux и в `Meta` на macOS.
 
-Holding down `Shift` will type the text that corresponds to the [key](/api/class-keyboard.mdx#keyboard-down-option-key) in the upper case.
+Удерживание `Shift` будет вводить текст, соответствующий [key](/api/class-keyboard.mdx#keyboard-down-option-key), в верхнем регистре.
 
-If [key](/api/class-keyboard.mdx#keyboard-down-option-key) is a single character, it is case-sensitive, so the values `a` and `A` will generate different respective texts.
+Если [key](/api/class-keyboard.mdx#keyboard-down-option-key) — это один символ, он чувствителен к регистру, поэтому значения `a` и `A` будут генерировать разные тексты.
 
-If [key](/api/class-keyboard.mdx#keyboard-down-option-key) is a modifier key, `Shift`, `Meta`, `Control`, or `Alt`, subsequent key presses will be sent with that modifier active. To release the modifier key, use [keyboard.up()](/api/class-keyboard.mdx#keyboard-up).
+Если [key](/api/class-keyboard.mdx#keyboard-down-option-key) — это клавиша-модификатор, `Shift`, `Meta`, `Control` или `Alt`, последующие нажатия клавиш будут отправлены с активным модификатором. Чтобы отпустить клавишу-модификатор, используйте [keyboard.up()](/api/class-keyboard.mdx#keyboard-up).
 
-After the key is pressed once, subsequent calls to [keyboard.down()](/api/class-keyboard.mdx#keyboard-down) will have [repeat](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/repeat) set to true. To release the key, use [keyboard.up()](/api/class-keyboard.mdx#keyboard-up).
+После нажатия клавиши один раз, последующие вызовы [keyboard.down()](/api/class-keyboard.mdx#keyboard-down) будут иметь [repeat](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/repeat), установленный в true. Чтобы отпустить клавишу, используйте [keyboard.up()](/api/class-keyboard.mdx#keyboard-up).
 
 :::note
 
-Modifier keys DO influence `keyboard.down`. Holding down `Shift` will type the text in upper case.
+Клавиши-модификаторы действительно влияют на `keyboard.down`. Удерживание `Shift` будет вводить текст в верхнем регистре.
 :::
 
-**Usage**
+**Использование**
 
 ```js
 await keyboard.down(key);
 ```
 
-**Arguments**
+**Аргументы**
 - `key` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="keyboard-down-option-key"/><a href="#keyboard-down-option-key" class="list-anchor">#</a>
   
-  Name of the key to press or a character to generate, such as `ArrowLeft` or `a`.
+  Название клавиши для нажатия или символ для генерации, например, `ArrowLeft` или `a`.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="keyboard-down-return"/><a href="#keyboard-down-return" class="list-anchor">#</a>
 
 ---
 
 ### insertText {#keyboard-insert-text}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>keyboard.insertText</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>keyboard.insertText</x-search>
 
-Dispatches only `input` event, does not emit the `keydown`, `keyup` or `keypress` events.
+Отправляет только событие `input`, не генерирует события `keydown`, `keyup` или `keypress`.
 
-**Usage**
+**Использование**
 
 ```js
 page.keyboard.insertText('嗨');
 ```
 
 :::note
-Modifier keys DO NOT effect `keyboard.insertText`. Holding down `Shift` will not type the text in upper case.
+Клавиши-модификаторы НЕ влияют на `keyboard.insertText`. Удерживание `Shift` не будет вводить текст в верхнем регистре.
 :::
 
-**Arguments**
+**Аргументы**
 - `text` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="keyboard-insert-text-option-text"/><a href="#keyboard-insert-text-option-text" class="list-anchor">#</a>
   
-  Sets input to the specified text value.
+  Устанавливает ввод на указанное текстовое значение.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="keyboard-insert-text-return"/><a href="#keyboard-insert-text-return" class="list-anchor">#</a>
 
 ---
 
 ### press {#keyboard-press}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>keyboard.press</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>keyboard.press</x-search>
 
 :::tip
 
-In most cases, you should use [locator.press()](/api/class-locator.mdx#locator-press) instead.
+В большинстве случаев вам следует использовать [locator.press()](/api/class-locator.mdx#locator-press) вместо этого.
 :::
 
-[key](/api/class-keyboard.mdx#keyboard-press-option-key) can specify the intended [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) value or a single character to generate the text for. A superset of the [key](/api/class-keyboard.mdx#keyboard-press-option-key) values can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values). Examples of the keys are:
+[key](/api/class-keyboard.mdx#keyboard-press-option-key) может указывать на предполагаемое значение [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) или один символ для генерации текста. Расширенный набор значений [key](/api/class-keyboard.mdx#keyboard-press-option-key) можно найти [здесь](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values). Примеры клавиш:
 
-`F1` - `F12`, `Digit0`- `Digit9`, `KeyA`- `KeyZ`, `Backquote`, `Minus`, `Equal`, `Backslash`, `Backspace`, `Tab`, `Delete`, `Escape`, `ArrowDown`, `End`, `Enter`, `Home`, `Insert`, `PageDown`, `PageUp`, `ArrowRight`, `ArrowUp`, etc.
+`F1` - `F12`, `Digit0`- `Digit9`, `KeyA`- `KeyZ`, `Backquote`, `Minus`, `Equal`, `Backslash`, `Backspace`, `Tab`, `Delete`, `Escape`, `ArrowDown`, `End`, `Enter`, `Home`, `Insert`, `PageDown`, `PageUp`, `ArrowRight`, `ArrowUp` и т.д.
 
-Following modification shortcuts are also supported: `Shift`, `Control`, `Alt`, `Meta`, `ShiftLeft`, `ControlOrMeta`. `ControlOrMeta` resolves to `Control` on Windows and Linux and to `Meta` on macOS.
+Также поддерживаются следующие модификаторы: `Shift`, `Control`, `Alt`, `Meta`, `ShiftLeft`, `ControlOrMeta`. `ControlOrMeta` разрешается в `Control` на Windows и Linux и в `Meta` на macOS.
 
-Holding down `Shift` will type the text that corresponds to the [key](/api/class-keyboard.mdx#keyboard-press-option-key) in the upper case.
+Удерживание `Shift` будет вводить текст, соответствующий [key](/api/class-keyboard.mdx#keyboard-press-option-key), в верхнем регистре.
 
-If [key](/api/class-keyboard.mdx#keyboard-press-option-key) is a single character, it is case-sensitive, so the values `a` and `A` will generate different respective texts.
+Если [key](/api/class-keyboard.mdx#keyboard-press-option-key) — это один символ, он чувствителен к регистру, поэтому значения `a` и `A` будут генерировать разные тексты.
 
-Shortcuts such as `key: "Control+o"`, `key: "Control++` or `key: "Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
+Поддерживаются такие сочетания клавиш, как `key: "Control+o"`, `key: "Control++` или `key: "Control+Shift+T"`. Когда указано с модификатором, модификатор удерживается во время нажатия последующей клавиши.
 
-**Usage**
+**Использование**
 
 ```js
 const page = await browser.newPage();
@@ -147,84 +145,83 @@ await page.screenshot({ path: 'O.png' });
 await browser.close();
 ```
 
-Shortcut for [keyboard.down()](/api/class-keyboard.mdx#keyboard-down) and [keyboard.up()](/api/class-keyboard.mdx#keyboard-up).
+Сочетание для [keyboard.down()](/api/class-keyboard.mdx#keyboard-down) и [keyboard.up()](/api/class-keyboard.mdx#keyboard-up).
 
-**Arguments**
+**Аргументы**
 - `key` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="keyboard-press-option-key"/><a href="#keyboard-press-option-key" class="list-anchor">#</a>
   
-  Name of the key to press or a character to generate, such as `ArrowLeft` or `a`.
-- `options` [Object] *(optional)*
-  - `delay` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="keyboard-press-option-delay"/><a href="#keyboard-press-option-delay" class="list-anchor">#</a>
+  Название клавиши для нажатия или символ для генерации, например, `ArrowLeft` или `a`.
+- `options` [Object] *(необязательно)*
+  - `delay` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="keyboard-press-option-delay"/><a href="#keyboard-press-option-delay" class="list-anchor">#</a>
     
-    Time to wait between `keydown` and `keyup` in milliseconds. Defaults to 0.
+    Время ожидания между `keydown` и `keyup` в миллисекундах. По умолчанию 0.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="keyboard-press-return"/><a href="#keyboard-press-return" class="list-anchor">#</a>
 
 ---
 
 ### type {#keyboard-type}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>keyboard.type</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>keyboard.type</x-search>
 
 :::caution
 
-In most cases, you should use [locator.fill()](/api/class-locator.mdx#locator-fill) instead. You only need to press keys one by one if there is special keyboard handling on the page - in this case use [locator.pressSequentially()](/api/class-locator.mdx#locator-press-sequentially).
+В большинстве случаев вам следует использовать [locator.fill()](/api/class-locator.mdx#locator-fill) вместо этого. Вам нужно нажимать клавиши по одной, только если на странице есть специальная обработка клавиатуры — в этом случае используйте [locator.pressSequentially()](/api/class-locator.mdx#locator-press-sequentially).
 :::
 
-Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text.
+Отправляет события `keydown`, `keypress`/`input` и `keyup` для каждого символа в тексте.
 
-To press a special key, like `Control` or `ArrowDown`, use [keyboard.press()](/api/class-keyboard.mdx#keyboard-press).
+Чтобы нажать специальную клавишу, такую как `Control` или `ArrowDown`, используйте [keyboard.press()](/api/class-keyboard.mdx#keyboard-press).
 
-**Usage**
+**Использование**
 
 ```js
-await page.keyboard.type('Hello'); // Types instantly
-await page.keyboard.type('World', { delay: 100 }); // Types slower, like a user
+await page.keyboard.type('Hello'); // Вводит мгновенно
+await page.keyboard.type('World', { delay: 100 }); // Вводит медленнее, как пользователь
 ```
 
 :::note
-Modifier keys DO NOT effect `keyboard.type`. Holding down `Shift` will not type the text in upper case.
+Клавиши-модификаторы НЕ влияют на `keyboard.type`. Удерживание `Shift` не будет вводить текст в верхнем регистре.
 :::
 
 :::note
-For characters that are not on a US keyboard, only an `input` event will be sent.
+Для символов, которые отсутствуют на американской клавиатуре, будет отправлено только событие `input`.
 :::
 
-**Arguments**
+**Аргументы**
 - `text` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="keyboard-type-option-text"/><a href="#keyboard-type-option-text" class="list-anchor">#</a>
   
-  A text to type into a focused element.
-- `options` [Object] *(optional)*
-  - `delay` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="keyboard-type-option-delay"/><a href="#keyboard-type-option-delay" class="list-anchor">#</a>
+  Текст для ввода в активный элемент.
+- `options` [Object] *(необязательно)*
+  - `delay` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="keyboard-type-option-delay"/><a href="#keyboard-type-option-delay" class="list-anchor">#</a>
     
-    Time to wait between key presses in milliseconds. Defaults to 0.
+    Время ожидания между нажатиями клавиш в миллисекундах. По умолчанию 0.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="keyboard-type-return"/><a href="#keyboard-type-return" class="list-anchor">#</a>
 
 ---
 
 ### up {#keyboard-up}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>keyboard.up</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>keyboard.up</x-search>
 
-Dispatches a `keyup` event.
+Отправляет событие `keyup`.
 
-**Usage**
+**Использование**
 
 ```js
 await keyboard.up(key);
 ```
 
-**Arguments**
+**Аргументы**
 - `key` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="keyboard-up-option-key"/><a href="#keyboard-up-option-key" class="list-anchor">#</a>
   
-  Name of the key to press or a character to generate, such as `ArrowLeft` or `a`.
+  Название клавиши для нажатия или символ для генерации, например, `ArrowLeft` или `a`.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="keyboard-up-return"/><a href="#keyboard-up-return" class="list-anchor">#</a>
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
@@ -328,6 +325,6 @@ await keyboard.up(key);
 [URL]: https://nodejs.org/api/url.html "URL"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
+[все доступные теги изображений]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"
+[Реестр артефактов Microsoft]: https://mcr.microsoft.com/en-us/product/playwright/about "Реестр артефактов Microsoft"
 [Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

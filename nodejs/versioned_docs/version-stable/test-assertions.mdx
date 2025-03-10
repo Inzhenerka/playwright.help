@@ -1,156 +1,156 @@
 ---
 id: test-assertions
-title: "Assertions"
+title: "Утверждения"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright includes test assertions in the form of `expect` function. To make an assertion, call `expect(value)` and choose a matcher that reflects the expectation. There are many [generic matchers](./api/class-genericassertions.mdx) like `toEqual`, `toContain`, `toBeTruthy` that can be used to assert any conditions.
+Playwright включает в себя тестовые утверждения в виде функции `expect`. Чтобы сделать утверждение, вызовите `expect(value)` и выберите сопоставитель, который отражает ожидание. Существует множество [универсальных сопоставителей](./api/class-genericassertions.mdx), таких как `toEqual`, `toContain`, `toBeTruthy`, которые можно использовать для утверждения любых условий.
 
 ```js
 expect(success).toBeTruthy();
 ```
 
-Playwright also includes web-specific [async matchers](./api/class-locatorassertions.mdx) that will wait until the expected condition is met. Consider the following example:
+Playwright также включает в себя специфические для веба [асинхронные сопоставители](./api/class-locatorassertions.mdx), которые будут ждать, пока ожидаемое условие не будет выполнено. Рассмотрим следующий пример:
 
 ```js
 await expect(page.getByTestId('status')).toHaveText('Submitted');
 ```
 
-Playwright will be re-testing the element with the test id of `status` until the fetched element has the `"Submitted"` text. It will re-fetch the element and check it over and over, until the condition is met or until the timeout is reached. You can either pass this timeout or configure it once via the [testConfig.expect](/api/class-testconfig.mdx#test-config-expect) value in the test config.
+Playwright будет повторно проверять элемент с тестовым идентификатором `status`, пока полученный элемент не будет содержать текст `"Submitted"`. Он будет повторно извлекать элемент и проверять его снова и снова, пока условие не будет выполнено или не истечет время ожидания. Вы можете либо передать это время ожидания, либо настроить его один раз через значение [testConfig.expect](/api/class-testconfig.mdx#test-config-expect) в конфигурации теста.
 
-By default, the timeout for assertions is set to 5 seconds. Learn more about [various timeouts](./test-timeouts.mdx).
+По умолчанию время ожидания для утверждений установлено на 5 секунд. Узнайте больше о [различных таймаутах](./test-timeouts.mdx).
 
-## Auto-retrying assertions
+## Авто-повторение утверждений
 
-The following assertions will retry until the assertion passes, or the assertion timeout is reached. Note that retrying assertions are async, so you must `await` them.
+Следующие утверждения будут повторяться до тех пор, пока утверждение не пройдет или не истечет время ожидания. Обратите внимание, что повторяющиеся утверждения являются асинхронными, поэтому вы должны использовать `await`.
 
-| Assertion | Description |
+| Утверждение | Описание |
 | :- | :- |
-| [await expect(locator).toBeAttached()](./api/class-locatorassertions.mdx#locator-assertions-to-be-attached) | Element is attached |
-| [await expect(locator).toBeChecked()](./api/class-locatorassertions.mdx#locator-assertions-to-be-checked) | Checkbox is checked |
-| [await expect(locator).toBeDisabled()](./api/class-locatorassertions.mdx#locator-assertions-to-be-disabled) | Element is disabled |
-| [await expect(locator).toBeEditable()](./api/class-locatorassertions.mdx#locator-assertions-to-be-editable) | Element is editable |
-| [await expect(locator).toBeEmpty()](./api/class-locatorassertions.mdx#locator-assertions-to-be-empty) | Container is empty |
-| [await expect(locator).toBeEnabled()](./api/class-locatorassertions.mdx#locator-assertions-to-be-enabled) | Element is enabled |
-| [await expect(locator).toBeFocused()](./api/class-locatorassertions.mdx#locator-assertions-to-be-focused) | Element is focused |
-| [await expect(locator).toBeHidden()](./api/class-locatorassertions.mdx#locator-assertions-to-be-hidden) | Element is not visible |
-| [await expect(locator).toBeInViewport()](./api/class-locatorassertions.mdx#locator-assertions-to-be-in-viewport) | Element intersects viewport |
-| [await expect(locator).toBeVisible()](./api/class-locatorassertions.mdx#locator-assertions-to-be-visible) | Element is visible |
-| [await expect(locator).toContainText()](./api/class-locatorassertions.mdx#locator-assertions-to-contain-text) | Element contains text |
-| [await expect(locator).toHaveAccessibleDescription()](./api/class-locatorassertions.mdx#locator-assertions-to-have-accessible-description) | Element has a matching [accessible description](https://w3c.github.io/accname/#dfn-accessible-description) |
-| [await expect(locator).toHaveAccessibleName()](./api/class-locatorassertions.mdx#locator-assertions-to-have-accessible-name) | Element has a matching [accessible name](https://w3c.github.io/accname/#dfn-accessible-name) |
-| [await expect(locator).toHaveAttribute()](./api/class-locatorassertions.mdx#locator-assertions-to-have-attribute) | Element has a DOM attribute |
-| [await expect(locator).toHaveClass()](./api/class-locatorassertions.mdx#locator-assertions-to-have-class) | Element has a class property |
-| [await expect(locator).toHaveCount()](./api/class-locatorassertions.mdx#locator-assertions-to-have-count) | List has exact number of children |
-| [await expect(locator).toHaveCSS()](./api/class-locatorassertions.mdx#locator-assertions-to-have-css) | Element has CSS property |
-| [await expect(locator).toHaveId()](./api/class-locatorassertions.mdx#locator-assertions-to-have-id) | Element has an ID |
-| [await expect(locator).toHaveJSProperty()](./api/class-locatorassertions.mdx#locator-assertions-to-have-js-property) | Element has a JavaScript property |
-| [await expect(locator).toHaveRole()](./api/class-locatorassertions.mdx#locator-assertions-to-have-role) | Element has a specific [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles) |
-| [await expect(locator).toHaveScreenshot()](./api/class-locatorassertions.mdx#locator-assertions-to-have-screenshot-1) | Element has a screenshot |
-| [await expect(locator).toHaveText()](./api/class-locatorassertions.mdx#locator-assertions-to-have-text) | Element matches text |
-| [await expect(locator).toHaveValue()](./api/class-locatorassertions.mdx#locator-assertions-to-have-value) | Input has a value |
-| [await expect(locator).toHaveValues()](./api/class-locatorassertions.mdx#locator-assertions-to-have-values) | Select has options selected |
-| [await expect(page).toHaveScreenshot()](./api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1) | Page has a screenshot |
-| [await expect(page).toHaveTitle()](./api/class-pageassertions.mdx#page-assertions-to-have-title) | Page has a title |
-| [await expect(page).toHaveURL()](./api/class-pageassertions.mdx#page-assertions-to-have-url) | Page has a URL |
-| [await expect(response).toBeOK()](./api/class-apiresponseassertions.mdx#api-response-assertions-to-be-ok) | Response has an OK status |
+| [await expect(locator).toBeAttached()](./api/class-locatorassertions.mdx#locator-assertions-to-be-attached) | Элемент прикреплен |
+| [await expect(locator).toBeChecked()](./api/class-locatorassertions.mdx#locator-assertions-to-be-checked) | Флажок установлен |
+| [await expect(locator).toBeDisabled()](./api/class-locatorassertions.mdx#locator-assertions-to-be-disabled) | Элемент отключен |
+| [await expect(locator).toBeEditable()](./api/class-locatorassertions.mdx#locator-assertions-to-be-editable) | Элемент редактируемый |
+| [await expect(locator).toBeEmpty()](./api/class-locatorassertions.mdx#locator-assertions-to-be-empty) | Контейнер пустой |
+| [await expect(locator).toBeEnabled()](./api/class-locatorassertions.mdx#locator-assertions-to-be-enabled) | Элемент включен |
+| [await expect(locator).toBeFocused()](./api/class-locatorassertions.mdx#locator-assertions-to-be-focused) | Элемент в фокусе |
+| [await expect(locator).toBeHidden()](./api/class-locatorassertions.mdx#locator-assertions-to-be-hidden) | Элемент не виден |
+| [await expect(locator).toBeInViewport()](./api/class-locatorassertions.mdx#locator-assertions-to-be-in-viewport) | Элемент пересекает область видимости |
+| [await expect(locator).toBeVisible()](./api/class-locatorassertions.mdx#locator-assertions-to-be-visible) | Элемент виден |
+| [await expect(locator).toContainText()](./api/class-locatorassertions.mdx#locator-assertions-to-contain-text) | Элемент содержит текст |
+| [await expect(locator).toHaveAccessibleDescription()](./api/class-locatorassertions.mdx#locator-assertions-to-have-accessible-description) | Элемент имеет соответствующее [доступное описание](https://w3c.github.io/accname/#dfn-accessible-description) |
+| [await expect(locator).toHaveAccessibleName()](./api/class-locatorassertions.mdx#locator-assertions-to-have-accessible-name) | Элемент имеет соответствующее [доступное имя](https://w3c.github.io/accname/#dfn-accessible-name) |
+| [await expect(locator).toHaveAttribute()](./api/class-locatorassertions.mdx#locator-assertions-to-have-attribute) | Элемент имеет DOM-атрибут |
+| [await expect(locator).toHaveClass()](./api/class-locatorassertions.mdx#locator-assertions-to-have-class) | Элемент имеет свойство класса |
+| [await expect(locator).toHaveCount()](./api/class-locatorassertions.mdx#locator-assertions-to-have-count) | Список имеет точное количество дочерних элементов |
+| [await expect(locator).toHaveCSS()](./api/class-locatorassertions.mdx#locator-assertions-to-have-css) | Элемент имеет CSS-свойство |
+| [await expect(locator).toHaveId()](./api/class-locatorassertions.mdx#locator-assertions-to-have-id) | Элемент имеет идентификатор |
+| [await expect(locator).toHaveJSProperty()](./api/class-locatorassertions.mdx#locator-assertions-to-have-js-property) | Элемент имеет свойство JavaScript |
+| [await expect(locator).toHaveRole()](./api/class-locatorassertions.mdx#locator-assertions-to-have-role) | Элемент имеет конкретную [ARIA роль](https://www.w3.org/TR/wai-aria-1.2/#roles) |
+| [await expect(locator).toHaveScreenshot()](./api/class-locatorassertions.mdx#locator-assertions-to-have-screenshot-1) | Элемент имеет скриншот |
+| [await expect(locator).toHaveText()](./api/class-locatorassertions.mdx#locator-assertions-to-have-text) | Элемент соответствует тексту |
+| [await expect(locator).toHaveValue()](./api/class-locatorassertions.mdx#locator-assertions-to-have-value) | Поле ввода имеет значение |
+| [await expect(locator).toHaveValues()](./api/class-locatorassertions.mdx#locator-assertions-to-have-values) | Выбор имеет выбранные опции |
+| [await expect(page).toHaveScreenshot()](./api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1) | Страница имеет скриншот |
+| [await expect(page).toHaveTitle()](./api/class-pageassertions.mdx#page-assertions-to-have-title) | Страница имеет заголовок |
+| [await expect(page).toHaveURL()](./api/class-pageassertions.mdx#page-assertions-to-have-url) | Страница имеет URL |
+| [await expect(response).toBeOK()](./api/class-apiresponseassertions.mdx#api-response-assertions-to-be-ok) | Ответ имеет статус OK |
 
-## Non-retrying assertions
+## Не повторяющиеся утверждения
 
-These assertions allow to test any conditions, but do not auto-retry. Most of the time, web pages show information asynchronously, and using non-retrying assertions can lead to a flaky test.
+Эти утверждения позволяют проверять любые условия, но не повторяются автоматически. Чаще всего веб-страницы отображают информацию асинхронно, и использование не повторяющихся утверждений может привести к нестабильным тестам.
 
-Prefer [auto-retrying](#auto-retrying-assertions) assertions whenever possible. For more complex assertions that need to be retried, use [`expect.poll`](#expectpoll) or [`expect.toPass`](#expecttopass).
+Предпочитайте [авто-повторяющиеся](#авто-повторение-утверждений) утверждения, когда это возможно. Для более сложных утверждений, которые необходимо повторять, используйте [`expect.poll`](#expectpoll) или [`expect.toPass`](#expecttopass).
 
-| Assertion | Description |
+| Утверждение | Описание |
 | :- | :- |
-| [expect(value).toBe()](/api/class-genericassertions.mdx#generic-assertions-to-be) | Value is the same |
-| [expect(value).toBeCloseTo()](/api/class-genericassertions.mdx#generic-assertions-to-be-close-to) | Number is approximately equal |
-| [expect(value).toBeDefined()](/api/class-genericassertions.mdx#generic-assertions-to-be-defined) | Value is not `undefined` |
-| [expect(value).toBeFalsy()](/api/class-genericassertions.mdx#generic-assertions-to-be-falsy) | Value is falsy, e.g. `false`, `0`, `null`, etc. |
-| [expect(value).toBeGreaterThan()](/api/class-genericassertions.mdx#generic-assertions-to-be-greater-than) | Number is more than |
-| [expect(value).toBeGreaterThanOrEqual()](/api/class-genericassertions.mdx#generic-assertions-to-be-greater-than-or-equal) | Number is more than or equal |
-| [expect(value).toBeInstanceOf()](/api/class-genericassertions.mdx#generic-assertions-to-be-instance-of) | Object is an instance of a class |
-| [expect(value).toBeLessThan()](/api/class-genericassertions.mdx#generic-assertions-to-be-less-than) | Number is less than |
-| [expect(value).toBeLessThanOrEqual()](/api/class-genericassertions.mdx#generic-assertions-to-be-less-than-or-equal) | Number is less than or equal |
-| [expect(value).toBeNaN()](/api/class-genericassertions.mdx#generic-assertions-to-be-na-n) | Value is `NaN` |
-| [expect(value).toBeNull()](/api/class-genericassertions.mdx#generic-assertions-to-be-null) | Value is `null` |
-| [expect(value).toBeTruthy()](/api/class-genericassertions.mdx#generic-assertions-to-be-truthy) | Value is truthy, i.e. not `false`, `0`, `null`, etc. |
-| [expect(value).toBeUndefined()](/api/class-genericassertions.mdx#generic-assertions-to-be-undefined) | Value is `undefined` |
-| [expect(value).toContain()](/api/class-genericassertions.mdx#generic-assertions-to-contain-1) | String contains a substring |
-| [expect(value).toContain()](/api/class-genericassertions.mdx#generic-assertions-to-contain-2) | Array or set contains an element |
-| [expect(value).toContainEqual()](/api/class-genericassertions.mdx#generic-assertions-to-contain-equal) | Array or set contains a similar element |
-| [expect(value).toEqual()](/api/class-genericassertions.mdx#generic-assertions-to-equal) | Value is similar - deep equality and pattern matching |
-| [expect(value).toHaveLength()](/api/class-genericassertions.mdx#generic-assertions-to-have-length) | Array or string has length |
-| [expect(value).toHaveProperty()](/api/class-genericassertions.mdx#generic-assertions-to-have-property) | Object has a property |
-| [expect(value).toMatch()](/api/class-genericassertions.mdx#generic-assertions-to-match) | String matches a regular expression |
-| [expect(value).toMatchObject()](/api/class-genericassertions.mdx#generic-assertions-to-match-object) | Object contains specified properties |
-| [expect(value).toStrictEqual()](/api/class-genericassertions.mdx#generic-assertions-to-strict-equal) | Value is similar, including property types |
-| [expect(value).toThrow()](/api/class-genericassertions.mdx#generic-assertions-to-throw) | Function throws an error |
-| [expect(value).any()](/api/class-genericassertions.mdx#generic-assertions-any) | Matches any instance of a class/primitive |
-| [expect(value).anything()](/api/class-genericassertions.mdx#generic-assertions-anything) | Matches anything |
-| [expect(value).arrayContaining()](/api/class-genericassertions.mdx#generic-assertions-array-containing) | Array contains specific elements |
-| [expect(value).closeTo()](/api/class-genericassertions.mdx#generic-assertions-close-to) | Number is approximately equal |
-| [expect(value).objectContaining()](/api/class-genericassertions.mdx#generic-assertions-object-containing) | Object contains specific properties |
-| [expect(value).stringContaining()](/api/class-genericassertions.mdx#generic-assertions-string-containing) | String contains a substring |
-| [expect(value).stringMatching()](/api/class-genericassertions.mdx#generic-assertions-string-matching) | String matches a regular expression |
+| [expect(value).toBe()](/api/class-genericassertions.mdx#generic-assertions-to-be) | Значение одинаковое |
+| [expect(value).toBeCloseTo()](/api/class-genericassertions.mdx#generic-assertions-to-be-close-to) | Число примерно равно |
+| [expect(value).toBeDefined()](/api/class-genericassertions.mdx#generic-assertions-to-be-defined) | Значение не `undefined` |
+| [expect(value).toBeFalsy()](/api/class-genericassertions.mdx#generic-assertions-to-be-falsy) | Значение ложно, например, `false`, `0`, `null` и т.д. |
+| [expect(value).toBeGreaterThan()](/api/class-genericassertions.mdx#generic-assertions-to-be-greater-than) | Число больше |
+| [expect(value).toBeGreaterThanOrEqual()](/api/class-genericassertions.mdx#generic-assertions-to-be-greater-than-or-equal) | Число больше или равно |
+| [expect(value).toBeInstanceOf()](/api/class-genericassertions.mdx#generic-assertions-to-be-instance-of) | Объект является экземпляром класса |
+| [expect(value).toBeLessThan()](/api/class-genericassertions.mdx#generic-assertions-to-be-less-than) | Число меньше |
+| [expect(value).toBeLessThanOrEqual()](/api/class-genericassertions.mdx#generic-assertions-to-be-less-than-or-equal) | Число меньше или равно |
+| [expect(value).toBeNaN()](/api/class-genericassertions.mdx#generic-assertions-to-be-na-n) | Значение равно `NaN` |
+| [expect(value).toBeNull()](/api/class-genericassertions.mdx#generic-assertions-to-be-null) | Значение равно `null` |
+| [expect(value).toBeTruthy()](/api/class-genericassertions.mdx#generic-assertions-to-be-truthy) | Значение истинно, т.е. не `false`, `0`, `null` и т.д. |
+| [expect(value).toBeUndefined()](/api/class-genericassertions.mdx#generic-assertions-to-be-undefined) | Значение равно `undefined` |
+| [expect(value).toContain()](/api/class-genericassertions.mdx#generic-assertions-to-contain-1) | Строка содержит подстроку |
+| [expect(value).toContain()](/api/class-genericassertions.mdx#generic-assertions-to-contain-2) | Массив или множество содержит элемент |
+| [expect(value).toContainEqual()](/api/class-genericassertions.mdx#generic-assertions-to-contain-equal) | Массив или множество содержит аналогичный элемент |
+| [expect(value).toEqual()](/api/class-genericassertions.mdx#generic-assertions-to-equal) | Значение аналогично - глубокое равенство и сопоставление шаблонов |
+| [expect(value).toHaveLength()](/api/class-genericassertions.mdx#generic-assertions-to-have-length) | Массив или строка имеет длину |
+| [expect(value).toHaveProperty()](/api/class-genericassertions.mdx#generic-assertions-to-have-property) | Объект имеет свойство |
+| [expect(value).toMatch()](/api/class-genericassertions.mdx#generic-assertions-to-match) | Строка соответствует регулярному выражению |
+| [expect(value).toMatchObject()](/api/class-genericassertions.mdx#generic-assertions-to-match-object) | Объект содержит указанные свойства |
+| [expect(value).toStrictEqual()](/api/class-genericassertions.mdx#generic-assertions-to-strict-equal) | Значение аналогично, включая типы свойств |
+| [expect(value).toThrow()](/api/class-genericassertions.mdx#generic-assertions-to-throw) | Функция выбрасывает ошибку |
+| [expect(value).any()](/api/class-genericassertions.mdx#generic-assertions-any) | Соответствует любому экземпляру класса/примитиву |
+| [expect(value).anything()](/api/class-genericassertions.mdx#generic-assertions-anything) | Соответствует любому значению |
+| [expect(value).arrayContaining()](/api/class-genericassertions.mdx#generic-assertions-array-containing) | Массив содержит конкретные элементы |
+| [expect(value).closeTo()](/api/class-genericassertions.mdx#generic-assertions-close-to) | Число примерно равно |
+| [expect(value).objectContaining()](/api/class-genericassertions.mdx#generic-assertions-object-containing) | Объект содержит конкретные свойства |
+| [expect(value).stringContaining()](/api/class-genericassertions.mdx#generic-assertions-string-containing) | Строка содержит подстроку |
+| [expect(value).stringMatching()](/api/class-genericassertions.mdx#generic-assertions-string-matching) | Строка соответствует регулярному выражению |
 
-## Negating matchers
+## Отрицательные сопоставители
 
-In general, we can expect the opposite to be true by adding a `.not` to the front of the matchers:
+В общем, мы можем ожидать, что противоположное будет истинным, добавив `.not` перед сопоставителями:
 
 ```js
 expect(value).not.toEqual(0);
 await expect(locator).not.toContainText('some text');
 ```
 
-## Soft assertions
+## Мягкие утверждения
 
-By default, failed assertion will terminate test execution. Playwright also supports *soft assertions*: failed soft assertions **do not** terminate test execution, but mark the test as failed.
+По умолчанию, неудавшееся утверждение завершает выполнение теста. Playwright также поддерживает *мягкие утверждения*: неудавшие мягкие утверждения **не** завершают выполнение теста, но помечают тест как неудавший.
 
 ```js
-// Make a few checks that will not stop the test when failed...
+// Сделайте несколько проверок, которые не остановят тест при неудаче...
 await expect.soft(page.getByTestId('status')).toHaveText('Success');
 await expect.soft(page.getByTestId('eta')).toHaveText('1 day');
 
-// ... and continue the test to check more things.
+// ... и продолжайте тест, чтобы проверить больше вещей.
 await page.getByRole('link', { name: 'next page' }).click();
 await expect.soft(page.getByRole('heading', { name: 'Make another order' })).toBeVisible();
 ```
 
-At any point during test execution, you can check whether there were any soft assertion failures:
+В любой момент во время выполнения теста вы можете проверить, были ли неудачи мягких утверждений:
 
 ```js
-// Make a few checks that will not stop the test when failed...
+// Сделайте несколько проверок, которые не остановят тест при неудаче...
 await expect.soft(page.getByTestId('status')).toHaveText('Success');
 await expect.soft(page.getByTestId('eta')).toHaveText('1 day');
 
-// Avoid running further if there were soft assertion failures.
+// Избегайте дальнейшего выполнения, если были неудачи мягких утверждений.
 expect(test.info().errors).toHaveLength(0);
 ```
 
-Note that soft assertions only work with Playwright test runner.
+Обратите внимание, что мягкие утверждения работают только с тестовым раннером Playwright.
 
-## Custom expect message
+## Пользовательское сообщение expect
 
-You can specify a custom expect message as a second argument to the `expect` function, for example:
+Вы можете указать пользовательское сообщение expect в качестве второго аргумента функции `expect`, например:
 
 ```js
 await expect(page.getByText('Name'), 'should be logged in').toBeVisible();
 ```
 
-This message will be shown in reporters, both for passing and failing expects, providing more context about the assertion.
+Это сообщение будет отображаться в репортерах как для успешных, так и для неудавшихся ожиданий, предоставляя больше контекста о утверждении.
 
-When expect passes, you might see a successful step like this:
+Когда expect проходит, вы можете увидеть успешный шаг, как этот:
 
 ```txt
 ✅ should be logged in    @example.spec.ts:18
 ```
 
-When expect fails, the error would look like this:
+Когда expect не проходит, ошибка будет выглядеть так:
 
 ```bash
     Error: should be logged in
@@ -168,7 +168,7 @@ When expect fails, the error would look like this:
       6 |
 ```
 
-Soft assertions also support custom message:
+Мягкие утверждения также поддерживают пользовательское сообщение:
 
 ```js
 expect.soft(value, 'my soft assertion').toBe(56);
@@ -176,44 +176,44 @@ expect.soft(value, 'my soft assertion').toBe(56);
 
 ## expect.configure
 
-You can create your own pre-configured `expect` instance to have its own defaults such as `timeout` and `soft`.
+Вы можете создать свой собственный предварительно настроенный экземпляр `expect`, чтобы иметь свои собственные значения по умолчанию, такие как `timeout` и `soft`.
 
 ```js
 const slowExpect = expect.configure({ timeout: 10000 });
 await slowExpect(locator).toHaveText('Submit');
 
-// Always do soft assertions.
+// Всегда делайте мягкие утверждения.
 const softExpect = expect.configure({ soft: true });
 await softExpect(locator).toHaveText('Submit');
 ```
 
 ## expect.poll
 
-You can convert any synchronous `expect` to an asynchronous polling one using `expect.poll`.
+Вы можете преобразовать любое синхронное `expect` в асинхронное с помощью `expect.poll`.
 
-The following method will poll given function until it returns HTTP status 200:
+Следующий метод будет опрашивать данную функцию, пока она не вернет HTTP статус 200:
 
 ```js
 await expect.poll(async () => {
   const response = await page.request.get('https://api.example.com');
   return response.status();
 }, {
-  // Custom expect message for reporting, optional.
+  // Пользовательское сообщение expect для отчетности, необязательно.
   message: 'make sure API eventually succeeds',
-  // Poll for 10 seconds; defaults to 5 seconds. Pass 0 to disable timeout.
+  // Опрос в течение 10 секунд; по умолчанию 5 секунд. Передайте 0, чтобы отключить таймаут.
   timeout: 10000,
 }).toBe(200);
 ```
 
-You can also specify custom polling intervals:
+Вы также можете указать пользовательские интервалы опроса:
 
 ```js
 await expect.poll(async () => {
   const response = await page.request.get('https://api.example.com');
   return response.status();
 }, {
-  // Probe, wait 1s, probe, wait 2s, probe, wait 10s, probe, wait 10s, probe
-  // ... Defaults to [100, 250, 500, 1000].
+  // Пробный опрос, подождите 1с, пробный опрос, подождите 2с, пробный опрос, подождите 10с, пробный опрос, подождите 10с, пробный опрос
+  // ... По умолчанию [100, 250, 500, 1000].
   intervals: [1_000, 2_000, 10_000],
   timeout: 60_000
 }).toBe(200);
@@ -221,7 +221,7 @@ await expect.poll(async () => {
 
 ## expect.toPass
 
-You can retry blocks of code until they are passing successfully.
+Вы можете повторять блоки кода, пока они не пройдут успешно.
 
 ```js
 await expect(async () => {
@@ -230,27 +230,27 @@ await expect(async () => {
 }).toPass();
 ```
 
-You can also specify custom timeout and retry intervals:
+Вы также можете указать пользовательское время ожидания и интервалы повторения:
 
 ```js
 await expect(async () => {
   const response = await page.request.get('https://api.example.com');
   expect(response.status()).toBe(200);
 }).toPass({
-  // Probe, wait 1s, probe, wait 2s, probe, wait 10s, probe, wait 10s, probe
-  // ... Defaults to [100, 250, 500, 1000].
+  // Пробный опрос, подождите 1с, пробный опрос, подождите 2с, пробный опрос, подождите 10с, пробный опрос, подождите 10с, пробный опрос
+  // ... По умолчанию [100, 250, 500, 1000].
   intervals: [1_000, 2_000, 10_000],
   timeout: 60_000
 });
 ```
 
-Note that by default `toPass` has timeout 0 and does not respect custom [expect timeout](./test-timeouts.mdx#expect-timeout).
+Обратите внимание, что по умолчанию `toPass` имеет таймаут 0 и не учитывает пользовательский [таймаут ожидания](./test-timeouts.mdx#expect-timeout).
 
-## Add custom matchers using expect.extend
+## Добавление пользовательских сопоставителей с помощью expect.extend
 
-You can extend Playwright assertions by providing custom matchers. These matchers will be available on the `expect` object.
+Вы можете расширить утверждения Playwright, предоставив пользовательские сопоставители. Эти сопоставители будут доступны в объекте `expect`.
 
-In this example we add a custom `toHaveAmount` function. Custom matcher should return a `pass` flag indicating whether the assertion passed, and a `message` callback that's used when the assertion fails.
+В этом примере мы добавляем пользовательскую функцию `toHaveAmount`. Пользовательский сопоставитель должен возвращать флаг `pass`, указывающий, прошло ли утверждение, и коллбек `message`, который используется, когда утверждение не проходит.
 
 ```js title="fixtures.ts"
 import { expect as baseExpect } from '@playwright/test';
@@ -294,7 +294,7 @@ export const expect = baseExpect.extend({
 });
 ```
 
-Now we can use `toHaveAmount` in the test.
+Теперь мы можем использовать `toHaveAmount` в тесте.
 
 ```js title="example.spec.ts"
 import { test, expect } from './fixtures';
@@ -304,16 +304,16 @@ test('amount', async () => {
 });
 ```
 
-### Compatibility with expect library
+### Совместимость с библиотекой expect
 
 :::note
 
-Do not confuse Playwright's `expect` with the [`expect` library](https://jestjs.io/docs/expect). The latter is not fully integrated with Playwright test runner, so make sure to use Playwright's own `expect`.
+Не путайте `expect` Playwright с библиотекой [`expect`](https://jestjs.io/docs/expect). Последняя не полностью интегрирована с тестовым раннером Playwright, поэтому убедитесь, что вы используете собственный `expect` Playwright.
 :::
 
-### Combine custom matchers from multiple modules
+### Объединение пользовательских сопоставителей из нескольких модулей
 
-You can combine custom matchers from multiple files or modules.
+Вы можете объединить пользовательские сопоставители из нескольких файлов или модулей.
 
 ```js title="fixtures.ts"
 import { mergeTests, mergeExpects } from '@playwright/test';
@@ -333,7 +333,7 @@ test('passes', async ({ database }) => {
 ```
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+[Accessibility]: /api/class-accessibility.mdx "Доступность"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
@@ -401,40 +401,36 @@ test('passes', async ({ database }) => {
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
 [TestStep]: /api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Элемент"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Итератор"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Происхождение"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "селектор"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Сериализуемый"
 [UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
-[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Массив"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Булевый"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Буфер"
+[ChildProcess]: https://nodejs.org/api/child_process.html "Дочерний процесс"
+[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Дата"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Ошибка"
 [EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Функция"
 [FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Карта"
 [Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
 [null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Число"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Объект"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
 [ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "Регулярное выражение"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "строка"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
-
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
-[Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

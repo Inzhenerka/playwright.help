@@ -1,40 +1,40 @@
 ---
 id: actionability
-title: "Auto-waiting"
+title: "Авто-ожидание"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright performs a range of actionability checks on the elements before making actions to ensure these actions behave as expected. It auto-waits for all the relevant checks to pass and only then performs the requested action. If the required checks do not pass within the given `timeout`, action fails with the `TimeoutError`.
+Playwright выполняет ряд проверок доступности элементов перед выполнением действий, чтобы гарантировать, что эти действия будут работать как ожидается. Он автоматически ожидает, пока все соответствующие проверки не пройдут, и только затем выполняет запрашиваемое действие. Если необходимые проверки не проходят в течение заданного `timeout`, действие завершается с ошибкой `TimeoutError`.
 
-For example, for [locator.click()](/api/class-locator.mdx#locator-click), Playwright will ensure that:
-- locator resolves to exactly one element
-- element is [Visible]
-- element is [Stable], as in not animating or completed animation
-- element [Receives Events], as in not obscured by other elements
-- element is [Enabled]
+Например, для [locator.click()](/api/class-locator.mdx#locator-click) Playwright убедится, что:
+- локатор разрешается в ровно один элемент
+- элемент [Видим]
+- элемент [Стабилен], то есть не анимирован или анимация завершена
+- элемент [Принимает события], то есть не закрыт другими элементами
+- элемент [Включен]
 
-Here is the complete list of actionability checks performed for each action:
+Вот полный список проверок доступности, выполняемых для каждого действия:
 
-| Action | [Visible] | [Stable] | [Receives Events] | [Enabled] | [Editable] |
+| Действие | [Видим] | [Стабилен] | [Принимает события] | [Включен] | [Редактируемый] |
 | :- | :-: | :-: | :-: | :-: | :-: |
-| [locator.check()](/api/class-locator.mdx#locator-check) | Yes | Yes | Yes | Yes | - |
-| [locator.click()](/api/class-locator.mdx#locator-click) | Yes | Yes | Yes | Yes | - |
-| [locator.dblclick()](/api/class-locator.mdx#locator-dblclick) | Yes | Yes | Yes | Yes | - |
-| [locator.setChecked()](/api/class-locator.mdx#locator-set-checked) | Yes | Yes | Yes | Yes | - |
-| [locator.tap()](/api/class-locator.mdx#locator-tap) | Yes | Yes | Yes | Yes | - |
-| [locator.uncheck()](/api/class-locator.mdx#locator-uncheck) | Yes | Yes | Yes | Yes | - |
-| [locator.hover()](/api/class-locator.mdx#locator-hover) | Yes | Yes | Yes | - | - |
-| [locator.dragTo()](/api/class-locator.mdx#locator-drag-to) | Yes | Yes | Yes | - | - |
-| [locator.screenshot()](/api/class-locator.mdx#locator-screenshot) | Yes | Yes | - | - | - |
-| [locator.fill()](/api/class-locator.mdx#locator-fill) | Yes | - | - | Yes | Yes |
-| [locator.clear()](/api/class-locator.mdx#locator-clear) | Yes | - | - | Yes | Yes |
-| [locator.selectOption()](/api/class-locator.mdx#locator-select-option) | Yes | - | - | Yes | - |
-| [locator.selectText()](/api/class-locator.mdx#locator-select-text) | Yes | - | - | - | - |
-| [locator.scrollIntoViewIfNeeded()](/api/class-locator.mdx#locator-scroll-into-view-if-needed) | - | Yes | - | - | - |
+| [locator.check()](/api/class-locator.mdx#locator-check) | Да | Да | Да | Да | - |
+| [locator.click()](/api/class-locator.mdx#locator-click) | Да | Да | Да | Да | - |
+| [locator.dblclick()](/api/class-locator.mdx#locator-dblclick) | Да | Да | Да | Да | - |
+| [locator.setChecked()](/api/class-locator.mdx#locator-set-checked) | Да | Да | Да | Да | - |
+| [locator.tap()](/api/class-locator.mdx#locator-tap) | Да | Да | Да | Да | - |
+| [locator.uncheck()](/api/class-locator.mdx#locator-uncheck) | Да | Да | Да | Да | - |
+| [locator.hover()](/api/class-locator.mdx#locator-hover) | Да | Да | Да | - | - |
+| [locator.dragTo()](/api/class-locator.mdx#locator-drag-to) | Да | Да | Да | - | - |
+| [locator.screenshot()](/api/class-locator.mdx#locator-screenshot) | Да | Да | - | - | - |
+| [locator.fill()](/api/class-locator.mdx#locator-fill) | Да | - | - | Да | Да |
+| [locator.clear()](/api/class-locator.mdx#locator-clear) | Да | - | - | Да | Да |
+| [locator.selectOption()](/api/class-locator.mdx#locator-select-option) | Да | - | - | Да | - |
+| [locator.selectText()](/api/class-locator.mdx#locator-select-text) | Да | - | - | - | - |
+| [locator.scrollIntoViewIfNeeded()](/api/class-locator.mdx#locator-scroll-into-view-if-needed) | - | Да | - | - | - |
 | [locator.blur()](/api/class-locator.mdx#locator-blur) | - | - | - | - | - |
 | [locator.dispatchEvent()](/api/class-locator.mdx#locator-dispatch-event) | - | - | - | - | - |
 | [locator.focus()](/api/class-locator.mdx#locator-focus) | - | - | - | - | - |
@@ -42,88 +42,88 @@ Here is the complete list of actionability checks performed for each action:
 | [locator.pressSequentially()](/api/class-locator.mdx#locator-press-sequentially) | - | - | - | - | - |
 | [locator.setInputFiles()](/api/class-locator.mdx#locator-set-input-files) | - | - | - | - | - |
 
-## Forcing actions
+## Принуждение действий
 
-Some actions like [locator.click()](/api/class-locator.mdx#locator-click) support `force` option that disables non-essential actionability checks, for example passing truthy `force` to [locator.click()](/api/class-locator.mdx#locator-click) method will not check that the target element actually receives click events.
+Некоторые действия, такие как [locator.click()](/api/class-locator.mdx#locator-click), поддерживают опцию `force`, которая отключает несущественные проверки доступности. Например, передача истинного значения `force` в метод [locator.click()](/api/class-locator.mdx#locator-click) не будет проверять, что целевой элемент действительно получает события клика.
 
-## Assertions
+## Утверждения
 
-Playwright includes auto-retrying assertions that remove flakiness by waiting until the condition is met, similarly to auto-waiting before actions.
+Playwright включает автоматическое повторение утверждений, которые устраняют нестабильность, ожидая, пока условие не будет выполнено, аналогично авто-ожиданию перед действиями.
 
-| Assertion | Description |
+| Утверждение | Описание |
 | :- | :- |
-| [expect(locator).toBeAttached()](/api/class-locatorassertions.mdx#locator-assertions-to-be-attached) | Element is attached |
-| [expect(locator).toBeChecked()](/api/class-locatorassertions.mdx#locator-assertions-to-be-checked) | Checkbox is checked |
-| [expect(locator).toBeDisabled()](/api/class-locatorassertions.mdx#locator-assertions-to-be-disabled) | Element is disabled |
-| [expect(locator).toBeEditable()](/api/class-locatorassertions.mdx#locator-assertions-to-be-editable) | Element is editable |
-| [expect(locator).toBeEmpty()](/api/class-locatorassertions.mdx#locator-assertions-to-be-empty) | Container is empty |
-| [expect(locator).toBeEnabled()](/api/class-locatorassertions.mdx#locator-assertions-to-be-enabled) | Element is enabled |
-| [expect(locator).toBeFocused()](/api/class-locatorassertions.mdx#locator-assertions-to-be-focused) | Element is focused |
-| [expect(locator).toBeHidden()](/api/class-locatorassertions.mdx#locator-assertions-to-be-hidden) | Element is not visible |
-| [expect(locator).toBeInViewport()](/api/class-locatorassertions.mdx#locator-assertions-to-be-in-viewport) | Element intersects viewport |
-| [expect(locator).toBeVisible()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible) | Element is visible |
-| [expect(locator).toContainText()](/api/class-locatorassertions.mdx#locator-assertions-to-contain-text) | Element contains text |
-| [expect(locator).toHaveAttribute()](/api/class-locatorassertions.mdx#locator-assertions-to-have-attribute) | Element has a DOM attribute |
-| [expect(locator).toHaveClass()](/api/class-locatorassertions.mdx#locator-assertions-to-have-class) | Element has a class property |
-| [expect(locator).toHaveCount()](/api/class-locatorassertions.mdx#locator-assertions-to-have-count) | List has exact number of children |
-| [expect(locator).toHaveCSS()](/api/class-locatorassertions.mdx#locator-assertions-to-have-css) | Element has CSS property |
-| [expect(locator).toHaveId()](/api/class-locatorassertions.mdx#locator-assertions-to-have-id) | Element has an ID |
-| [expect(locator).toHaveJSProperty()](/api/class-locatorassertions.mdx#locator-assertions-to-have-js-property) | Element has a JavaScript property |
-| [expect(locator).toHaveText()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text) | Element matches text |
-| [expect(locator).toHaveValue()](/api/class-locatorassertions.mdx#locator-assertions-to-have-value) | Input has a value |
-| [expect(locator).toHaveValues()](/api/class-locatorassertions.mdx#locator-assertions-to-have-values) | Select has options selected |
-| [expect(page).toHaveTitle()](/api/class-pageassertions.mdx#page-assertions-to-have-title) | Page has a title |
-| [expect(page).toHaveURL()](/api/class-pageassertions.mdx#page-assertions-to-have-url) | Page has a URL |
-| [expect(response).toBeOK()](/api/class-apiresponseassertions.mdx#api-response-assertions-to-be-ok) | Response has an OK status |
+| [expect(locator).toBeAttached()](/api/class-locatorassertions.mdx#locator-assertions-to-be-attached) | Элемент прикреплен |
+| [expect(locator).toBeChecked()](/api/class-locatorassertions.mdx#locator-assertions-to-be-checked) | Флажок установлен |
+| [expect(locator).toBeDisabled()](/api/class-locatorassertions.mdx#locator-assertions-to-be-disabled) | Элемент отключен |
+| [expect(locator).toBeEditable()](/api/class-locatorassertions.mdx#locator-assertions-to-be-editable) | Элемент редактируемый |
+| [expect(locator).toBeEmpty()](/api/class-locatorassertions.mdx#locator-assertions-to-be-empty) | Контейнер пустой |
+| [expect(locator).toBeEnabled()](/api/class-locatorassertions.mdx#locator-assertions-to-be-enabled) | Элемент включен |
+| [expect(locator).toBeFocused()](/api/class-locatorassertions.mdx#locator-assertions-to-be-focused) | Элемент в фокусе |
+| [expect(locator).toBeHidden()](/api/class-locatorassertions.mdx#locator-assertions-to-be-hidden) | Элемент не виден |
+| [expect(locator).toBeInViewport()](/api/class-locatorassertions.mdx#locator-assertions-to-be-in-viewport) | Элемент пересекает область просмотра |
+| [expect(locator).toBeVisible()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible) | Элемент виден |
+| [expect(locator).toContainText()](/api/class-locatorassertions.mdx#locator-assertions-to-contain-text) | Элемент содержит текст |
+| [expect(locator).toHaveAttribute()](/api/class-locatorassertions.mdx#locator-assertions-to-have-attribute) | Элемент имеет DOM-атрибут |
+| [expect(locator).toHaveClass()](/api/class-locatorassertions.mdx#locator-assertions-to-have-class) | Элемент имеет класс |
+| [expect(locator).toHaveCount()](/api/class-locatorassertions.mdx#locator-assertions-to-have-count) | Список имеет точное количество дочерних элементов |
+| [expect(locator).toHaveCSS()](/api/class-locatorassertions.mdx#locator-assertions-to-have-css) | Элемент имеет CSS-свойство |
+| [expect(locator).toHaveId()](/api/class-locatorassertions.mdx#locator-assertions-to-have-id) | Элемент имеет ID |
+| [expect(locator).toHaveJSProperty()](/api/class-locatorassertions.mdx#locator-assertions-to-have-js-property) | Элемент имеет JavaScript-свойство |
+| [expect(locator).toHaveText()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text) | Элемент соответствует тексту |
+| [expect(locator).toHaveValue()](/api/class-locatorassertions.mdx#locator-assertions-to-have-value) | Ввод имеет значение |
+| [expect(locator).toHaveValues()](/api/class-locatorassertions.mdx#locator-assertions-to-have-values) | Выбор имеет выбранные опции |
+| [expect(page).toHaveTitle()](/api/class-pageassertions.mdx#page-assertions-to-have-title) | У страницы есть заголовок |
+| [expect(page).toHaveURL()](/api/class-pageassertions.mdx#page-assertions-to-have-url) | У страницы есть URL |
+| [expect(response).toBeOK()](/api/class-apiresponseassertions.mdx#api-response-assertions-to-be-ok) | Ответ имеет статус OK |
 
-Learn more in the [assertions guide](./test-assertions.mdx).
+Узнайте больше в [руководстве по утверждениям](./test-assertions.mdx).
 
-## Visible
+## Видимый
 
-Element is considered visible when it has non-empty bounding box and does not have `visibility:hidden` computed style.
+Элемент считается видимым, когда у него есть непустая область и у него нет стиля `visibility:hidden`.
 
-Note that according to this definition:
-* Elements of zero size **are not** considered visible.
-* Elements with `display:none` **are not** considered visible.
-* Elements with `opacity:0` **are** considered visible.
+Обратите внимание, что согласно этому определению:
+* Элементы нулевого размера **не считаются** видимыми.
+* Элементы с `display:none` **не считаются** видимыми.
+* Элементы с `opacity:0` **считаются** видимыми.
 
-## Stable
+## Стабильный
 
-Element is considered stable when it has maintained the same bounding box for at least two consecutive animation frames.
+Элемент считается стабильным, когда он сохраняет одну и ту же область в течение как минимум двух последовательных кадров анимации.
 
-## Enabled
+## Включен
 
-Element is considered enabled when it is **not disabled**.
+Элемент считается включенным, когда он **не отключен**.
 
-Element is **disabled** when:
-- it is a `<button>`, `<select>`, `<input>`, `<textarea>`, `<option>` or `<optgroup>` with a `[disabled]` attribute;
-- it is a `<button>`, `<select>`, `<input>`, `<textarea>`, `<option>` or `<optgroup>` that is a part of a `<fieldset>` with a `[disabled]` attribute;
-- it is a descendant of an element with `[aria-disabled=true]` attribute.
+Элемент **отключен**, когда:
+- это `<button>`, `<select>`, `<input>`, `<textarea>`, `<option>` или `<optgroup>` с атрибутом `[disabled]`;
+- это `<button>`, `<select>`, `<input>`, `<textarea>`, `<option>` или `<optgroup>`, который является частью `<fieldset>` с атрибутом `[disabled]`;
+- это потомок элемента с атрибутом `[aria-disabled=true]`.
 
-## Editable
+## Редактируемый
 
-Element is considered editable when it is [enabled] and is **not readonly**.
+Элемент считается редактируемым, когда он [включен] и **не является только для чтения**.
 
-Element is **readonly** when:
-- it is a `<select>`, `<input>` or `<textarea>` with a `[readonly]` attribute;
-- it has an `[aria-readonly=true]` attribute and an aria role that [supports it](https://w3c.github.io/aria/#aria-readonly).
+Элемент **только для чтения**, когда:
+- это `<select>`, `<input>` или `<textarea>` с атрибутом `[readonly]`;
+- у него есть атрибут `[aria-readonly=true]` и роль aria, которая [поддерживает это](https://w3c.github.io/aria/#aria-readonly).
 
-## Receives Events
+## Принимает события
 
-Element is considered receiving pointer events when it is the hit target of the pointer event at the action point. For example, when clicking at the point `(10;10)`, Playwright checks whether some other element (usually an overlay) will instead capture the click at `(10;10)`.
+Элемент считается принимающим указательные события, когда он является целевым объектом указательного события в точке действия. Например, при клике в точке `(10;10)` Playwright проверяет, будет ли какой-либо другой элемент (обычно наложение) вместо этого захватывать клик в `(10;10)`.
 
-For example, consider a scenario where Playwright will click `Sign Up` button regardless of when the [locator.click()](/api/class-locator.mdx#locator-click) call was made:
-- page is checking that user name is unique and `Sign Up` button is disabled;
-- after checking with the server, the disabled `Sign Up` button is replaced with another one that is now enabled.
+Например, рассмотрим сценарий, когда Playwright будет кликать на кнопку `Sign Up`, независимо от того, когда был выполнен вызов [locator.click()](/api/class-locator.mdx#locator-click):
+- страница проверяет, что имя пользователя уникально, и кнопка `Sign Up` отключена;
+- после проверки с сервером отключенная кнопка `Sign Up` заменяется другой, которая теперь включена.
 
-[Visible]: #visible "Visible"
-[Stable]: #stable "Stable"
-[Enabled]: #enabled "Enabled"
-[Editable]: #editable "Editable"
-[Receives Events]: #receives-events "Receives Events"
+[Видимый]: #visible "Видимый"
+[Стабилен]: #stable "Стабилен"
+[Включен]: #enabled "Включен"
+[Редактируемый]: #editable "Редактируемый"
+[Принимает события]: #receives-events "Принимает события"
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+[Доступность]: /api/class-accessibility.mdx "Доступность"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
@@ -191,13 +191,13 @@ For example, consider a scenario where Playwright will click `Sign Up` button re
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
 [TestStep]: /api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[Элемент]: https://developer.mozilla.org/en-US/docs/Web/API/element "Элемент"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Итератор"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Происхождение"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "селектор"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Сериализуемый"
 [UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
@@ -225,6 +225,6 @@ For example, consider a scenario where Playwright will click `Sign Up` button re
 [URL]: https://nodejs.org/api/url.html "URL"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
+[все доступные теги изображений]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"
+[Реестр артефактов Microsoft]: https://mcr.microsoft.com/en-us/product/playwright/about "Реестр артефактов Microsoft"
 [Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

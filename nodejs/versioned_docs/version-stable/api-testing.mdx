@@ -1,55 +1,55 @@
 ---
 id: api-testing
-title: "API testing"
+title: "Тестирование API"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright can be used to get access to the [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) API of your application.
+Playwright можно использовать для доступа к [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) API вашего приложения.
 
-Sometimes you may want to send requests to the server directly from Node.js without loading a page and running js code in it. A few examples where it may come in handy:
-- Test your server API.
-- Prepare server side state before visiting the web application in a test.
-- Validate server side post-conditions after running some actions in the browser.
+Иногда вам может понадобиться отправить запросы на сервер напрямую из Node.js, не загружая страницу и не выполняя код JavaScript в ней. Вот несколько примеров, когда это может быть полезно:
+- Тестирование API вашего сервера.
+- Подготовка состояния на стороне сервера перед посещением веб-приложения в тесте.
+- Проверка постусловий на стороне сервера после выполнения некоторых действий в браузере.
 
-All of that could be achieved via [APIRequestContext] methods.
+Все это можно реализовать с помощью методов [APIRequestContext].
 
-## Writing API Test
+## Написание теста API
 
-[APIRequestContext] can send all kinds of HTTP(S) requests over network.
+[APIRequestContext] может отправлять все виды HTTP(S) запросов по сети.
 
-The following example demonstrates how to use Playwright to test issues creation via [GitHub API](https://docs.github.com/en/rest). The test suite will do the following:
-- Create a new repository before running tests.
-- Create a few issues and validate server state.
-- Delete the repository after running tests.
+Следующий пример демонстрирует, как использовать Playwright для тестирования создания задач через [GitHub API](https://docs.github.com/en/rest). Набор тестов выполнит следующее:
+- Создаст новый репозиторий перед запуском тестов.
+- Создаст несколько задач и проверит состояние сервера.
+- Удалит репозиторий после выполнения тестов.
 
-### Configuration
+### Конфигурация
 
-GitHub API requires authorization, so we'll configure the token once for all tests. While at it, we'll also set the `baseURL` to simplify the tests. You can either put them in the configuration file, or in the test file with `test.use()`.
+GitHub API требует авторизации, поэтому мы настроим токен один раз для всех тестов. При этом мы также установим `baseURL`, чтобы упростить тесты. Вы можете либо поместить их в файл конфигурации, либо в файл теста с помощью `test.use()`.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
 export default defineConfig({
   use: {
-    // All requests we send go to this API endpoint.
+    // Все запросы, которые мы отправляем, идут на этот API-эндпоинт.
     baseURL: 'https://api.github.com',
     extraHTTPHeaders: {
-      // We set this header per GitHub guidelines.
+      // Мы устанавливаем этот заголовок в соответствии с рекомендациями GitHub.
       'Accept': 'application/vnd.github.v3+json',
-      // Add authorization token to all requests.
-      // Assuming personal access token available in the environment.
+      // Добавляем токен авторизации ко всем запросам.
+      // Предполагается, что персональный токен доступа доступен в окружении.
       'Authorization': `token ${process.env.API_TOKEN}`,
     },
   }
 });
 ```
 
-**Proxy configuration**
+**Конфигурация прокси**
 
-If your tests need to run behind a proxy, you can specify this in the config and the `request` fixture will pick it up automatically:
+Если ваши тесты должны выполняться за прокси, вы можете указать это в конфигурации, и фикстура `request` автоматически подхватит это:
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -64,21 +64,21 @@ export default defineConfig({
 });
 ```
 
-### Writing tests
+### Написание тестов
 
-Playwright Test comes with the built-in `request` fixture that respects configuration options like `baseURL` or `extraHTTPHeaders` we specified and is ready to send some requests.
+Playwright Test поставляется с встроенной фикстурой `request`, которая учитывает такие параметры конфигурации, как `baseURL` или `extraHTTPHeaders`, которые мы указали, и готова отправлять запросы.
 
-Now we can add a few tests that will create new issues in the repository.
+Теперь мы можем добавить несколько тестов, которые создадут новые задачи в репозитории.
 
 ```js
 const REPO = 'test-repo-1';
 const USER = 'github-username';
 
-test('should create a bug report', async ({ request }) => {
+test('должен создать отчет об ошибке', async ({ request }) => {
   const newIssue = await request.post(`/repos/${USER}/${REPO}/issues`, {
     data: {
       title: '[Bug] report 1',
-      body: 'Bug description',
+      body: 'Описание ошибки',
     }
   });
   expect(newIssue.ok()).toBeTruthy();
@@ -87,15 +87,15 @@ test('should create a bug report', async ({ request }) => {
   expect(issues.ok()).toBeTruthy();
   expect(await issues.json()).toContainEqual(expect.objectContaining({
     title: '[Bug] report 1',
-    body: 'Bug description'
+    body: 'Описание ошибки'
   }));
 });
 
-test('should create a feature request', async ({ request }) => {
+test('должен создать запрос на функцию', async ({ request }) => {
   const newIssue = await request.post(`/repos/${USER}/${REPO}/issues`, {
     data: {
       title: '[Feature] request 1',
-      body: 'Feature description',
+      body: 'Описание функции',
     }
   });
   expect(newIssue.ok()).toBeTruthy();
@@ -104,18 +104,18 @@ test('should create a feature request', async ({ request }) => {
   expect(issues.ok()).toBeTruthy();
   expect(await issues.json()).toContainEqual(expect.objectContaining({
     title: '[Feature] request 1',
-    body: 'Feature description'
+    body: 'Описание функции'
   }));
 });
 ```
 
-### Setup and teardown
+### Настройка и завершение
 
-These tests assume that repository exists. You probably want to create a new one before running tests and delete it afterwards. Use `beforeAll` and `afterAll` hooks for that.
+Эти тесты предполагают, что репозиторий существует. Вам, вероятно, нужно будет создать новый перед запуском тестов и удалить его после. Используйте хуки `beforeAll` и `afterAll` для этого.
 
 ```js
 test.beforeAll(async ({ request }) => {
-  // Create a new repository
+  // Создаем новый репозиторий
   const response = await request.post('/user/repos', {
     data: {
       name: REPO
@@ -125,15 +125,15 @@ test.beforeAll(async ({ request }) => {
 });
 
 test.afterAll(async ({ request }) => {
-  // Delete the repository
+  // Удаляем репозиторий
   const response = await request.delete(`/repos/${USER}/${REPO}`);
   expect(response.ok()).toBeTruthy();
 });
 ```
 
-## Using request context
+## Использование контекста запросов
 
-Behind the scenes, [`request` fixture](./api/class-fixtures#fixtures-request) will actually call [apiRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context). You can always do that manually if you'd like more control. Below is a standalone script that does the same as `beforeAll` and `afterAll` from above.
+За кулисами фикстура [`request`](./api/class-fixtures#fixtures-request) на самом деле вызовет [apiRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context). Вы всегда можете сделать это вручную, если хотите больше контроля. Ниже приведен отдельный скрипт, который выполняет то же самое, что и `beforeAll` и `afterAll` из выше.
 
 ```js
 import { request } from '@playwright/test';
@@ -141,16 +141,16 @@ const REPO = 'test-repo-1';
 const USER = 'github-username';
 
 (async () => {
-  // Create a context that will issue http requests.
+  // Создаем контекст, который будет отправлять http запросы.
   const context = await request.newContext({
     baseURL: 'https://api.github.com',
   });
 
-  // Create a repository.
+  // Создаем репозиторий.
   await context.post('/user/repos', {
     headers: {
       'Accept': 'application/vnd.github.v3+json',
-      // Add GitHub personal access token.
+      // Добавляем персональный токен доступа GitHub.
       'Authorization': `token ${process.env.API_TOKEN}`,
     },
     data: {
@@ -158,24 +158,24 @@ const USER = 'github-username';
     }
   });
 
-  // Delete a repository.
+  // Удаляем репозиторий.
   await context.delete(`/repos/${USER}/${REPO}`, {
     headers: {
       'Accept': 'application/vnd.github.v3+json',
-      // Add GitHub personal access token.
+      // Добавляем персональный токен доступа GitHub.
       'Authorization': `token ${process.env.API_TOKEN}`,
     }
   });
 })();
 ```
 
-## Sending API requests from UI tests
+## Отправка API запросов из UI тестов
 
-While running tests inside browsers you may want to make calls to the HTTP API of your application. It may be helpful if you need to prepare server state before running a test or to check some postconditions on the server after performing some actions in the browser. All of that could be achieved via [APIRequestContext] methods.
+Во время выполнения тестов в браузерах вы можете захотеть сделать вызовы к HTTP API вашего приложения. Это может быть полезно, если вам нужно подготовить состояние сервера перед запуском теста или проверить некоторые постусловия на сервере после выполнения действий в браузере. Все это можно реализовать с помощью методов [APIRequestContext].
 
-### Establishing preconditions
+### Установление предшествующих условий
 
-The following test creates a new issue via API and then navigates to the list of all issues in the project to check that it appears at the top of the list.
+Следующий тест создает новую задачу через API, а затем переходит к списку всех задач в проекте, чтобы проверить, что она появляется в верхней части списка.
 
 ```js
 import { test, expect } from '@playwright/test';
@@ -183,29 +183,29 @@ import { test, expect } from '@playwright/test';
 const REPO = 'test-repo-1';
 const USER = 'github-username';
 
-// Request context is reused by all tests in the file.
+// Контекст запроса используется всеми тестами в файле.
 let apiContext;
 
 test.beforeAll(async ({ playwright }) => {
   apiContext = await playwright.request.newContext({
-    // All requests we send go to this API endpoint.
+    // Все запросы, которые мы отправляем, идут на этот API-эндпоинт.
     baseURL: 'https://api.github.com',
     extraHTTPHeaders: {
-      // We set this header per GitHub guidelines.
+      // Мы устанавливаем этот заголовок в соответствии с рекомендациями GitHub.
       'Accept': 'application/vnd.github.v3+json',
-      // Add authorization token to all requests.
-      // Assuming personal access token available in the environment.
+      // Добавляем токен авторизации ко всем запросам.
+      // Предполагается, что персональный токен доступа доступен в окружении.
       'Authorization': `token ${process.env.API_TOKEN}`,
     },
   });
 });
 
 test.afterAll(async ({ }) => {
-  // Dispose all responses.
+  // Освобождаем все ответы.
   await apiContext.dispose();
 });
 
-test('last created issue should be first in the list', async ({ page }) => {
+test('последняя созданная задача должна быть первой в списке', async ({ page }) => {
   const newIssue = await apiContext.post(`/repos/${USER}/${REPO}/issues`, {
     data: {
       title: '[Feature] request 1',
@@ -219,9 +219,9 @@ test('last created issue should be first in the list', async ({ page }) => {
 });
 ```
 
-### Validating postconditions
+### Проверка постусловий
 
-The following test creates a new issue via user interface in the browser and then uses checks if it was created via API:
+Следующий тест создает новую задачу через пользовательский интерфейс в браузере, а затем проверяет, была ли она создана через API:
 
 ```js
 import { test, expect } from '@playwright/test';
@@ -229,33 +229,33 @@ import { test, expect } from '@playwright/test';
 const REPO = 'test-repo-1';
 const USER = 'github-username';
 
-// Request context is reused by all tests in the file.
+// Контекст запроса используется всеми тестами в файле.
 let apiContext;
 
 test.beforeAll(async ({ playwright }) => {
   apiContext = await playwright.request.newContext({
-    // All requests we send go to this API endpoint.
+    // Все запросы, которые мы отправляем, идут на этот API-эндпоинт.
     baseURL: 'https://api.github.com',
     extraHTTPHeaders: {
-      // We set this header per GitHub guidelines.
+      // Мы устанавливаем этот заголовок в соответствии с рекомендациями GitHub.
       'Accept': 'application/vnd.github.v3+json',
-      // Add authorization token to all requests.
-      // Assuming personal access token available in the environment.
+      // Добавляем токен авторизации ко всем запросам.
+      // Предполагается, что персональный токен доступа доступен в окружении.
       'Authorization': `token ${process.env.API_TOKEN}`,
     },
   });
 });
 
 test.afterAll(async ({ }) => {
-  // Dispose all responses.
+  // Освобождаем все ответы.
   await apiContext.dispose();
 });
 
-test('last created issue should be on the server', async ({ page }) => {
+test('последняя созданная задача должна быть на сервере', async ({ page }) => {
   await page.goto(`https://github.com/${USER}/${REPO}/issues`);
   await page.getByText('New Issue').click();
   await page.getByRole('textbox', { name: 'Title' }).fill('Bug report 1');
-  await page.getByRole('textbox', { name: 'Comment body' }).fill('Bug description');
+  await page.getByRole('textbox', { name: 'Comment body' }).fill('Описание ошибки');
   await page.getByText('Submit new issue').click();
   const issueId = page.url().substr(page.url().lastIndexOf('/'));
 
@@ -269,11 +269,11 @@ test('last created issue should be on the server', async ({ page }) => {
 });
 ```
 
-## Reusing authentication state
+## Повторное использование состояния аутентификации
 
-Web apps use cookie-based or token-based authentication, where authenticated state is stored as [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies). Playwright provides [apiRequestContext.storageState()](/api/class-apirequestcontext.mdx#api-request-context-storage-state) method that can be used to retrieve storage state from an authenticated context and then create new contexts with that state.
+Веб-приложения используют аутентификацию на основе куки или токенов, где аутентифицированное состояние хранится в [куках](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies). Playwright предоставляет метод [apiRequestContext.storageState()](/api/class-apirequestcontext.mdx#api-request-context-storage-state), который можно использовать для получения состояния хранилища из аутентифицированного контекста, а затем создать новые контексты с этим состоянием.
 
-Storage state is interchangeable between [BrowserContext] and [APIRequestContext]. You can use it to log in via API calls and then create a new context with cookies already there. The following code snippet retrieves state from an authenticated [APIRequestContext] and creates a new [BrowserContext] with that state.
+Состояние хранилища взаимозаменяемо между [BrowserContext] и [APIRequestContext]. Вы можете использовать его для входа через API-вызовы, а затем создать новый контекст с уже существующими куками. Следующий фрагмент кода получает состояние из аутентифицированного [APIRequestContext] и создает новый [BrowserContext] с этим состоянием.
 
 ```js
 const requestContext = await request.newContext({
@@ -283,39 +283,39 @@ const requestContext = await request.newContext({
   }
 });
 await requestContext.get(`https://api.example.com/login`);
-// Save storage state into the file.
+// Сохраняем состояние хранилища в файл.
 await requestContext.storageState({ path: 'state.json' });
 
-// Create a new context with the saved storage state.
+// Создаем новый контекст с сохраненным состоянием хранилища.
 const context = await browser.newContext({ storageState: 'state.json' });
 ```
 
-## Context request vs global request
+## Запрос контекста против глобального запроса
 
-There are two types of [APIRequestContext]:
-* associated with a [BrowserContext]
-* isolated instance, created via [apiRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context)
+Существует два типа [APIRequestContext]:
+* связанный с [BrowserContext]
+* изолированный экземпляр, созданный через [apiRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context)
 
-The main difference is that [APIRequestContext] accessible via [browserContext.request](/api/class-browsercontext.mdx#browser-context-request) and [page.request](/api/class-page.mdx#page-request) will populate request's `Cookie` header from the browser context and will automatically update browser cookies if [APIResponse] has `Set-Cookie` header:
+Основное различие заключается в том, что [APIRequestContext], доступный через [browserContext.request](/api/class-browsercontext.mdx#browser-context-request) и [page.request](/api/class-page.mdx#page-request), будет заполнять заголовок `Cookie` запроса из контекста браузера и автоматически обновлять куки браузера, если [APIResponse] имеет заголовок `Set-Cookie`:
 
 ```js
-test('context request will share cookie storage with its browser context', async ({
+test('запрос контекста будет делиться хранилищем куки с его контекстом браузера', async ({
   page,
   context,
 }) => {
   await context.route('https://www.github.com/', async route => {
-    // Send an API request that shares cookie storage with the browser context.
+    // Отправляем API-запрос, который делится хранилищем куки с контекстом браузера.
     const response = await context.request.fetch(route.request());
     const responseHeaders = response.headers();
 
-    // The response will have 'Set-Cookie' header.
+    // В ответе будет заголовок 'Set-Cookie'.
     const responseCookies = new Map(responseHeaders['set-cookie']
         .split('\n')
         .map(c => c.split(';', 2)[0].split('=')));
-    // The response will have 3 cookies in 'Set-Cookie' header.
+    // В ответе будет 3 куки в заголовке 'Set-Cookie'.
     expect(responseCookies.size).toBe(3);
     const contextCookies = await context.cookies();
-    // The browser context will already contain all the cookies from the API response.
+    // Контекст браузера уже будет содержать все куки из ответа API.
     expect(new Map(contextCookies.map(({ name, value }) =>
       [name, value])
     )).toEqual(responseCookies);
@@ -329,16 +329,16 @@ test('context request will share cookie storage with its browser context', async
 });
 ```
 
-If you don't want [APIRequestContext] to use and update cookies from the browser context, you can manually create a new instance of [APIRequestContext] which will have its own isolated cookies:
+Если вы не хотите, чтобы [APIRequestContext] использовал и обновлял куки из контекста браузера, вы можете вручную создать новый экземпляр [APIRequestContext], который будет иметь свои собственные изолированные куки:
 
 ```js
-test('global context request has isolated cookie storage', async ({
+test('глобальный запрос контекста имеет изолированное хранилище куки', async ({
   page,
   context,
   browser,
   playwright
 }) => {
-  // Create a new instance of APIRequestContext with isolated cookie storage.
+  // Создаем новый экземпляр APIRequestContext с изолированным хранилищем куки.
   const request = await playwright.request.newContext();
   await context.route('https://www.github.com/', async route => {
     const response = await request.fetch(route.request());
@@ -347,18 +347,18 @@ test('global context request has isolated cookie storage', async ({
     const responseCookies = new Map(responseHeaders['set-cookie']
         .split('\n')
         .map(c => c.split(';', 2)[0].split('=')));
-    // The response will have 3 cookies in 'Set-Cookie' header.
+    // В ответе будет 3 куки в заголовке 'Set-Cookie'.
     expect(responseCookies.size).toBe(3);
     const contextCookies = await context.cookies();
-    // The browser context will not have any cookies from the isolated API request.
+    // Контекст браузера не будет иметь никаких куков из изолированного API-запроса.
     expect(contextCookies.length).toBe(0);
 
-    // Manually export cookie storage.
+    // Вручную экспортируем хранилище куки.
     const storageState = await request.storageState();
-    // Create a new context and initialize it with the cookies from the global request.
+    // Создаем новый контекст и инициализируем его куками из глобального запроса.
     const browserContext2 = await browser.newContext({ storageState });
     const contextCookies2 = await browserContext2.cookies();
-    // The new browser context will already contain all the cookies from the API response.
+    // Новый контекст браузера уже будет содержать все куки из ответа API.
     expect(
         new Map(contextCookies2.map(({ name, value }) => [name, value]))
     ).toEqual(responseCookies);
@@ -372,7 +372,6 @@ test('global context request has isolated cookie storage', async ({
   await request.dispose();
 });
 ```
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
@@ -476,6 +475,6 @@ test('global context request has isolated cookie storage', async ({
 [URL]: https://nodejs.org/api/url.html "URL"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
+[все доступные теги изображений]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"
+[Реестр артефактов Microsoft]: https://mcr.microsoft.com/en-us/product/playwright/about "Реестр артефактов Microsoft"
 [Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

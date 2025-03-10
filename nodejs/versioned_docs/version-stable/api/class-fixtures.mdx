@@ -6,10 +6,9 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+Playwright Test основан на концепции [тестовых фикстур](../test-fixtures.mdx). Тестовые фикстуры используются для создания окружения для каждого теста, предоставляя тесту все необходимое и ничего лишнего.
 
-Playwright Test is based on the concept of the [test fixtures](../test-fixtures.mdx). Test fixtures are used to establish environment for each test, giving the test everything it needs and nothing else.
-
-Playwright Test looks at each test declaration, analyses the set of fixtures the test needs and prepares those fixtures specifically for the test. Values prepared by the fixtures are merged into a single object that is available to the `test`, hooks, annotations and other fixtures as a first parameter.
+Playwright Test анализирует каждое объявление теста, определяет набор фикстур, необходимых для теста, и подготавливает эти фикстуры специально для теста. Значения, подготовленные фикстурами, объединяются в один объект, который доступен для `test`, хуков, аннотаций и других фикстур в качестве первого параметра.
 
 ```js
 import { test, expect } from '@playwright/test';
@@ -19,24 +18,23 @@ test('basic test', async ({ page }) => {
 });
 ```
 
-Given the test above, Playwright Test will set up the `page` fixture before running the test, and tear it down after the test has finished. `page` fixture provides a [Page] object that is available to the test.
+В приведенном выше тесте Playwright Test настроит фикстуру `page` перед выполнением теста и уничтожит ее после завершения теста. Фикстура `page` предоставляет объект [Page], который доступен для теста.
 
-Playwright Test comes with builtin fixtures listed below, and you can add your own fixtures as well. Playwright Test also [provides options][TestOptions] to  configure [fixtures.browser](/api/class-fixtures.mdx#fixtures-browser), [fixtures.context](/api/class-fixtures.mdx#fixtures-context) and [fixtures.page](/api/class-fixtures.mdx#fixtures-page).
-
+Playwright Test поставляется с предустановленными фикстурами, перечисленными ниже, и вы также можете добавлять свои собственные фикстуры. Playwright Test также [предоставляет параметры][TestOptions] для настройки [fixtures.browser](/api/class-fixtures.mdx#fixtures-browser), [fixtures.context](/api/class-fixtures.mdx#fixtures-context) и [fixtures.page](/api/class-fixtures.mdx#fixtures-page).
 
 ---
 
-## Properties
+## Свойства
 
 ### browser {#fixtures-browser}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>fixtures.browser</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>fixtures.browser</x-search>
 
-[Browser] instance is shared between all tests in the [same worker](../test-parallel.mdx) - this makes testing efficient. However, each test runs in an isolated [BrowserContext]  and gets a fresh environment.
+Экземпляр [Browser] разделяется между всеми тестами в [одном и том же worker](../test-parallel.mdx) — это делает тестирование более эффективным. Однако каждый тест выполняется в изолированном [BrowserContext] и получает новое окружение.
 
-Learn how to [configure browser](../test-configuration.mdx) and see [available options][TestOptions].
+Узнайте, как [настроить браузер](../test-configuration.mdx) и посмотрите [доступные параметры][TestOptions].
 
-**Usage**
+**Использование**
 
 ```js
 test.beforeAll(async ({ browser }) => {
@@ -45,18 +43,18 @@ test.beforeAll(async ({ browser }) => {
 });
 ```
 
-**Type**
+**Тип**
 - [Browser]
 
 ---
 
 ### browserName {#fixtures-browser-name}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>fixtures.browserName</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>fixtures.browserName</x-search>
 
-Name of the browser that runs tests. Defaults to `'chromium'`. Useful to [annotate tests](../test-annotations.mdx) based on the browser.
+Имя браузера, в котором выполняются тесты. По умолчанию `'chromium'`. Полезно для [аннотирования тестов](../test-annotations.mdx) в зависимости от браузера.
 
-**Usage**
+**Использование**
 
 ```js
 test('skip this test in Firefox', async ({ page, browserName }) => {
@@ -65,22 +63,22 @@ test('skip this test in Firefox', async ({ page, browserName }) => {
 });
 ```
 
-**Type**
+**Тип**
 - "chromium" | "firefox" | "webkit"
 
 ---
 
 ### context {#fixtures-context}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>fixtures.context</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>fixtures.context</x-search>
 
-Isolated [BrowserContext] instance, created for each test. Since contexts are isolated between each other, every test gets a fresh environment, even when multiple tests run in a single [Browser] for maximum efficiency.
+Изолированный экземпляр [BrowserContext], созданный для каждого теста. Поскольку контексты изолированы друг от друга, каждый тест получает новое окружение, даже когда несколько тестов выполняются в одном [Browser] для максимальной эффективности.
 
-Learn how to [configure context](../test-configuration.mdx) and see [available options][TestOptions].
+Узнайте, как [настроить контекст](../test-configuration.mdx) и посмотрите [доступные параметры][TestOptions].
 
-Default [fixtures.page](/api/class-fixtures.mdx#fixtures-page) belongs to this context.
+По умолчанию [fixtures.page](/api/class-fixtures.mdx#fixtures-page) принадлежит этому контексту.
 
-**Usage**
+**Использование**
 
 ```js
 test('example test', async ({ page, context }) => {
@@ -89,20 +87,20 @@ test('example test', async ({ page, context }) => {
 });
 ```
 
-**Type**
+**Тип**
 - [BrowserContext]
 
 ---
 
 ### page {#fixtures-page}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>fixtures.page</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>fixtures.page</x-search>
 
-Isolated [Page] instance, created for each test. Pages are isolated between tests due to [fixtures.context](/api/class-fixtures.mdx#fixtures-context) isolation.
+Изолированный экземпляр [Page], созданный для каждого теста. Страницы изолированы между тестами благодаря изоляции [fixtures.context](/api/class-fixtures.mdx#fixtures-context).
 
-This is the most common fixture used in a test.
+Это самая распространенная фикстура, используемая в тесте.
 
-**Usage**
+**Использование**
 
 ```js
 import { test, expect } from '@playwright/test';
@@ -116,18 +114,18 @@ test('basic test', async ({ page }) => {
 });
 ```
 
-**Type**
+**Тип**
 - [Page]
 
 ---
 
 ### request {#fixtures-request}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>fixtures.request</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>fixtures.request</x-search>
 
-Isolated [APIRequestContext] instance for each test.
+Изолированный экземпляр [APIRequestContext] для каждого теста.
 
-**Usage**
+**Использование**
 
 ```js
 import { test, expect } from '@playwright/test';
@@ -143,9 +141,8 @@ test('basic test', async ({ request }) => {
 });
 ```
 
-**Type**
+**Тип**
 - [APIRequestContext]
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
@@ -249,6 +246,6 @@ test('basic test', async ({ request }) => {
 [URL]: https://nodejs.org/api/url.html "URL"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
+[все доступные теги изображений]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"
+[Реестр артефактов Microsoft]: https://mcr.microsoft.com/en-us/product/playwright/about "Реестр артефактов Microsoft"
 [Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

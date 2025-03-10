@@ -1,16 +1,16 @@
 ---
 id: test-parameterize
-title: "Parameterize tests"
+title: "Параметризация тестов"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-You can either parameterize tests on a test level or on a project level.
+Вы можете параметризировать тесты на уровне теста или на уровне проекта.
 
-## Parameterized Tests
+## Параметризованные тесты
 
 ```js title="example.spec.ts"
 [
@@ -18,17 +18,17 @@ You can either parameterize tests on a test level or on a project level.
   { name: 'Bob', expected: 'Hello, Bob!' },
   { name: 'Charlie', expected: 'Hello, Charlie!' },
 ].forEach(({ name, expected }) => {
-  // You can also do it with test.describe() or with multiple tests as long the test name is unique.
-  test(`testing with ${name}`, async ({ page }) => {
+  // Вы также можете сделать это с помощью test.describe() или с несколькими тестами, если имя теста уникально.
+  test(`тестирование с ${name}`, async ({ page }) => {
     await page.goto(`https://example.com/greet?name=${name}`);
     await expect(page.getByRole('heading')).toHaveText(expected);
   });
 });
 ```
 
-### Before and after hooks
+### Хуки before и after
 
-Most of the time you should put `beforeEach`, `beforeAll`, `afterEach` and `afterAll` hooks outside of `forEach`, so that hooks are executed just once:
+Чаще всего вам следует помещать хуки `beforeEach`, `beforeAll`, `afterEach` и `afterAll` вне `forEach`, чтобы хуки выполнялись только один раз:
 
 ```js title="example.spec.ts"
 test.beforeEach(async ({ page }) => {
@@ -44,14 +44,14 @@ test.afterEach(async ({ page }) => {
   { name: 'Bob', expected: 'Hello, Bob!' },
   { name: 'Charlie', expected: 'Hello, Charlie!' },
 ].forEach(({ name, expected }) => {
-  test(`testing with ${name}`, async ({ page }) => {
+  test(`тестирование с ${name}`, async ({ page }) => {
     await page.goto(`https://example.com/greet?name=${name}`);
     await expect(page.getByRole('heading')).toHaveText(expected);
   });
 });
 ```
 
-If you want to have hooks for each test, you can put them inside a `describe()` - so they are executed for each iteration / each individual test:
+Если вы хотите иметь хуки для каждого теста, вы можете поместить их внутрь `describe()` - так они будут выполняться для каждой итерации / каждого отдельного теста:
 
 ```js title="example.spec.ts"
 [
@@ -63,18 +63,18 @@ If you want to have hooks for each test, you can put them inside a `describe()` 
     test.beforeEach(async ({ page }) => {
       await page.goto(`https://example.com/greet?name=${name}`);
     });
-    test(`testing with ${expected}`, async ({ page }) => {
+    test(`тестирование с ${expected}`, async ({ page }) => {
       await expect(page.getByRole('heading')).toHaveText(expected);
     });
   });
 });
 ```
 
-## Parameterized Projects
+## Параметризованные проекты
 
-Playwright Test supports running multiple test projects at the same time. In the following example, we'll run two projects with different options.
+Playwright Test поддерживает запуск нескольких тестовых проектов одновременно. В следующем примере мы запустим два проекта с разными параметрами.
 
-We declare the option `person` and set the value in the config. The first project runs with the value `Alice` and the second with the value `Bob`.
+Мы объявляем параметр `person` и устанавливаем значение в конфигурации. Первый проект запускается со значением `Alice`, а второй - со значением `Bob`.
 
 <Tabs
   groupId="js-flavor"
@@ -94,8 +94,8 @@ export type TestOptions = {
 };
 
 export const test = base.extend<TestOptions>({
-  // Define an option and provide a default value.
-  // We can later override it in the config.
+  // Определите параметр и предоставьте значение по умолчанию.
+  // Мы можем позже переопределить его в конфигурации.
   person: ['John', { option: true }],
 });
 ```
@@ -107,8 +107,8 @@ export const test = base.extend<TestOptions>({
 const base = require('@playwright/test');
 
 exports.test = base.test.extend({
-  // Define an option and provide a default value.
-  // We can later override it in the config.
+  // Определите параметр и предоставьте значение по умолчанию.
+  // Мы можем позже переопределить его в конфигурации.
   person: ['John', { option: true }],
 });
 ```
@@ -116,19 +116,19 @@ exports.test = base.test.extend({
 </TabItem>
 </Tabs>
 
-We can use this option in the test, similarly to [fixtures](./test-fixtures.mdx).
+Мы можем использовать этот параметр в тесте, аналогично [фикстурам](./test-fixtures.mdx).
 
 ```js title="example.spec.ts"
 import { test } from './my-test';
 
-test('test 1', async ({ page, person }) => {
+test('тест 1', async ({ page, person }) => {
   await page.goto(`/index.html`);
   await expect(page.locator('#node')).toContainText(person);
   // ...
 });
 ```
 
-Now, we can run tests in multiple configurations by using projects.
+Теперь мы можем запускать тесты в нескольких конфигурациях, используя проекты.
 
 <Tabs
   groupId="js-flavor"
@@ -181,7 +181,7 @@ module.exports = defineConfig({
 </TabItem>
 </Tabs>
 
-We can also use the option in a fixture. Learn more about [fixtures](./test-fixtures.mdx).
+Мы также можем использовать параметр в фикстуре. Узнайте больше о [фикстурах](./test-fixtures.mdx).
 
 <Tabs
   groupId="js-flavor"
@@ -201,17 +201,17 @@ export type TestOptions = {
 };
 
 export const test = base.extend<TestOptions>({
-  // Define an option and provide a default value.
-  // We can later override it in the config.
+  // Определите параметр и предоставьте значение по умолчанию.
+  // Мы можем позже переопределить его в конфигурации.
   person: ['John', { option: true }],
 
-  // Override default "page" fixture.
+  // Переопределите фикстуру "page" по умолчанию.
   page: async ({ page, person }, use) => {
     await page.goto('/chat');
-    // We use "person" parameter as a "name" for the chat room.
+    // Мы используем параметр "person" как "имя" для комнаты чата.
     await page.getByLabel('User Name').fill(person);
     await page.getByText('Enter chat room').click();
-    // Each test will get a "page" that already has the person name.
+    // Каждый тест получит "page", который уже имеет имя пользователя.
     await use(page);
   },
 });
@@ -224,17 +224,17 @@ export const test = base.extend<TestOptions>({
 const base = require('@playwright/test');
 
 exports.test = base.test.extend({
-  // Define an option and provide a default value.
-  // We can later override it in the config.
+  // Определите параметр и предоставьте значение по умолчанию.
+  // Мы можем позже переопределить его в конфигурации.
   person: ['John', { option: true }],
 
-  // Override default "page" fixture.
+  // Переопределите фикстуру "page" по умолчанию.
   page: async ({ page, person }, use) => {
     await page.goto('/chat');
-    // We use "person" parameter as a "name" for the chat room.
+    // Мы используем параметр "person" как "имя" для комнаты чата.
     await page.getByLabel('User Name').fill(person);
     await page.getByText('Enter chat room').click();
-    // Each test will get a "page" that already has the person name.
+    // Каждый тест получит "page", который уже имеет имя пользователя.
     await use(page);
   },
 });
@@ -245,24 +245,24 @@ exports.test = base.test.extend({
 
 :::note
 
-Parameterized projects behavior has changed in version 1.18. [Learn more](./release-notes#breaking-change-custom-config-options).
+Поведение параметризованных проектов изменилось в версии 1.18. [Узнайте больше](./release-notes#breaking-change-custom-config-options).
 :::
 
-## Passing Environment Variables
+## Передача переменных окружения
 
-You can use environment variables to configure tests from the command line.
+Вы можете использовать переменные окружения для настройки тестов из командной строки.
 
-For example, consider the following test file that needs a username and a password. It is usually a good idea not to store your secrets in the source code, so we'll need a way to pass secrets from outside.
+Например, рассмотрим следующий тестовый файл, который требует имя пользователя и пароль. Обычно хорошей идеей является не хранить ваши секреты в исходном коде, поэтому нам нужен способ передать секреты извне.
 
 ```js title="example.spec.ts"
-test(`example test`, async ({ page }) => {
+test(`пример теста`, async ({ page }) => {
   // ...
   await page.getByLabel('User Name').fill(process.env.USER_NAME);
   await page.getByLabel('Password').fill(process.env.PASSWORD);
 });
 ```
 
-You can run this test with your secret username and password set in the command line.
+Вы можете запустить этот тест с вашим секретным именем пользователя и паролем, установленными в командной строке.
 
 <Tabs
   groupId="bash-flavor"
@@ -300,7 +300,7 @@ npx playwright test
 </TabItem>
 </Tabs>
 
-Similarly, configuration file can also read environment variables passed through the command line.
+Аналогично, файл конфигурации также может считывать переменные окружения, переданные через командную строку.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -312,7 +312,7 @@ export default defineConfig({
 });
 ```
 
-Now, you can run tests against a staging or a production environment:
+Теперь вы можете запускать тесты против тестовой или производственной среды:
 
 <Tabs
   groupId="bash-flavor"
@@ -348,19 +348,19 @@ npx playwright test
 </TabItem>
 </Tabs>
 
-### .env files
+### Файлы .env
 
-To make environment variables easier to manage, consider something like `.env` files. Here is an example that uses [`dotenv`](https://www.npmjs.com/package/dotenv) package to read environment variables directly in the configuration file.
+Чтобы упростить управление переменными окружения, рассмотрите возможность использования файлов `.env`. Вот пример, который использует пакет [`dotenv`](https://www.npmjs.com/package/dotenv) для чтения переменных окружения непосредственно в файле конфигурации.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
 import dotenv from 'dotenv';
 import path from 'path';
 
-// Read from ".env" file.
+// Чтение из файла ".env".
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
-// Alternatively, read from "../my.env" file.
+// Альтернативно, чтение из файла "../my.env".
 dotenv.config({ path: path.resolve(__dirname, '..', 'my.env') });
 
 export default defineConfig({
@@ -370,26 +370,26 @@ export default defineConfig({
 });
 ```
 
-Now, you can just edit `.env` file to set any variables you'd like.
+Теперь вы можете просто редактировать файл `.env`, чтобы установить любые переменные, которые вам нужны.
 
 ```bash
-# .env file
+# файл .env
 STAGING=0
 USER_NAME=me
 PASSWORD=secret
 ```
 
-Run tests as usual, your environment variables should be picked up.
+Запустите тесты как обычно, ваши переменные окружения должны быть подхвачены.
 
 ```bash
 npx playwright test
 ```
 
-## Create tests via a CSV file
+## Создание тестов через CSV файл
 
-The Playwright test-runner runs in Node.js, this means you can directly read files from the file system and parse them with your preferred CSV library.
+Тестовый раннер Playwright работает в Node.js, это означает, что вы можете напрямую читать файлы из файловой системы и парсить их с помощью вашей предпочитаемой библиотеки CSV.
 
-See for example this CSV file, in our example `input.csv`:
+Например, рассмотрим этот CSV файл, в нашем примере `input.csv`:
 
 ```txt
 "test_case","some_value","some_other_value"
@@ -399,7 +399,7 @@ See for example this CSV file, in our example `input.csv`:
 "value 4","value 44","foobar4321"
 ```
 
-Based on this we'll generate some tests by using the [csv-parse](https://www.npmjs.com/package/csv-parse) library from NPM:
+На основе этого мы сгенерируем несколько тестов, используя библиотеку [csv-parse](https://www.npmjs.com/package/csv-parse) из NPM:
 
 ```js title="test.spec.ts"
 import fs from 'fs';

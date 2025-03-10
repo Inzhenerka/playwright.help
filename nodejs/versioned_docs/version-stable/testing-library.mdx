@@ -1,25 +1,25 @@
 ---
 id: testing-library
-title: "Migrating from Testing Library"
+title: "Миграция с Testing Library"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Migration principles
+## Принципы миграции
 
-This guide describes migration to Playwright's [Experimental Component Testing](./test-components) from [DOM Testing Library](https://testing-library.com/docs/dom-testing-library/intro/), [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/), [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro) and [Svelte Testing Library](https://testing-library.com/docs/svelte-testing-library/intro).
+Этот гид описывает миграцию к [Экспериментальному тестированию компонентов](./test-components) Playwright с [DOM Testing Library](https://testing-library.com/docs/dom-testing-library/intro/), [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/), [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro) и [Svelte Testing Library](https://testing-library.com/docs/svelte-testing-library/intro).
 
 :::note
 
-If you use DOM Testing Library in the browser (for example, you bundle end-to-end tests with webpack), you can switch directly to Playwright Test. Examples below are focused on component tests, but for end-to-end test you just need to replace `await mount` with `await page.goto('http://localhost:3000/')` to open the page under test.
+Если вы используете DOM Testing Library в браузере (например, вы собираете end-to-end тесты с помощью webpack), вы можете сразу перейти на Playwright Test. Примеры ниже сосредоточены на тестах компонентов, но для end-to-end теста вам просто нужно заменить `await mount` на `await page.goto('http://localhost:3000/')`, чтобы открыть страницу, которую вы тестируете.
 :::
 
-## Cheat Sheet
+## Шпаргалка
 
 | Testing Library                                                                 | Playwright                                                             |
 | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| [screen](https://testing-library.com/docs/queries/about#screen)                 | [page](./api/class-page) and [component](./api/class-locator)          |
+| [screen](https://testing-library.com/docs/queries/about#screen)                 | [page](./api/class-page) и [component](./api/class-locator)          |
 | [queries](https://testing-library.com/docs/queries/about)                       | [locators](./locators)                                                 |
 | [async helpers](https://testing-library.com/docs/dom-testing-library/api-async) | [assertions](./test-assertions)                                        |
 | [user events](https://testing-library.com/docs/user-event/intro)                | [actions](./api/class-locator)                                         |
@@ -36,7 +36,7 @@ If you use DOM Testing Library in the browser (for example, you bundle end-to-en
 | `const { unmount } = render(<Component />);`                                    | `const { unmount } = await mount(<Component />);`                      |
 | `const { rerender } = render(<Component />);`                                   | `const { update } = await mount(<Component />);`                       |
 
-## Example
+## Пример
 
 Testing Library:
 
@@ -45,54 +45,54 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-test('sign in', async () => {
-  // Setup the page.
+test('вход в систему', async () => {
+  // Настройка страницы.
   const user = userEvent.setup();
   render(<SignInPage />);
 
-  // Perform actions.
+  // Выполнение действий.
   await user.type(screen.getByLabelText('Username'), 'John');
   await user.type(screen.getByLabelText('Password'), 'secret');
   await user.click(screen.getByRole('button', { name: 'Sign in' }));
 
-  // Verify signed in state by waiting until "Welcome" message appears.
+  // Проверка состояния входа, ожидая появления сообщения "Добро пожаловать".
   expect(await screen.findByText('Welcome, John')).toBeInTheDocument();
 });
 ```
 
-Line-by-line migration to Playwright Test:
+Пошаговая миграция на Playwright Test:
 
 ```js
 const { test, expect } = require('@playwright/experimental-ct-react'); // 1
 
-test('sign in', async ({ mount }) => { // 2
-  // Setup the page.
+test('вход в систему', async ({ mount }) => { // 2
+  // Настройка страницы.
   const component = await mount(<SignInPage />); // 3
 
-  // Perform actions.
+  // Выполнение действий.
   await component.getByLabel('Username').fill('John'); // 4
   await component.getByLabel('Password').fill('secret');
   await component.getByRole('button', { name: 'Sign in' }).click();
 
-  // Verify signed in state by waiting until "Welcome" message appears.
+  // Проверка состояния входа, ожидая появления сообщения "Добро пожаловать".
   await expect(component.getByText('Welcome, John')).toBeVisible(); // 5
 });
 ```
 
-Migration highlights (see inline comments in the Playwright Test code snippet):
-1. Import everything from `@playwright/experimental-ct-react` (or -vue, -svelte) for component tests, or from `@playwright/test` for end-to-end tests.
-1. Test function is given a `page` that is isolated from other tests, and `mount` that renders a component in this page. These are two of the [useful fixtures](./api/class-fixtures) in Playwright Test.
-1. Replace `render` with `mount` that returns a [component locator](./locators).
-1. Use locators created with [locator.locator()](/api/class-locator.mdx#locator-locator) or [page.locator()](/api/class-page.mdx#page-locator) to perform most of the actions.
-1. Use [assertions](./test-assertions) to verify the state.
+Основные моменты миграции (см. встроенные комментарии в коде Playwright Test):
+1. Импортируйте все из `@playwright/experimental-ct-react` (или -vue, -svelte) для тестов компонентов или из `@playwright/test` для end-to-end тестов.
+1. Функция теста получает `page`, которая изолирована от других тестов, и `mount`, который рендерит компонент на этой странице. Это два из [полезных фикстур](./api/class-fixtures) в Playwright Test.
+1. Замените `render` на `mount`, который возвращает [локатор компонента](./locators).
+1. Используйте локаторы, созданные с помощью [locator.locator()](/api/class-locator.mdx#locator-locator) или [page.locator()](/api/class-page.mdx#page-locator), чтобы выполнять большинство действий.
+1. Используйте [assertions](./test-assertions) для проверки состояния.
 
-## Migrating queries
+## Миграция запросов
 
-All queries like `getBy...`, `findBy...`, `queryBy...` and their multi-element counterparts are replaced with `component.getBy...` locators. Locators always auto-wait and retry when needed, so you don't have to worry about choosing the right method. When you want to do a [list operation](./locators#lists), e.g. assert a list of texts, Playwright automatically performs multi-element operations.
+Все запросы, такие как `getBy...`, `findBy...`, `queryBy...` и их многокомпонентные аналоги, заменяются на локаторы `component.getBy...`. Локаторы всегда автоматически ждут и повторяют попытки, когда это необходимо, поэтому вам не нужно беспокоиться о выборе правильного метода. Когда вы хотите выполнить [операцию со списком](./locators#lists), например, проверить список текстов, Playwright автоматически выполняет многокомпонентные операции.
 
-## Replacing `waitFor`
+## Замена `waitFor`
 
-Playwright includes [assertions](./test-assertions) that automatically wait for the condition, so you don't usually need an explicit `waitFor`/`waitForElementToBeRemoved` call.
+Playwright включает в себя [assertions](./test-assertions), которые автоматически ждут выполнения условия, поэтому вам обычно не нужно явно вызывать `waitFor`/`waitForElementToBeRemoved`.
 
 ```js
 // Testing Library
@@ -106,7 +106,7 @@ await expect(page.getByText('the lion king')).toBeVisible();
 await expect(page.getByText('the mummy')).toBeHidden();
 ```
 
-When you cannot find a suitable assertion, use [`expect.poll`](./test-assertions#expectpoll) instead.
+Когда вы не можете найти подходящее утверждение, используйте [`expect.poll`](./test-assertions#expectpoll) вместо этого.
 
 ```js
 await expect.poll(async () => {
@@ -115,9 +115,9 @@ await expect.poll(async () => {
 }).toBe(200);
 ```
 
-## Replacing `within`
+## Замена `within`
 
-You can create a locator inside another locator with [locator.locator()](/api/class-locator.mdx#locator-locator) method.
+Вы можете создать локатор внутри другого локатора с помощью метода [locator.locator()](/api/class-locator.mdx#locator-locator).
 
 ```js
 // Testing Library
@@ -129,134 +129,27 @@ const messages = component.getByTestId('messages');
 const helloMessage = messages.getByText('hello');
 ```
 
-## Playwright Test Super Powers
+## Суперспособности Playwright Test
 
-Once you're on Playwright Test, you get a lot!
-- Full zero-configuration TypeScript support
-- Run tests across **all web engines** (Chrome, Firefox, Safari) on **any popular operating system** (Windows, macOS, Ubuntu)
-- Full support for multiple origins, [(i)frames](./api/class-frame), [tabs and contexts](./pages)
-- Run tests in isolation in parallel across multiple browsers
-- Built-in test [artifact collection](./test-use-options.mdx#recording-options)
+Как только вы переходите на Playwright Test, вы получаете много преимуществ!
+- Полная поддержка TypeScript без конфигурации
+- Запуск тестов на **всех веб-движках** (Chrome, Firefox, Safari) на **любых популярных операционных системах** (Windows, macOS, Ubuntu)
+- Полная поддержка нескольких источников, [(i)frames](./api/class-frame), [вкладок и контекстов](./pages)
+- Запуск тестов в изоляции параллельно на нескольких браузерах
+- Встроенный сбор [артефактов тестирования](./test-use-options.mdx#recording-options)
 
-You also get all these ✨ awesome tools ✨ that come bundled with Playwright Test:
-- [Visual Studio Code integration](./getting-started-vscode.mdx)
-- [UI mode](./test-ui-mode.mdx) for debugging tests with a time travel experience complete with watch mode.
+Вы также получаете все эти ✨ потрясающие инструменты ✨, которые идут в комплекте с Playwright Test:
+- [Интеграция с Visual Studio Code](./getting-started-vscode.mdx)
+- [Режим UI](./test-ui-mode.mdx) для отладки тестов с опытом путешествия во времени, включая режим наблюдения.
 - [Playwright Inspector](./debug.mdx#playwright-inspector)
-- [Playwright Test Code generation](./codegen-intro.mdx)
-- [Playwright Tracing](./trace-viewer.mdx) for post-mortem debugging
+- [Генерация кода Playwright Test](./codegen-intro.mdx)
+- [Playwright Tracing](./trace-viewer.mdx) для постмортем отладки
 
-## Further Reading
+## Дальнейшее чтение
 
-Learn more about Playwright Test runner:
-- [Getting Started](./intro)
-- [Experimental Component Testing](./test-components)
-- [Locators](./locators.mdx)
-- [Assertions](./test-assertions)
-- [Auto-waiting](./actionability)
-
-
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
-[APIRequest]: /api/class-apirequest.mdx "APIRequest"
-[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
-[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
-[Browser]: /api/class-browser.mdx "Browser"
-[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
-[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
-[BrowserType]: /api/class-browsertype.mdx "BrowserType"
-[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
-[Clock]: /api/class-clock.mdx "Clock"
-[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
-[Coverage]: /api/class-coverage.mdx "Coverage"
-[Dialog]: /api/class-dialog.mdx "Dialog"
-[Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
-[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
-[FileChooser]: /api/class-filechooser.mdx "FileChooser"
-[Frame]: /api/class-frame.mdx "Frame"
-[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
-[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
-[JSHandle]: /api/class-jshandle.mdx "JSHandle"
-[Keyboard]: /api/class-keyboard.mdx "Keyboard"
-[Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
-[Logger]: /api/class-logger.mdx "Logger"
-[Mouse]: /api/class-mouse.mdx "Mouse"
-[Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
-[Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
-[Request]: /api/class-request.mdx "Request"
-[Response]: /api/class-response.mdx "Response"
-[Route]: /api/class-route.mdx "Route"
-[Selectors]: /api/class-selectors.mdx "Selectors"
-[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
-[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
-[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: /api/class-tracing.mdx "Tracing"
-[Video]: /api/class-video.mdx "Video"
-[WebError]: /api/class-weberror.mdx "WebError"
-[WebSocket]: /api/class-websocket.mdx "WebSocket"
-[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
-[Worker]: /api/class-worker.mdx "Worker"
-[Fixtures]: /api/class-fixtures.mdx "Fixtures"
-[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
-[FullProject]: /api/class-fullproject.mdx "FullProject"
-[Location]: /api/class-location.mdx "Location"
-[Test]: /api/class-test.mdx "Test"
-[TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestInfo]: /api/class-testinfo.mdx "TestInfo"
-[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
-[TestOptions]: /api/class-testoptions.mdx "TestOptions"
-[TestProject]: /api/class-testproject.mdx "TestProject"
-[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
-[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
-[Reporter]: /api/class-reporter.mdx "Reporter"
-[Suite]: /api/class-suite.mdx "Suite"
-[TestCase]: /api/class-testcase.mdx "TestCase"
-[TestError]: /api/class-testerror.mdx "TestError"
-[TestResult]: /api/class-testresult.mdx "TestResult"
-[TestStep]: /api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
-
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
-[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
-[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
-[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
-[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
-[URL]: https://nodejs.org/api/url.html "URL"
-[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
-
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
-[Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"
+Узнайте больше о тестовом раннере Playwright:
+- [Начало работы](./intro)
+- [Экспериментальное тестирование компонентов](./test-components)
+- [Локаторы](./locators.mdx)
+- [Утверждения](./test-assertions)
+- [Авто-ожидание](./actionability)

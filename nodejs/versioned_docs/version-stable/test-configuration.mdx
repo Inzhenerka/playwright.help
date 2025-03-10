@@ -1,56 +1,56 @@
 ---
 id: test-configuration
-title: "Test configuration"
+title: "Конфигурация тестов"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright has many options to configure how your tests are run. You can specify these options in the configuration file. Note that test runner options are **top-level**, do not put them into the `use` section.
+Playwright предлагает множество опций для настройки выполнения ваших тестов. Вы можете указать эти опции в файле конфигурации. Обратите внимание, что опции тестового раннера являются **верхнего уровня**, не помещайте их в секцию `use`.
 
-## Basic Configuration
+## Основная конфигурация
 
-Here are some of the most common configuration options.
+Вот некоторые из самых распространенных опций конфигурации.
 
 ```js
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  // Look for test files in the "tests" directory, relative to this configuration file.
+  // Ищите тестовые файлы в директории "tests", относительно этого файла конфигурации.
   testDir: 'tests',
 
-  // Run all tests in parallel.
+  // Запускайте все тесты параллельно.
   fullyParallel: true,
 
-  // Fail the build on CI if you accidentally left test.only in the source code.
+  // Провалите сборку на CI, если вы случайно оставили test.only в исходном коде.
   forbidOnly: !!process.env.CI,
 
-  // Retry on CI only.
+  // Повторная попытка только на CI.
   retries: process.env.CI ? 2 : 0,
 
-  // Opt out of parallel tests on CI.
+  // Отказ от параллельных тестов на CI.
   workers: process.env.CI ? 1 : undefined,
 
-  // Reporter to use
+  // Репортер для использования
   reporter: 'html',
 
   use: {
-    // Base URL to use in actions like `await page.goto('/')`.
+    // Базовый URL для использования в действиях, таких как `await page.goto('/')`.
     baseURL: 'http://localhost:3000',
 
-    // Collect trace when retrying the failed test.
+    // Собирать трассировку при повторной попытке неудачного теста.
     trace: 'on-first-retry',
   },
-  // Configure projects for major browsers.
+  // Настройка проектов для основных браузеров.
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  // Run your local dev server before starting the tests.
+  // Запустите ваш локальный сервер разработки перед началом тестов.
   webServer: {
     command: 'npm run start',
     url: 'http://localhost:3000',
@@ -59,87 +59,86 @@ export default defineConfig({
 });
 ```
 
-| Option | Description |
+| Опция | Описание |
 | :- | :- |
-| [testConfig.forbidOnly](/api/class-testconfig.mdx#test-config-forbid-only) | Whether to exit with an error if any tests are marked as `test.only`. Useful on CI.|
-| [testConfig.fullyParallel](/api/class-testconfig.mdx#test-config-fully-parallel) | have all tests in all files to run in parallel. See [Parallelism](./test-parallel) and [Sharding](./test-sharding) for more details. |
-| [testConfig.projects](/api/class-testconfig.mdx#test-config-projects) | Run tests in multiple configurations or on multiple browsers |
-| [testConfig.reporter](/api/class-testconfig.mdx#test-config-reporter) | Reporter to use. See [Test Reporters](/test-reporters.mdx) to learn more about which reporters are available. |
-| [testConfig.retries](/api/class-testconfig.mdx#test-config-retries) | The maximum number of retry attempts per test. See [Test Retries](/test-retries.mdx) to learn more about retries.|
-| [testConfig.testDir](/api/class-testconfig.mdx#test-config-test-dir) | Directory with the test files. |
-| [testConfig.use](/api/class-testconfig.mdx#test-config-use)  | Options with `use{}` |
-| [testConfig.webServer](/api/class-testconfig.mdx#test-config-web-server) | To launch a server during the tests, use the `webServer` option |
-| [testConfig.workers](/api/class-testconfig.mdx#test-config-workers) | The maximum number of concurrent worker processes to use for parallelizing tests. Can also be set as percentage of logical CPU cores, e.g. `'50%'.`. See [Parallelism](./test-parallel) and [Sharding](./test-sharding) for more details. |
+| [testConfig.forbidOnly](/api/class-testconfig.mdx#test-config-forbid-only) | Указывает, следует ли завершать с ошибкой, если какие-либо тесты помечены как `test.only`. Полезно на CI.|
+| [testConfig.fullyParallel](/api/class-testconfig.mdx#test-config-fully-parallel) | Запуск всех тестов во всех файлах параллельно. См. [Параллелизм](./test-parallel) и [Шардинг](./test-sharding) для получения дополнительных сведений. |
+| [testConfig.projects](/api/class-testconfig.mdx#test-config-projects) | Запуск тестов в нескольких конфигурациях или на нескольких браузерах |
+| [testConfig.reporter](/api/class-testconfig.mdx#test-config-reporter) | Репортер для использования. См. [Тестовые репортеры](/test-reporters.mdx), чтобы узнать больше о доступных репортерах. |
+| [testConfig.retries](/api/class-testconfig.mdx#test-config-retries) | Максимальное количество попыток повторного запуска для каждого теста. См. [Повторные попытки тестов](/test-retries.mdx), чтобы узнать больше о повторных попытках.|
+| [testConfig.testDir](/api/class-testconfig.mdx#test-config-test-dir) | Директория с тестовыми файлами. |
+| [testConfig.use](/api/class-testconfig.mdx#test-config-use)  | Опции с `use{}` |
+| [testConfig.webServer](/api/class-testconfig.mdx#test-config-web-server) | Для запуска сервера во время тестов используйте опцию `webServer` |
+| [testConfig.workers](/api/class-testconfig.mdx#test-config-workers) | Максимальное количество параллельных рабочих процессов для параллелизации тестов. Также может быть установлено как процент логических ядер ЦП, например, `'50%'`. См. [Параллелизм](./test-parallel) и [Шардинг](./test-sharding) для получения дополнительных сведений. |
 
-## Filtering Tests
+## Фильтрация тестов
 
-Filter tests by glob patterns or regular expressions.
+Фильтруйте тесты по шаблонам glob или регулярным выражениям.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  // Glob patterns or regular expressions to ignore test files.
+  // Шаблоны glob или регулярные выражения для игнорирования тестовых файлов.
   testIgnore: '*test-assets',
 
-  // Glob patterns or regular expressions that match test files.
+  // Шаблоны glob или регулярные выражения, которые соответствуют тестовым файлам.
   testMatch: '*todo-tests/*.spec.ts',
 });
 ```
 
-| Option | Description |
+| Опция | Описание |
 | :- | :- |
-| [testConfig.testIgnore](/api/class-testconfig.mdx#test-config-test-ignore) | Glob patterns or regular expressions that should be ignored when looking for the test files. For example, `'*test-assets'` |
-| [testConfig.testMatch](/api/class-testconfig.mdx#test-config-test-match) | Glob patterns or regular expressions that match test files. For example, `'*todo-tests/*.spec.ts'`. By default, Playwright runs <code>.*(test&#124;spec)\.(js&#124;ts&#124;mjs)</code> files. |
+| [testConfig.testIgnore](/api/class-testconfig.mdx#test-config-test-ignore) | Шаблоны glob или регулярные выражения, которые должны быть проигнорированы при поиске тестовых файлов. Например, `'*test-assets'` |
+| [testConfig.testMatch](/api/class-testconfig.mdx#test-config-test-match) | Шаблоны glob или регулярные выражения, которые соответствуют тестовым файлам. Например, `'*todo-tests/*.spec.ts'`. По умолчанию Playwright запускает файлы <code>.*(test&#124;spec)\.(js&#124;ts&#124;mjs)</code>. |
 
-## Advanced Configuration
+## Расширенная конфигурация
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  // Folder for test artifacts such as screenshots, videos, traces, etc.
+  // Папка для артефактов тестов, таких как скриншоты, видео, трассировки и т. д.
   outputDir: 'test-results',
 
-  // path to the global setup files.
+  // путь к файлам глобальной настройки.
   globalSetup: require.resolve('./global-setup'),
 
-  // path to the global teardown files.
+  // путь к файлам глобального завершения.
   globalTeardown: require.resolve('./global-teardown'),
 
-  // Each test is given 30 seconds.
+  // Каждому тесту отводится 30 секунд.
   timeout: 30000,
 
 });
 ```
 
-| Option | Description |
+| Опция | Описание |
 | :- | :- |
-| [testConfig.globalSetup](/api/class-testconfig.mdx#test-config-global-setup) | Path to the global setup file. This file will be required and run before all the tests. It must export a single function. |
-| [testConfig.globalTeardown](/api/class-testconfig.mdx#test-config-global-teardown) |Path to the global teardown file. This file will be required and run after all the tests. It must export a single function. |
-| [testConfig.outputDir](/api/class-testconfig.mdx#test-config-output-dir) | Folder for test artifacts such as screenshots, videos, traces, etc. |
-| [testConfig.timeout](/api/class-testconfig.mdx#test-config-timeout) | Playwright enforces a [timeout](./test-timeouts.mdx) for each test, 30 seconds by default. Time spent by the test function, test fixtures and beforeEach hooks is included in the test timeout. |
+| [testConfig.globalSetup](/api/class-testconfig.mdx#test-config-global-setup) | Путь к файлу глобальной настройки. Этот файл будет загружен и выполнен перед всеми тестами. Он должен экспортировать одну функцию. |
+| [testConfig.globalTeardown](/api/class-testconfig.mdx#test-config-global-teardown) | Путь к файлу глобального завершения. Этот файл будет загружен и выполнен после всех тестов. Он должен экспортировать одну функцию. |
+| [testConfig.outputDir](/api/class-testconfig.mdx#test-config-output-dir) | Папка для артефактов тестов, таких как скриншоты, видео, трассировки и т. д. |
+| [testConfig.timeout](/api/class-testconfig.mdx#test-config-timeout) | Playwright устанавливает [тайм-аут](./test-timeouts.mdx) для каждого теста, по умолчанию 30 секунд. Время, затраченное функцией теста, тестовыми фикстурами и хуками beforeEach, включается в тайм-аут теста. |
 
-## Expect Options
+## Опции Expect
 
-Configuration for the expect assertion library.
+Конфигурация для библиотеки утверждений expect.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   expect: {
-    // Maximum time expect() should wait for the condition to be met.
+    // Максимальное время, которое expect() должен ждать, чтобы условие было выполнено.
     timeout: 5000,
 
     toHaveScreenshot: {
-      // An acceptable amount of pixels that could be different, unset by default.
+      // Допустимое количество пикселей, которые могут отличаться, по умолчанию не установлено.
       maxDiffPixels: 10,
     },
 
     toMatchSnapshot: {
-      // An acceptable ratio of pixels that are different to the
-      // total amount of pixels, between 0 and 1.
+      // Допустимое соотношение пикселей, которые отличаются от общего количества пикселей, между 0 и 1.
       maxDiffPixelRatio: 0.1,
     },
   },
@@ -147,11 +146,11 @@ export default defineConfig({
 });
 ```
 
-| Option | Description |
+| Опция | Описание |
 | :- | :- |
-| [testConfig.expect](/api/class-testconfig.mdx#test-config-expect) | [Web first assertions](./test-assertions.mdx) like `expect(locator).toHaveText()` have a separate timeout of 5 seconds by default. This is the maximum time the `expect()` should wait for the condition to be met. Learn more about [test and expect timeouts](./test-timeouts.mdx) and how to set them for a single test. |
-| [expect(page).toHaveScreenshot()](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1) | Configuration for the `expect(locator).toHaveScreenshot()` method. |
-| [expect(value).toMatchSnapshot()](/api/class-snapshotassertions.mdx#snapshot-assertions-to-match-snapshot-1)| Configuration for the `expect(locator).toMatchSnapshot()` method.|
+| [testConfig.expect](/api/class-testconfig.mdx#test-config-expect) | [Утверждения с приоритетом веба](./test-assertions.mdx), такие как `expect(locator).toHaveText()`, имеют отдельный тайм-аут в 5 секунд по умолчанию. Это максимальное время, которое `expect()` должен ждать, чтобы условие было выполнено. Узнайте больше о [тайм-аутах тестов и expect](./test-timeouts.mdx) и о том, как установить их для одного теста. |
+| [expect(page).toHaveScreenshot()](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1) | Конфигурация для метода `expect(locator).toHaveScreenshot()`. |
+| [expect(value).toMatchSnapshot()](/api/class-snapshotassertions.mdx#snapshot-assertions-to-match-snapshot-1)| Конфигурация для метода `expect(locator).toMatchSnapshot()`. |
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
@@ -256,6 +255,6 @@ export default defineConfig({
 [URL]: https://nodejs.org/api/url.html "URL"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Реестр артефактов Microsoft"
 [Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

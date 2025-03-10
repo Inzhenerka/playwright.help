@@ -6,167 +6,165 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-
-Electron application representation. You can use [electron.launch()](/api/class-electron.mdx#electron-launch) to obtain the application instance. This instance you can control main electron process as well as work with Electron windows:
+Представление приложения Electron. Вы можете использовать [electron.launch()](/api/class-electron.mdx#electron-launch) для получения экземпляра приложения. Этот экземпляр позволяет управлять основным процессом Electron, а также работать с окнами Electron:
 
 ```js
 const { _electron: electron } = require('playwright');
 
 (async () => {
-  // Launch Electron app.
+  // Запуск приложения Electron.
   const electronApp = await electron.launch({ args: ['main.js'] });
 
-  // Evaluation expression in the Electron context.
+  // Оценка выражения в контексте Electron.
   const appPath = await electronApp.evaluate(async ({ app }) => {
-    // This runs in the main Electron process, parameter here is always
-    // the result of the require('electron') in the main app script.
+    // Это выполняется в основном процессе Electron, параметр здесь всегда
+    // является результатом require('electron') в основном скрипте приложения.
     return app.getAppPath();
   });
   console.log(appPath);
 
-  // Get the first window that the app opens, wait if necessary.
+  // Получить первое окно, которое открывает приложение, подождать при необходимости.
   const window = await electronApp.firstWindow();
-  // Print the title.
+  // Вывести заголовок.
   console.log(await window.title());
-  // Capture a screenshot.
+  // Сделать скриншот.
   await window.screenshot({ path: 'intro.png' });
-  // Direct Electron console to Node terminal.
+  // Направить консоль Electron в терминал Node.
   window.on('console', console.log);
-  // Click button.
+  // Нажать кнопку.
   await window.click('text=Click me');
-  // Exit app.
+  // Закрыть приложение.
   await electronApp.close();
 })();
 ```
 
-
 ---
 
-## Methods
+## Методы
 
 ### browserWindow {#electron-application-browser-window}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>electronApplication.browserWindow</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.11</font><x-search>electronApplication.browserWindow</x-search>
 
-Returns the BrowserWindow object that corresponds to the given Playwright page.
+Возвращает объект BrowserWindow, который соответствует данной странице Playwright.
 
-**Usage**
+**Использование**
 
 ```js
 await electronApplication.browserWindow(page);
 ```
 
-**Arguments**
+**Аргументы**
 - `page` [Page]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-browser-window-option-page"/><a href="#electron-application-browser-window-option-page" class="list-anchor">#</a>
   
-  Page to retrieve the window for.
+  Страница, для которой нужно получить окно.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[JSHandle]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-browser-window-return"/><a href="#electron-application-browser-window-return" class="list-anchor">#</a>
 
 ---
 
 ### close {#electron-application-close}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>electronApplication.close</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>electronApplication.close</x-search>
 
-Closes Electron application.
+Закрывает приложение Electron.
 
-**Usage**
+**Использование**
 
 ```js
 await electronApplication.close();
 ```
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-close-return"/><a href="#electron-application-close-return" class="list-anchor">#</a>
 
 ---
 
 ### context {#electron-application-context}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>electronApplication.context</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>electronApplication.context</x-search>
 
-This method returns browser context that can be used for setting up context-wide routing, etc.
+Этот метод возвращает контекст браузера, который можно использовать для настройки маршрутизации на уровне контекста и т.д.
 
-**Usage**
+**Использование**
 
 ```js
 electronApplication.context();
 ```
 
-**Returns**
+**Возвращает**
 - [BrowserContext]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-context-return"/><a href="#electron-application-context-return" class="list-anchor">#</a>
 
 ---
 
 ### evaluate {#electron-application-evaluate}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>electronApplication.evaluate</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>electronApplication.evaluate</x-search>
 
-Returns the return value of [pageFunction](/api/class-electronapplication.mdx#electron-application-evaluate-option-expression).
+Возвращает значение, возвращаемое [pageFunction](/api/class-electronapplication.mdx#electron-application-evaluate-option-expression).
 
-If the function passed to the [electronApplication.evaluate()](/api/class-electronapplication.mdx#electron-application-evaluate) returns a [Promise], then [electronApplication.evaluate()](/api/class-electronapplication.mdx#electron-application-evaluate) would wait for the promise to resolve and return its value.
+Если функция, переданная в [electronApplication.evaluate()](/api/class-electronapplication.mdx#electron-application-evaluate), возвращает [Promise], то [electronApplication.evaluate()](/api/class-electronapplication.mdx#electron-application-evaluate) будет ждать разрешения промиса и вернет его значение.
 
-If the function passed to the [electronApplication.evaluate()](/api/class-electronapplication.mdx#electron-application-evaluate) returns a non-[Serializable] value, then [electronApplication.evaluate()](/api/class-electronapplication.mdx#electron-application-evaluate) returns `undefined`. Playwright also supports transferring some additional values that are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`.
+Если функция, переданная в [electronApplication.evaluate()](/api/class-electronapplication.mdx#electron-application-evaluate), возвращает не-[Serializable] значение, то [electronApplication.evaluate()](/api/class-electronapplication.mdx#electron-application-evaluate) вернет `undefined`. Playwright также поддерживает передачу некоторых дополнительных значений, которые не сериализуемы с помощью `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`.
 
-**Usage**
+**Использование**
 
 ```js
 await electronApplication.evaluate(pageFunction);
 await electronApplication.evaluate(pageFunction, arg);
 ```
 
-**Arguments**
+**Аргументы**
 - `pageFunction` [function] | [Electron]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-evaluate-option-expression"/><a href="#electron-application-evaluate-option-expression" class="list-anchor">#</a>
   
-  Function to be evaluated in the main Electron process.
-- `arg` [EvaluationArgument] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-evaluate-option-arg"/><a href="#electron-application-evaluate-option-arg" class="list-anchor">#</a>
+  Функция, которая будет оцениваться в основном процессе Electron.
+- `arg` [EvaluationArgument] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-evaluate-option-arg"/><a href="#electron-application-evaluate-option-arg" class="list-anchor">#</a>
   
-  Optional argument to pass to [pageFunction](/api/class-electronapplication.mdx#electron-application-evaluate-option-expression).
+  Опциональный аргумент, который передается в [pageFunction](/api/class-electronapplication.mdx#electron-application-evaluate-option-expression).
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[Serializable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-evaluate-return"/><a href="#electron-application-evaluate-return" class="list-anchor">#</a>
 
 ---
 
 ### evaluateHandle {#electron-application-evaluate-handle}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>electronApplication.evaluateHandle</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>electronApplication.evaluateHandle</x-search>
 
-Returns the return value of [pageFunction](/api/class-electronapplication.mdx#electron-application-evaluate-handle-option-expression) as a [JSHandle].
+Возвращает значение, возвращаемое [pageFunction](/api/class-electronapplication.mdx#electron-application-evaluate-handle-option-expression) в виде [JSHandle].
 
-The only difference between [electronApplication.evaluate()](/api/class-electronapplication.mdx#electron-application-evaluate) and [electronApplication.evaluateHandle()](/api/class-electronapplication.mdx#electron-application-evaluate-handle) is that [electronApplication.evaluateHandle()](/api/class-electronapplication.mdx#electron-application-evaluate-handle) returns [JSHandle].
+Единственное отличие между [electronApplication.evaluate()](/api/class-electronapplication.mdx#electron-application-evaluate) и [electronApplication.evaluateHandle()](/api/class-electronapplication.mdx#electron-application-evaluate-handle) заключается в том, что [electronApplication.evaluateHandle()](/api/class-electronapplication.mdx#electron-application-evaluate-handle) возвращает [JSHandle].
 
-If the function passed to the [electronApplication.evaluateHandle()](/api/class-electronapplication.mdx#electron-application-evaluate-handle) returns a [Promise], then [electronApplication.evaluateHandle()](/api/class-electronapplication.mdx#electron-application-evaluate-handle) would wait for the promise to resolve and return its value.
+Если функция, переданная в [electronApplication.evaluateHandle()](/api/class-electronapplication.mdx#electron-application-evaluate-handle), возвращает [Promise], то [electronApplication.evaluateHandle()](/api/class-electronapplication.mdx#electron-application-evaluate-handle) будет ждать разрешения промиса и вернет его значение.
 
-**Usage**
+**Использование**
 
 ```js
 await electronApplication.evaluateHandle(pageFunction);
 await electronApplication.evaluateHandle(pageFunction, arg);
 ```
 
-**Arguments**
+**Аргументы**
 - `pageFunction` [function] | [Electron]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-evaluate-handle-option-expression"/><a href="#electron-application-evaluate-handle-option-expression" class="list-anchor">#</a>
   
-  Function to be evaluated in the main Electron process.
-- `arg` [EvaluationArgument] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-evaluate-handle-option-arg"/><a href="#electron-application-evaluate-handle-option-arg" class="list-anchor">#</a>
+  Функция, которая будет оцениваться в основном процессе Electron.
+- `arg` [EvaluationArgument] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-evaluate-handle-option-arg"/><a href="#electron-application-evaluate-handle-option-arg" class="list-anchor">#</a>
   
-  Optional argument to pass to [pageFunction](/api/class-electronapplication.mdx#electron-application-evaluate-handle-option-expression).
+  Опциональный аргумент, который передается в [pageFunction](/api/class-electronapplication.mdx#electron-application-evaluate-handle-option-expression).
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[JSHandle]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-evaluate-handle-return"/><a href="#electron-application-evaluate-handle-return" class="list-anchor">#</a>
 
 ---
 
 ### firstWindow {#electron-application-first-window}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>electronApplication.firstWindow</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>electronApplication.firstWindow</x-search>
 
-Convenience method that waits for the first application window to be opened.
+Удобный метод, который ждет открытия первого окна приложения.
 
-**Usage**
+**Использование**
 
 ```js
 const electronApp = await electron.launch({
@@ -176,41 +174,41 @@ const window = await electronApp.firstWindow();
 // ...
 ```
 
-**Arguments**
-- `options` [Object] *(optional)*
-  - `timeout` [number] *(optional)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-first-window-option-timeout"/><a href="#electron-application-first-window-option-timeout" class="list-anchor">#</a>
+**Аргументы**
+- `options` [Object] *(опционально)*
+  - `timeout` [number] *(опционально)* <font size="2">Добавлено в: v1.33</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-first-window-option-timeout"/><a href="#electron-application-first-window-option-timeout" class="list-anchor">#</a>
     
-    Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
+    Максимальное время ожидания в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить с помощью [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[Page]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-first-window-return"/><a href="#electron-application-first-window-return" class="list-anchor">#</a>
 
 ---
 
 ### process {#electron-application-process}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.21</font><x-search>electronApplication.process</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.21</font><x-search>electronApplication.process</x-search>
 
-Returns the main process for this Electron Application.
+Возвращает основной процесс для этого приложения Electron.
 
-**Usage**
+**Использование**
 
 ```js
 electronApplication.process();
 ```
 
-**Returns**
+**Возвращает**
 - [ChildProcess]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-process-return"/><a href="#electron-application-process-return" class="list-anchor">#</a>
 
 ---
 
 ### waitForEvent {#electron-application-wait-for-event}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>electronApplication.waitForEvent</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>electronApplication.waitForEvent</x-search>
 
-Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the application is closed before the event is fired. Returns the event data value.
+Ожидает срабатывания события и передает его значение в предикатную функцию. Возвращает результат, когда предикат возвращает истинное значение. Выдаст ошибку, если приложение будет закрыто до срабатывания события. Возвращает значение данных события.
 
-**Usage**
+**Использование**
 
 ```js
 const windowPromise = electronApp.waitForEvent('window');
@@ -218,51 +216,51 @@ await mainWindow.click('button');
 const window = await windowPromise;
 ```
 
-**Arguments**
+**Аргументы**
 - `event` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-wait-for-event-option-event"/><a href="#electron-application-wait-for-event-option-event" class="list-anchor">#</a>
   
-  Event name, same one typically passed into `*.on(event)`.
-- `optionsOrPredicate` [function] | [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-wait-for-event-option-options-or-predicate"/><a href="#electron-application-wait-for-event-option-options-or-predicate" class="list-anchor">#</a>
+  Имя события, то же самое, что обычно передается в `*.on(event)`.
+- `optionsOrPredicate` [function] | [Object] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-wait-for-event-option-options-or-predicate"/><a href="#electron-application-wait-for-event-option-options-or-predicate" class="list-anchor">#</a>
   - `predicate` [function]
     
-    receives the event data and resolves to truthy value when the waiting should resolve.
-  - `timeout` [number] *(optional)*
+    получает данные события и разрешается в истинное значение, когда ожидание должно завершиться.
+  - `timeout` [number] *(опционально)*
     
-    maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
+    максимальное время ожидания в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить с помощью [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
   
-  Either a predicate that receives an event or an options object. Optional.
+  Либо предикат, который получает событие, либо объект параметров. Опционально.
 
-**Returns**
+**Возвращает**
 - [Promise]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-wait-for-event-return"/><a href="#electron-application-wait-for-event-return" class="list-anchor">#</a>
 
 ---
 
 ### windows {#electron-application-windows}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>electronApplication.windows</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>electronApplication.windows</x-search>
 
-Convenience method that returns all the opened windows.
+Удобный метод, который возвращает все открытые окна.
 
-**Usage**
+**Использование**
 
 ```js
 electronApplication.windows();
 ```
 
-**Returns**
+**Возвращает**
 - [Array]&lt;[Page]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-windows-return"/><a href="#electron-application-windows-return" class="list-anchor">#</a>
 
 ---
 
-## Events
+## События
 
 ### on('close') {#electron-application-event-close}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>electronApplication.on('close')</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>electronApplication.on('close')</x-search>
 
-This event is issued when the application process has been terminated.
+Это событие возникает, когда процесс приложения был завершен.
 
-**Usage**
+**Использование**
 
 ```js
 electronApplication.on('close', data => {});
@@ -272,13 +270,13 @@ electronApplication.on('close', data => {});
 
 ### on('console') {#electron-application-event-console}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.42</font><x-search>electronApplication.on('console')</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.42</font><x-search>electronApplication.on('console')</x-search>
 
-Emitted when JavaScript within the Electron main process calls one of console API methods, e.g. `console.log` or `console.dir`.
+Срабатывает, когда JavaScript в основном процессе Electron вызывает один из методов API консоли, например `console.log` или `console.dir`.
 
-The arguments passed into `console.log` are available on the [ConsoleMessage] event handler argument.
+Аргументы, переданные в `console.log`, доступны в аргументе обработчика события [ConsoleMessage].
 
-**Usage**
+**Использование**
 
 ```js
 electronApp.on('console', async msg => {
@@ -290,129 +288,23 @@ electronApp.on('console', async msg => {
 await electronApp.evaluate(() => console.log('hello', 5, { foo: 'bar' }));
 ```
 
-**Event data**
+**Данные события**
 - [ConsoleMessage]
 
 ---
 
 ### on('window') {#electron-application-event-window}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>electronApplication.on('window')</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>electronApplication.on('window')</x-search>
 
-This event is issued for every window that is created **and loaded** in Electron. It contains a [Page] that can be used for Playwright automation.
+Это событие возникает для каждого окна, которое создается **и загружается** в Electron. Оно содержит [Page], который можно использовать для автоматизации с помощью Playwright.
 
-**Usage**
+**Использование**
 
 ```js
 electronApplication.on('window', data => {});
 ```
 
-**Event data**
+**Данные события**
 - [Page]
 
-
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
-[APIRequest]: /api/class-apirequest.mdx "APIRequest"
-[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
-[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
-[Browser]: /api/class-browser.mdx "Browser"
-[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
-[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
-[BrowserType]: /api/class-browsertype.mdx "BrowserType"
-[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
-[Clock]: /api/class-clock.mdx "Clock"
-[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
-[Coverage]: /api/class-coverage.mdx "Coverage"
-[Dialog]: /api/class-dialog.mdx "Dialog"
-[Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
-[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
-[FileChooser]: /api/class-filechooser.mdx "FileChooser"
-[Frame]: /api/class-frame.mdx "Frame"
-[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
-[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
-[JSHandle]: /api/class-jshandle.mdx "JSHandle"
-[Keyboard]: /api/class-keyboard.mdx "Keyboard"
-[Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
-[Logger]: /api/class-logger.mdx "Logger"
-[Mouse]: /api/class-mouse.mdx "Mouse"
-[Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
-[Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
-[Request]: /api/class-request.mdx "Request"
-[Response]: /api/class-response.mdx "Response"
-[Route]: /api/class-route.mdx "Route"
-[Selectors]: /api/class-selectors.mdx "Selectors"
-[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
-[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
-[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: /api/class-tracing.mdx "Tracing"
-[Video]: /api/class-video.mdx "Video"
-[WebError]: /api/class-weberror.mdx "WebError"
-[WebSocket]: /api/class-websocket.mdx "WebSocket"
-[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
-[Worker]: /api/class-worker.mdx "Worker"
-[Fixtures]: /api/class-fixtures.mdx "Fixtures"
-[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
-[FullProject]: /api/class-fullproject.mdx "FullProject"
-[Location]: /api/class-location.mdx "Location"
-[Test]: /api/class-test.mdx "Test"
-[TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestInfo]: /api/class-testinfo.mdx "TestInfo"
-[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
-[TestOptions]: /api/class-testoptions.mdx "TestOptions"
-[TestProject]: /api/class-testproject.mdx "TestProject"
-[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
-[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
-[Reporter]: /api/class-reporter.mdx "Reporter"
-[Suite]: /api/class-suite.mdx "Suite"
-[TestCase]: /api/class-testcase.mdx "TestCase"
-[TestError]: /api/class-testerror.mdx "TestError"
-[TestResult]: /api/class-testresult.mdx "TestResult"
-[TestStep]: /api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
-
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
-[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
-[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
-[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
-[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
-[URL]: https://nodejs.org/api/url.html "URL"
-[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
-
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
-[Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"
