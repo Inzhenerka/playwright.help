@@ -173,7 +173,7 @@ export default {
           ],
         },
         {
-          title: "More",
+          title: "Другое",
           items: [
             {
               label: "GitHub",

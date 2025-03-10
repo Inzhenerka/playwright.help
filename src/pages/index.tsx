@@ -235,8 +235,6 @@ const Home: React.FC = () => {
       </header>
       <br></br>
       <main>
-        <br></br>
-        <br></br>
 
         <section className={styles.features}>
           <div className="container">
@@ -246,8 +244,9 @@ const Home: React.FC = () => {
                 <p>
                     Сайт является переведенной версией оригинальной документации по Playwright. Мы приглашаем всех желающих вносить правки и улучшения в перевод, чтобы сделать его ещё точнее и полезнее для сообщества.
                     Если вы заметили неточность или хотите помочь улучшить перевод, присылайте правки в <a href="https://github.com/Inzhenerka/playwright.inzhenerka.tech" target="_blank" rel="noreferrer noopener">репозиторий</a> или в <a href="https://t.me/inzhenerkatech_sup" target="_blank" rel="noreferrer noopener">поддержку</a>.
-
-                    Сайт полностью дублирует оригинальный, поэтому для перевода любой страницы достаточно заменить адрес <b>https://playwright.dev</b> на <b>https://playwright.inzhenerka.tech</b>.
+                </p>
+                <p>
+                    Сайт полностью дублирует оригинальный, поэтому для перевода любой страницы достаточно заменить адрес <b>https://playwright.dev</b> на <b>https://playwright.<span style={{color: '#45ba4b'}}>inzhenerka.tech</span></b>.
                 </p>
               </div>
             </div>
@@ -267,24 +266,6 @@ const Home: React.FC = () => {
           </div>
         </section>
 
-        <section className={styles.logosSection}>
-          <div className="container">
-            <div className="row">
-              <div className={clsx("col col--12", styles.logosColumn)}>
-                <h2>Выбран компаниями и проектами с открытым исходным кодом</h2>
-                <ul className={styles.logosList}>
-                  {logos.map(({ imageUrl, href, alt }, idx) => (
-                    <li key={idx}>
-                      <a href={href} target="_blank" rel="noreferrer noopener">
-                        <img src={imageUrl} alt={alt} />
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
     </Layout>
   );
