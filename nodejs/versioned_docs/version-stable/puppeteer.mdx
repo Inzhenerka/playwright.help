@@ -8,11 +8,11 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Принципы миграции
 
-Этот гид описывает миграцию на [Playwright Library](./library) и [Playwright Test](./intro.mdx) с Puppeteer. API имеют сходства, но Playwright предлагает гораздо больше возможностей для веб-тестирования и кросс-браузерной автоматизации.
-- Большинство API Puppeteer можно использовать без изменений
-- Использование [ElementHandle] не рекомендуется, вместо этого используйте объекты [Locator] и веб-ориентированные утверждения.
+Это руководство описывает миграцию на [Playwright Library](./library) и [Playwright Test](./intro.mdx) с Puppeteer. API имеют сходства, но Playwright предлагает гораздо больше возможностей для тестирования веб-приложений и кросс-браузерной автоматизации.
+- Большинство API Puppeteer можно использовать как есть
+- Использование [ElementHandle] не рекомендуется, вместо этого используйте объекты [Locator] и утверждения, ориентированные на веб.
 - Playwright поддерживает кросс-браузерность
-- Вам, вероятно, не нужно явное ожидание
+- Вероятно, вам не нужны явные ожидания
 
 ## Шпаргалка
 
@@ -20,12 +20,12 @@ import HTMLCard from '@site/src/components/HTMLCard';
 |----------------------------------------------------|---------------------------------------------|
 | `await puppeteer.launch()`                         | `await playwright.chromium.launch()`        |
 | `puppeteer.launch({product: 'firefox'})`           | `await playwright.firefox.launch()`         |
-|  WebKit не поддерживается Puppeteer               | `await playwright.webkit.launch()`          |
+|  WebKit не поддерживается Puppeteer                | `await playwright.webkit.launch()`          |
 | `await browser.createIncognitoBrowserContext(...)` | `await browser.newContext(...)`             |
 | `await page.setViewport(...)`                      | `await page.setViewportSize(...)`           |
 | `await page.waitForXPath(XPathSelector)`           | `await page.waitForSelector(XPathSelector)` |
 | `await page.waitForNetworkIdle(...)`               | `await page.waitForLoadState('networkidle')` |
-| `await page.$eval(...)`                            | [Assertions](./test-assertions) можно часто использовать вместо этого для проверки текста, атрибута, класса... |
+| `await page.$eval(...)`                            | [Assertions](./test-assertions) часто могут быть использованы вместо этого для проверки текста, атрибута, класса... |
 | `await page.$(...)`                                | Не рекомендуется, используйте [Locators](./api/class-locator) вместо этого |
 | `await page.$x(xpath_selector)`                    | Не рекомендуется, используйте [Locators](./api/class-locator) вместо этого |
 | Нет методов, посвященных чекбоксам или радио-кнопкам | `await page.locator(selector).check()`<br/>`await page.locator(selector).uncheck()` |
@@ -39,13 +39,13 @@ import HTMLCard from '@site/src/components/HTMLCard';
 | `await page.cookies([...urls])`                    | `await browserContext.cookies([urls])`      |
 | `await page.deleteCookie(...cookies)`              | `await browserContext.clearCookies()`       |
 | `await page.setCookie(...cookies)`                 | `await browserContext.addCookies(cookies)`  |
-| `page.on(...)`                                     | `page.on(...)`<br/>Чтобы перехватить и изменить запросы, смотрите [page.route()](/api/class-page.mdx#page-route) |
+| `page.on(...)`                                     | `page.on(...)`<br/>Для перехвата и изменения запросов, см. [page.route()](/api/class-page.mdx#page-route) |
 
 `page.waitForNavigation` и `page.waitForSelector` остаются, но во многих случаях не будут необходимы благодаря [авто-ожиданию](./actionability).
 
-Использование [ElementHandle] не рекомендуется, вместо этого используйте объекты [Locator] и веб-ориентированные утверждения.
+Использование [ElementHandle] не рекомендуется, вместо этого используйте объекты [Locator] и утверждения, ориентированные на веб.
 
-Локаторы являются центральным элементом авто-ожидания и возможности повторных попыток в Playwright. Локаторы строгие. Это означает, что все операции с локаторами, которые подразумевают некоторый целевой DOM-элемент, вызовут исключение, если более одного элемента соответствует данному селектору.
+Локаторы являются центральной частью авто-ожидания и возможности повторных попыток в Playwright. Локаторы строгие. Это означает, что все операции с локаторами, которые подразумевают некоторый целевой элемент DOM, вызовут исключение, если более одного элемента соответствует данному селектору.
 
 ## Примеры
 
@@ -68,7 +68,7 @@ const puppeteer = require('puppeteer');
 })();
 ```
 
-Пошаговая миграция на Playwright:
+Построчная миграция на Playwright:
 
 ```js
 const { chromium } = require('playwright'); // 1
@@ -85,8 +85,8 @@ const { chromium } = require('playwright'); // 1
 })();
 ```
 
-Основные моменты миграции (см. встроенные комментарии в коде Playwright):
-1. Каждый файл Playwright Library имеет явный импорт `chromium`. Другие браузеры `webkit` или `firefox` могут быть использованы.
+Основные моменты миграции (см. комментарии в коде Playwright):
+1. Каждый файл Playwright Library имеет явный импорт `chromium`. Можно использовать другие браузеры `webkit` или `firefox`.
 1. Для изоляции состояния браузера рассмотрите [контексты браузера](./browser-contexts.mdx)
 1. `setViewport` становится `setViewportSize`
 1. `networkidle2` становится `networkidle`. Обратите внимание, что в большинстве случаев это не полезно благодаря авто-ожиданию.
@@ -98,7 +98,7 @@ Puppeteer с Jest:
 ```js
 import puppeteer from 'puppeteer';
 
-describe('Главная страница Playwright', () => {
+describe('Playwright homepage', () => {
   let browser;
   let page;
 
@@ -107,28 +107,28 @@ describe('Главная страница Playwright', () => {
     page = await browser.newPage();
   });
 
-  it('содержит заголовок героя', async () => {
+  it('contains hero title', async () => {
     await page.goto('https://playwright.dev/');
     await page.waitForSelector('.hero__title');
     const text = await page.$eval('.hero__title', e => e.textContent);
-    expect(text).toContain('Playwright позволяет надежное сквозное тестирование'); // 5
+    expect(text).toContain('Playwright enables reliable end-to-end testing'); // 5
   });
 
   afterAll(() => browser.close());
 });
 ```
 
-Пошаговая миграция на Playwright Test:
+Построчная миграция на Playwright Test:
 
 ```js
 import { test, expect } from '@playwright/test'; // 1
 
-test.describe('Главная страница Playwright', () => {
-  test('содержит заголовок героя', async ({ page }) => { // 2, 3
+test.describe('Playwright homepage', () => {
+  test('contains hero title', async ({ page }) => { // 2, 3
     await page.goto('https://playwright.dev/');
     const titleLocator = page.locator('.hero__title'); // 4
     await expect(titleLocator).toContainText( // 5
-        'Playwright позволяет надежное сквозное тестирование'
+        'Playwright enables reliable end-to-end testing'
     );
   });
 });
@@ -136,35 +136,35 @@ test.describe('Главная страница Playwright', () => {
 
 1. Каждый файл Playwright Test имеет явный импорт функций `test` и `expect`
 1. Функция теста помечена как `async`
-1. Playwright Test получает `page` в качестве одного из своих параметров. Это один из многих [полезных фикстур](./api/class-fixtures) в Playwright Test. Playwright Test создает изолированный [Page] объект для каждого теста. Однако, если вы хотите повторно использовать один [Page] объект между несколькими тестами, вы можете создать свой собственный в [test.beforeAll()](/api/class-test.mdx#test-before-all) и закрыть его в [test.afterAll()](/api/class-test.mdx#test-after-all).
-1. Создание локатора с помощью [page.locator()](/api/class-page.mdx#page-locator) является одним из немногих методов, которые синхронны.
+1. Playwright Test получает `page` в качестве одного из своих параметров. Это один из многих [полезных фикстур](./api/class-fixtures) в Playwright Test. Playwright Test создает изолированный объект [Page] для каждого теста. Однако, если вы хотите использовать один объект [Page] между несколькими тестами, вы можете создать его в [test.beforeAll()](/api/class-test.mdx#test-before-all) и закрыть в [test.afterAll()](/api/class-test.mdx#test-after-all).
+1. Создание локатора с помощью [page.locator()](/api/class-page.mdx#page-locator) является одним из немногих методов, которые являются синхронными.
 1. Используйте [утверждения](./test-assertions) для проверки состояния вместо `page.$eval()`.
 
 ## Тестирование
 
-Для улучшения тестирования рекомендуется использовать [Locators](./api/class-locator) и веб-ориентированные [Assertions](./test-assertions). Смотрите [Написание тестов](./writing-tests)
+Для улучшения тестирования рекомендуется использовать [Локаторы](./api/class-locator) и веб-ориентированные [Утверждения](./test-assertions). См. [Написание тестов](./writing-tests)
 
-С Puppeteer часто используется `page.evaluate()` или `page.$eval()` для инспекции [ElementHandle] и извлечения значения текстового содержимого, атрибута, класса... Веб-ориентированные [Assertions](./test-assertions) предлагают несколько матчеров для этой цели, это более надежно и читаемо.
+В Puppeteer часто используется `page.evaluate()` или `page.$eval()` для инспекции [ElementHandle] и извлечения значения текстового содержимого, атрибута, класса... Веб-ориентированные [Утверждения](./test-assertions) предлагают несколько матчеров для этой цели, они более надежны и читаемы.
 
-[Playwright Test](./intro.mdx) является рекомендуемым тестовым раннером от первой стороны для использования с Playwright. Он предоставляет несколько функций, таких как модель объекта страницы, параллелизм, фикстуры или репортеры.
+[Playwright Test](./intro.mdx) является нашим рекомендованным тестовым раннером для использования с Playwright. Он предоставляет несколько функций, таких как модель объектов страницы, параллелизм, фикстуры или репортеры.
 
-## Суперсилы Playwright Test
+## Суперспособности Playwright Test
 
-Как только вы переходите на Playwright Test, вы получаете много!
+Как только вы начнете использовать Playwright Test, вы получите много преимуществ!
 - Полная поддержка TypeScript без конфигурации
-- Запуск тестов на **всех веб-движках** (Chrome, Firefox, Safari) на **любых популярных операционных системах** (Windows, macOS, Ubuntu)
-- Полная поддержка нескольких источников, [(i)frames](./api/class-frame), [вкладок и контекстов](./pages)
-- Запуск тестов в изоляции параллельно на нескольких браузерах
+- Запуск тестов на **всех веб-движках** (Chrome, Firefox, Safari) на **любой популярной операционной системе** (Windows, macOS, Ubuntu)
+- Полная поддержка нескольких источников, [(i)фреймов](./api/class-frame), [вкладок и контекстов](./pages)
+- Запуск тестов в изоляции параллельно в нескольких браузерах
 - Встроенный сбор [артефактов тестирования](./test-use-options.mdx#recording-options)
 
-Вы также получаете все эти ✨ потрясающие инструменты ✨, которые идут в комплекте с Playwright Test:
+Вы также получите все эти ✨ потрясающие инструменты ✨, которые поставляются в комплекте с Playwright Test:
 - [Playwright Inspector](./debug.mdx)
 - [Генерация кода Playwright Test](./codegen-intro.mdx)
-- [Playwright Tracing](./trace-viewer.mdx) для постмортем отладки
+- [Playwright Tracing](./trace-viewer.mdx) для постмортем-отладки
 
-## Дальнейшее чтение
+## Дополнительное чтение
 
-Узнайте больше о раннере тестов Playwright:
+Узнайте больше о тестовом раннере Playwright:
 - [Начало работы](./intro)
 - [Фикстуры](./test-fixtures)
 - [Локаторы](./locators.mdx)

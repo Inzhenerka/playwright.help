@@ -1,6 +1,6 @@
 ---
 id: mock-browser-apis
-title: "Мокирование браузерных API"
+title: "Мокирование API браузера"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -8,15 +8,15 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Введение
 
-Playwright предоставляет нативную поддержку большинства функций браузера. Однако существуют некоторые экспериментальные API и API, которые не (еще) полностью поддерживаются всеми браузерами. В таких случаях Playwright обычно не предоставляет специализированные API для автоматизации. Вы можете использовать моки для тестирования поведения вашего приложения. Этот гид содержит несколько примеров.
+Playwright предоставляет нативную поддержку для большинства функций браузера. Однако существуют некоторые экспериментальные API и API, которые еще не полностью поддерживаются всеми браузерами. В таких случаях Playwright обычно не предоставляет специализированные API для автоматизации. Вы можете использовать моки, чтобы протестировать поведение вашего приложения в таких случаях. Это руководство дает несколько примеров.
 
 ## Введение
 
-Рассмотрим веб-приложение, которое использует [API батареи](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/getBattery) для отображения статуса батареи вашего устройства. Мы замокируем API батареи и проверим, что страница правильно отображает статус батареи.
+Рассмотрим веб-приложение, которое использует [battery API](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/getBattery) для отображения статуса батареи вашего устройства. Мы замокируем battery API и проверим, что страница правильно отображает статус батареи.
 
 ## Создание моков
 
-Поскольку страница может вызывать API очень рано во время загрузки, важно настроить все моки до начала загрузки страницы. Самый простой способ добиться этого — вызвать [page.addInitScript()](/api/class-page.mdx#page-add-init-script):
+Поскольку страница может вызывать API очень рано во время загрузки, важно настроить все моки до того, как страница начнет загружаться. Самый простой способ достичь этого — вызвать [page.addInitScript()](/api/class-page.mdx#page-add-init-script):
 
 ```js
 await page.addInitScript(() => {
@@ -27,12 +27,12 @@ await page.addInitScript(() => {
     dischargingTime: Infinity,
     addEventListener: () => { }
   };
-  // Переопределяем метод, чтобы он всегда возвращал информацию о моковой батарее.
+  // Переопределяем метод, чтобы всегда возвращать информацию о мокированной батарее.
   window.navigator.getBattery = async () => mockBattery;
 });
 ```
 
-После этого вы можете перейти на страницу и проверить ее состояние пользовательского интерфейса:
+После этого вы можете перейти на страницу и проверить состояние ее интерфейса:
 
 ```js
 // Настройка мок API перед каждым тестом.
@@ -45,7 +45,7 @@ test.beforeEach(async ({ page }) => {
       dischargingTime: Infinity,
       addEventListener: () => { }
     };
-    // Переопределяем метод, чтобы он всегда возвращал информацию о моковой батарее.
+    // Переопределяем метод, чтобы всегда возвращать информацию о мокированной батарее.
     window.navigator.getBattery = async () => mockBattery;
   });
 });
@@ -53,21 +53,22 @@ test.beforeEach(async ({ page }) => {
 test('показать статус батареи', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('.battery-percentage')).toHaveText('90%');
-  await expect(page.locator('.battery-status')).toHaveText('Адаптер');
+  await expect(page.locator('.battery-status')).toHaveText('Adapter');
   await expect(page.locator('.battery-fully')).toHaveText('00:30');
 });
+
 ```
 
 ## Мокирование только для чтения API
 
-Некоторые API являются только для чтения, поэтому вы не сможете присвоить значение свойству navigator. Например,
+Некоторые API доступны только для чтения, поэтому вы не сможете присвоить значение свойству navigator. Например,
 
 ```js
-// Следующая строка не окажет никакого эффекта.
+// Следующая строка не будет иметь эффекта.
 navigator.cookieEnabled = true;
 ```
 
-Тем не менее, если свойство является [настраиваемым](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty#configurable), вы все равно можете переопределить его с помощью обычного JavaScript:
+Однако, если свойство [configurable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty#configurable), вы все равно можете переопределить его, используя обычный JavaScript:
 
 ```js
 await page.addInitScript(() => {
@@ -77,12 +78,12 @@ await page.addInitScript(() => {
 
 ## Проверка вызовов API
 
-Иногда полезно проверить, сделала ли страница все ожидаемые вызовы API. Вы можете записать все вызовы методов API, а затем сравнить их с эталонным результатом. [page.exposeFunction()](/api/class-page.mdx#page-expose-function) может быть полезен для передачи сообщений со страницы обратно в код теста:
+Иногда полезно проверить, сделала ли страница все ожидаемые вызовы API. Вы можете записать все вызовы методов API, а затем сравнить их с эталонным результатом. [page.exposeFunction()](/api/class-page.mdx#page-expose-function) может быть полезен для передачи сообщений со страницы обратно в тестовый код:
 
 ```js
-test('логировать вызовы батареи', async ({ page }) => {
+test('логирование вызовов батареи', async ({ page }) => {
   const log = [];
-  // Экспонируем функцию для отправки сообщений в скрипт Node.js.
+  // Экспонируем функцию для добавления сообщений в скрипт Node.js.
   await page.exposeFunction('logCall', msg => log.push(msg));
   await page.addInitScript(() => {
     const mockBattery = {
@@ -90,10 +91,10 @@ test('логировать вызовы батареи', async ({ page }) => {
       charging: true,
       chargingTime: 1800,
       dischargingTime: Infinity,
-      // Логируем вызовы addEventListener.
+      // Логирование вызовов addEventListener.
       addEventListener: (name, cb) => logCall(`addEventListener:${name}`)
     };
-    // Переопределяем метод, чтобы он всегда возвращал информацию о моковой батарее.
+    // Переопределяем метод, чтобы всегда возвращать информацию о мокированной батарее.
     window.navigator.getBattery = async () => {
       logCall('getBattery');
       return mockBattery;
@@ -114,12 +115,12 @@ test('логировать вызовы батареи', async ({ page }) => {
 
 ## Обновление мока
 
-Чтобы протестировать, что приложение правильно отражает обновления статуса батареи, важно убедиться, что мок-объект батареи вызывает те же события, что и реализация браузера. Следующий тест демонстрирует, как это сделать:
+Чтобы протестировать, что приложение правильно отражает обновления статуса батареи, важно убедиться, что объект мокированной батареи генерирует те же события, что и реализация браузера. Следующий тест демонстрирует, как этого достичь:
 
 ```js
-test('обновить статус батареи (без эталона)', async ({ page }) => {
+test('обновление статуса батареи (без эталона)', async ({ page }) => {
   await page.addInitScript(() => {
-    // Мок-класс, который будет уведомлять соответствующих слушателей, когда изменяется статус батареи.
+    // Мок-класс, который будет уведомлять соответствующих слушателей при изменении статуса батареи.
     class BatteryMock {
       level = 0.10;
       charging = false;
@@ -133,7 +134,7 @@ test('обновить статус батареи (без эталона)', asy
         if (eventName === 'levelchange')
           this._levelListeners.push(listener);
       }
-      // Будет вызван тестом.
+      // Будет вызвано тестом.
       _setLevel(value) {
         this.level = value;
         this._levelListeners.forEach(cb => cb());
@@ -144,9 +145,9 @@ test('обновить статус батареи (без эталона)', asy
       }
     }
     const mockBattery = new BatteryMock();
-    // Переопределяем метод, чтобы он всегда возвращал информацию о моковой батарее.
+    // Переопределяем метод, чтобы всегда возвращать информацию о мокированной батарее.
     window.navigator.getBattery = async () => mockBattery;
-    // Сохраняем мок-объект в window для более удобного доступа.
+    // Сохраняем объект мока в window для более легкого доступа.
     window.mockBattery = mockBattery;
   });
 
@@ -156,11 +157,11 @@ test('обновить статус батареи (без эталона)', asy
   // Обновляем уровень до 27.5%
   await page.evaluate(() => window.mockBattery._setLevel(0.275));
   await expect(page.locator('.battery-percentage')).toHaveText('27.5%');
-  await expect(page.locator('.battery-status')).toHaveText('Батарея');
+  await expect(page.locator('.battery-status')).toHaveText('Battery');
 
-  // Эмулируем подключенный адаптер
+  // Эмулируем подключение адаптера
   await page.evaluate(() => window.mockBattery._setCharging(true));
-  await expect(page.locator('.battery-status')).toHaveText('Адаптер');
+  await expect(page.locator('.battery-status')).toHaveText('Adapter');
   await expect(page.locator('.battery-fully')).toHaveText('00:30');
 });
 ```
@@ -268,6 +269,6 @@ test('обновить статус батареи (без эталона)', asy
 [URL]: https://nodejs.org/api/url.html "URL"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
 [Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
 [Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

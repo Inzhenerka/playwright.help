@@ -8,240 +8,27 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Введение
 
-Вы можете параметризировать тесты на уровне теста или на уровне проекта.
+Вы можете параметризовать тесты на уровне теста или на уровне проекта.
 
 ## Параметризованные тесты
 
-```js title="example.spec.ts"
-[
-  { name: 'Alice', expected: 'Hello, Alice!' },
-  { name: 'Bob', expected: 'Hello, Bob!' },
-  { name: 'Charlie', expected: 'Hello, Charlie!' },
-].forEach(({ name, expected }) => {
-  // Вы также можете сделать это с помощью test.describe() или с несколькими тестами, если имя теста уникально.
-  test(`тестирование с ${name}`, async ({ page }) => {
-    await page.goto(`https://example.com/greet?name=${name}`);
-    await expect(page.getByRole('heading')).toHaveText(expected);
-  });
-});
-```
+### Хуки до и после
 
-### Хуки before и after
+В большинстве случаев следует размещать хуки `beforeEach`, `beforeAll`, `afterEach` и `afterAll` вне `forEach`, чтобы они выполнялись только один раз:
 
-Чаще всего вам следует помещать хуки `beforeEach`, `beforeAll`, `afterEach` и `afterAll` вне `forEach`, чтобы хуки выполнялись только один раз:
-
-```js title="example.spec.ts"
-test.beforeEach(async ({ page }) => {
-  // ...
-});
-
-test.afterEach(async ({ page }) => {
-  // ...
-});
-
-[
-  { name: 'Alice', expected: 'Hello, Alice!' },
-  { name: 'Bob', expected: 'Hello, Bob!' },
-  { name: 'Charlie', expected: 'Hello, Charlie!' },
-].forEach(({ name, expected }) => {
-  test(`тестирование с ${name}`, async ({ page }) => {
-    await page.goto(`https://example.com/greet?name=${name}`);
-    await expect(page.getByRole('heading')).toHaveText(expected);
-  });
-});
-```
-
-Если вы хотите иметь хуки для каждого теста, вы можете поместить их внутрь `describe()` - так они будут выполняться для каждой итерации / каждого отдельного теста:
-
-```js title="example.spec.ts"
-[
-  { name: 'Alice', expected: 'Hello, Alice!' },
-  { name: 'Bob', expected: 'Hello, Bob!' },
-  { name: 'Charlie', expected: 'Hello, Charlie!' },
-].forEach(({ name, expected }) => {
-  test.describe(() => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto(`https://example.com/greet?name=${name}`);
-    });
-    test(`тестирование с ${expected}`, async ({ page }) => {
-      await expect(page.getByRole('heading')).toHaveText(expected);
-    });
-  });
-});
-```
+Если вы хотите иметь хуки для каждого теста, вы можете поместить их внутри `describe()`, чтобы они выполнялись для каждой итерации / каждого отдельного теста:
 
 ## Параметризованные проекты
 
-Playwright Test поддерживает запуск нескольких тестовых проектов одновременно. В следующем примере мы запустим два проекта с разными параметрами.
+Playwright Test поддерживает запуск нескольких тестовых проектов одновременно. В следующем примере мы запустим два проекта с разными опциями.
 
-Мы объявляем параметр `person` и устанавливаем значение в конфигурации. Первый проект запускается со значением `Alice`, а второй - со значением `Bob`.
+Мы объявляем опцию `person` и задаем значение в конфигурации. Первый проект запускается со значением `Alice`, а второй со значением `Bob`.
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
-```js title="my-test.ts"
-import { test as base } from '@playwright/test';
-
-export type TestOptions = {
-  person: string;
-};
-
-export const test = base.extend<TestOptions>({
-  // Определите параметр и предоставьте значение по умолчанию.
-  // Мы можем позже переопределить его в конфигурации.
-  person: ['John', { option: true }],
-});
-```
-
-</TabItem>
-<TabItem value="js">
-
-```js title="my-test.js"
-const base = require('@playwright/test');
-
-exports.test = base.test.extend({
-  // Определите параметр и предоставьте значение по умолчанию.
-  // Мы можем позже переопределить его в конфигурации.
-  person: ['John', { option: true }],
-});
-```
-
-</TabItem>
-</Tabs>
-
-Мы можем использовать этот параметр в тесте, аналогично [фикстурам](./test-fixtures.mdx).
-
-```js title="example.spec.ts"
-import { test } from './my-test';
-
-test('тест 1', async ({ page, person }) => {
-  await page.goto(`/index.html`);
-  await expect(page.locator('#node')).toContainText(person);
-  // ...
-});
-```
+Мы можем использовать эту опцию в тесте, аналогично [фикстурам](./test-fixtures.mdx).
 
 Теперь мы можем запускать тесты в нескольких конфигурациях, используя проекты.
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
-```js title="playwright.config.ts"
-import { defineConfig } from '@playwright/test';
-import type { TestOptions } from './my-test';
-
-export default defineConfig<TestOptions>({
-  projects: [
-    {
-      name: 'alice',
-      use: { person: 'Alice' },
-    },
-    {
-      name: 'bob',
-      use: { person: 'Bob' },
-    },
-  ]
-});
-```
-
-</TabItem>
-<TabItem value="js">
-
-```js title="playwright.config.ts"
-// @ts-check
-
-module.exports = defineConfig({
-  projects: [
-    {
-      name: 'alice',
-      use: { person: 'Alice' },
-    },
-    {
-      name: 'bob',
-      use: { person: 'Bob' },
-    },
-  ]
-});
-```
-
-</TabItem>
-</Tabs>
-
-Мы также можем использовать параметр в фикстуре. Узнайте больше о [фикстурах](./test-fixtures.mdx).
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
-```js title="my-test.ts"
-import { test as base } from '@playwright/test';
-
-export type TestOptions = {
-  person: string;
-};
-
-export const test = base.extend<TestOptions>({
-  // Определите параметр и предоставьте значение по умолчанию.
-  // Мы можем позже переопределить его в конфигурации.
-  person: ['John', { option: true }],
-
-  // Переопределите фикстуру "page" по умолчанию.
-  page: async ({ page, person }, use) => {
-    await page.goto('/chat');
-    // Мы используем параметр "person" как "имя" для комнаты чата.
-    await page.getByLabel('User Name').fill(person);
-    await page.getByText('Enter chat room').click();
-    // Каждый тест получит "page", который уже имеет имя пользователя.
-    await use(page);
-  },
-});
-```
-
-</TabItem>
-<TabItem value="js">
-
-```js title="my-test.js"
-const base = require('@playwright/test');
-
-exports.test = base.test.extend({
-  // Определите параметр и предоставьте значение по умолчанию.
-  // Мы можем позже переопределить его в конфигурации.
-  person: ['John', { option: true }],
-
-  // Переопределите фикстуру "page" по умолчанию.
-  page: async ({ page, person }, use) => {
-    await page.goto('/chat');
-    // Мы используем параметр "person" как "имя" для комнаты чата.
-    await page.getByLabel('User Name').fill(person);
-    await page.getByText('Enter chat room').click();
-    // Каждый тест получит "page", который уже имеет имя пользователя.
-    await use(page);
-  },
-});
-```
-
-</TabItem>
-</Tabs>
+Мы также можем использовать опцию в фикстуре. Узнайте больше о [фикстурах](./test-fixtures.mdx).
 
 :::note
 
@@ -252,276 +39,26 @@ exports.test = base.test.extend({
 
 Вы можете использовать переменные окружения для настройки тестов из командной строки.
 
-Например, рассмотрим следующий тестовый файл, который требует имя пользователя и пароль. Обычно хорошей идеей является не хранить ваши секреты в исходном коде, поэтому нам нужен способ передать секреты извне.
-
-```js title="example.spec.ts"
-test(`пример теста`, async ({ page }) => {
-  // ...
-  await page.getByLabel('User Name').fill(process.env.USER_NAME);
-  await page.getByLabel('Password').fill(process.env.PASSWORD);
-});
-```
+Например, рассмотрим следующий тестовый файл, которому нужны имя пользователя и пароль. Обычно лучше не хранить ваши секреты в исходном коде, поэтому нам нужно будет передать секреты извне.
 
 Вы можете запустить этот тест с вашим секретным именем пользователя и паролем, установленными в командной строке.
 
-<Tabs
-  groupId="bash-flavor"
-  defaultValue="bash"
-  values={[
-    {label: 'Bash', value: 'bash'},
-    {label: 'PowerShell', value: 'powershell'},
-    {label: 'Batch', value: 'batch'}
-  ]
-}>
-<TabItem value="bash">
+Аналогично, файл конфигурации также может читать переменные окружения, переданные через командную строку.
 
-```bash
-USER_NAME=me PASSWORD=secret npx playwright test
-```
+Теперь вы можете запускать тесты в тестовой или производственной среде:
 
-</TabItem>
-<TabItem value="powershell">
-
-```powershell
-$env:USER_NAME=me
-$env:PASSWORD=secret
-npx playwright test
-```
-
-</TabItem>
-<TabItem value="batch">
-
-```batch
-set USER_NAME=me
-set PASSWORD=secret
-npx playwright test
-```
-
-</TabItem>
-</Tabs>
-
-Аналогично, файл конфигурации также может считывать переменные окружения, переданные через командную строку.
-
-```js title="playwright.config.ts"
-import { defineConfig } from '@playwright/test';
-
-export default defineConfig({
-  use: {
-    baseURL: process.env.STAGING === '1' ? 'http://staging.example.test/' : 'http://example.test/',
-  }
-});
-```
-
-Теперь вы можете запускать тесты против тестовой или производственной среды:
-
-<Tabs
-  groupId="bash-flavor"
-  defaultValue="bash"
-  values={[
-    {label: 'Bash', value: 'bash'},
-    {label: 'PowerShell', value: 'powershell'},
-    {label: 'Batch', value: 'batch'}
-  ]
-}>
-<TabItem value="bash">
-
-```bash
-STAGING=1 npx playwright test
-```
-
-</TabItem>
-<TabItem value="powershell">
-
-```powershell
-$env:STAGING=1
-npx playwright test
-```
-
-</TabItem>
-<TabItem value="batch">
-
-```batch
-set STAGING=1
-npx playwright test
-```
-
-</TabItem>
-</Tabs>
-
-### Файлы .env
+### .env файлы
 
 Чтобы упростить управление переменными окружения, рассмотрите возможность использования файлов `.env`. Вот пример, который использует пакет [`dotenv`](https://www.npmjs.com/package/dotenv) для чтения переменных окружения непосредственно в файле конфигурации.
 
-```js title="playwright.config.ts"
-import { defineConfig } from '@playwright/test';
-import dotenv from 'dotenv';
-import path from 'path';
-
-// Чтение из файла ".env".
-dotenv.config({ path: path.resolve(__dirname, '.env') });
-
-// Альтернативно, чтение из файла "../my.env".
-dotenv.config({ path: path.resolve(__dirname, '..', 'my.env') });
-
-export default defineConfig({
-  use: {
-    baseURL: process.env.STAGING === '1' ? 'http://staging.example.test/' : 'http://example.test/',
-  }
-});
-```
-
-Теперь вы можете просто редактировать файл `.env`, чтобы установить любые переменные, которые вам нужны.
-
-```bash
-# файл .env
-STAGING=0
-USER_NAME=me
-PASSWORD=secret
-```
+Теперь вы можете просто отредактировать файл `.env`, чтобы установить любые переменные, которые вы хотите.
 
 Запустите тесты как обычно, ваши переменные окружения должны быть подхвачены.
 
-```bash
-npx playwright test
-```
-
 ## Создание тестов через CSV файл
 
-Тестовый раннер Playwright работает в Node.js, это означает, что вы можете напрямую читать файлы из файловой системы и парсить их с помощью вашей предпочитаемой библиотеки CSV.
+Тестовый раннер Playwright работает в Node.js, это означает, что вы можете напрямую читать файлы из файловой системы и разбирать их с помощью предпочитаемой библиотеки CSV.
 
-Например, рассмотрим этот CSV файл, в нашем примере `input.csv`:
-
-```txt
-"test_case","some_value","some_other_value"
-"value 1","value 11","foobar1"
-"value 2","value 22","foobar21"
-"value 3","value 33","foobar321"
-"value 4","value 44","foobar4321"
-```
+Рассмотрим, например, этот CSV файл, в нашем примере `input.csv`:
 
 На основе этого мы сгенерируем несколько тестов, используя библиотеку [csv-parse](https://www.npmjs.com/package/csv-parse) из NPM:
-
-```js title="test.spec.ts"
-import fs from 'fs';
-import path from 'path';
-import { test } from '@playwright/test';
-import { parse } from 'csv-parse/sync';
-
-const records = parse(fs.readFileSync(path.join(__dirname, 'input.csv')), {
-  columns: true,
-  skip_empty_lines: true
-});
-
-for (const record of records) {
-  test(`foo: ${record.test_case}`, async ({ page }) => {
-    console.log(record.test_case, record.some_value, record.some_other_value);
-  });
-}
-```
-
-
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
-[APIRequest]: /api/class-apirequest.mdx "APIRequest"
-[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
-[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
-[Browser]: /api/class-browser.mdx "Browser"
-[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
-[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
-[BrowserType]: /api/class-browsertype.mdx "BrowserType"
-[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
-[Clock]: /api/class-clock.mdx "Clock"
-[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
-[Coverage]: /api/class-coverage.mdx "Coverage"
-[Dialog]: /api/class-dialog.mdx "Dialog"
-[Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
-[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
-[FileChooser]: /api/class-filechooser.mdx "FileChooser"
-[Frame]: /api/class-frame.mdx "Frame"
-[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
-[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
-[JSHandle]: /api/class-jshandle.mdx "JSHandle"
-[Keyboard]: /api/class-keyboard.mdx "Keyboard"
-[Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
-[Logger]: /api/class-logger.mdx "Logger"
-[Mouse]: /api/class-mouse.mdx "Mouse"
-[Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
-[Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
-[Request]: /api/class-request.mdx "Request"
-[Response]: /api/class-response.mdx "Response"
-[Route]: /api/class-route.mdx "Route"
-[Selectors]: /api/class-selectors.mdx "Selectors"
-[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
-[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
-[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: /api/class-tracing.mdx "Tracing"
-[Video]: /api/class-video.mdx "Video"
-[WebError]: /api/class-weberror.mdx "WebError"
-[WebSocket]: /api/class-websocket.mdx "WebSocket"
-[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
-[Worker]: /api/class-worker.mdx "Worker"
-[Fixtures]: /api/class-fixtures.mdx "Fixtures"
-[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
-[FullProject]: /api/class-fullproject.mdx "FullProject"
-[Location]: /api/class-location.mdx "Location"
-[Test]: /api/class-test.mdx "Test"
-[TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestInfo]: /api/class-testinfo.mdx "TestInfo"
-[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
-[TestOptions]: /api/class-testoptions.mdx "TestOptions"
-[TestProject]: /api/class-testproject.mdx "TestProject"
-[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
-[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
-[Reporter]: /api/class-reporter.mdx "Reporter"
-[Suite]: /api/class-suite.mdx "Suite"
-[TestCase]: /api/class-testcase.mdx "TestCase"
-[TestError]: /api/class-testerror.mdx "TestError"
-[TestResult]: /api/class-testresult.mdx "TestResult"
-[TestStep]: /api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
-
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
-[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
-[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
-[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
-[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
-[URL]: https://nodejs.org/api/url.html "URL"
-[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
-
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
-[Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

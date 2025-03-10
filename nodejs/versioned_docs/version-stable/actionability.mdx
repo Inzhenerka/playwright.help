@@ -1,6 +1,6 @@
 ---
 id: actionability
-title: "Авто-ожидание"
+title: "Автоожидание"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -8,18 +8,18 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Введение
 
-Playwright выполняет ряд проверок доступности элементов перед выполнением действий, чтобы гарантировать, что эти действия будут работать как ожидается. Он автоматически ожидает, пока все соответствующие проверки не пройдут, и только затем выполняет запрашиваемое действие. Если необходимые проверки не проходят в течение заданного `timeout`, действие завершается с ошибкой `TimeoutError`.
+Playwright выполняет ряд проверок на возможность выполнения действий с элементами перед их выполнением, чтобы гарантировать, что эти действия будут работать как ожидается. Он автоматически ожидает, пока все соответствующие проверки не пройдут, и только затем выполняет запрашиваемое действие. Если необходимые проверки не проходят в течение заданного `timeout`, действие завершается с ошибкой `TimeoutError`.
 
-Например, для [locator.click()](/api/class-locator.mdx#locator-click) Playwright убедится, что:
+Например, для [locator.click()](/api/class-locator.mdx#locator-click), Playwright убедится, что:
 - локатор разрешается в ровно один элемент
 - элемент [Видим]
-- элемент [Стабилен], то есть не анимирован или анимация завершена
-- элемент [Принимает события], то есть не закрыт другими элементами
+- элемент [Стабилен], то есть не анимируется или завершил анимацию
+- элемент [Получает события], то есть не перекрыт другими элементами
 - элемент [Включен]
 
-Вот полный список проверок доступности, выполняемых для каждого действия:
+Вот полный список проверок на возможность выполнения действий для каждого действия:
 
-| Действие | [Видим] | [Стабилен] | [Принимает события] | [Включен] | [Редактируемый] |
+| Действие | [Видим] | [Стабилен] | [Получает события] | [Включен] | [Редактируем] |
 | :- | :-: | :-: | :-: | :-: | :-: |
 | [locator.check()](/api/class-locator.mdx#locator-check) | Да | Да | Да | Да | - |
 | [locator.click()](/api/class-locator.mdx#locator-click) | Да | Да | Да | Да | - |
@@ -42,26 +42,26 @@ Playwright выполняет ряд проверок доступности э�
 | [locator.pressSequentially()](/api/class-locator.mdx#locator-press-sequentially) | - | - | - | - | - |
 | [locator.setInputFiles()](/api/class-locator.mdx#locator-set-input-files) | - | - | - | - | - |
 
-## Принуждение действий
+## Принудительное выполнение действий
 
-Некоторые действия, такие как [locator.click()](/api/class-locator.mdx#locator-click), поддерживают опцию `force`, которая отключает несущественные проверки доступности. Например, передача истинного значения `force` в метод [locator.click()](/api/class-locator.mdx#locator-click) не будет проверять, что целевой элемент действительно получает события клика.
+Некоторые действия, такие как [locator.click()](/api/class-locator.mdx#locator-click), поддерживают опцию `force`, которая отключает несущественные проверки на возможность выполнения действий. Например, передача истинного значения `force` в метод [locator.click()](/api/class-locator.mdx#locator-click) не будет проверять, что целевой элемент действительно получает события клика.
 
 ## Утверждения
 
-Playwright включает автоматическое повторение утверждений, которые устраняют нестабильность, ожидая, пока условие не будет выполнено, аналогично авто-ожиданию перед действиями.
+Playwright включает в себя утверждения с автоматическим повтором, которые устраняют нестабильность, ожидая, пока условие не будет выполнено, аналогично автоожиданию перед действиями.
 
 | Утверждение | Описание |
 | :- | :- |
 | [expect(locator).toBeAttached()](/api/class-locatorassertions.mdx#locator-assertions-to-be-attached) | Элемент прикреплен |
-| [expect(locator).toBeChecked()](/api/class-locatorassertions.mdx#locator-assertions-to-be-checked) | Флажок установлен |
+| [expect(locator).toBeChecked()](/api/class-locatorassertions.mdx#locator-assertions-to-be-checked) | Чекбокс отмечен |
 | [expect(locator).toBeDisabled()](/api/class-locatorassertions.mdx#locator-assertions-to-be-disabled) | Элемент отключен |
-| [expect(locator).toBeEditable()](/api/class-locatorassertions.mdx#locator-assertions-to-be-editable) | Элемент редактируемый |
-| [expect(locator).toBeEmpty()](/api/class-locatorassertions.mdx#locator-assertions-to-be-empty) | Контейнер пустой |
+| [expect(locator).toBeEditable()](/api/class-locatorassertions.mdx#locator-assertions-to-be-editable) | Элемент редактируем |
+| [expect(locator).toBeEmpty()](/api/class-locatorassertions.mdx#locator-assertions-to-be-empty) | Контейнер пуст |
 | [expect(locator).toBeEnabled()](/api/class-locatorassertions.mdx#locator-assertions-to-be-enabled) | Элемент включен |
 | [expect(locator).toBeFocused()](/api/class-locatorassertions.mdx#locator-assertions-to-be-focused) | Элемент в фокусе |
-| [expect(locator).toBeHidden()](/api/class-locatorassertions.mdx#locator-assertions-to-be-hidden) | Элемент не виден |
-| [expect(locator).toBeInViewport()](/api/class-locatorassertions.mdx#locator-assertions-to-be-in-viewport) | Элемент пересекает область просмотра |
-| [expect(locator).toBeVisible()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible) | Элемент виден |
+| [expect(locator).toBeHidden()](/api/class-locatorassertions.mdx#locator-assertions-to-be-hidden) | Элемент не видим |
+| [expect(locator).toBeInViewport()](/api/class-locatorassertions.mdx#locator-assertions-to-be-in-viewport) | Элемент пересекается с областью просмотра |
+| [expect(locator).toBeVisible()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible) | Элемент видим |
 | [expect(locator).toContainText()](/api/class-locatorassertions.mdx#locator-assertions-to-contain-text) | Элемент содержит текст |
 | [expect(locator).toHaveAttribute()](/api/class-locatorassertions.mdx#locator-assertions-to-have-attribute) | Элемент имеет DOM-атрибут |
 | [expect(locator).toHaveClass()](/api/class-locatorassertions.mdx#locator-assertions-to-have-class) | Элемент имеет класс |
@@ -70,26 +70,26 @@ Playwright включает автоматическое повторение у
 | [expect(locator).toHaveId()](/api/class-locatorassertions.mdx#locator-assertions-to-have-id) | Элемент имеет ID |
 | [expect(locator).toHaveJSProperty()](/api/class-locatorassertions.mdx#locator-assertions-to-have-js-property) | Элемент имеет JavaScript-свойство |
 | [expect(locator).toHaveText()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text) | Элемент соответствует тексту |
-| [expect(locator).toHaveValue()](/api/class-locatorassertions.mdx#locator-assertions-to-have-value) | Ввод имеет значение |
-| [expect(locator).toHaveValues()](/api/class-locatorassertions.mdx#locator-assertions-to-have-values) | Выбор имеет выбранные опции |
-| [expect(page).toHaveTitle()](/api/class-pageassertions.mdx#page-assertions-to-have-title) | У страницы есть заголовок |
-| [expect(page).toHaveURL()](/api/class-pageassertions.mdx#page-assertions-to-have-url) | У страницы есть URL |
+| [expect(locator).toHaveValue()](/api/class-locatorassertions.mdx#locator-assertions-to-have-value) | Поле ввода имеет значение |
+| [expect(locator).toHaveValues()](/api/class-locatorassertions.mdx#locator-assertions-to-have-values) | В селекте выбраны опции |
+| [expect(page).toHaveTitle()](/api/class-pageassertions.mdx#page-assertions-to-have-title) | Страница имеет заголовок |
+| [expect(page).toHaveURL()](/api/class-pageassertions.mdx#page-assertions-to-have-url) | Страница имеет URL |
 | [expect(response).toBeOK()](/api/class-apiresponseassertions.mdx#api-response-assertions-to-be-ok) | Ответ имеет статус OK |
 
 Узнайте больше в [руководстве по утверждениям](./test-assertions.mdx).
 
-## Видимый
+## Видим
 
-Элемент считается видимым, когда у него есть непустая область и у него нет стиля `visibility:hidden`.
+Элемент считается видимым, когда у него есть непустая ограничивающая рамка и отсутствует вычисленный стиль `visibility:hidden`.
 
 Обратите внимание, что согласно этому определению:
 * Элементы нулевого размера **не считаются** видимыми.
 * Элементы с `display:none` **не считаются** видимыми.
 * Элементы с `opacity:0` **считаются** видимыми.
 
-## Стабильный
+## Стабилен
 
-Элемент считается стабильным, когда он сохраняет одну и ту же область в течение как минимум двух последовательных кадров анимации.
+Элемент считается стабильным, когда он сохраняет одну и ту же ограничивающую рамку как минимум в течение двух последовательных кадров анимации.
 
 ## Включен
 
@@ -100,131 +100,18 @@ Playwright включает автоматическое повторение у
 - это `<button>`, `<select>`, `<input>`, `<textarea>`, `<option>` или `<optgroup>`, который является частью `<fieldset>` с атрибутом `[disabled]`;
 - это потомок элемента с атрибутом `[aria-disabled=true]`.
 
-## Редактируемый
+## Редактируем
 
 Элемент считается редактируемым, когда он [включен] и **не является только для чтения**.
 
 Элемент **только для чтения**, когда:
 - это `<select>`, `<input>` или `<textarea>` с атрибутом `[readonly]`;
-- у него есть атрибут `[aria-readonly=true]` и роль aria, которая [поддерживает это](https://w3c.github.io/aria/#aria-readonly).
+- у него есть атрибут `[aria-readonly=true]` и роль aria, которая [поддерживает его](https://w3c.github.io/aria/#aria-readonly).
 
-## Принимает события
+## Получает события
 
-Элемент считается принимающим указательные события, когда он является целевым объектом указательного события в точке действия. Например, при клике в точке `(10;10)` Playwright проверяет, будет ли какой-либо другой элемент (обычно наложение) вместо этого захватывать клик в `(10;10)`.
+Элемент считается получающим события указателя, когда он является целевым объектом события указателя в точке действия. Например, при клике в точке `(10;10)`, Playwright проверяет, не захватит ли клик в `(10;10)` какой-либо другой элемент (обычно это оверлей).
 
-Например, рассмотрим сценарий, когда Playwright будет кликать на кнопку `Sign Up`, независимо от того, когда был выполнен вызов [locator.click()](/api/class-locator.mdx#locator-click):
-- страница проверяет, что имя пользователя уникально, и кнопка `Sign Up` отключена;
-- после проверки с сервером отключенная кнопка `Sign Up` заменяется другой, которая теперь включена.
-
-[Видимый]: #visible "Видимый"
-[Стабилен]: #stable "Стабилен"
-[Включен]: #enabled "Включен"
-[Редактируемый]: #editable "Редактируемый"
-[Принимает события]: #receives-events "Принимает события"
-
-
-[Доступность]: /api/class-accessibility.mdx "Доступность"
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
-[APIRequest]: /api/class-apirequest.mdx "APIRequest"
-[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
-[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
-[Browser]: /api/class-browser.mdx "Browser"
-[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
-[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
-[BrowserType]: /api/class-browsertype.mdx "BrowserType"
-[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
-[Clock]: /api/class-clock.mdx "Clock"
-[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
-[Coverage]: /api/class-coverage.mdx "Coverage"
-[Dialog]: /api/class-dialog.mdx "Dialog"
-[Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
-[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
-[FileChooser]: /api/class-filechooser.mdx "FileChooser"
-[Frame]: /api/class-frame.mdx "Frame"
-[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
-[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
-[JSHandle]: /api/class-jshandle.mdx "JSHandle"
-[Keyboard]: /api/class-keyboard.mdx "Keyboard"
-[Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
-[Logger]: /api/class-logger.mdx "Logger"
-[Mouse]: /api/class-mouse.mdx "Mouse"
-[Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
-[Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
-[Request]: /api/class-request.mdx "Request"
-[Response]: /api/class-response.mdx "Response"
-[Route]: /api/class-route.mdx "Route"
-[Selectors]: /api/class-selectors.mdx "Selectors"
-[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
-[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
-[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: /api/class-tracing.mdx "Tracing"
-[Video]: /api/class-video.mdx "Video"
-[WebError]: /api/class-weberror.mdx "WebError"
-[WebSocket]: /api/class-websocket.mdx "WebSocket"
-[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
-[Worker]: /api/class-worker.mdx "Worker"
-[Fixtures]: /api/class-fixtures.mdx "Fixtures"
-[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
-[FullProject]: /api/class-fullproject.mdx "FullProject"
-[Location]: /api/class-location.mdx "Location"
-[Test]: /api/class-test.mdx "Test"
-[TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestInfo]: /api/class-testinfo.mdx "TestInfo"
-[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
-[TestOptions]: /api/class-testoptions.mdx "TestOptions"
-[TestProject]: /api/class-testproject.mdx "TestProject"
-[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
-[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
-[Reporter]: /api/class-reporter.mdx "Reporter"
-[Suite]: /api/class-suite.mdx "Suite"
-[TestCase]: /api/class-testcase.mdx "TestCase"
-[TestError]: /api/class-testerror.mdx "TestError"
-[TestResult]: /api/class-testresult.mdx "TestResult"
-[TestStep]: /api/class-teststep.mdx "TestStep"
-[Элемент]: https://developer.mozilla.org/en-US/docs/Web/API/element "Элемент"
-[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Итератор"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Происхождение"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "селектор"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Сериализуемый"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
-
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
-[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
-[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
-[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
-[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
-[URL]: https://nodejs.org/api/url.html "URL"
-[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
-
-[все доступные теги изображений]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"
-[Реестр артефактов Microsoft]: https://mcr.microsoft.com/en-us/product/playwright/about "Реестр артефактов Microsoft"
-[Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"
+Например, рассмотрим сценарий, когда Playwright кликнет по кнопке `Sign Up` независимо от того, когда был вызван [locator.click()](/api/class-locator.mdx#locator-click):
+- страница проверяет, уникально ли имя пользователя, и кнопка `Sign Up` отключена;
+- после проверки с сервером отключенная кнопка `Sign Up` заменяется на другую, которая теперь включена.

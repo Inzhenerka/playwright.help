@@ -6,11 +6,9 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-
-Когда сетевой маршрут настраивается с помощью [page.route()](/api/class-page.mdx#page-route) или [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route), объект `Route` позволяет обрабатывать этот маршрут.
+Когда сетевая маршрутизация настроена с помощью [page.route()](/api/class-page.mdx#page-route) или [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route), объект `Route` позволяет управлять маршрутом.
 
 Узнайте больше о [сетевом взаимодействии](../network.mdx).
-
 
 ---
 
@@ -30,22 +28,22 @@ await route.abort(errorCode);
 ```
 
 **Аргументы**
-- `errorCode` [string] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-abort-option-error-code"/><a href="#route-abort-option-error-code" class="list-anchor">#</a>
+- `errorCode` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-abort-option-error-code"/><a href="#route-abort-option-error-code" class="list-anchor">#</a>
   
-  Необязательный код ошибки. По умолчанию `failed`, может быть одним из следующих:
-  * `'aborted'` - Операция была прервана (в результате действия пользователя)
+  Опциональный код ошибки. По умолчанию `failed`, может быть одним из следующих:
+  * `'aborted'` - Операция была прервана (из-за действия пользователя)
   * `'accessdenied'` - Доступ к ресурсу, отличному от сети, был запрещен
-  * `'addressunreachable'` - IP-адрес недоступен. Это обычно означает, что нет маршрута к указанному хосту или сети.
+  * `'addressunreachable'` - IP-адрес недоступен. Обычно это означает, что нет маршрута к указанному хосту или сети.
   * `'blockedbyclient'` - Клиент решил заблокировать запрос.
   * `'blockedbyresponse'` - Запрос не удался, потому что ответ был доставлен с требованиями, которые не были выполнены (например, проверки 'X-Frame-Options' и 'Content-Security-Policy').
-  * `'connectionaborted'` - Соединение было прервано из-за отсутствия ACK для отправленных данных.
+  * `'connectionaborted'` - Соединение прервано из-за отсутствия ACK для отправленных данных.
   * `'connectionclosed'` - Соединение было закрыто (соответствует TCP FIN).
   * `'connectionfailed'` - Попытка соединения не удалась.
   * `'connectionrefused'` - Попытка соединения была отклонена.
   * `'connectionreset'` - Соединение было сброшено (соответствует TCP RST).
-  * `'internetdisconnected'` - Соединение с Интернетом было потеряно.
-  * `'namenotresolved'` - Имя хоста не может быть разрешено.
-  * `'timedout'` - Операция превысила время ожидания.
+  * `'internetdisconnected'` - Интернет-соединение было потеряно.
+  * `'namenotresolved'` - Имя хоста не удалось разрешить.
+  * `'timedout'` - Операция завершилась по тайм-ауту.
   * `'failed'` - Произошла общая ошибка.
 
 **Возвращает**
@@ -57,7 +55,7 @@ await route.abort(errorCode);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>route.continue</x-search>
 
-Отправляет запрос маршрута в сеть с необязательными переопределениями.
+Отправляет запрос маршрута в сеть с возможностью переопределения.
 
 **Использование**
 
@@ -74,26 +72,26 @@ await page.route('**/*', async (route, request) => {
 ```
 
 **Аргументы**
-- `options` [Object] *(необязательный)*
-  - `headers` [Object]&lt;[string], [string]&gt; *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-continue-option-headers"/><a href="#route-continue-option-headers" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `headers` [Object]&lt;[string], [string]&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-continue-option-headers"/><a href="#route-continue-option-headers" class="list-anchor">#</a>
     
-    Если задано, изменяет HTTP-заголовки запроса. Значения заголовков будут преобразованы в строку.
-  - `method` [string] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-continue-option-method"/><a href="#route-continue-option-method" class="list-anchor">#</a>
+    Если установлено, изменяет HTTP-заголовки запроса. Значения заголовков будут преобразованы в строку.
+  - `method` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-continue-option-method"/><a href="#route-continue-option-method" class="list-anchor">#</a>
     
-    Если задано, изменяет метод запроса (например, GET или POST).
-  - `postData` [string] | [Buffer] | [Serializable] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-continue-option-post-data"/><a href="#route-continue-option-post-data" class="list-anchor">#</a>
+    Если установлено, изменяет метод запроса (например, GET или POST).
+  - `postData` [string] | [Buffer] | [Serializable] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-continue-option-post-data"/><a href="#route-continue-option-post-data" class="list-anchor">#</a>
     
-    Если задано, изменяет данные поста запроса.
-  - `url` [string] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-continue-option-url"/><a href="#route-continue-option-url" class="list-anchor">#</a>
+    Если установлено, изменяет данные post запроса.
+  - `url` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-continue-option-url"/><a href="#route-continue-option-url" class="list-anchor">#</a>
     
-    Если задано, изменяет URL запроса. Новый URL должен иметь тот же протокол, что и оригинальный.
+    Если установлено, изменяет URL запроса. Новый URL должен иметь тот же протокол, что и оригинальный.
 
 **Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-continue-return"/><a href="#route-continue-return" class="list-anchor">#</a>
 
-**Подробности**
+**Детали**
 
-Опция [headers](/api/class-route.mdx#route-continue-option-headers) применяется как к маршрутизируемому запросу, так и к любым перенаправлениям, которые он инициирует. Однако [url](/api/class-route.mdx#route-continue-option-url), [method](/api/class-route.mdx#route-continue-option-method) и [postData](/api/class-route.mdx#route-continue-option-post-data) применяются только к оригинальному запросу и не передаются на перенаправленные запросы.
+Опция [headers](/api/class-route.mdx#route-continue-option-headers) применяется как к маршрутизированному запросу, так и к любым перенаправлениям, которые он инициирует. Однако [url](/api/class-route.mdx#route-continue-option-url), [method](/api/class-route.mdx#route-continue-option-method) и [postData](/api/class-route.mdx#route-continue-option-post-data) применяются только к оригинальному запросу и не переносятся на перенаправленные запросы.
 
 [route.continue()](/api/class-route.mdx#route-continue) немедленно отправит запрос в сеть, другие соответствующие обработчики не будут вызваны. Используйте [route.fallback()](/api/class-route.mdx#route-fallback), если вы хотите, чтобы следующий соответствующий обработчик в цепочке был вызван.
 
@@ -103,11 +101,11 @@ await page.route('**/*', async (route, request) => {
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.23</font><x-search>route.fallback</x-search>
 
-Продолжает запрос маршрута с необязательными переопределениями. Метод аналогичен [route.continue()](/api/class-route.mdx#route-continue), с той разницей, что другие соответствующие обработчики будут вызваны перед отправкой запроса.
+Продолжает запрос маршрута с возможностью переопределения. Метод аналогичен [route.continue()](/api/class-route.mdx#route-continue), с той разницей, что другие соответствующие обработчики будут вызваны перед отправкой запроса.
 
 **Использование**
 
-Когда несколько маршрутов соответствуют заданному шаблону, они выполняются в порядке, обратном их регистрации. Таким образом, последний зарегистрированный маршрут всегда может переопределить все предыдущие. В приведенном ниже примере запрос будет обрабатываться сначала самым нижним обработчиком, затем он вернется к предыдущему, и в конце будет прерван первым зарегистрированным маршрутом.
+Когда несколько маршрутов соответствуют заданному шаблону, они выполняются в порядке, обратном их регистрации. Таким образом, последний зарегистрированный маршрут всегда может переопределить все предыдущие. В примере ниже запрос будет обработан сначала самым нижним обработчиком, затем он перейдет к предыдущему и в конце будет прерван первым зарегистрированным маршрутом.
 
 ```js
 await page.route('**/*', async route => {
@@ -124,10 +122,10 @@ await page.route('**/*', async route => {
 });
 ```
 
-Регистрация нескольких маршрутов полезна, когда вы хотите, чтобы отдельные обработчики обрабатывали разные виды запросов, например, API-вызовы против ресурсов страницы или GET-запросы против POST-запросов, как в приведенном ниже примере.
+Регистрация нескольких маршрутов полезна, когда вы хотите, чтобы отдельные обработчики обрабатывали разные виды запросов, например, API вызовы против ресурсов страницы или GET запросы против POST запросов, как в примере ниже.
 
 ```js
-// Обработка GET-запросов.
+// Обработка GET запросов.
 await page.route('**/*', async route => {
   if (route.request().method() !== 'GET') {
     await route.fallback();
@@ -137,7 +135,7 @@ await page.route('**/*', async route => {
   // ...
 });
 
-// Обработка POST-запросов.
+// Обработка POST запросов.
 await page.route('**/*', async route => {
   if (route.request().method() !== 'POST') {
     await route.fallback();
@@ -148,7 +146,7 @@ await page.route('**/*', async route => {
 });
 ```
 
-Также можно изменить запрос, возвращаясь к последующему обработчику, таким образом промежуточный обработчик маршрута может изменить url, метод, заголовки и postData запроса.
+Также можно изменить запрос, переходя к следующему обработчику, таким образом промежуточный обработчик маршрута может изменить url, метод, заголовки и postData запроса.
 
 ```js
 await page.route('**/*', async (route, request) => {
@@ -162,22 +160,22 @@ await page.route('**/*', async (route, request) => {
 });
 ```
 
-Используйте [route.continue()](/api/class-route.mdx#route-continue), чтобы немедленно отправить запрос в сеть, в этом случае другие соответствующие обработчики не будут вызваны.
+Используйте [route.continue()](/api/class-route.mdx#route-continue) для немедленной отправки запроса в сеть, в этом случае другие соответствующие обработчики не будут вызваны.
 
 **Аргументы**
-- `options` [Object] *(необязательный)*
-  - `headers` [Object]&lt;[string], [string]&gt; *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fallback-option-headers"/><a href="#route-fallback-option-headers" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `headers` [Object]&lt;[string], [string]&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fallback-option-headers"/><a href="#route-fallback-option-headers" class="list-anchor">#</a>
     
-    Если задано, изменяет HTTP-заголовки запроса. Значения заголовков будут преобразованы в строку.
-  - `method` [string] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fallback-option-method"/><a href="#route-fallback-option-method" class="list-anchor">#</a>
+    Если установлено, изменяет HTTP-заголовки запроса. Значения заголовков будут преобразованы в строку.
+  - `method` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fallback-option-method"/><a href="#route-fallback-option-method" class="list-anchor">#</a>
     
-    Если задано, изменяет метод запроса (например, GET или POST).
-  - `postData` [string] | [Buffer] | [Serializable] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fallback-option-post-data"/><a href="#route-fallback-option-post-data" class="list-anchor">#</a>
+    Если установлено, изменяет метод запроса (например, GET или POST).
+  - `postData` [string] | [Buffer] | [Serializable] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fallback-option-post-data"/><a href="#route-fallback-option-post-data" class="list-anchor">#</a>
     
-    Если задано, изменяет данные поста запроса.
-  - `url` [string] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fallback-option-url"/><a href="#route-fallback-option-url" class="list-anchor">#</a>
+    Если установлено, изменяет данные post запроса.
+  - `url` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fallback-option-url"/><a href="#route-fallback-option-url" class="list-anchor">#</a>
     
-    Если задано, изменяет URL запроса. Новый URL должен иметь тот же протокол, что и оригинальный. Изменение URL не повлияет на соответствие маршрута, все маршруты соответствуют исходному URL запроса.
+    Если установлено, изменяет URL запроса. Новый URL должен иметь тот же протокол, что и оригинальный. Изменение URL не повлияет на соответствие маршрута, все маршруты сопоставляются с использованием оригинального URL запроса.
 
 **Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fallback-return"/><a href="#route-fallback-return" class="list-anchor">#</a>
@@ -188,7 +186,7 @@ await page.route('**/*', async (route, request) => {
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.29</font><x-search>route.fetch</x-search>
 
-Выполняет запрос и получает результат, не выполняя его, чтобы ответ мог быть изменен и затем выполнен.
+Выполняет запрос и получает результат без его выполнения, чтобы ответ мог быть изменен и затем выполнен.
 
 **Использование**
 
@@ -202,35 +200,35 @@ await page.route('https://dog.ceo/api/breeds/list/all', async route => {
 ```
 
 **Аргументы**
-- `options` [Object] *(необязательный)*
-  - `headers` [Object]&lt;[string], [string]&gt; *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fetch-option-headers"/><a href="#route-fetch-option-headers" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `headers` [Object]&lt;[string], [string]&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fetch-option-headers"/><a href="#route-fetch-option-headers" class="list-anchor">#</a>
     
-    Если задано, изменяет HTTP-заголовки запроса. Значения заголовков будут преобразованы в строку.
-  - `maxRedirects` [number] *(необязательный)* <font size="2">Добавлено в: v1.31</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fetch-option-max-redirects"/><a href="#route-fetch-option-max-redirects" class="list-anchor">#</a>
+    Если установлено, изменяет HTTP-заголовки запроса. Значения заголовков будут преобразованы в строку.
+  - `maxRedirects` [number] *(опционально)* <font size="2">Добавлено в: v1.31</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fetch-option-max-redirects"/><a href="#route-fetch-option-max-redirects" class="list-anchor">#</a>
     
-    Максимальное количество перенаправлений запроса, которые будут автоматически выполнены. Если число превышено, будет выброшена ошибка. По умолчанию `20`. Установите `0`, чтобы не следовать перенаправлениям.
-  - `maxRetries` [number] *(необязательный)* <font size="2">Добавлено в: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fetch-option-max-retries"/><a href="#route-fetch-option-max-retries" class="list-anchor">#</a>
+    Максимальное количество перенаправлений запроса, которые будут автоматически следоваться. Ошибка будет выброшена, если количество превышено. По умолчанию `20`. Передайте `0`, чтобы не следовать перенаправлениям.
+  - `maxRetries` [number] *(опционально)* <font size="2">Добавлено в: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fetch-option-max-retries"/><a href="#route-fetch-option-max-retries" class="list-anchor">#</a>
     
-    Максимальное количество раз, которое следует повторить сетевые ошибки. В настоящее время повторяется только ошибка `ECONNRESET`. Не повторяет на основе кодов HTTP-ответов. Если лимит превышен, будет выброшена ошибка. По умолчанию `0` - без повторов.
-  - `method` [string] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fetch-option-method"/><a href="#route-fetch-option-method" class="list-anchor">#</a>
+    Максимальное количество повторных попыток при сетевых ошибках. В настоящее время повторно пытается только ошибку `ECONNRESET`. Не повторяет попытки на основе кодов ответа HTTP. Ошибка будет выброшена, если лимит превышен. По умолчанию `0` - без повторных попыток.
+  - `method` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fetch-option-method"/><a href="#route-fetch-option-method" class="list-anchor">#</a>
     
-    Если задано, изменяет метод запроса (например, GET или POST).
-  - `postData` [string] | [Buffer] | [Serializable] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fetch-option-post-data"/><a href="#route-fetch-option-post-data" class="list-anchor">#</a>
+    Если установлено, изменяет метод запроса (например, GET или POST).
+  - `postData` [string] | [Buffer] | [Serializable] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fetch-option-post-data"/><a href="#route-fetch-option-post-data" class="list-anchor">#</a>
     
-    Позволяет установить данные поста запроса. Если параметр данных является объектом, он будет сериализован в строку JSON, и заголовок `content-type` будет установлен в `application/json`, если не установлен явно. В противном случае заголовок `content-type` будет установлен в `application/octet-stream`, если не установлен явно.
-  - `timeout` [number] *(необязательный)* <font size="2">Добавлено в: v1.33</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fetch-option-timeout"/><a href="#route-fetch-option-timeout" class="list-anchor">#</a>
+    Позволяет установить данные post запроса. Если параметр данных является объектом, он будет сериализован в строку json, и заголовок `content-type` будет установлен в `application/json`, если не установлен явно. В противном случае заголовок `content-type` будет установлен в `application/octet-stream`, если не установлен явно.
+  - `timeout` [number] *(опционально)* <font size="2">Добавлено в: v1.33</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fetch-option-timeout"/><a href="#route-fetch-option-timeout" class="list-anchor">#</a>
     
-    Таймаут запроса в миллисекундах. По умолчанию `30000` (30 секунд). Установите `0`, чтобы отключить таймаут.
-  - `url` [string] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fetch-option-url"/><a href="#route-fetch-option-url" class="list-anchor">#</a>
+    Тайм-аут запроса в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут.
+  - `url` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fetch-option-url"/><a href="#route-fetch-option-url" class="list-anchor">#</a>
     
-    Если задано, изменяет URL запроса. Новый URL должен иметь тот же протокол, что и оригинальный.
+    Если установлено, изменяет URL запроса. Новый URL должен иметь тот же протокол, что и оригинальный.
 
 **Возвращает**
 - [Promise]&lt;[APIResponse]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fetch-return"/><a href="#route-fetch-return" class="list-anchor">#</a>
 
-**Подробности**
+**Детали**
 
-Обратите внимание, что опция [headers](/api/class-route.mdx#route-fetch-option-headers) будет применяться как к запрашиваемому запросу, так и к любым перенаправлениям, инициированным им. Если вы хотите применить [headers](/api/class-route.mdx#route-fetch-option-headers) только к оригинальному запросу, но не к перенаправлениям, посмотрите на [route.continue()](/api/class-route.mdx#route-continue).
+Обратите внимание, что опция [headers](/api/class-route.mdx#route-fetch-option-headers) будет применяться как к запрашиваемому запросу, так и к любым перенаправлениям, инициированным им. Если вы хотите применить [headers](/api/class-route.mdx#route-fetch-option-headers) только к оригинальному запросу, но не к перенаправлениям, рассмотрите возможность использования [route.continue()](/api/class-route.mdx#route-continue).
 
 ---
 
@@ -249,7 +247,7 @@ await page.route('**/*', async route => {
   await route.fulfill({
     status: 404,
     contentType: 'text/plain',
-    body: 'Не найдено!'
+    body: 'Not Found!'
   });
 });
 ```
@@ -261,28 +259,28 @@ await page.route('**/xhr_endpoint', route => route.fulfill({ path: 'mock_data.js
 ```
 
 **Аргументы**
-- `options` [Object] *(необязательный)*
-  - `body` [string] | [Buffer] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fulfill-option-body"/><a href="#route-fulfill-option-body" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `body` [string] | [Buffer] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fulfill-option-body"/><a href="#route-fulfill-option-body" class="list-anchor">#</a>
     
     Тело ответа.
-  - `contentType` [string] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fulfill-option-content-type"/><a href="#route-fulfill-option-content-type" class="list-anchor">#</a>
+  - `contentType` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fulfill-option-content-type"/><a href="#route-fulfill-option-content-type" class="list-anchor">#</a>
     
-    Если задано, эквивалентно установке заголовка ответа `Content-Type`.
-  - `headers` [Object]&lt;[string], [string]&gt; *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fulfill-option-headers"/><a href="#route-fulfill-option-headers" class="list-anchor">#</a>
+    Если установлено, эквивалентно установке заголовка ответа `Content-Type`.
+  - `headers` [Object]&lt;[string], [string]&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fulfill-option-headers"/><a href="#route-fulfill-option-headers" class="list-anchor">#</a>
     
     Заголовки ответа. Значения заголовков будут преобразованы в строку.
-  - `json` [Serializable] *(необязательный)* <font size="2">Добавлено в: v1.29</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fulfill-option-json"/><a href="#route-fulfill-option-json" class="list-anchor">#</a>
+  - `json` [Serializable] *(опционально)* <font size="2">Добавлено в: v1.29</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fulfill-option-json"/><a href="#route-fulfill-option-json" class="list-anchor">#</a>
     
-    JSON-ответ. Этот метод установит тип контента в `application/json`, если не установлен.
-  - `path` [string] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fulfill-option-path"/><a href="#route-fulfill-option-path" class="list-anchor">#</a>
+    JSON ответ. Этот метод установит тип содержимого в `application/json`, если не установлен.
+  - `path` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fulfill-option-path"/><a href="#route-fulfill-option-path" class="list-anchor">#</a>
     
-    Путь к файлу для ответа. Тип контента будет определен по расширению файла. Если `path` является относительным путем, он будет разрешен относительно текущего рабочего каталога.
-  - `response` [APIResponse] *(необязательный)* <font size="2">Добавлено в: v1.15</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fulfill-option-response"/><a href="#route-fulfill-option-response" class="list-anchor">#</a>
+    Путь к файлу для ответа. Тип содержимого будет определен из расширения файла. Если `path` является относительным путем, то он разрешается относительно текущей рабочей директории.
+  - `response` [APIResponse] *(опционально)* <font size="2">Добавлено в: v1.15</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fulfill-option-response"/><a href="#route-fulfill-option-response" class="list-anchor">#</a>
     
-    [APIResponse], с которым нужно выполнить запрос маршрута. Отдельные поля ответа (такие как заголовки) могут быть переопределены с помощью параметров выполнения.
-  - `status` [number] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fulfill-option-status"/><a href="#route-fulfill-option-status" class="list-anchor">#</a>
+    [APIResponse] для выполнения запроса маршрута. Отдельные поля ответа (такие как заголовки) могут быть переопределены с помощью опций выполнения.
+  - `status` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fulfill-option-status"/><a href="#route-fulfill-option-status" class="list-anchor">#</a>
     
-    Код состояния ответа, по умолчанию `200`.
+    Код статуса ответа, по умолчанию `200`.
 
 **Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fulfill-return"/><a href="#route-fulfill-return" class="list-anchor">#</a>
@@ -293,7 +291,7 @@ await page.route('**/xhr_endpoint', route => route.fulfill({ path: 'mock_data.js
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>route.request</x-search>
 
-Запрос, который должен быть маршрутизирован.
+Запрос, который будет маршрутизирован.
 
 **Использование**
 
@@ -303,106 +301,3 @@ route.request();
 
 **Возвращает**
 - [Request]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-request-return"/><a href="#route-request-return" class="list-anchor">#</a>
-
-
-[Accessibility]: /api/class-accessibility.mdx "Доступность"
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
-[APIRequest]: /api/class-apirequest.mdx "APIRequest"
-[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
-[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
-[Browser]: /api/class-browser.mdx "Browser"
-[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
-[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
-[BrowserType]: /api/class-browsertype.mdx "BrowserType"
-[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
-[Clock]: /api/class-clock.mdx "Clock"
-[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
-[Coverage]: /api/class-coverage.mdx "Coverage"
-[Dialog]: /api/class-dialog.mdx "Dialog"
-[Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
-[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
-[FileChooser]: /api/class-filechooser.mdx "FileChooser"
-[Frame]: /api/class-frame.mdx "Frame"
-[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
-[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
-[JSHandle]: /api/class-jshandle.mdx "JSHandle"
-[Keyboard]: /api/class-keyboard.mdx "Keyboard"
-[Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
-[Logger]: /api/class-logger.mdx "Logger"
-[Mouse]: /api/class-mouse.mdx "Mouse"
-[Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
-[Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
-[Request]: /api/class-request.mdx "Request"
-[Response]: /api/class-response.mdx "Response"
-[Route]: /api/class-route.mdx "Route"
-[Selectors]: /api/class-selectors.mdx "Selectors"
-[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
-[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
-[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: /api/class-tracing.mdx "Tracing"
-[Video]: /api/class-video.mdx "Video"
-[WebError]: /api/class-weberror.mdx "WebError"
-[WebSocket]: /api/class-websocket.mdx "WebSocket"
-[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
-[Worker]: /api/class-worker.mdx "Worker"
-[Fixtures]: /api/class-fixtures.mdx "Fixtures"
-[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
-[FullProject]: /api/class-fullproject.mdx "FullProject"
-[Location]: /api/class-location.mdx "Location"
-[Test]: /api/class-test.mdx "Test"
-[TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestInfo]: /api/class-testinfo.mdx "TestInfo"
-[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
-[TestOptions]: /api/class-testoptions.mdx "TestOptions"
-[TestProject]: /api/class-testproject.mdx "TestProject"
-[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
-[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
-[Reporter]: /api/class-reporter.mdx "Reporter"
-[Suite]: /api/class-suite.mdx "Suite"
-[TestCase]: /api/class-testcase.mdx "TestCase"
-[TestError]: /api/class-testerror.mdx "TestError"
-[TestResult]: /api/class-testresult.mdx "TestResult"
-[TestStep]: /api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Элемент"
-[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Итератор"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Происхождение"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "селектор"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Сериализуемый"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
-
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Массив"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Булев"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Буфер"
-[ChildProcess]: https://nodejs.org/api/child_process.html "Дочерний процесс"
-[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Дата"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Ошибка"
-[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Функция"
-[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Число"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Объект"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "строка"
-[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
-[URL]: https://nodejs.org/api/url.html "URL"
-[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"

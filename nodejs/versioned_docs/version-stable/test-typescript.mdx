@@ -8,9 +8,9 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Введение
 
-Playwright поддерживает TypeScript из коробки. Вы просто пишете тесты на TypeScript, а Playwright читает их, преобразует в JavaScript и выполняет.
+Playwright поддерживает TypeScript из коробки. Вы просто пишете тесты на TypeScript, и Playwright будет их читать, преобразовывать в JavaScript и запускать.
 
-Обратите внимание, что Playwright не проверяет типы и будет выполнять тесты даже в случае наличия некритических ошибок компиляции TypeScript. Мы рекомендуем запускать компилятор TypeScript вместе с Playwright. Например, в GitHub Actions:
+Обратите внимание, что Playwright не проверяет типы и будет запускать тесты, даже если есть некритические ошибки компиляции TypeScript. Мы рекомендуем запускать компилятор TypeScript вместе с Playwright. Например, в GitHub actions:
 
 ```yaml
 jobs:
@@ -18,9 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     ...
-    - name: Запуск проверки типов
+    - name: Run type checks
       run: npx tsc -p tsconfig.json --noEmit
-    - name: Запуск тестов Playwright
+    - name: Run Playwright tests
       run: npx playwright test
 ```
 
@@ -32,9 +32,9 @@ npx tsc -p tsconfig.json --noEmit -w
 
 ## tsconfig.json
 
-Playwright будет использовать `tsconfig.json` для каждого загружаемого исходного файла. Обратите внимание, что Playwright **поддерживает только** следующие параметры tsconfig: `allowJs`, `baseUrl`, `paths` и `references`.
+Playwright будет использовать `tsconfig.json` для каждого загружаемого исходного файла. Обратите внимание, что Playwright **поддерживает только** следующие опции tsconfig: `allowJs`, `baseUrl`, `paths` и `references`.
 
-Мы рекомендуем настроить отдельный `tsconfig.json` в директории тестов, чтобы вы могли изменить некоторые параметры специально для тестов. Вот пример структуры директорий.
+Мы рекомендуем настроить отдельный `tsconfig.json` в директории тестов, чтобы вы могли изменить некоторые предпочтения специально для тестов. Вот пример структуры директорий.
 
 ```txt
 src/
@@ -49,9 +49,9 @@ tsconfig.json  # общий tsconfig для всех исходников TypeSc
 playwright.config.ts
 ```
 
-### Сопоставление путей в tsconfig
+### Маппинг путей в tsconfig
 
-Playwright поддерживает [сопоставление путей](https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping), объявленное в `tsconfig.json`. Убедитесь, что `baseUrl` также установлен.
+Playwright поддерживает [маппинг путей](https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping), объявленный в `tsconfig.json`. Убедитесь, что `baseUrl` также установлен.
 
 Вот пример `tsconfig.json`, который работает с Playwright:
 
@@ -60,13 +60,13 @@ Playwright поддерживает [сопоставление путей](http
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@myhelper/*": ["packages/myhelper/*"] // Это сопоставление относительно "baseUrl".
+      "@myhelper/*": ["packages/myhelper/*"] // Это отображение относительно "baseUrl".
     }
   }
 }
 ```
 
-Теперь вы можете импортировать, используя сопоставленные пути:
+Теперь вы можете импортировать, используя отображенные пути:
 
 ```js title="example.spec.ts"
 import { test, expect } from '@playwright/test';
@@ -80,21 +80,21 @@ test('example', async ({ page }) => {
 
 ### Разрешение tsconfig
 
-По умолчанию Playwright будет искать ближайший tsconfig для каждого импортированного файла, поднимаясь по структуре директорий и ища `tsconfig.json` или `jsconfig.json`. Таким образом, вы можете создать файл `tests/tsconfig.json`, который будет использоваться только для ваших тестов, и Playwright автоматически его подберет.
+По умолчанию Playwright будет искать ближайший tsconfig для каждого импортированного файла, поднимаясь по структуре директорий и ища `tsconfig.json` или `jsconfig.json`. Таким образом, вы можете создать файл `tests/tsconfig.json`, который будет использоваться только для ваших тестов, и Playwright автоматически его подхватит.
 
 ```sh
 # Playwright автоматически выберет tsconfig
 npx playwright test
 ```
 
-В качестве альтернативы вы можете указать один tsconfig файл для использования в командной строке, и Playwright будет использовать его для всех импортированных файлов, а не только для тестовых файлов.
+В качестве альтернативы, вы можете указать один файл tsconfig для использования в командной строке, и Playwright будет использовать его для всех импортированных файлов, а не только для тестовых файлов.
 
 ```sh
 # Указать конкретный tsconfig
 npx playwright test --tsconfig=tsconfig.test.json
 ```
 
-Вы можете указать один tsconfig файл в конфигурационном файле, который будет использоваться для загрузки тестовых файлов, репортеров и т.д. Однако он не будет использоваться при загрузке самого конфигурационного файла playwright или любых файлов, импортированных из него.
+Вы можете указать один файл tsconfig в конфигурационном файле, который будет использоваться для загрузки тестовых файлов, репортеров и т.д. Однако он не будет использоваться при загрузке самого конфигурационного файла playwright или любых файлов, импортированных из него.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -104,9 +104,9 @@ export default defineConfig({
 });
 ```
 
-## Ручная компиляция тестов с TypeScript
+## Ручная компиляция тестов с помощью TypeScript
 
-Иногда Playwright Test не сможет правильно преобразовать ваш код на TypeScript, например, когда вы используете экспериментальные или очень новые функции TypeScript, обычно настраиваемые в `tsconfig.json`.
+Иногда Playwright Test не сможет правильно преобразовать ваш код TypeScript, например, когда вы используете экспериментальные или очень новые функции TypeScript, обычно настроенные в `tsconfig.json`.
 
 В этом случае вы можете выполнить собственную компиляцию TypeScript перед отправкой тестов в Playwright.
 
@@ -135,6 +135,6 @@ export default defineConfig({
 }
 ```
 
-Скрипт `pretest` запускает TypeScript на тестах. `test` будет запускать тесты, которые были сгенерированы в директории `tests-out`. Аргумент `-c` настраивает тестовый раннер на поиск тестов внутри директории `tests-out`.
+Скрипт `pretest` запускает TypeScript на тестах. `test` будет запускать тесты, которые были сгенерированы в директорию `tests-out`. Аргумент `-c` настраивает тестовый раннер на поиск тестов внутри директории `tests-out`.
 
-Теперь команда `npm run test` соберет тесты и запустит их.
+Затем `npm run test` соберет тесты и запустит их.

@@ -11,22 +11,22 @@ import HTMLCard from '@site/src/components/HTMLCard';
 Playwright поддерживает теги и аннотации, которые отображаются в отчете о тестировании.
 
 Вы можете добавлять свои собственные теги и аннотации в любой момент, но Playwright поставляется с несколькими встроенными:
-- [test.skip()](/api/class-test.mdx#test-skip) помечает тест как неактуальный. Playwright не выполняет такой тест. Используйте эту аннотацию, когда тест не применим в какой-либо конфигурации.
-- [test.fail()](/api/class-test.mdx#test-fail) помечает тест как провалившийся. Playwright выполнит этот тест и убедится, что он действительно проваливается. Если тест не проваливается, Playwright выдаст предупреждение.
-- [test.fixme()](/api/class-test.mdx#test-fixme) помечает тест как провалившийся. В отличие от аннотации `fail`, Playwright не будет выполнять этот тест. Используйте `fixme`, когда выполнение теста медленное или вызывает сбой.
-- [test.slow()](/api/class-test.mdx#test-slow) помечает тест как медленный и утрачивает время ожидания теста в три раза.
+- [test.skip()](/api/class-test.mdx#test-skip) помечает тест как неактуальный. Playwright не запускает такой тест. Используйте эту аннотацию, когда тест не применим в какой-либо конфигурации.
+- [test.fail()](/api/class-test.mdx#test-fail) помечает тест как неудачный. Playwright запустит этот тест и убедится, что он действительно неудачен. Если тест не провалится, Playwright сообщит об этом.
+- [test.fixme()](/api/class-test.mdx#test-fixme) помечает тест как неудачный. Playwright не будет запускать этот тест, в отличие от аннотации `fail`. Используйте `fixme`, когда выполнение теста медленное или приводит к сбоям.
+- [test.slow()](/api/class-test.mdx#test-slow) помечает тест как медленный и утрояет тайм-аут теста.
 
 Аннотации могут быть добавлены к одному тесту или группе тестов.
 
-Встроенные аннотации могут быть условными, в этом случае они применяются, когда условие истинно, и могут зависеть от тестовых фикстур. На одном и том же тесте может быть несколько аннотаций, возможно, в разных конфигурациях.
+Встроенные аннотации могут быть условными, в этом случае они применяются, когда условие истинно, и могут зависеть от тестовых фикстур. На одном тесте может быть несколько аннотаций, возможно, в разных конфигурациях.
 
 ## Сфокусировать тест
 
-Вы можете сфокусировать некоторые тесты. Когда есть сфокусированные тесты, выполняются только эти тесты.
+Вы можете сфокусировать некоторые тесты. Когда есть сфокусированные тесты, запускаются только они.
 
 ```js
-test.only('сфокусировать этот тест', async ({ page }) => {
-  // Выполнять только сфокусированные тесты во всем проекте.
+test.only('focus this test', async ({ page }) => {
+  // Run only focused tests in the entire project.
 });
 ```
 
@@ -35,18 +35,18 @@ test.only('сфокусировать этот тест', async ({ page }) => {
 Пометьте тест как пропущенный.
 
 ```js
-test.skip('пропустить этот тест', async ({ page }) => {
-  // Этот тест не выполняется
+test.skip('skip this test', async ({ page }) => {
+  // This test is not run
 });
 ```
 
 ## Условно пропустить тест
 
-Вы можете пропустить определенный тест на основе условия.
+Вы можете пропустить определенные тесты в зависимости от условия.
 
 ```js
-test('пропустить этот тест', async ({ page, browserName }) => {
-  test.skip(browserName === 'firefox', 'Все еще работаем над этим');
+test('skip this test', async ({ page, browserName }) => {
+  test.skip(browserName === 'firefox', 'Still working on it');
 });
 ```
 
@@ -57,12 +57,12 @@ test('пропустить этот тест', async ({ page, browserName }) => 
 ```js
 import { test, expect } from '@playwright/test';
 
-test.describe('две теста', () => {
-  test('один', async ({ page }) => {
+test.describe('two tests', () => {
+  test('one', async ({ page }) => {
     // ...
   });
 
-  test('два', async ({ page }) => {
+  test('two', async ({ page }) => {
     // ...
   });
 });
@@ -70,20 +70,20 @@ test.describe('две теста', () => {
 
 ## Тегирование тестов
 
-Иногда вы хотите пометить свои тесты как `@fast` или `@slow`, а затем фильтровать по тегу в отчете о тестировании. Или вы можете захотеть выполнять только тесты, которые имеют определенный тег.
+Иногда вы хотите пометить свои тесты как `@fast` или `@slow`, а затем фильтровать по тегу в отчете о тестировании. Или вы можете захотеть запускать только тесты, которые имеют определенный тег.
 
-Чтобы пометить тест, либо предоставьте дополнительный объект деталей при объявлении теста, либо добавьте токен `@` к заголовку теста. Обратите внимание, что теги должны начинаться с символа `@`.
+Чтобы пометить тест, либо предоставьте дополнительный объект с деталями при объявлении теста, либо добавьте токен `@` к заголовку теста. Обратите внимание, что теги должны начинаться с символа `@`.
 
 ```js
 import { test, expect } from '@playwright/test';
 
-test('тест страницы входа', {
+test('test login page', {
   tag: '@fast',
 }, async ({ page }) => {
   // ...
 });
 
-test('тест полного отчета @slow', async ({ page }) => {
+test('test full report @slow', async ({ page }) => {
   // ...
 });
 ```
@@ -93,14 +93,14 @@ test('тест полного отчета @slow', async ({ page }) => {
 ```js
 import { test, expect } from '@playwright/test';
 
-test.describe('группа', {
+test.describe('group', {
   tag: '@report',
 }, () => {
-  test('тест заголовка отчета', async ({ page }) => {
+  test('test report header', async ({ page }) => {
     // ...
   });
 
-  test('тест полного отчета', {
+  test('test full report', {
     tag: ['@slow', '@vrt'],
   }, async ({ page }) => {
     // ...
@@ -176,7 +176,7 @@ npx playwright test --grep-invert @fast
 </TabItem>
 </Tabs>
 
-Чтобы запустить тесты, содержащие любой тег (логический оператор `OR`):
+Чтобы запустить тесты, содержащие любой из тегов (логический оператор `OR`):
 
 <Tabs
   groupId="bash-flavor"
@@ -210,24 +210,24 @@ npx playwright test --grep "@fast^|@slow"
 </TabItem>
 </Tabs>
 
-Или запустите тесты, содержащие оба тега (логический оператор `AND`), используя регулярные выражения:
+Или запустить тесты, содержащие оба тега (логический оператор `AND`), используя lookaheads в регулярных выражениях:
 
 ```bash
 npx playwright test --grep "(?=.*@fast)(?=.*@slow)"
 ```
 
-Вы также можете фильтровать тесты в конфигурационном файле через [testConfig.grep](/api/class-testconfig.mdx#test-config-grep) и [testProject.grep](/api/class-testproject.mdx#test-project-grep).
+Вы также можете фильтровать тесты в файле конфигурации через [testConfig.grep](/api/class-testconfig.mdx#test-config-grep) и [testProject.grep](/api/class-testproject.mdx#test-project-grep).
 
 ## Аннотирование тестов
 
-Если вы хотите аннотировать свои тесты чем-то более значительным, чем тег, вы можете сделать это при объявлении теста. Аннотации имеют `type` и `description` для дополнительного контекста и доступны в API репортера. Встроенный HTML-репортер Playwright показывает все аннотации, кроме тех, где `type` начинается с символа `_`.
+Если вы хотите аннотировать свои тесты чем-то более значительным, чем тег, вы можете сделать это при объявлении теста. Аннотации имеют `type` и `description` для большего контекста и доступны в API репортера. Встроенный HTML-репортер Playwright показывает все аннотации, кроме тех, где `type` начинается с символа `_`.
 
-Например, чтобы аннотировать тест с URL проблемы:
+Например, чтобы аннотировать тест с URL-адресом проблемы:
 
 ```js
 import { test, expect } from '@playwright/test';
 
-test('тест страницы входа', {
+test('test login page', {
   annotation: {
     type: 'issue',
     description: 'https://github.com/microsoft/playwright/issues/23180',
@@ -242,17 +242,17 @@ test('тест страницы входа', {
 ```js
 import { test, expect } from '@playwright/test';
 
-test.describe('тесты отчета', {
-  annotation: { type: 'category', description: 'отчет' },
+test.describe('report tests', {
+  annotation: { type: 'category', description: 'report' },
 }, () => {
-  test('тест заголовка отчета', async ({ page }) => {
+  test('test report header', async ({ page }) => {
     // ...
   });
 
-  test('тест полного отчета', {
+  test('test full report', {
     annotation: [
       { type: 'issue', description: 'https://github.com/microsoft/playwright/issues/23180' },
-      { type: 'performance', description: 'очень медленный тест!' },
+      { type: 'performance', description: 'very slow test!' },
     ],
   }, async ({ page }) => {
     // ...
@@ -262,57 +262,164 @@ test.describe('тесты отчета', {
 
 ## Условно пропустить группу тестов
 
-Например, вы можете запустить группу тестов только в Chromium, передав обратный вызов.
+Например, вы можете запустить группу тестов только в Chromium, передав callback.
 
 ```js title="example.spec.ts"
 
-test.describe('только для chromium', () => {
-  test.skip(({ browserName }) => browserName !== 'chromium', 'Только для Chromium!');
+test.describe('chromium only', () => {
+  test.skip(({ browserName }) => browserName !== 'chromium', 'Chromium only!');
 
   test.beforeAll(async () => {
-    // Этот хук выполняется только в Chromium.
+    // This hook is only run in Chromium.
   });
 
-  test('тест 1', async ({ page }) => {
-    // Этот тест выполняется только в Chromium.
+  test('test 1', async ({ page }) => {
+    // This test is only run in Chromium.
   });
 
-  test('тест 2', async ({ page }) => {
-    // Этот тест выполняется только в Chromium.
+  test('test 2', async ({ page }) => {
+    // This test is only run in Chromium.
   });
 });
 ```
 
-## Используйте fixme в хуке `beforeEach`
+## Использование fixme в хуке `beforeEach`
 
 Чтобы избежать выполнения хуков `beforeEach`, вы можете поместить аннотации в сам хук.
 
 ```js title="example.spec.ts"
 
 test.beforeEach(async ({ page, isMobile }) => {
-  test.fixme(isMobile, 'Страница настроек пока не работает на мобильных устройствах');
+  test.fixme(isMobile, 'Settings page does not work in mobile yet');
 
   await page.goto('http://localhost:3000/settings');
 });
 
-test('профиль пользователя', async ({ page }) => {
-  await page.getByText('Мой профиль').click();
+test('user profile', async ({ page }) => {
+  await page.getByText('My Profile').click();
   // ...
 });
 ```
 
 ## Аннотации во время выполнения
 
-Во время выполнения теста вы можете добавлять аннотации в [`test.info().annotations`](./api/class-testinfo#test-info-annotations).
+Пока тест уже выполняется, вы можете добавлять аннотации в [`test.info().annotations`](./api/class-testinfo#test-info-annotations).
 
 ```js title="example.spec.ts"
 
-test('пример теста', async ({ page, browser }) => {
+test('example test', async ({ page, browser }) => {
   test.info().annotations.push({
-    type: 'версия браузера',
+    type: 'browser version',
     description: browser.version(),
   });
 
   // ...
 });
 ```
+
+
+[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
+[APIRequest]: /api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
+[Browser]: /api/class-browser.mdx "Browser"
+[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[Clock]: /api/class-clock.mdx "Clock"
+[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: /api/class-coverage.mdx "Coverage"
+[Dialog]: /api/class-dialog.mdx "Dialog"
+[Download]: /api/class-download.mdx "Download"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[Frame]: /api/class-frame.mdx "Frame"
+[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
+[JSHandle]: /api/class-jshandle.mdx "JSHandle"
+[Keyboard]: /api/class-keyboard.mdx "Keyboard"
+[Locator]: /api/class-locator.mdx "Locator"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
+[Logger]: /api/class-logger.mdx "Logger"
+[Mouse]: /api/class-mouse.mdx "Mouse"
+[Page]: /api/class-page.mdx "Page"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
+[Playwright]: /api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
+[Request]: /api/class-request.mdx "Request"
+[Response]: /api/class-response.mdx "Response"
+[Route]: /api/class-route.mdx "Route"
+[Selectors]: /api/class-selectors.mdx "Selectors"
+[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
+[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: /api/class-tracing.mdx "Tracing"
+[Video]: /api/class-video.mdx "Video"
+[WebError]: /api/class-weberror.mdx "WebError"
+[WebSocket]: /api/class-websocket.mdx "WebSocket"
+[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[Worker]: /api/class-worker.mdx "Worker"
+[Fixtures]: /api/class-fixtures.mdx "Fixtures"
+[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
+[FullProject]: /api/class-fullproject.mdx "FullProject"
+[Location]: /api/class-location.mdx "Location"
+[Test]: /api/class-test.mdx "Test"
+[TestConfig]: /api/class-testconfig.mdx "TestConfig"
+[TestInfo]: /api/class-testinfo.mdx "TestInfo"
+[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
+[TestOptions]: /api/class-testoptions.mdx "TestOptions"
+[TestProject]: /api/class-testproject.mdx "TestProject"
+[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
+[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
+[Reporter]: /api/class-reporter.mdx "Reporter"
+[Suite]: /api/class-suite.mdx "Suite"
+[TestCase]: /api/class-testcase.mdx "TestCase"
+[TestError]: /api/class-testerror.mdx "TestError"
+[TestResult]: /api/class-testresult.mdx "TestResult"
+[TestStep]: /api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
+
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
+[Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

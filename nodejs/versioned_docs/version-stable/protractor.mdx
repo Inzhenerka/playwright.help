@@ -8,9 +8,9 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Принципы миграции
 - Нет необходимости в "webdriver-manager" / Selenium.
-- [ElementFinder] Protractor ⇄ [Playwright Test Locator](./api/class-locator)
-- [`waitForAngular`] Protractor ⇄ Playwright Test [авто-ожидание](./actionability.mdx)
-- Не забудьте использовать await в Playwright Test
+- [ElementFinder] из Protractor ⇄ [Playwright Test Locator](./api/class-locator)
+- [`waitForAngular`] из Protractor ⇄ [авто-ожидание](./actionability.mdx) в Playwright Test
+- Не забывайте использовать await в Playwright Test
 
 ## Шпаргалка
 
@@ -43,7 +43,7 @@ describe('angularjs homepage todo list', function() {
     expect(todoList.count()).toEqual(3);
     expect(todoList.get(2).getText()).toEqual('first test');
 
-    // Вы написали свой первый тест, отметьте его в списке
+    // Вы написали свой первый тест, вычеркните его из списка
     todoList.get(2).element(by.css('input')).click();
     const completedAmount = element.all(by.css('.done-true'));
     expect(completedAmount.count()).toEqual(2);
@@ -51,7 +51,7 @@ describe('angularjs homepage todo list', function() {
 });
 ```
 
-Пошаговая миграция на Playwright Test:
+Построчная миграция в Playwright Test:
 
 ```js
 const { test, expect } = require('@playwright/test'); // 1
@@ -69,7 +69,7 @@ test.describe('angularjs homepage todo list', () => {
       useInnerText: true,
     });
 
-    // Вы написали свой первый тест, отметьте его в списке
+    // Вы написали свой первый тест, вычеркните его из списка
     await todoList.nth(2).getByRole('textbox').click();
     const completedAmount = page.locator('.done-true');
     await expect(completedAmount).toHaveCount(2);
@@ -77,20 +77,20 @@ test.describe('angularjs homepage todo list', () => {
 });
 ```
 
-Основные моменты миграции (см. встроенные комментарии в коде Playwright Test):
+Основные моменты миграции (см. комментарии в коде Playwright Test):
 1. Каждый файл Playwright Test имеет явный импорт функций `test` и `expect`
 1. Функция теста помечена как `async`
 1. Playwright Test получает `page` в качестве одного из своих параметров. Это один из многих [полезных фикстур](./api/class-fixtures) в Playwright Test.
-1. Почти все вызовы Playwright начинаются с `await`
-1. Создание локатора с помощью [page.locator()](/api/class-page.mdx#page-locator) — это один из немногих методов, который является синхронным.
+1. Почти все вызовы Playwright предваряются `await`
+1. Создание локатора с помощью [page.locator()](/api/class-page.mdx#page-locator) является одним из немногих методов, которые синхронны.
 
-## Полифиллинг `waitForAngular`
+## Полифил `waitForAngular`
 
-Playwright Test имеет встроенное [авто-ожидание](./actionability.mdx), что делает `waitForAngular` из Protractor ненужным в общем случае.
+Playwright Test имеет встроенное [авто-ожидание](./actionability.mdx), которое делает ненужным использование `waitForAngular` из Protractor в общем случае.
 
-Тем не менее, это может быть полезно в некоторых крайних случаях. Вот как полифилить функцию `waitForAngular` в Playwright Test:
-1. Убедитесь, что у вас установлен Protractor в вашем package.json
-1. Функция полифилла
+Однако, это может быть полезно в некоторых крайних случаях. Вот как можно создать полифил для функции `waitForAngular` в Playwright Test:
+1. Убедитесь, что у вас установлен protractor в вашем package.json
+1. Функция полифила
    
    ```js
    async function waitForAngular(page) {
@@ -114,7 +114,7 @@ Playwright Test имеет встроенное [авто-ожидание](./ac
    }
    ```
    
-   Если вы не хотите держать версию Protractor, вы также можете использовать этот более простой подход с этой функцией (работает только для Angular 2+):
+   Если вы не хотите оставлять версию protractor, вы также можете использовать этот более простой подход с использованием этой функции (работает только для Angular 2+):
    
    ```js
    async function waitForAngular(page) {
@@ -132,7 +132,7 @@ Playwright Test имеет встроенное [авто-ожидание](./ac
    }
    ```
    
-1. Использование полифилла
+1. Использование полифила
    
    ```js
    const page = await context.newPage();
@@ -142,19 +142,19 @@ Playwright Test имеет встроенное [авто-ожидание](./ac
    
 ## Суперспособности Playwright Test
 
-Как только вы перейдете на Playwright Test, вы получите много преимуществ!
-- Полная поддержка TypeScript без конфигурации
-- Запуск тестов на **всех веб-движках** (Chrome, Firefox, Safari) на **любых популярных операционных системах** (Windows, macOS, Ubuntu)
-- Полная поддержка нескольких источников, [(i)frames](./api/class-frame), [вкладок и контекстов](./pages)
-- Запуск тестов параллельно на нескольких браузерах
+Как только вы перейдете на Playwright Test, вы получите множество преимуществ!
+- Полная поддержка TypeScript без необходимости настройки
+- Запуск тестов на **всех веб-движках** (Chrome, Firefox, Safari) на **любой популярной операционной системе** (Windows, macOS, Ubuntu)
+- Полная поддержка нескольких источников, [(i)фреймов](./api/class-frame), [вкладок и контекстов](./pages)
+- Запуск тестов параллельно в нескольких браузерах
 - Встроенный сбор [артефактов тестирования](./test-use-options.mdx#recording-options)
 
-Вы также получаете все эти ✨ потрясающие инструменты ✨, которые идут в комплекте с Playwright Test:
+Вы также получите все эти ✨ потрясающие инструменты ✨, которые поставляются в комплекте с Playwright Test:
 - [Playwright Inspector](./debug.mdx)
 - [Генерация кода Playwright Test](./codegen-intro.mdx)
-- [Playwright Tracing](./trace-viewer.mdx) для отладки после завершения
+- [Playwright Tracing](./trace-viewer.mdx) для постмортем-отладки
 
-## Дальнейшее чтение
+## Дополнительное чтение
 
 Узнайте больше о тестовом раннере Playwright:
 - [Начало работы](./intro)

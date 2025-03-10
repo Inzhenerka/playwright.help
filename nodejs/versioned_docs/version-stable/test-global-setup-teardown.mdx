@@ -8,11 +8,11 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Введение
 
-Существует два способа настройки глобальной настройки и завершения: с использованием глобального файла настройки и его указанием в конфигурации под [`globalSetup`](#option-2-configure-globalsetup-and-globalteardown) или с использованием [зависимостей проекта](#option-1-project-dependencies). При использовании зависимостей проекта вы определяете проект, который выполняется перед всеми другими проектами. Это рекомендуемый способ настройки глобальной настройки, так как с зависимостями проекта ваш HTML-отчет будет показывать глобальную настройку, просмотрщик трасс будет записывать трассу настройки, и можно будет использовать фикстуры.
+Существует два способа настройки глобальной инициализации и завершения: использование глобального файла настройки и установка в конфигурации через [`globalSetup`](#option-2-configure-globalsetup-and-globalteardown) или использование [зависимостей проекта](#option-1-project-dependencies). С помощью зависимостей проекта вы определяете проект, который запускается перед всеми другими проектами. Это рекомендуемый способ настройки глобальной инициализации, так как с зависимостями проекта ваш HTML-отчет будет показывать глобальную настройку, средство просмотра трассировки будет записывать трассировку настройки, и можно использовать фикстуры.
 
 ## Вариант 1: Зависимости проекта
 
-[Зависимости проекта](./api/class-testproject#test-project-dependencies) — это список проектов, которые должны выполняться перед запуском тестов в другом проекте. Они могут быть полезны для настройки действий глобальной настройки, чтобы один проект зависел от выполнения этого проекта первым. Использование зависимостей позволяет глобальной настройке производить трассы и другие артефакты.
+[Зависимости проекта](./api/class-testproject#test-project-dependencies) — это список проектов, которые должны быть выполнены перед запуском тестов в другом проекте. Они могут быть полезны для настройки глобальных действий, чтобы один проект зависел от выполнения другого. Использование зависимостей позволяет глобальной настройке создавать трассировки и другие артефакты.
 
 ### Настройка
 
@@ -36,7 +36,7 @@ export default defineConfig({
 });
 ```
 
-Затем мы добавляем свойство [testProject.dependencies](/api/class-testproject.mdx#test-project-dependencies) к нашим проектам, которые зависят от проекта настройки, и передаем в массив имя нашего зависимого проекта, которое мы определили на предыдущем шаге:
+Затем мы добавляем свойство [testProject.dependencies](/api/class-testproject.mdx#test-project-dependencies) к нашим проектам, которые зависят от проекта настройки, и передаем в массив имя нашего проекта-зависимости, который мы определили на предыдущем шаге:
 
 ```js title="playwright.config.ts"
 import { defineConfig, devices } from '@playwright/test';
@@ -58,13 +58,13 @@ export default defineConfig({
 });
 ```
 
-В этом примере проект 'chromium with db' зависит от проекта 'setup db'. Затем мы создаем тест настройки, который хранится на корневом уровне вашего проекта (обратите внимание, что код настройки и завершения должен быть определен как обычные тесты, вызывая функцию [test()](./api/class-test#test-call)):
+В этом примере проект 'chromium with db' зависит от проекта 'setup db'. Затем мы создаем тест настройки, который хранится на корневом уровне вашего проекта (обратите внимание, что код настройки и завершения должен быть определен как обычные тесты с помощью вызова функции [test()](./api/class-test#test-call)):
 
 ```js title="tests/global.setup.ts"
 import { test as setup } from '@playwright/test';
 
 setup('create new database', async ({ }) => {
-  console.log('создание новой базы данных...');
+  console.log('creating new database...');
   // Инициализация базы данных
 });
 ```
@@ -79,7 +79,7 @@ test('menu', async ({ page }) => {
 
 ### Завершение
 
-Вы можете завершить вашу настройку, добавив свойство [testProject.teardown](/api/class-testproject.mdx#test-project-teardown) к вашему проекту настройки. Это будет выполнено после того, как все зависимые проекты будут выполнены.
+Вы можете завершить настройку, добавив свойство [testProject.teardown](/api/class-testproject.mdx#test-project-teardown) к вашему проекту настройки. Это будет выполнено после того, как все зависимые проекты будут выполнены.
 
 Сначала мы добавляем свойство [testProject.teardown](/api/class-testproject.mdx#test-project-teardown) к нашему проекту настройки с именем 'cleanup db', которое мы дали нашему проекту завершения на предыдущем шаге:
 
@@ -108,13 +108,13 @@ export default defineConfig({
 });
 ```
 
-Затем мы создаем файл `global.teardown.ts` в каталоге tests вашего проекта. Этот файл будет использоваться для удаления данных из базы данных после выполнения всех тестов.
+Затем мы создаем файл `global.teardown.ts` в каталоге тестов вашего проекта. Он будет использоваться для удаления данных из базы данных после выполнения всех тестов.
 
 ```js title="tests/global.teardown.ts"
 import { test as teardown } from '@playwright/test';
 
 teardown('delete database', async ({ }) => {
-  console.log('удаление тестовой базы данных...');
+  console.log('deleting test database...');
   // Удаление базы данных
 });
 ```
@@ -122,24 +122,24 @@ teardown('delete database', async ({ }) => {
 ### Больше примеров
 
 Для более подробных примеров ознакомьтесь с:
-- нашим [руководством по аутентификации](./auth.mdx)
-- нашей статьей в блоге [Лучшая глобальная настройка в Playwright с повторным использованием входа с зависимостями проекта](https://dev.to/playwright/a-better-global-setup-in-playwright-reusing-login-with-project-dependencies-14)
-- [видео о релизе v1.31](https://youtu.be/PI50YAPTAs4), чтобы увидеть демонстрацию
+- нашим руководством по [аутентификации](./auth.mdx)
+- нашим блогом [Лучший глобальный сетап в Playwright с повторным использованием входа с зависимостями проекта](https://dev.to/playwright/a-better-global-setup-in-playwright-reusing-login-with-project-dependencies-14)
+- [видео о выпуске v1.31](https://youtu.be/PI50YAPTAs4), чтобы увидеть демонстрацию
 
 ## Вариант 2: Настройка globalSetup и globalTeardown
 
 Вы можете использовать опцию `globalSetup` в [файле конфигурации](./test-configuration.mdx#advanced-configuration), чтобы настроить что-то один раз перед запуском всех тестов. Глобальный файл настройки должен экспортировать одну функцию, которая принимает объект конфигурации. Эта функция будет выполнена один раз перед всеми тестами.
 
-Аналогично, используйте `globalTeardown`, чтобы выполнить что-то один раз после всех тестов. В качестве альтернативы, позвольте `globalSetup` вернуть функцию, которая будет использоваться в качестве глобального завершения. Вы можете передавать данные, такие как номер порта, токены аутентификации и т. д., из вашей глобальной настройки в ваши тесты с помощью переменных окружения.
+Аналогично, используйте `globalTeardown`, чтобы выполнить что-то один раз после всех тестов. В качестве альтернативы, пусть `globalSetup` возвращает функцию, которая будет использоваться как глобальное завершение. Вы можете передавать данные, такие как номер порта, токены аутентификации и т.д., из вашей глобальной настройки в ваши тесты, используя переменные окружения.
 
 :::note
 
-Обратите внимание на предостережения по поводу `globalSetup` и `globalTeardown`:
-- Эти методы не будут производить трассы или артефакты, если это не будет явно включено, как описано в [Запись трассы ошибок во время глобальной настройки](#capturing-trace-of-failures-during-global-setup).
-- Опции, такие как `headless` или `testIdAttribute`, указанные в файле конфигурации, не применяются,
+Будьте осторожны с ограничениями `globalSetup` и `globalTeardown`:
+- Эти методы не будут создавать трассировки или артефакты, если они не включены явно, как описано в разделе [Захват трассировки ошибок во время глобальной настройки](#capturing-trace-of-failures-during-global-setup).
+- Опции, такие как `headless` или `testIdAttribute`, указанные в файле конфигурации, не применяются.
 - Необработанное исключение, выброшенное в `globalSetup`, предотвратит выполнение тестов Playwright, и результаты тестов не появятся в отчетах.
 
-Рекомендуется использовать [зависимости проекта](#option-1-project-dependencies), чтобы производить трассы, артефакты, учитывать параметры конфигурации и получать результаты тестов в отчетах даже в случае сбоя настройки.
+Рассмотрите возможность использования [зависимостей проекта](#option-1-project-dependencies), чтобы создавать трассировки, артефакты, учитывать параметры конфигурации и получать результаты тестов в отчетах даже в случае сбоя настройки.
 :::
 
 ```js title="playwright.config.ts"
@@ -153,7 +153,7 @@ export default defineConfig({
 
 ### Пример
 
-Вот пример глобальной настройки, которая аутентифицирует один раз и повторно использует состояние аутентификации в тестах. Он использует параметры `baseURL` и `storageState` из файла конфигурации.
+Вот пример глобальной настройки, которая аутентифицируется один раз и повторно использует состояние аутентификации в тестах. Она использует опции `baseURL` и `storageState` из файла конфигурации.
 
 ```js title="global-setup.ts"
 import { chromium, type FullConfig } from '@playwright/test';
@@ -186,7 +186,7 @@ export default defineConfig({
 });
 ```
 
-Тесты уже начинают с аутентификацией, потому что мы указываем `storageState`, который был заполнен глобальной настройкой.
+Тесты начинаются уже аутентифицированными, потому что мы указываем `storageState`, который был заполнен глобальной настройкой.
 
 ```js
 import { test } from '@playwright/test';
@@ -203,7 +203,7 @@ test('test', async ({ page }) => {
 import type { FullConfig } from '@playwright/test';
 
 async function globalSetup(config: FullConfig) {
-  process.env.FOO = 'некоторые данные';
+  process.env.FOO = 'some data';
   // Или более сложная структура данных в формате JSON:
   process.env.BAR = JSON.stringify({ some: 'data' });
 }
@@ -221,16 +221,16 @@ test('test', async ({ page }) => {
   const { FOO, BAR } = process.env;
 
   // Свойства FOO и BAR заполнены.
-  expect(FOO).toEqual('некоторые данные');
+  expect(FOO).toEqual('some data');
 
   const complexData = JSON.parse(BAR);
   expect(BAR).toEqual({ some: 'data' });
 });
 ```
 
-### Запись трассы ошибок во время глобальной настройки
+### Захват трассировки ошибок во время глобальной настройки
 
-В некоторых случаях может быть полезно записать трассу ошибок, возникших во время глобальной настройки. Для этого вы должны [начать трассировку](./api/class-tracing.mdx#tracing-start) в вашей настройке и убедиться, что вы [остановили трассировку](./api/class-tracing.mdx#tracing-stop), если произошла ошибка, прежде чем эта ошибка будет выброшена. Это можно сделать, обернув вашу настройку в блок `try...catch`. Вот пример, который расширяет пример глобальной настройки для захвата трассы.
+В некоторых случаях может быть полезно захватить трассировку ошибок, возникших во время глобальной настройки. Для этого вы должны [начать трассировку](./api/class-tracing.mdx#tracing-start) в вашей настройке и убедиться, что вы [остановите трассировку](./api/class-tracing.mdx#tracing-stop), если ошибка произойдет до того, как она будет выброшена. Это можно сделать, обернув вашу настройку в блок `try...catch`. Вот пример, который расширяет пример глобальной настройки для захвата трассировки.
 
 ```js title="global-setup.ts"
 import { chromium, type FullConfig } from '@playwright/test';
@@ -262,3 +262,106 @@ async function globalSetup(config: FullConfig) {
 
 export default globalSetup;
 ```
+
+
+[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
+[APIRequest]: /api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
+[Browser]: /api/class-browser.mdx "Browser"
+[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[Clock]: /api/class-clock.mdx "Clock"
+[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: /api/class-coverage.mdx "Coverage"
+[Dialog]: /api/class-dialog.mdx "Dialog"
+[Download]: /api/class-download.mdx "Download"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[Frame]: /api/class-frame.mdx "Frame"
+[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
+[JSHandle]: /api/class-jshandle.mdx "JSHandle"
+[Keyboard]: /api/class-keyboard.mdx "Keyboard"
+[Locator]: /api/class-locator.mdx "Locator"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
+[Logger]: /api/class-logger.mdx "Logger"
+[Mouse]: /api/class-mouse.mdx "Mouse"
+[Page]: /api/class-page.mdx "Page"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
+[Playwright]: /api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
+[Request]: /api/class-request.mdx "Request"
+[Response]: /api/class-response.mdx "Response"
+[Route]: /api/class-route.mdx "Route"
+[Selectors]: /api/class-selectors.mdx "Selectors"
+[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
+[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: /api/class-tracing.mdx "Tracing"
+[Video]: /api/class-video.mdx "Video"
+[WebError]: /api/class-weberror.mdx "WebError"
+[WebSocket]: /api/class-websocket.mdx "WebSocket"
+[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[Worker]: /api/class-worker.mdx "Worker"
+[Fixtures]: /api/class-fixtures.mdx "Fixtures"
+[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
+[FullProject]: /api/class-fullproject.mdx "FullProject"
+[Location]: /api/class-location.mdx "Location"
+[Test]: /api/class-test.mdx "Test"
+[TestConfig]: /api/class-testconfig.mdx "TestConfig"
+[TestInfo]: /api/class-testinfo.mdx "TestInfo"
+[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
+[TestOptions]: /api/class-testoptions.mdx "TestOptions"
+[TestProject]: /api/class-testproject.mdx "TestProject"
+[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
+[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
+[Reporter]: /api/class-reporter.mdx "Reporter"
+[Suite]: /api/class-suite.mdx "Suite"
+[TestCase]: /api/class-testcase.mdx "TestCase"
+[TestError]: /api/class-testerror.mdx "TestError"
+[TestResult]: /api/class-testresult.mdx "TestResult"
+[TestStep]: /api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"

@@ -1,47 +1,33 @@
----
-id: service-workers-experimental
-title: "(Экспериментально) События сети Service Worker"
----
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-import HTMLCard from '@site/src/components/HTMLCard';
-
 ## Введение
 
 :::warning
 
-Если вы ищете общие методы для мокирования, маршрутизации и перехвата сетевых запросов, сначала ознакомьтесь с [Руководством по сети](./network.mdx). Playwright предоставляет встроенные API для этого случая, которые не требуют информации ниже. Однако, если вас интересуют запросы, сделанные самими Service Workers, пожалуйста, читайте дальше.
+Если вы хотите выполнять общую имитацию сети, маршрутизацию и перехват, пожалуйста, сначала ознакомьтесь с [Руководством по сети](./network.mdx). Playwright предоставляет встроенные API для этого случая, которые не требуют информации, представленной ниже. Однако, если вас интересуют запросы, выполняемые самими Service Workers, читайте дальше.
 :::
 
-[Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) предоставляют нативный метод браузера для обработки запросов, сделанных страницей с использованием нативного [Fetch API (`fetch`)](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API), а также других сетевых ресурсов (таких как скрипты, css и изображения).
+[Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) предоставляют встроенный в браузер метод обработки запросов, выполняемых страницей с использованием нативного [Fetch API (`fetch`)](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API), а также других сетевых ресурсов (таких как скрипты, CSS и изображения).
 
-Они могут действовать как **сетевой прокси** между страницей и внешней сетью для выполнения логики кэширования или могут предоставить пользователям оффлайн-опыт, если Service Worker добавляет слушатель [FetchEvent](https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent#examples).
+Они могут выступать в качестве **сетевого прокси** между страницей и внешней сетью для выполнения логики кэширования или предоставления пользователям офлайн-опыта, если Service Worker добавляет слушатель [FetchEvent](https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent#examples).
 
-Многие сайты, использующие Service Workers, просто используют их как прозрачную технику оптимизации. Хотя пользователи могут заметить более быструю работу, реализация приложения не осознает их существования. Запуск приложения с включенными или отключенными Service Workers выглядит функционально эквивалентным.
+Многие сайты, использующие Service Workers, просто применяют их как прозрачную технику оптимизации. Хотя пользователи могут заметить более быструю работу, реализация приложения не осведомлена об их существовании. Запуск приложения с включенными или отключенными Service Workers выглядит функционально эквивалентно.
 
 ## Как включить
 
-Инспекция и маршрутизация запросов, сделанных Service Workers в Playwright, являются **экспериментальными** и отключены по умолчанию.
+Инспекция и маршрутизация запросов, выполняемых Service Workers в Playwright, являются **экспериментальными** и по умолчанию отключены.
 
 Установите переменную окружения `PW_EXPERIMENTAL_SERVICE_WORKER_NETWORK_EVENTS` в `1` (или любое другое значение), чтобы включить эту функцию. В настоящее время поддерживаются только Chrome/Chromium.
 
-Если вы используете (или заинтересованы в использовании этой функции), пожалуйста, прокомментируйте [эту проблему](https://github.com/microsoft/playwright/issues/15684), сообщив нам о вашем случае использования.
+Если вы используете (или заинтересованы в использовании этой функции), пожалуйста, оставьте комментарий в [этой задаче](https://github.com/microsoft/playwright/issues/15684), сообщив нам о вашем случае использования.
 
-## Fetch Service Worker
+## Запросы Service Worker
 
 ### Доступ к Service Workers и ожидание активации
 
-Вы можете использовать [browserContext.serviceWorkers()](/api/class-browsercontext.mdx#browser-context-service-workers), чтобы перечислить Service [Worker]ы, или специально отслеживать Service [Worker], если вы ожидаете, что страница вызовет его [регистрацию](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerContainer/register):
+Вы можете использовать [browserContext.serviceWorkers()](/api/class-browsercontext.mdx#browser-context-service-workers) для получения списка Service [Worker]s или специально следить за Service [Worker], если вы ожидаете, что страница вызовет его [регистрацию](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerContainer/register).
 
-```js
-const serviceWorkerPromise = context.waitForEvent('serviceworker');
-await page.goto('/example-with-a-service-worker.html');
-const serviceworker = await serviceWorkerPromise;
-```
+[browserContext.on('serviceworker')](/api/class-browsercontext.mdx#browser-context-event-service-worker) срабатывает ***до*** того, как основной скрипт Service Worker был оценен, поэтому ***до*** вызова service[worker.evaluate()](/api/class-worker.mdx#worker-evaluate) вы должны дождаться его активации.
 
-[browserContext.on('serviceworker')](/api/class-browsercontext.mdx#browser-context-event-service-worker) срабатывает ***до*** того, как основной скрипт Service Worker будет оценен, поэтому ***прежде чем*** вызывать service[worker.evaluate()](/api/class-worker.mdx#worker-evaluate), вам следует дождаться его активации.
-
-Существуют более идиоматические методы ожидания активации Service Worker, но следующий метод является независимым от реализации:
+Существуют более идиоматические методы ожидания активации Service Worker, но следующий метод не зависит от реализации:
 
 ```js
 await page.evaluate(async () => {
@@ -56,26 +42,26 @@ await page.evaluate(async () => {
 
 ### Сетевые события и маршрутизация
 
-Любой сетевой запрос, сделанный **Service Worker**, будет иметь:
+Любой сетевой запрос, выполненный **Service Worker**, будет иметь:
 * [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) и соответствующие события ([browserContext.on('requestfinished')](/api/class-browsercontext.mdx#browser-context-event-request-finished) и [browserContext.on('response')](/api/class-browsercontext.mdx#browser-context-event-response), или [browserContext.on('requestfailed')](/api/class-browsercontext.mdx#browser-context-event-request-failed))
 * [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route) увидит запрос
-* [request.serviceWorker()](/api/class-request.mdx#request-service-worker) будет установлен на экземпляр Service [Worker], а [request.frame()](/api/class-request.mdx#request-frame) **выдаст ошибку**
+* [request.serviceWorker()](/api/class-request.mdx#request-service-worker) будет установлен на экземпляр Service [Worker], а [request.frame()](/api/class-request.mdx#request-frame) **выбросит исключение**
 * [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) вернет `false`
 
-Кроме того, любой сетевой запрос, сделанный **Страницей** (включая ее под-[Frame]ы), будет иметь:
+Кроме того, любой сетевой запрос, выполненный **страницей** (включая ее под-[Frame]ы), будет иметь:
 * [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) и соответствующие события ([browserContext.on('requestfinished')](/api/class-browsercontext.mdx#browser-context-event-request-finished) и [browserContext.on('response')](/api/class-browsercontext.mdx#browser-context-event-response), или [browserContext.on('requestfailed')](/api/class-browsercontext.mdx#browser-context-event-request-failed))
 * [page.on('request')](/api/class-page.mdx#page-event-request) и соответствующие события ([page.on('requestfinished')](/api/class-page.mdx#page-event-request-finished) и [page.on('response')](/api/class-page.mdx#page-event-response), или [page.on('requestfailed')](/api/class-page.mdx#page-event-request-failed))
-* [page.route()](/api/class-page.mdx#page-route) и [page.route()](/api/class-page.mdx#page-route) **не увидят** запрос (если был зарегистрирован обработчик fetch Service Worker)
+* [page.route()](/api/class-page.mdx#page-route) и [page.route()](/api/class-page.mdx#page-route) **не** увидят запрос (если обработчик fetch Service Worker был зарегистрирован)
 * [request.serviceWorker()](/api/class-request.mdx#request-service-worker) будет установлен на `null`, а [request.frame()](/api/class-request.mdx#request-frame) вернет [Frame]
-* [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) вернет `true` (если был зарегистрирован обработчик fetch Service Worker)
+* [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) вернет `true` (если обработчик fetch Service Worker был зарегистрирован)
 
-Многие реализации Service Worker просто выполняют запрос со стороны страницы (возможно, с некоторой пользовательской логикой кэширования/оффлайн, опущенной для простоты):
+Многие реализации Service Worker просто выполняют запрос со страницы (возможно, с некоторой пользовательской логикой кэширования/офлайн, опущенной для простоты):
 
 ```js title="transparent-service-worker.js"
 self.addEventListener('fetch', event => {
-  // фактически выполняет запрос
+  // фактически выполняем запрос
   const responsePromise = fetch(event.request);
-  // отправляет его обратно на страницу
+  // отправляем его обратно на страницу
   event.respondWith(responsePromise);
 });
 
@@ -93,31 +79,31 @@ self.addEventListener('activate', event => {
 </script>
 ```
 
-При первом посещении страницы через [page.goto()](/api/class-page.mdx#page-goto) будут сгенерированы следующие события Request/Response (вместе с соответствующими сетевыми событиями жизненного цикла):
+При первом посещении страницы через [page.goto()](/api/class-page.mdx#page-goto) будут сгенерированы следующие события Request/Response (вместе с соответствующими событиями жизненного цикла сети):
 
 | Событие                           | Владелец         | URL                            | Маршрутизировано | [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) |
-| -                                 | -                | -                              | -      | -                                      |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | index.html                     | Да     |                                        |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | index.html                     | Да     |                                        |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | transparent-service-worker.js  | Да     |                                        |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | data.json                      | Да     |                                        |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | data.json                      |        | Да                                    |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | data.json                      |        | Да                                    |
+| -                                 | -                | -                              | -                | -                                      |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | index.html                     | Да              |                                        |
+| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | index.html                     | Да              |                                        |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | transparent-service-worker.js  | Да              |                                        |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | data.json                      | Да              |                                        |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | data.json                      |                  | Да                                    |
+| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | data.json                      |                  | Да                                    |
 
 Поскольку пример Service Worker просто действует как базовый прозрачный "прокси":
 * Существует 2 события [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) для `data.json`; одно принадлежит [Frame], другое - Service [Worker].
-* Только запрос, принадлежащий Service [Worker], для ресурса был маршрутизируемым через [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route); события, принадлежащие [Frame], для `data.json` не маршрутизируемы, так как они даже не имели возможности выйти в внешнюю сеть, поскольку у Service Worker зарегистрирован обработчик fetch.
+* Только запрос, принадлежащий Service [Worker], на ресурс был маршрутизируемым через [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route); события, принадлежащие [Frame], для `data.json` не маршрутизируемы, так как они даже не имели возможности попасть во внешнюю сеть, поскольку у Service Worker зарегистрирован обработчик fetch.
 
 :::caution
 
-Важно отметить: вызов [request.frame()](/api/class-request.mdx#request-frame) или [response.frame()](/api/class-response.mdx#response-frame) **выдаст** исключение, если вызван на [Request]/[Response], у которого [request.serviceWorker()](/api/class-request.mdx#request-service-worker) не равен null.
+Важно отметить: вызов [request.frame()](/api/class-request.mdx#request-frame) или [response.frame()](/api/class-response.mdx#response-frame) **выбросит** исключение, если он вызван на [Request]/[Response], у которого [request.serviceWorker()](/api/class-request.mdx#request-service-worker) не равен null.
 :::
 
-#### Расширенный пример
+#### Продвинутый пример
 
-Когда Service Worker обрабатывает запрос страницы, он может сделать от 0 до n запросов к внешней сети. Service Worker может ответить непосредственно из кэша, сгенерировать ответ в памяти, переписать запрос, сделать два запроса и затем объединить их в один и т.д.
+Когда Service Worker обрабатывает запрос страницы, Service Worker может выполнить от 0 до n запросов к внешней сети. Service Worker может ответить непосредственно из кэша, сгенерировать ответ в памяти, переписать запрос, выполнить два запроса и затем объединить их в один и т.д.
 
-Рассмотрите приведенные ниже фрагменты кода, чтобы понять, как Playwright видит Request/Responses и как это влияет на маршрутизацию в некоторых из этих случаев.
+Рассмотрите приведенные ниже фрагменты кода, чтобы понять, как Playwright видит запросы/ответы и как это влияет на маршрутизацию в некоторых из этих случаев.
 
 ```js title="complex-service-worker.js"
 self.addEventListener('install', function(event) {
@@ -129,20 +115,20 @@ self.addEventListener('install', function(event) {
   );
 });
 
-// Выбор обработки FetchEvent'ов со стороны страницы
+// Выбираем обработку FetchEvent со страницы
 self.addEventListener('fetch', event => {
   event.respondWith(
       (async () => {
-        // 1. Сначала попробуйте обслужить непосредственно из кэшей
+        // 1. Пытаемся сначала обслужить непосредственно из кэша
         const response = await caches.match(event.request);
         if (response)
           return response;
 
-        // 2. Перепишите запрос с /foo на /bar
+        // 2. Переписываем запрос для /foo на /bar
         if (event.request.url.endsWith('foo'))
           return fetch('./bar');
 
-        // 3. Запретите получение tracker.js и верните ответ-заполнитель
+        // 3. Предотвращаем получение tracker.js и возвращаем ответ-заглушку
         if (event.request.url.endsWith('tracker.js')) {
           return new Response('console.log("no trackers!")', {
             status: 200,
@@ -150,7 +136,7 @@ self.addEventListener('fetch', event => {
           });
         }
 
-        // 4. В противном случае, выполните fetch и ответьте
+        // 4. В противном случае, выполняем fetch и отвечаем
         return fetch(event.request);
       })()
   );
@@ -173,15 +159,15 @@ self.addEventListener('activate', event => {
 При первом посещении страницы через [page.goto()](/api/class-page.mdx#page-goto) будут сгенерированы следующие события Request/Response:
 
 | Событие                           | Владелец         | URL                            | Маршрутизировано | [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) |
-| -                                 | -                | -                              | -      | -                                      |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | index.html                     | Да     |                                        |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | index.html                     | Да     |                                        |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | complex-service-worker.js      | Да     |                                        |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | addressbook.json               | Да     |                                        |
+| -                                 | -                | -                              | -                | -                                      |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | index.html                     | Да              |                                        |
+| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | index.html                     | Да              |                                        |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | complex-service-worker.js      | Да              |                                        |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | addressbook.json               | Да              |                                        |
 
-Важно отметить, что [`cache.add`](https://developer.mozilla.org/en-US/docs/Web/API/Cache/add) вызвало запрос Service Worker (принадлежащий Service [Worker]), даже до того, как `addressbook.json` был запрошен на странице.
+Важно отметить, что [`cache.add`](https://developer.mozilla.org/en-US/docs/Web/API/Cache/add) вызвал Service Worker для выполнения запроса (принадлежащего Service [Worker]), даже до того, как `addressbook.json` был запрошен на странице.
 
-После активации Service Worker и обработки FetchEvents, если страница делает следующие запросы:
+После активации Service Worker и обработки FetchEvents, если страница выполняет следующие запросы:
 
 ```js
 await page.evaluate(() => fetch('/addressbook.json'));
@@ -193,28 +179,28 @@ await page.evaluate(() => fetch('/fallthrough.txt'));
 Будут сгенерированы следующие события Request/Response:
 
 | Событие                           | Владелец         | URL                            | Маршрутизировано | [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) |
-| -                                 | -                | -                              | -      | -                                      |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | addressbook.json               |        | Да                                    |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | addressbook.json               |        | Да                                    |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | bar                            | Да     |                                        |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | foo                            |        | Да                                    |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | foo                            |        | Да                                    |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | tracker.js                     |        | Да                                    |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | tracker.js                     |        | Да                                    |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | fallthrough.txt                | Да     |                                        |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | fallthrough.txt                |        | Да                                    |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | fallthrough.txt                |        | Да                                    |
+| -                                 | -                | -                              | -                | -                                      |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | addressbook.json               |                  | Да                                    |
+| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | addressbook.json               |                  | Да                                    |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | bar                            | Да              |                                        |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | foo                            |                  | Да                                    |
+| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | foo                            |                  | Да                                    |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | tracker.js                     |                  | Да                                    |
+| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | tracker.js                     |                  | Да                                    |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | fallthrough.txt                | Да              |                                        |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | fallthrough.txt                |                  | Да                                    |
+| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | fallthrough.txt                |                  | Да                                    |
 
 Важно отметить:
-* Страница запрашивала `/foo`, но Service Worker запрашивал `/bar`, поэтому существуют только события, принадлежащие [Frame], для `/foo`, но не для `/bar`.
-* Точно так же Service Worker никогда не выходил в сеть для `tracker.js`, поэтому только события, принадлежащие [Frame], были сгенерированы для этого запроса.
+* Страница запросила `/foo`, но Service Worker запросил `/bar`, поэтому существуют только события, принадлежащие [Frame], для `/foo`, но не для `/bar`.
+* Аналогично, Service Worker никогда не обращался к сети для `tracker.js`, поэтому были сгенерированы только события, принадлежащие [Frame], для этого запроса.
 
 ## Маршрутизация только запросов Service Worker
 
 ```js
 await context.route('**', async route => {
   if (route.request().serviceWorker()) {
-    // Примечание: вызов route.request().frame() здесь вызовет ИСКЛЮЧЕНИЕ
+    // NB: вызов route.request().frame() здесь вызовет ИСКЛЮЧЕНИЕ
     return route.fulfill({
       contentType: 'text/plain',
       status: 200,
@@ -228,4 +214,4 @@ await context.route('**', async route => {
 
 ## Известные ограничения
 
-Запросы на обновленный основной скрипт Service Worker в настоящее время не могут быть маршрутизированы (https://github.com/microsoft/playwright/issues/14711).
+Запросы на обновление основного скрипта Service Worker в настоящее время не могут быть маршрутизированы (https://github.com/microsoft/playwright/issues/14711).

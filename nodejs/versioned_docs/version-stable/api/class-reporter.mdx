@@ -6,9 +6,9 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-Тестовый раннер уведомляет репортер о различных событиях во время выполнения тестов. Все методы репортера являются необязательными.
+Тестовый раннер уведомляет репортера о различных событиях во время выполнения тестов. Все методы репортера являются необязательными.
 
-Вы можете создать пользовательский репортер, реализовав класс с некоторыми методами репортера. Убедитесь, что вы экспортируете этот класс по умолчанию.
+Вы можете создать собственный репортер, реализовав класс с некоторыми методами репортера. Убедитесь, что экспортируете этот класс по умолчанию.
 
 <Tabs
   groupId="js-flavor"
@@ -27,23 +27,23 @@ import type {
 
 class MyReporter implements Reporter {
   constructor(options: { customOption?: string } = {}) {
-    console.log(`my-awesome-reporter настроен с customOption равным ${options.customOption}`);
+    console.log(`my-awesome-reporter setup with customOption set to ${options.customOption}`);
   }
 
   onBegin(config: FullConfig, suite: Suite) {
-    console.log(`Запуск с ${suite.allTests().length} тестами`);
+    console.log(`Starting the run with ${suite.allTests().length} tests`);
   }
 
   onTestBegin(test: TestCase) {
-    console.log(`Запуск теста ${test.title}`);
+    console.log(`Starting test ${test.title}`);
   }
 
   onTestEnd(test: TestCase, result: TestResult) {
-    console.log(`Завершен тест ${test.title}: ${result.status}`);
+    console.log(`Finished test ${test.title}: ${result.status}`);
   }
 
   onEnd(result: FullResult) {
-    console.log(`Завершен запуск: ${result.status}`);
+    console.log(`Finished the run: ${result.status}`);
   }
 }
 export default MyReporter;
@@ -58,23 +58,23 @@ export default MyReporter;
 /** @implements {import('@playwright/test/reporter').Reporter} */
 class MyReporter {
   constructor(options) {
-    console.log(`my-awesome-reporter настроен с customOption равным ${options.customOption}`);
+    console.log(`my-awesome-reporter setup with customOption set to ${options.customOption}`);
   }
 
   onBegin(config, suite) {
-    console.log(`Запуск с ${suite.allTests().length} тестами`);
+    console.log(`Starting the run with ${suite.allTests().length} tests`);
   }
 
   onTestBegin(test) {
-    console.log(`Запуск теста ${test.title}`);
+    console.log(`Starting test ${test.title}`);
   }
 
   onTestEnd(test, result) {
-    console.log(`Завершен тест ${test.title}: ${result.status}`);
+    console.log(`Finished test ${test.title}: ${result.status}`);
   }
 
   onEnd(result) {
-    console.log(`Завершен запуск: ${result.status}`);
+    console.log(`Finished the run: ${result.status}`);
   }
 }
 
@@ -95,21 +95,21 @@ export default defineConfig({
 ```
 
 Вот типичный порядок вызовов репортера:
-* [reporter.onBegin()](/api/class-reporter.mdx#reporter-on-begin) вызывается один раз с корневым набором, который содержит все остальные наборы и тесты. Узнайте больше о [иерархии наборов][Suite].
-* [reporter.onTestBegin()](/api/class-reporter.mdx#reporter-on-test-begin) вызывается для каждого запуска теста. Ему передается [TestCase], который выполняется, и [TestResult], который почти пуст. Результат теста будет заполняться во время выполнения теста (например, шагами и стандартным выводом) и получит окончательный `status`, как только тест завершится.
+* [reporter.onBegin()](/api/class-reporter.mdx#reporter-on-begin) вызывается один раз с корневым набором, который содержит все другие наборы и тесты. Узнайте больше о [иерархии наборов][Suite].
+* [reporter.onTestBegin()](/api/class-reporter.mdx#reporter-on-test-begin) вызывается для каждого запуска теста. Ему передается [TestCase], который выполняется, и [TestResult], который почти пуст. Результат теста будет заполняться во время выполнения теста (например, шагами и stdio) и получит окончательный `status` после завершения теста.
 * [reporter.onStepBegin()](/api/class-reporter.mdx#reporter-on-step-begin) и [reporter.onStepEnd()](/api/class-reporter.mdx#reporter-on-step-end) вызываются для каждого выполненного шага внутри теста. Когда шаги выполняются, запуск теста еще не завершен.
 * [reporter.onTestEnd()](/api/class-reporter.mdx#reporter-on-test-end) вызывается, когда запуск теста завершен. К этому времени [TestResult] завершен, и вы можете использовать [testResult.status](/api/class-testresult.mdx#test-result-status), [testResult.error](/api/class-testresult.mdx#test-result-error) и другие.
-* [reporter.onEnd()](/api/class-reporter.mdx#reporter-on-end) вызывается один раз после завершения всех тестов, которые должны были выполниться.
-* [reporter.onExit()](/api/class-reporter.mdx#reporter-on-exit) вызывается немедленно перед выходом тестового раннера.
+* [reporter.onEnd()](/api/class-reporter.mdx#reporter-on-end) вызывается один раз после завершения всех тестов, которые должны были быть выполнены.
+* [reporter.onExit()](/api/class-reporter.mdx#reporter-on-exit) вызывается непосредственно перед выходом тестового раннера.
 
-Кроме того, [reporter.onStdOut()](/api/class-reporter.mdx#reporter-on-std-out) и [reporter.onStdErr()](/api/class-reporter.mdx#reporter-on-std-err) вызываются, когда стандартный вывод производится в рабочем процессе, возможно, во время выполнения теста, а [reporter.onError()](/api/class-reporter.mdx#reporter-on-error) вызывается, когда что-то пошло не так вне выполнения теста.
+Кроме того, [reporter.onStdOut()](/api/class-reporter.mdx#reporter-on-std-out) и [reporter.onStdErr()](/api/class-reporter.mdx#reporter-on-std-err) вызываются, когда стандартный вывод производится в процессе рабочего потока, возможно, во время выполнения теста, а [reporter.onError()](/api/class-reporter.mdx#reporter-on-error) вызывается, когда что-то пошло не так вне выполнения теста.
 
 Если ваш пользовательский репортер ничего не выводит в терминал, реализуйте [reporter.printsToStdio()](/api/class-reporter.mdx#reporter-prints-to-stdio) и верните `false`. Таким образом, Playwright будет использовать один из стандартных терминальных репортеров в дополнение к вашему пользовательскому репортеру для улучшения пользовательского опыта.
 
-**Примечания по API объединенного отчета**
+**Заметки по API объединенного отчета**
 
-При объединении нескольких [`blob`](../test-reporters#blob-reporter) отчетов через команду CLI [`merge-reports`](../test-sharding#merge-reports-cli) вызывается тот же [Reporter] API для создания окончательных отчетов, и все существующие репортеры должны работать без каких-либо изменений. Однако есть некоторые тонкие различия, которые могут повлиять на некоторые пользовательские репортеры.
-* Проекты из разных шардов всегда остаются отдельными [TestProject] объектами. Например, если проект 'Desktop Chrome' был разделен на 5 машин, то в конфигурации, переданной в [reporter.onBegin()](/api/class-reporter.mdx#reporter-on-begin), будет 5 экземпляров проектов с одинаковым именем.
+При объединении нескольких отчетов [`blob`](../test-reporters#blob-reporter) с помощью команды CLI [`merge-reports`](../test-sharding#merge-reports-cli), тот же API [Reporter] вызывается для создания окончательных отчетов, и все существующие репортеры должны работать без изменений. Однако есть некоторые тонкие различия, которые могут повлиять на некоторые пользовательские репортеры.
+* Проекты из разных шардов всегда сохраняются как отдельные объекты [TestProject]. Например, если проект 'Desktop Chrome' был разделен на 5 машин, то в конфигурации, переданной в [reporter.onBegin()](/api/class-reporter.mdx#reporter-on-begin), будет 5 экземпляров проектов с одинаковым именем.
 
 ---
 
@@ -119,7 +119,7 @@ export default defineConfig({
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onBegin</x-search>
 
-Вызывается один раз перед запуском тестов. Все тесты уже были обнаружены и помещены в иерархию [Suite]ов.
+Вызывается один раз перед запуском тестов. Все тесты уже обнаружены и помещены в иерархию [Suite]s.
 
 **Использование**
 
@@ -133,7 +133,7 @@ reporter.onBegin(config, suite);
   Разрешенная конфигурация.
 - `suite` [Suite]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-begin-option-suite"/><a href="#reporter-on-begin-option-suite" class="list-anchor">#</a>
   
-  Корневой набор, который содержит все проекты, файлы и тестовые случаи.
+  Корневой набор, содержащий все проекты, файлы и тестовые случаи.
 
 ---
 
@@ -141,7 +141,7 @@ reporter.onBegin(config, suite);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onEnd</x-search>
 
-Вызывается после того, как все тесты были выполнены, или тестирование было прервано. Обратите внимание, что этот метод может возвращать [Promise], и Playwright Test будет ожидать его. Репортер может переопределить статус и, таким образом, повлиять на код выхода тестового раннера.
+Вызывается после того, как все тесты были выполнены или тестирование было прервано. Обратите внимание, что этот метод может возвращать [Promise], и Playwright Test будет ожидать его. Репортер может переопределить статус и, следовательно, повлиять на код выхода тестового раннера.
 
 **Использование**
 
@@ -159,25 +159,26 @@ await reporter.onEnd(result);
     Время начала выполнения теста.
   - `duration` [number]
     
-    Длительность выполнения теста в миллисекундах.
+    Продолжительность выполнения теста в миллисекундах.
   
   Результат полного выполнения теста, `status` может быть одним из:
   * `'passed'` - Все прошло как ожидалось.
   * `'failed'` - Любой тест не прошел.
   * `'timedout'` - Достигнут [testConfig.globalTimeout](/api/class-testconfig.mdx#test-config-global-timeout).
-  * `'interrupted'` - Прерван пользователем.
+  * `'interrupted'` - Прервано пользователем.
 
 **Возвращает**
 - [Promise]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-end-return"/><a href="#reporter-on-end-return" class="list-anchor">#</a>
-  - `status` "passed" | "failed" | "timedout" | "interrupted" *(необязательно)*
-
+  - `status` "passed" | "failed" | "timedout" | "interrupted" *(опционально)*
+    
+    
 ---
 
 ### onError {#reporter-on-error}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onError</x-search>
 
-Вызывается при возникновении глобальной ошибки, например, необработанного исключения в рабочем процессе.
+Вызывается при возникновении глобальной ошибки, например, необработанного исключения в процессе рабочего потока.
 
 **Использование**
 
@@ -196,7 +197,7 @@ reporter.onError(error);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.33</font><x-search>reporter.onExit</x-search>
 
-Вызывается немедленно перед выходом тестового раннера. На этом этапе все репортеры получили сигнал [reporter.onEnd()](/api/class-reporter.mdx#reporter-on-end), поэтому все отчеты должны быть собраны. Вы можете выполнить код, который загружает отчеты в этом хуке.
+Вызывается непосредственно перед выходом тестового раннера. На этом этапе все репортеры получили сигнал [reporter.onEnd()](/api/class-reporter.mdx#reporter-on-end), так что все отчеты должны быть построены. Вы можете запустить код, который загружает отчеты в этом хуке.
 
 **Использование**
 
@@ -213,7 +214,7 @@ await reporter.onExit();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onStdErr</x-search>
 
-Вызывается, когда что-то было записано в стандартный поток ошибок в рабочем процессе.
+Вызывается, когда что-то было записано в стандартный поток ошибок в процессе рабочего потока.
 
 **Использование**
 
@@ -224,10 +225,10 @@ reporter.onStdErr(chunk, test, result);
 **Аргументы**
 - `chunk` [string] | [Buffer]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-std-err-option-chunk"/><a href="#reporter-on-std-err-option-chunk" class="list-anchor">#</a>
   
-  Часть вывода.
+  Выходной фрагмент.
 - `test` [void] | [TestCase]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-std-err-option-test"/><a href="#reporter-on-std-err-option-test" class="list-anchor">#</a>
   
-  Тест, который выполнялся. Обратите внимание, что вывод может происходить, когда ни один тест не выполняется, в этом случае это будет [void].
+  Тест, который выполнялся. Обратите внимание, что вывод может происходить, когда тест не выполняется, в этом случае это будет [void].
 - `result` [void] | [TestResult]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-std-err-option-result"/><a href="#reporter-on-std-err-option-result" class="list-anchor">#</a>
   
   Результат выполнения теста, этот объект заполняется во время выполнения теста.
@@ -238,7 +239,7 @@ reporter.onStdErr(chunk, test, result);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onStdOut</x-search>
 
-Вызывается, когда что-то было записано в стандартный поток вывода в рабочем процессе.
+Вызывается, когда что-то было записано в стандартный вывод в процессе рабочего потока.
 
 **Использование**
 
@@ -249,10 +250,10 @@ reporter.onStdOut(chunk, test, result);
 **Аргументы**
 - `chunk` [string] | [Buffer]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-std-out-option-chunk"/><a href="#reporter-on-std-out-option-chunk" class="list-anchor">#</a>
   
-  Часть вывода.
+  Выходной фрагмент.
 - `test` [void] | [TestCase]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-std-out-option-test"/><a href="#reporter-on-std-out-option-test" class="list-anchor">#</a>
   
-  Тест, который выполнялся. Обратите внимание, что вывод может происходить, когда ни один тест не выполняется, в этом случае это будет [void].
+  Тест, который выполнялся. Обратите внимание, что вывод может происходить, когда тест не выполняется, в этом случае это будет [void].
 - `result` [void] | [TestResult]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-std-out-option-result"/><a href="#reporter-on-std-out-option-result" class="list-anchor">#</a>
   
   Результат выполнения теста, этот объект заполняется во время выполнения теста.
@@ -263,7 +264,7 @@ reporter.onStdOut(chunk, test, result);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onStepBegin</x-search>
 
-Вызывается, когда шаг теста начался в рабочем процессе.
+Вызывается, когда шаг теста начался в процессе рабочего потока.
 
 **Использование**
 
@@ -274,7 +275,7 @@ reporter.onStepBegin(test, result, step);
 **Аргументы**
 - `test` [TestCase]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-step-begin-option-test"/><a href="#reporter-on-step-begin-option-test" class="list-anchor">#</a>
   
-  Тест, к которому принадлежит шаг.
+  Тест, к которому относится шаг.
 - `result` [TestResult]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-step-begin-option-result"/><a href="#reporter-on-step-begin-option-result" class="list-anchor">#</a>
   
   Результат выполнения теста, этот объект заполняется во время выполнения теста.
@@ -288,7 +289,7 @@ reporter.onStepBegin(test, result, step);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onStepEnd</x-search>
 
-Вызывается, когда шаг теста завершен в рабочем процессе.
+Вызывается, когда шаг теста завершился в процессе рабочего потока.
 
 **Использование**
 
@@ -299,7 +300,7 @@ reporter.onStepEnd(test, result, step);
 **Аргументы**
 - `test` [TestCase]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-step-end-option-test"/><a href="#reporter-on-step-end-option-test" class="list-anchor">#</a>
   
-  Тест, к которому принадлежит шаг.
+  Тест, к которому относится шаг.
 - `result` [TestResult]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-step-end-option-result"/><a href="#reporter-on-step-end-option-result" class="list-anchor">#</a>
   
   Результат выполнения теста.
@@ -313,7 +314,7 @@ reporter.onStepEnd(test, result, step);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onTestBegin</x-search>
 
-Вызывается после того, как тест был запущен в рабочем процессе.
+Вызывается после того, как тест был запущен в процессе рабочего потока.
 
 **Использование**
 
@@ -335,7 +336,7 @@ reporter.onTestBegin(test, result);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onTestEnd</x-search>
 
-Вызывается после того, как тест был завершен в рабочем процессе.
+Вызывается после того, как тест был завершен в процессе рабочего потока.
 
 **Использование**
 
@@ -357,7 +358,7 @@ reporter.onTestEnd(test, result);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.printsToStdio</x-search>
 
-Указывает, использует ли этот репортер стандартный ввод-вывод для отчетности. Если он этого не делает, Playwright Test может добавить некоторый вывод для улучшения пользовательского опыта. Если ваш репортер не выводит в терминал, настоятельно рекомендуется вернуть `false`.
+Использует ли этот репортер stdio для отчетности. Если нет, Playwright Test может добавить некоторый вывод для улучшения пользовательского опыта. Если ваш репортер не выводит в терминал, настоятельно рекомендуется вернуть `false`.
 
 **Использование**
 
@@ -367,109 +368,3 @@ reporter.printsToStdio();
 
 **Возвращает**
 - [boolean]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-prints-to-stdio-return"/><a href="#reporter-prints-to-stdio-return" class="list-anchor">#</a>
-
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
-[APIRequest]: /api/class-apirequest.mdx "APIRequest"
-[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
-[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
-[Browser]: /api/class-browser.mdx "Browser"
-[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
-[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
-[BrowserType]: /api/class-browsertype.mdx "BrowserType"
-[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
-[Clock]: /api/class-clock.mdx "Clock"
-[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
-[Coverage]: /api/class-coverage.mdx "Coverage"
-[Dialog]: /api/class-dialog.mdx "Dialog"
-[Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
-[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
-[FileChooser]: /api/class-filechooser.mdx "FileChooser"
-[Frame]: /api/class-frame.mdx "Frame"
-[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
-[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
-[JSHandle]: /api/class-jshandle.mdx "JSHandle"
-[Keyboard]: /api/class-keyboard.mdx "Keyboard"
-[Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
-[Logger]: /api/class-logger.mdx "Logger"
-[Mouse]: /api/class-mouse.mdx "Mouse"
-[Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
-[Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
-[Request]: /api/class-request.mdx "Request"
-[Response]: /api/class-response.mdx "Response"
-[Route]: /api/class-route.mdx "Route"
-[Selectors]: /api/class-selectors.mdx "Selectors"
-[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
-[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
-[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: /api/class-tracing.mdx "Tracing"
-[Video]: /api/class-video.mdx "Video"
-[WebError]: /api/class-weberror.mdx "WebError"
-[WebSocket]: /api/class-websocket.mdx "WebSocket"
-[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
-[Worker]: /api/class-worker.mdx "Worker"
-[Fixtures]: /api/class-fixtures.mdx "Fixtures"
-[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
-[FullProject]: /api/class-fullproject.mdx "FullProject"
-[Location]: /api/class-location.mdx "Location"
-[Test]: /api/class-test.mdx "Test"
-[TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestInfo]: /api/class-testinfo.mdx "TestInfo"
-[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
-[TestOptions]: /api/class-testoptions.mdx "TestOptions"
-[TestProject]: /api/class-testproject.mdx "TestProject"
-[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
-[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
-[Reporter]: /api/class-reporter.mdx "Reporter"
-[Suite]: /api/class-suite.mdx "Suite"
-[TestCase]: /api/class-testcase.mdx "TestCase"
-[TestError]: /api/class-testerror.mdx "TestError"
-[TestResult]: /api/class-testresult.mdx "TestResult"
-[TestStep]: /api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
-
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
-[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
-[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
-[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
-[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
-[URL]: https://nodejs.org/api/url.html "URL"
-[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
-
-[все доступные теги изображений]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"
-[Регистр артефактов Microsoft]: https://mcr.microsoft.com/en-us/product/playwright/about "Регистр артефактов Microsoft"
-[Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

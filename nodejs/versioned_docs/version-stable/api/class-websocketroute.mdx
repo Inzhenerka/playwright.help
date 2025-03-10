@@ -6,11 +6,11 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-Когда маршрут [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) настраивается с помощью [page.routeWebSocket()](/api/class-page.mdx#page-route-web-socket) или [browserContext.routeWebSocket()](/api/class-browsercontext.mdx#browser-context-route-web-socket), объект `WebSocketRoute` позволяет обрабатывать WebSocket, как это делает настоящий сервер.
+Когда маршрут [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) настроен с помощью [page.routeWebSocket()](/api/class-page.mdx#page-route-web-socket) или [browserContext.routeWebSocket()](/api/class-browsercontext.mdx#browser-context-route-web-socket), объект `WebSocketRoute` позволяет обрабатывать WebSocket, как это делает реальный сервер.
 
 **Мокирование**
 
-По умолчанию, маршрутизируемый WebSocket не будет подключаться к серверу. Таким образом, вы можете мокировать всю коммуникацию через WebSocket. Вот пример, который отвечает на `"request"` с помощью `"response"`.
+По умолчанию, маршрутизированный WebSocket не будет подключаться к серверу. Таким образом, вы можете мокировать всю коммуникацию через WebSocket. Вот пример, который отвечает на `"request"` с `"response"`.
 
 ```js
 await page.routeWebSocket('wss://example.com/ws', ws => {
@@ -37,9 +37,9 @@ await page.routeWebSocket('wss://example.com/ws', ws => {
 
 **Перехват**
 
-В качестве альтернативы, вы можете захотеть подключиться к настоящему серверу, но перехватывать сообщения между ними и изменять или блокировать их. Вызов [webSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server) возвращает экземпляр `WebSocketRoute` на стороне сервера, к которому вы можете отправлять сообщения или обрабатывать входящие сообщения.
+В качестве альтернативы, вы можете подключиться к реальному серверу, но перехватывать сообщения между ними и изменять или блокировать их. Вызов [webSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server) возвращает серверный экземпляр `WebSocketRoute`, к которому вы можете отправлять сообщения или обрабатывать входящие сообщения.
 
-Ниже приведен пример, который изменяет некоторые сообщения, отправленные со страницы на сервер. Сообщения, отправленные с сервера на страницу, остаются нетронутыми, полагаясь на стандартную пересылку.
+Ниже приведен пример, который изменяет некоторые сообщения, отправляемые страницей на сервер. Сообщения, отправляемые с сервера на страницу, остаются нетронутыми, полагаясь на автоматическую пересылку по умолчанию.
 
 ```js
 await page.routeWebSocket('/ws', ws => {
@@ -55,11 +55,11 @@ await page.routeWebSocket('/ws', ws => {
 
 После подключения к серверу все **сообщения пересылаются** между страницей и сервером по умолчанию.
 
-Однако, если вы вызовете [webSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) на оригинальном маршруте, сообщения со страницы на сервер **больше не будут пересылаться**, а должны обрабатываться [обработчиком](/api/class-websocketroute.mdx#web-socket-route-on-message-option-handler).
+Однако, если вы вызываете [webSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) на оригинальном маршруте, сообщения от страницы к серверу **больше не будут пересылаться**, но должны обрабатываться [обработчиком](/api/class-websocketroute.mdx#web-socket-route-on-message-option-handler).
 
-Аналогично, вызов [webSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) на WebSocket на стороне сервера **остановит пересылку сообщений** с сервера на страницу, и [обработчик](/api/class-websocketroute.mdx#web-socket-route-on-message-option-handler) должен позаботиться о них.
+Аналогично, вызов [webSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) на серверном WebSocket **прекратит пересылку сообщений** с сервера на страницу, и [обработчик](/api/class-websocketroute.mdx#web-socket-route-on-message-option-handler) должен позаботиться о них.
 
-Следующий пример блокирует некоторые сообщения в обоих направлениях. Поскольку он вызывает [webSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) в обоих направлениях, автоматической пересылки вообще нет.
+Следующий пример блокирует некоторые сообщения в обоих направлениях. Поскольку он вызывает [webSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) в обоих направлениях, автоматическая пересылка полностью отсутствует.
 
 ```js
 await page.routeWebSocket('/ws', ws => {
@@ -83,7 +83,7 @@ await page.routeWebSocket('/ws', ws => {
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.48</font><x-search>webSocketRoute.close</x-search>
 
-Закрывает одну сторону соединения WebSocket.
+Закрывает одну сторону WebSocket-соединения.
 
 **Использование**
 
@@ -93,13 +93,13 @@ await webSocketRoute.close(options);
 ```
 
 **Аргументы**
-- `options` [Object] *(необязательно)*
-  - `code` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-option-code"/><a href="#web-socket-route-close-option-code" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `code` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-option-code"/><a href="#web-socket-route-close-option-code" class="list-anchor">#</a>
     
-    Необязательный [код закрытия](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#code).
-  - `reason` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-option-reason"/><a href="#web-socket-route-close-option-reason" class="list-anchor">#</a>
+    Опциональный [код закрытия](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#code).
+  - `reason` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-option-reason"/><a href="#web-socket-route-close-option-reason" class="list-anchor">#</a>
     
-    Необъяснительная [причина закрытия](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason).
+    Опциональная [причина закрытия](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason).
 
 **Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-return"/><a href="#web-socket-route-close-return" class="list-anchor">#</a>
@@ -110,13 +110,13 @@ await webSocketRoute.close(options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.48</font><x-search>webSocketRoute.connectToServer</x-search>
 
-По умолчанию, маршрутизируемый WebSocket не подключается к серверу, поэтому вы можете мокировать всю коммуникацию WebSocket. Этот метод подключается к настоящему WebSocket-серверу и возвращает экземпляр [WebSocketRoute] на стороне сервера, предоставляя возможность отправлять и получать сообщения от сервера.
+По умолчанию, маршрутизированный WebSocket не подключается к серверу, чтобы вы могли мокировать всю коммуникацию через WebSocket. Этот метод подключается к реальному WebSocket-серверу и возвращает серверный экземпляр [WebSocketRoute], предоставляя возможность отправлять и получать сообщения с сервера.
 
 После подключения к серверу:
-* Сообщения, полученные от сервера, будут **автоматически пересылаться** на WebSocket на странице, если не вызван [webSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) на `WebSocketRoute` на стороне сервера.
-* Сообщения, отправленные вызовом [`WebSocket.send()`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send) на странице, будут **автоматически пересылаться** на сервер, если не вызван [webSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) на оригинальном `WebSocketRoute`.
+* Сообщения, полученные с сервера, будут **автоматически пересылаться** в WebSocket на странице, если только [webSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) не вызван на серверной стороне `WebSocketRoute`.
+* Сообщения, отправленные вызовом [`WebSocket.send()`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send) на странице, будут **автоматически пересылаться** на сервер, если только [webSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) не вызван на оригинальной `WebSocketRoute`.
 
-Смотрите примеры в начале для получения дополнительных деталей.
+Смотрите примеры в начале для более подробной информации.
 
 **Использование**
 
@@ -135,7 +135,7 @@ webSocketRoute.connectToServer();
 
 Позволяет обрабатывать [`WebSocket.close`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close).
 
-По умолчанию, закрытие одной стороны соединения, либо на странице, либо на сервере, закроет другую сторону. Однако, когда установлен обработчик [webSocketRoute.onClose()](/api/class-websocketroute.mdx#web-socket-route-on-close), стандартная пересылка закрытия отключается, и обработчик должен позаботиться об этом.
+По умолчанию, закрытие одной стороны соединения, будь то на странице или на сервере, закроет другую сторону. Однако, когда установлен обработчик [webSocketRoute.onClose()](/api/class-websocketroute.mdx#web-socket-route-on-close), автоматическая пересылка закрытия отключается, и обработчик должен позаботиться об этом.
 
 **Использование**
 
@@ -146,7 +146,7 @@ webSocketRoute.onClose(handler);
 **Аргументы**
 - `handler` [function]\([number] | [undefined]\):[Promise]&lt;[Object]&gt; | [Object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-close-option-handler"/><a href="#web-socket-route-on-close-option-handler" class="list-anchor">#</a>
   
-  Функция, которая будет обрабатывать закрытие WebSocket. Получает необязательный [код закрытия](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#code) и необязательную [причину закрытия](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason).
+  Функция, которая будет обрабатывать закрытие WebSocket. Получает опциональный [код закрытия](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#code) и опциональную [причину закрытия](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason).
 
 ---
 
@@ -154,13 +154,13 @@ webSocketRoute.onClose(handler);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.48</font><x-search>webSocketRoute.onMessage</x-search>
 
-Этот метод позволяет обрабатывать сообщения, которые отправляются через WebSocket, как со стороны страницы, так и со стороны сервера.
+Этот метод позволяет обрабатывать сообщения, отправляемые через WebSocket, будь то со страницы или с сервера.
 
-Когда вызывается на оригинальном маршруте WebSocket, этот метод обрабатывает сообщения, отправленные со страницы. Вы можете обрабатывать эти сообщения, отвечая на них с помощью [webSocketRoute.send()](/api/class-websocketroute.mdx#web-socket-route-send), пересылая их на серверное соединение, возвращенное [webSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server), или делать что-то другое.
+Когда вызывается на оригинальном маршруте WebSocket, этот метод обрабатывает сообщения, отправленные со страницы. Вы можете обрабатывать эти сообщения, отвечая на них с помощью [webSocketRoute.send()](/api/class-websocketroute.mdx#web-socket-route-send), пересылая их на серверное соединение, возвращенное [webSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server), или делая что-то еще.
 
-После вызова этого метода сообщения не пересылаются автоматически на сервер или на страницу - вы должны делать это вручную, вызывая [webSocketRoute.send()](/api/class-websocketroute.mdx#web-socket-route-send). Смотрите примеры в начале для получения дополнительных деталей.
+После вызова этого метода сообщения не пересылаются автоматически на сервер или на страницу - вы должны делать это вручную, вызывая [webSocketRoute.send()](/api/class-websocketroute.mdx#web-socket-route-send). Смотрите примеры в начале для более подробной информации.
 
-Повторный вызов этого метода переопределит обработчик новым.
+Повторный вызов этого метода заменит обработчик на новый.
 
 **Использование**
 
@@ -179,7 +179,7 @@ webSocketRoute.onMessage(handler);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.48</font><x-search>webSocketRoute.send</x-search>
 
-Отправляет сообщение в WebSocket. Когда вызывается на оригинальном WebSocket, отправляет сообщение на страницу. Когда вызывается на результате [webSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server), отправляет сообщение на сервер. Смотрите примеры в начале для получения дополнительных деталей.
+Отправляет сообщение в WebSocket. Когда вызывается на оригинальном WebSocket, отправляет сообщение на страницу. Когда вызывается на результате [webSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server), отправляет сообщение на сервер. Смотрите примеры в начале для более подробной информации.
 
 **Использование**
 
@@ -208,109 +208,3 @@ webSocketRoute.url();
 
 **Возвращает**
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-url-return"/><a href="#web-socket-route-url-return" class="list-anchor">#</a>
-
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
-[APIRequest]: /api/class-apirequest.mdx "APIRequest"
-[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
-[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
-[Browser]: /api/class-browser.mdx "Browser"
-[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
-[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
-[BrowserType]: /api/class-browsertype.mdx "BrowserType"
-[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
-[Clock]: /api/class-clock.mdx "Clock"
-[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
-[Coverage]: /api/class-coverage.mdx "Coverage"
-[Dialog]: /api/class-dialog.mdx "Dialog"
-[Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
-[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
-[FileChooser]: /api/class-filechooser.mdx "FileChooser"
-[Frame]: /api/class-frame.mdx "Frame"
-[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
-[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
-[JSHandle]: /api/class-jshandle.mdx "JSHandle"
-[Keyboard]: /api/class-keyboard.mdx "Keyboard"
-[Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
-[Logger]: /api/class-logger.mdx "Logger"
-[Mouse]: /api/class-mouse.mdx "Mouse"
-[Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
-[Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
-[Request]: /api/class-request.mdx "Request"
-[Response]: /api/class-response.mdx "Response"
-[Route]: /api/class-route.mdx "Route"
-[Selectors]: /api/class-selectors.mdx "Selectors"
-[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
-[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
-[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: /api/class-tracing.mdx "Tracing"
-[Video]: /api/class-video.mdx "Video"
-[WebError]: /api/class-weberror.mdx "WebError"
-[WebSocket]: /api/class-websocket.mdx "WebSocket"
-[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
-[Worker]: /api/class-worker.mdx "Worker"
-[Fixtures]: /api/class-fixtures.mdx "Fixtures"
-[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
-[FullProject]: /api/class-fullproject.mdx "FullProject"
-[Location]: /api/class-location.mdx "Location"
-[Test]: /api/class-test.mdx "Test"
-[TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestInfo]: /api/class-testinfo.mdx "TestInfo"
-[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
-[TestOptions]: /api/class-testoptions.mdx "TestOptions"
-[TestProject]: /api/class-testproject.mdx "TestProject"
-[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
-[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
-[Reporter]: /api/class-reporter.mdx "Reporter"
-[Suite]: /api/class-suite.mdx "Suite"
-[TestCase]: /api/class-testcase.mdx "TestCase"
-[TestError]: /api/class-testerror.mdx "TestError"
-[TestResult]: /api/class-testresult.mdx "TestResult"
-[TestStep]: /api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
-
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
-[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
-[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
-[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
-[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
-[URL]: https://nodejs.org/api/url.html "URL"
-[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
-
-[все доступные теги изображений]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"
-[Регистр артефактов Microsoft]: https://mcr.microsoft.com/en-us/product/playwright/about "Регистр артефактов Microsoft"
-[Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

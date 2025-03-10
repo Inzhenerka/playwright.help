@@ -1,35 +1,35 @@
 ---
 id: test-timeouts
-title: "Таймауты"
+title: "Тайм-ауты"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-Playwright Test имеет несколько настраиваемых таймаутов для различных задач.
+Playwright Test имеет несколько настраиваемых тайм-аутов для различных задач.
 
-| Таймаут          | По умолчанию      | Описание                          |
-|:-----------------|:-----------------|:----------------------------------|
-| Таймаут теста    | 30_000 мс        | Таймаут для каждого теста<br/><span style={{textTransform:'uppercase',fontSize:'smaller',fontWeight:'bold',opacity:'0.7'}}>Установить в конфигурации</span><br/><code>{`{ timeout: 60_000 }`}</code><br/><span style={{textTransform: 'uppercase',fontSize: 'smaller', fontWeight: 'bold', opacity: '0.7'}}>Переопределить в тесте</span><br/>`test.setTimeout(120_000)` |
-| Таймаут ожидания | 5_000 мс         | Таймаут для каждого утверждения<br/><span style={{textTransform:'uppercase',fontSize:'smaller',fontWeight:'bold',opacity:'0.7'}}>Установить в конфигурации</span><br/><code>{`{ expect: { timeout: 10_000 } }`}</code><br/><span style={{textTransform: 'uppercase',fontSize: 'smaller', fontWeight: 'bold', opacity: '0.7'}}>Переопределить в тесте</span><br/>`expect(locator).toBeVisible({ timeout: 10_000 })` |
+|Тайм-аут    |По умолчанию             |Описание                      |
+|:----------|:----------------|:--------------------------------|
+|Тайм-аут теста|30_000 мс|Тайм-аут для каждого теста<br/><span style={{textTransform:'uppercase',fontSize:'smaller',fontWeight:'bold',opacity:'0.7'}}>Установить в конфигурации</span><br/><code>{`{ timeout: 60_000 }`}</code><br/><span style={{textTransform: 'uppercase',fontSize: 'smaller', fontWeight: 'bold', opacity: '0.7'}}>Переопределить в тесте</span><br/>`test.setTimeout(120_000)` |
+|Тайм-аут ожидания|5_000 мс|Тайм-аут для каждого утверждения<br/><span style={{textTransform:'uppercase',fontSize:'smaller',fontWeight:'bold',opacity:'0.7'}}>Установить в конфигурации</span><br/><code>{`{ expect: { timeout: 10_000 } }`}</code><br/><span style={{textTransform: 'uppercase',fontSize: 'smaller', fontWeight: 'bold', opacity: '0.7'}}>Переопределить в тесте</span><br/>`expect(locator).toBeVisible({ timeout: 10_000 })` |
 
-## Таймаут теста
+## Тайм-аут теста
 
-Playwright Test устанавливает таймаут для каждого теста, по умолчанию 30 секунд. Время, затраченное на выполнение функции теста, настройку фикстур и хуки `beforeEach`, включается в таймаут теста.
+Playwright Test применяет тайм-аут для каждого теста, по умолчанию 30 секунд. Время, затраченное на выполнение функции теста, настройку фикстур и хуки `beforeEach`, включается в тайм-аут теста.
 
-Тест, который превысил таймаут, выдает следующую ошибку:
+Тест, который превысил тайм-аут, вызывает следующую ошибку:
 
 ```txt
-example.spec.ts:3:1 › базовый тест ===========================
+example.spec.ts:3:1 › basic test ===========================
 
-Таймаут в 30000 мс превышен.
+Timeout of 30000ms exceeded.
 ```
 
-Дополнительный отдельный таймаут, равный этому значению, используется для завершения фикстур и хуков `afterEach`, после завершения функции теста.
+Дополнительный отдельный тайм-аут, с тем же значением, используется для завершения фикстур и хуков `afterEach`, после завершения функции теста.
 
-То же значение таймаута также применяется к хукам `beforeAll` и `afterAll`, но они не делят время с каким-либо тестом.
+То же значение тайм-аута также применяется к хукам `beforeAll` и `afterAll`, но они не делят время с каким-либо тестом.
 
-### Установить таймаут теста в конфигурации
+### Установить тайм-аут теста в конфигурации
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -39,71 +39,71 @@ export default defineConfig({
 });
 ```
 
-Справочная информация по API: [testConfig.timeout](/api/class-testconfig.mdx#test-config-timeout).
+Ссылка на API: [testConfig.timeout](/api/class-testconfig.mdx#test-config-timeout).
 
-### Установить таймаут для одного теста
+### Установить тайм-аут для одного теста
 
 ```js title="example.spec.ts"
 import { test, expect } from '@playwright/test';
 
-test('медленный тест', async ({ page }) => {
-  test.slow(); // Легкий способ утроить таймаут по умолчанию
+test('slow test', async ({ page }) => {
+  test.slow(); // Легкий способ утроить тайм-аут по умолчанию
   // ...
 });
 
-test('очень медленный тест', async ({ page }) => {
+test('very slow test', async ({ page }) => {
   test.setTimeout(120_000);
   // ...
 });
 ```
 
-Справочная информация по API: [test.setTimeout()](/api/class-test.mdx#test-set-timeout) и [test.slow()](/api/class-test.mdx#test-slow).
+Ссылка на API: [test.setTimeout()](/api/class-test.mdx#test-set-timeout) и [test.slow()](/api/class-test.mdx#test-slow).
 
-### Изменить таймаут из хука `beforeEach`
+### Изменить тайм-аут из хука `beforeEach`
 
 ```js title="example.spec.ts"
 import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }, testInfo) => {
-  // Увеличить таймаут для всех тестов, использующих этот хук, на 30 секунд.
+  // Увеличить тайм-аут для всех тестов, использующих этот хук, на 30 секунд.
   testInfo.setTimeout(testInfo.timeout + 30_000);
 });
 ```
 
-Справочная информация по API: [testInfo.setTimeout()](/api/class-testinfo.mdx#test-info-set-timeout).
+Ссылка на API: [testInfo.setTimeout()](/api/class-testinfo.mdx#test-info-set-timeout).
 
-### Изменить таймаут для хуков `beforeAll`/`afterAll`
+### Изменить тайм-аут для хука `beforeAll`/`afterAll`
 
-Хуки `beforeAll` и `afterAll` имеют отдельный таймаут, по умолчанию равный таймауту теста. Вы можете изменить его отдельно для каждого хука, вызвав [testInfo.setTimeout()](/api/class-testinfo.mdx#test-info-set-timeout) внутри хука.
+Хуки `beforeAll` и `afterAll` имеют отдельный тайм-аут, по умолчанию равный тайм-ауту теста. Вы можете изменить его отдельно для каждого хука, вызвав [testInfo.setTimeout()](/api/class-testinfo.mdx#test-info-set-timeout) внутри хука.
 
 ```js title="example.spec.ts"
 import { test, expect } from '@playwright/test';
 
 test.beforeAll(async () => {
-  // Установить таймаут для этого хука.
+  // Установить тайм-аут для этого хука.
   test.setTimeout(60000);
 });
 ```
 
-Справочная информация по API: [testInfo.setTimeout()](/api/class-testinfo.mdx#test-info-set-timeout).
+Ссылка на API: [testInfo.setTimeout()](/api/class-testinfo.mdx#test-info-set-timeout).
 
-## Таймаут ожидания
+## Тайм-аут ожидания
 
-Авто-повторяющиеся утверждения, такие как [expect(locator).toHaveText()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text), имеют отдельный таймаут, по умолчанию 5 секунд. Таймаут утверждения не связан с таймаутом теста. Он выдает следующую ошибку:
+Автоматически повторяющиеся утверждения, такие как [expect(locator).toHaveText()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text), имеют отдельный тайм-аут, по умолчанию 5 секунд. Тайм-аут утверждения не связан с тайм-аутом теста. Он вызывает следующую ошибку:
 
 ```txt
-example.spec.ts:3:1 › базовый тест ===========================
+example.spec.ts:3:1 › basic test ===========================
 
-Ошибка: expect(received).toHaveText(expected)
+Error: expect(received).toHaveText(expected)
 
-Ожидаемая строка: "my text"
-Полученная строка: ""
-Журнал вызовов:
-  - expect.toHaveText с таймаутом 5000 мс
-  - ожидание "locator('button')"
+Expected string: "my text"
+Received string: ""
+Call log:
+  - expect.toHaveText with timeout 5000ms
+  - waiting for "locator('button')"
 ```
 
-### Установить таймаут ожидания в конфигурации
+### Установить тайм-аут ожидания в конфигурации
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -115,31 +115,31 @@ export default defineConfig({
 });
 ```
 
-Справочная информация по API: [testConfig.expect](/api/class-testconfig.mdx#test-config-expect).
+Ссылка на API: [testConfig.expect](/api/class-testconfig.mdx#test-config-expect).
 
-### Указать таймаут ожидания для одного утверждения
+### Указать тайм-аут ожидания для одного утверждения
 
 ```js title="example.spec.ts"
 import { test, expect } from '@playwright/test';
 
-test('пример', async ({ page }) => {
+test('example', async ({ page }) => {
   await expect(locator).toHaveText('hello', { timeout: 10_000 });
 });
 ```
 
-## Глобальный таймаут
+## Глобальный тайм-аут
 
-Playwright Test поддерживает таймаут для всего запуска тестов. Это предотвращает избыточное использование ресурсов, когда что-то пошло не так. Глобальный таймаут по умолчанию не установлен, но вы можете установить разумный таймаут в конфигурации, например, на один час. Глобальный таймаут выдает следующую ошибку:
+Playwright Test поддерживает тайм-аут для всего выполнения теста. Это предотвращает избыточное использование ресурсов, когда все пошло не так. По умолчанию глобальный тайм-аут отсутствует, но вы можете установить разумный в конфигурации, например, один час. Глобальный тайм-аут вызывает следующую ошибку:
 
 ```txt
-Запуск 1000 тестов с использованием 10 рабочих процессов
+Running 1000 tests using 10 workers
 
-  514 пропущено
-  486 пройдено
-  Таймаут ожидания 3600 с для всего запуска тестов
+  514 skipped
+  486 passed
+  Timed out waiting 3600s for the entire test run
 ```
 
-Вы можете установить глобальный таймаут в конфигурации.
+Вы можете установить глобальный тайм-аут в конфигурации.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -149,21 +149,21 @@ export default defineConfig({
 });
 ```
 
-Справочная информация по API: [testConfig.globalTimeout](/api/class-testconfig.mdx#test-config-global-timeout).
+Ссылка на API: [testConfig.globalTimeout](/api/class-testconfig.mdx#test-config-global-timeout).
 
-## Расширенные: низкоуровневые таймауты
+## Продвинутое: низкоуровневые тайм-ауты
 
-Это низкоуровневые таймауты, которые предварительно настроены тестовым раннером, и вам не нужно их изменять. Если вы находитесь в этом разделе из-за нестабильности ваших тестов, скорее всего, вам следует искать решение в другом месте.
+Это низкоуровневые тайм-ауты, которые предварительно настроены тестовым раннером, и вам не нужно их изменять. Если вы оказались в этом разделе из-за того, что ваши тесты нестабильны, скорее всего, вам следует искать решение в другом месте.
 
-| Таймаут                     | По умолчанию      | Описание                          |
-|:----------------------------|:-----------------|:----------------------------------|
-| Таймаут действия            | нет таймаута     | Таймаут для каждого действия<br/><span style={{textTransform:'uppercase',fontSize:'smaller',fontWeight:'bold',opacity:'0.7'}}>Установить в конфигурации</span><br/><code>{`{ use: { actionTimeout: 10_000 } }`}</code><br/><span style={{textTransform: 'uppercase',fontSize: 'smaller',fontWeight: 'bold',opacity:'0.7'}}>Переопределить в тесте</span><br/>`locator.click({ timeout: 10_000 })` |
-| Таймаут навигации          | нет таймаута     | Таймаут для каждого действия навигации<br/><span style={{textTransform:'uppercase',fontSize:'smaller',fontWeight:'bold',opacity:'0.7'}}>Установить в конфигурации</span><br/><code>{`{ use: { navigationTimeout: 30_000 } }`}</code><br/><span style={{textTransform: 'uppercase',fontSize: 'smaller',fontWeight: 'bold',opacity:'0.7'}}>Переопределить в тесте</span><br/>`page.goto('/', { timeout: 30_000 })` |
-| Глобальный таймаут         | нет таймаута     | Глобальный таймаут для всего запуска тестов<br/><span style={{textTransform:'uppercase',fontSize:'smaller',fontWeight:'bold',opacity:'0.7'}}>Установить в конфигурации</span><br/>`{ globalTimeout: 3_600_000 }`<br/> |
-| Таймаут `beforeAll`/`afterAll` | 30_000 мс      | Таймаут для хука<br/><span style={{textTransform:'uppercase',fontSize:'smaller',fontWeight:'bold',opacity:'0.7'}}>Установить в хуке</span><br/>`test.setTimeout(60_000)`<br/> |
-| Таймаут фикстуры           | нет таймаута     | Таймаут для отдельной фикстуры<br/><span style={{textTransform:'uppercase',fontSize:'smaller',fontWeight:'bold',opacity:'0.7'}}>Установить в фикстуре</span><br/>`{ scope: 'test', timeout: 30_000 }`<br/> |
+|Тайм-аут    |По умолчанию             |Описание                      |
+|:----------|:----------------|:--------------------------------|
+|Тайм-аут действия| нет тайм-аута |Тайм-аут для каждого действия<br/><span style={{textTransform:'uppercase',fontSize:'smaller',fontWeight:'bold',opacity:'0.7'}}>Установить в конфигурации</span><br/><code>{`{ use: { actionTimeout: 10_000 } }`}</code><br/><span style={{textTransform: 'uppercase',fontSize: 'smaller', fontWeight: 'bold', opacity: '0.7'}}>Переопределить в тесте</span><br/>`locator.click({ timeout: 10_000 })` |
+|Тайм-аут навигации| нет тайм-аута |Тайм-аут для каждого действия навигации<br/><span style={{textTransform:'uppercase',fontSize:'smaller',fontWeight:'bold',opacity:'0.7'}}>Установить в конфигурации</span><br/><code>{`{ use: { navigationTimeout: 30_000 } }`}</code><br/><span style={{textTransform: 'uppercase',fontSize: 'smaller', fontWeight: 'bold', opacity: '0.7'}}>Переопределить в тесте</span><br/>`page.goto('/', { timeout: 30_000 })` |
+|Глобальный тайм-аут|нет тайм-аута |Глобальный тайм-аут для всего выполнения теста<br/><span style={{textTransform:'uppercase',fontSize:'smaller',fontWeight:'bold',opacity:'0.7'}}>Установить в конфигурации</span><br/>`{ globalTimeout: 3_600_000 }`<br/> |
+|Тайм-аут `beforeAll`/`afterAll`|30_000 мс|Тайм-аут для хука<br/><span style={{textTransform:'uppercase',fontSize:'smaller',fontWeight:'bold',opacity:'0.7'}}>Установить в хуке</span><br/>`test.setTimeout(60_000)`<br/> |
+|Тайм-аут фикстуры|нет тайм-аута |Тайм-аут для отдельной фикстуры<br/><span style={{textTransform:'uppercase',fontSize:'smaller',fontWeight:'bold',opacity:'0.7'}}>Установить в фикстуре</span><br/>`{ scope: 'test', timeout: 30_000 }`<br/> |
 
-### Установить таймауты действий и навигации в конфигурации
+### Установить тайм-ауты действий и навигации в конфигурации
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -176,22 +176,22 @@ export default defineConfig({
 });
 ```
 
-Справочная информация по API: [testOptions.actionTimeout](/api/class-testoptions.mdx#test-options-action-timeout) и [testOptions.navigationTimeout](/api/class-testoptions.mdx#test-options-navigation-timeout).
+Ссылка на API: [testOptions.actionTimeout](/api/class-testoptions.mdx#test-options-action-timeout) и [testOptions.navigationTimeout](/api/class-testoptions.mdx#test-options-navigation-timeout).
 
-### Установить таймаут для одного действия
+### Установить тайм-аут для одного действия
 
 ```js title="example.spec.ts"
 import { test, expect } from '@playwright/test';
 
-test('базовый тест', async ({ page }) => {
+test('basic test', async ({ page }) => {
   await page.goto('https://playwright.dev', { timeout: 30000 });
-  await page.getByText('Начать работу').click({ timeout: 10000 });
+  await page.getByText('Get Started').click({ timeout: 10000 });
 });
 ```
 
-## Таймаут фикстуры
+## Тайм-аут фикстуры
 
-По умолчанию [фикстура](./test-fixtures) делит таймаут с тестом. Однако для медленных фикстур, особенно [фикстур с областью действия рабочего процесса](./test-fixtures#worker-scoped-fixtures), удобно иметь отдельный таймаут. Таким образом, вы можете сохранить общий таймаут теста небольшим и дать медленной фикстуре больше времени.
+По умолчанию [фикстура](./test-fixtures) делит тайм-аут с тестом. Однако для медленных фикстур, особенно [связанных с рабочими](./test-fixtures#worker-scoped-fixtures), удобно иметь отдельный тайм-аут. Таким образом, вы можете сохранить общий тайм-аут теста небольшим и дать медленной фикстуре больше времени.
 
 ```js title="example.spec.ts"
 import { test as base, expect } from '@playwright/test';
@@ -203,9 +203,9 @@ const test = base.extend<{ slowFixture: string }>({
   }, { timeout: 60_000 }]
 });
 
-test('пример теста', async ({ slowFixture }) => {
+test('example test', async ({ slowFixture }) => {
   // ...
 });
 ```
 
-Справочная информация по API: [test.extend()](/api/class-test.mdx#test-extend).
+Ссылка на API: [test.extend()](/api/class-test.mdx#test-extend).

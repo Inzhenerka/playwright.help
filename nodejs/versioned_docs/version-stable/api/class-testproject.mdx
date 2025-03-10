@@ -6,9 +6,9 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-Playwright Test поддерживает одновременный запуск нескольких тестовых проектов. Это полезно для выполнения тестов в различных конфигурациях. Например, можно запускать тесты в разных браузерах. Этот тип описывает формат проекта в конфигурационном файле, для доступа к разрешенным параметрам конфигурации во время выполнения используйте [FullProject].
+Playwright Test поддерживает одновременный запуск нескольких тестовых проектов. Это полезно для выполнения тестов в нескольких конфигурациях. Например, можно запускать тесты в нескольких браузерах. Этот тип описывает формат проекта в файле конфигурации, для доступа к разрешённым параметрам конфигурации во время выполнения используйте [FullProject].
 
-`TestProject` инкапсулирует конфигурацию, специфичную для одного проекта. Проекты настраиваются в [testConfig.projects](/api/class-testconfig.mdx#test-config-projects), указанных в [конфигурационном файле](../test-configuration.mdx). Обратите внимание, что все свойства [TestProject] доступны в верхнем уровне [TestConfig], в этом случае они разделяются между всеми проектами.
+`TestProject` инкапсулирует конфигурацию, специфичную для одного проекта. Проекты настраиваются в [testConfig.projects](/api/class-testconfig.mdx#test-config-projects), указанных в [файле конфигурации](../test-configuration.mdx). Обратите внимание, что все свойства [TestProject] доступны в верхнем уровне [TestConfig], в этом случае они общие для всех проектов.
 
 Вот пример конфигурации, которая запускает каждый тест в Chromium, Firefox и WebKit, как в настольных, так и в мобильных версиях.
 
@@ -54,11 +54,9 @@ export default defineConfig({
 
 ### dependencies {#test-project-dependencies}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.31</font><x-search>testProject.dependencies</x-search>
+Список проектов, которые должны быть выполнены до запуска любого теста в этом проекте. Зависимости могут быть полезны для настройки глобальных действий в виде тестов. Передача аргумента `--no-deps` игнорирует зависимости и ведет себя так, как если бы они не были указаны.
 
-Список проектов, которые должны быть выполнены перед запуском любого теста в этом проекте. Зависимости могут быть полезны для настройки глобальных действий инициализации таким образом, чтобы каждое действие было в форме теста. Передача аргумента `--no-deps` игнорирует зависимости и ведет себя так, как будто они не были указаны.
-
-Использование зависимостей позволяет глобальной настройке создавать трассировки и другие артефакты, видеть шаги настройки в отчете о тестах и т.д.
+Использование зависимостей позволяет глобальной настройке создавать трассы и другие артефакты, видеть шаги настройки в отчете о тестировании и т.д.
 
 **Использование**
 
@@ -97,8 +95,6 @@ export default defineConfig({
 
 ### expect {#test-project-expect}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.expect</x-search>
-
 Конфигурация для библиотеки утверждений `expect`.
 
 Используйте [testConfig.expect](/api/class-testconfig.mdx#test-config-expect), чтобы изменить эту опцию для всех проектов.
@@ -113,50 +109,50 @@ testProject.expect
 - [Object]
   - `timeout` [number] *(опционально)*
     
-    Значение по умолчанию для асинхронных матчеров expect в миллисекундах, по умолчанию 5000мс.
+    Тайм-аут по умолчанию для асинхронных сопоставителей expect в миллисекундах, по умолчанию 5000ms.
   - `toHaveScreenshot` [Object] *(опционально)*
     - `threshold` [number] *(опционально)*
       
-      допустимое воспринимаемое цветовое различие между одним и тем же пикселем в сравниваемых изображениях, варьируется от `0` (строго) до `1` (свободно). Компаратор `"pixelmatch"` вычисляет цветовое различие в [YIQ цветовой модели](https://en.wikipedia.org/wiki/YIQ) и по умолчанию устанавливает значение `threshold` на `0.2`.
+      допустимая воспринимаемая разница в цвете между одним и тем же пикселем в сравниваемых изображениях, в диапазоне от `0` (строго) до `1` (мягко). Компаратор `"pixelmatch"` вычисляет разницу в цвете в [цветовом пространстве YIQ](https://en.wikipedia.org/wiki/YIQ) и по умолчанию устанавливает значение `threshold` в `0.2`.
     - `maxDiffPixels` [number] *(опционально)*
       
       допустимое количество пикселей, которые могут отличаться, по умолчанию не установлено.
     - `maxDiffPixelRatio` [number] *(опционально)*
       
-      допустимое соотношение пикселей, которые отличаются от общего количества пикселей, между `0` и `1`, по умолчанию не установлено.
+      допустимое соотношение пикселей, которые отличаются, к общему количеству пикселей, между `0` и `1`, по умолчанию не установлено.
     - `animations` "allow" | "disabled" *(опционально)*
       
-      См. [animations](/api/class-page.mdx#page-screenshot-option-animations) в [page.screenshot()](/api/class-page.mdx#page-screenshot). По умолчанию "disabled".
+      См. [animations](/api/class-page.mdx#page-screenshot-option-animations) в [page.screenshot()](/api/class-page.mdx#page-screenshot). По умолчанию `"disabled"`.
     - `caret` "hide" | "initial" *(опционально)*
       
-      См. [caret](/api/class-page.mdx#page-screenshot-option-caret) в [page.screenshot()](/api/class-page.mdx#page-screenshot). По умолчанию "hide".
+      См. [caret](/api/class-page.mdx#page-screenshot-option-caret) в [page.screenshot()](/api/class-page.mdx#page-screenshot). По умолчанию `"hide"`.
     - `scale` "css" | "device" *(опционально)*
       
-      См. [scale](/api/class-page.mdx#page-screenshot-option-scale) в [page.screenshot()](/api/class-page.mdx#page-screenshot). По умолчанию "css".
+      См. [scale](/api/class-page.mdx#page-screenshot-option-scale) в [page.screenshot()](/api/class-page.mdx#page-screenshot). По умолчанию `"css"`.
     - `stylePath` [string] | [Array]&lt;[string]&gt; *(опционально)*
       
-      См. [style](/api/class-page.mdx#page-screenshot-option-style) в [page.screenshot()].
+      См. [style](/api/class-page.mdx#page-screenshot-option-style) в [page.screenshot()](/api/class-page.mdx#page-screenshot).
     - `pathTemplate` [string] *(опционально)*
       
-      Шаблон, контролирующий расположение скриншотов. См. [testProject.snapshotPathTemplate](/api/class-testproject.mdx#test-project-snapshot-path-template) для получения подробностей.
+      Шаблон, контролирующий расположение скриншотов. См. [testProject.snapshotPathTemplate](/api/class-testproject.mdx#test-project-snapshot-path-template) для деталей.
     
     Конфигурация для метода [expect(page).toHaveScreenshot()](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1).
   - `toMatchAriaSnapshot` [Object] *(опционально)*
     - `pathTemplate` [string] *(опционально)*
       
-      Шаблон, контролирующий расположение ария-снимков. См. [testProject.snapshotPathTemplate](/api/class-testproject.mdx#test-project-snapshot-path-template) для получения подробностей.
+      Шаблон, контролирующий расположение снимков aria. См. [testProject.snapshotPathTemplate](/api/class-testproject.mdx#test-project-snapshot-path-template) для деталей.
     
     Конфигурация для метода [expect(locator).toMatchAriaSnapshot()](/api/class-locatorassertions.mdx#locator-assertions-to-match-aria-snapshot-2).
   - `toMatchSnapshot` [Object] *(опционально)*
     - `threshold` [number] *(опционально)*
       
-      допустимое воспринимаемое цветовое различие между одним и тем же пикселем в сравниваемых изображениях, варьируется от `0` (строго) до `1` (свободно). Компаратор `"pixelmatch"` вычисляет цветовое различие в [YIQ цветовой модели](https://en.wikipedia.org/wiki/YIQ) и по умолчанию устанавливает значение `threshold` на `0.2`.
+      допустимая воспринимаемая разница в цвете между одним и тем же пикселем в сравниваемых изображениях, в диапазоне от `0` (строго) до `1` (мягко). Компаратор `"pixelmatch"` вычисляет разницу в цвете в [цветовом пространстве YIQ](https://en.wikipedia.org/wiki/YIQ) и по умолчанию устанавливает значение `threshold` в `0.2`.
     - `maxDiffPixels` [number] *(опционально)*
       
       допустимое количество пикселей, которые могут отличаться, по умолчанию не установлено.
     - `maxDiffPixelRatio` [number] *(опционально)*
       
-      допустимое соотношение пикселей, которые отличаются от общего количества пикселей, между `0` и `1`, по умолчанию не установлено.
+      допустимое соотношение пикселей, которые отличаются, к общему количеству пикселей, между `0` и `1`, по умолчанию не установлено.
     
     Конфигурация для метода [expect(value).toMatchSnapshot()](/api/class-snapshotassertions.mdx#snapshot-assertions-to-match-snapshot-1).
   - `toPass` [Object] *(опционально)*
@@ -165,7 +161,7 @@ testProject.expect
       тайм-аут для метода toPass в миллисекундах.
     - `intervals` [Array]&lt;[number]&gt; *(опционально)*
       
-      интервалы опроса для метода toPass в миллисекундах.
+      интервалы проверки для метода toPass в миллисекундах.
     
     Конфигурация для метода [expect(value).toPass()](../test-assertions.mdx).
 
@@ -173,11 +169,9 @@ testProject.expect
 
 ### fullyParallel {#test-project-fully-parallel}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.fullyParallel</x-search>
+Playwright Test выполняет тесты параллельно. Для этого он запускает несколько рабочих процессов, которые выполняются одновременно. По умолчанию **тестовые файлы** выполняются параллельно. Тесты в одном файле выполняются по порядку, в одном рабочем процессе.
 
-Playwright Test запускает тесты параллельно. Для этого он запускает несколько рабочих процессов, которые выполняются одновременно. По умолчанию **тестовые файлы** выполняются параллельно. Тесты в одном файле выполняются последовательно, в одном и том же рабочем процессе.
-
-Вы можете настроить весь тестовый проект для одновременного выполнения всех тестов во всех файлах, используя эту опцию.
+Вы можете настроить весь тестовый проект на одновременное выполнение всех тестов во всех файлах, используя эту опцию.
 
 **Использование**
 
@@ -192,9 +186,7 @@ testProject.fullyParallel
 
 ### grep {#test-project-grep}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.grep</x-search>
-
-Фильтр для выполнения только тех тестов, заголовки которых соответствуют одному из шаблонов. Например, передача `grep: /cart/` должна запускать только тесты с "cart" в заголовке. Также доступно глобально и в [командной строке](../test-cli.mdx) с опцией `-g`. Регулярное выражение будет проверяться на строке, состоящей из имени проекта, имени тестового файла, имени `test.describe` (если есть), имени теста и тегов теста, разделенных пробелами, например `chromium my-test.spec.ts my-suite my-test`.
+Фильтр для выполнения только тех тестов, заголовок которых соответствует одному из шаблонов. Например, передача `grep: /cart/` должна выполнять только тесты с "cart" в заголовке. Также доступно глобально и в [командной строке](../test-cli.mdx) с опцией `-g`. Регулярное выражение будет проверяться на строке, состоящей из имени проекта, имени тестового файла, имени `test.describe` (если есть), имени теста и тегов теста, разделенных пробелами, например, `chromium my-test.spec.ts my-suite my-test`.
 
 Опция `grep` также полезна для [тегирования тестов](../test-annotations.mdx#tag-tests).
 
@@ -211,9 +203,7 @@ testProject.grep
 
 ### grepInvert {#test-project-grep-invert}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.grepInvert</x-search>
-
-Фильтр для выполнения только тех тестов, заголовки которых **не** соответствуют одному из шаблонов. Это противоположно [testProject.grep](/api/class-testproject.mdx#test-project-grep). Также доступно глобально и в [командной строке](../test-cli.mdx) с опцией `--grep-invert`.
+Фильтр для выполнения только тех тестов, заголовок которых **не** соответствует одному из шаблонов. Это противоположность [testProject.grep](/api/class-testproject.mdx#test-project-grep). Также доступно глобально и в [командной строке](../test-cli.mdx) с опцией `--grep-invert`.
 
 Опция `grepInvert` также полезна для [тегирования тестов](../test-annotations.mdx#tag-tests).
 
@@ -230,13 +220,11 @@ testProject.grepInvert
 
 ### ignoreSnapshots {#test-project-ignore-snapshots}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.44</font><x-search>testProject.ignoreSnapshots</x-search>
-
-Указывает, следует ли пропускать ожидания снимков, такие как `expect(value).toMatchSnapshot()` и `await expect(page).toHaveScreenshot()`.
+Пропускать ли ожидания снимков, такие как `expect(value).toMatchSnapshot()` и `await expect(page).toHaveScreenshot()`.
 
 **Использование**
 
-Следующий пример будет выполнять утверждения о скриншотах только для Chromium.
+Следующий пример будет выполнять утверждения скриншотов только в Chromium.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -268,9 +256,7 @@ export default defineConfig({
 
 ### metadata {#test-project-metadata}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.metadata</x-search>
-
-Метаданные, которые будут непосредственно добавлены в отчет о тестах в формате JSON.
+Метаданные, которые будут помещены непосредственно в отчет о тестировании, сериализованный как JSON.
 
 **Использование**
 
@@ -285,13 +271,11 @@ testProject.metadata
 
 ### name {#test-project-name}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.name</x-search>
-
-Имя проекта видно в отчете и во время выполнения тестов.
+Имя проекта отображается в отчете и во время выполнения теста.
 
 :::warning
 
-Playwright выполняет конфигурационный файл несколько раз. Не создавайте динамически нестабильные значения в вашей конфигурации.
+Playwright выполняет файл конфигурации несколько раз. Не создавайте динамически нестабильные значения в вашей конфигурации.
 :::
 
 **Использование**
@@ -307,11 +291,9 @@ testProject.name
 
 ### outputDir {#test-project-output-dir}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.outputDir</x-search>
+Директория для файлов, созданных во время выполнения теста. По умолчанию `<package.json-directory>/test-results`.
 
-Каталог для файлов, создаваемых во время выполнения тестов. По умолчанию `<package.json-directory>/test-results`.
-
-Этот каталог очищается в начале. При запуске теста создается уникальный подкаталог внутри [testProject.outputDir](/api/class-testproject.mdx#test-project-output-dir), что гарантирует, что тесты, выполняемые параллельно, не конфликтуют. Этот каталог можно получить через [testInfo.outputDir](/api/class-testinfo.mdx#test-info-output-dir) и [testInfo.outputPath()](/api/class-testinfo.mdx#test-info-output-path).
+Эта директория очищается в начале. При выполнении теста создается уникальная поддиректория внутри [testProject.outputDir](/api/class-testproject.mdx#test-project-output-dir), что гарантирует, что тесты, выполняемые параллельно, не конфликтуют. Эта директория может быть доступна через [testInfo.outputDir](/api/class-testinfo.mdx#test-info-output-dir) и [testInfo.outputPath()](/api/class-testinfo.mdx#test-info-output-path).
 
 Вот пример, который использует [testInfo.outputPath()](/api/class-testinfo.mdx#test-info-output-path) для создания временного файла.
 
@@ -340,9 +322,7 @@ testProject.outputDir
 
 ### repeatEach {#test-project-repeat-each}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.repeatEach</x-search>
-
-Количество раз, которое следует повторить каждый тест, полезно для отладки ненадежных тестов.
+Количество повторений каждого теста, полезно для отладки нестабильных тестов.
 
 Используйте [testConfig.repeatEach](/api/class-testconfig.mdx#test-config-repeat-each), чтобы изменить эту опцию для всех проектов.
 
@@ -359,9 +339,7 @@ testProject.repeatEach
 
 ### respectGitIgnore {#test-project-respect-git-ignore}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.45</font><x-search>testProject.respectGitIgnore</x-search>
-
-Указывает, следует ли пропускать записи из `.gitignore` при поиске тестовых файлов. По умолчанию, если ни [testConfig.testDir](/api/class-testconfig.mdx#test-config-test-dir), ни [testProject.testDir](/api/class-testproject.mdx#test-project-test-dir) не указаны явно, Playwright будет игнорировать любые тестовые файлы, соответствующие записям `.gitignore`. Эта опция позволяет переопределить это поведение.
+Пропускать ли записи из `.gitignore` при поиске тестовых файлов. По умолчанию, если ни [testConfig.testDir](/api/class-testconfig.mdx#test-config-test-dir), ни [testProject.testDir](/api/class-testproject.mdx#test-project-test-dir) явно не указаны, Playwright будет игнорировать любые тестовые файлы, соответствующие записям `.gitignore`. Эта опция позволяет переопределить это поведение.
 
 **Использование**
 
@@ -376,11 +354,9 @@ testProject.respectGitIgnore
 
 ### retries {#test-project-retries}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.retries</x-search>
+Максимальное количество попыток повторного выполнения для неудачных тестов. Узнайте больше о [повторных попытках тестов](../test-retries.mdx#retries).
 
-Максимальное количество попыток повторного запуска для неудавшихся тестов. Узнайте больше о [повторах тестов](../test-retries.mdx#retries).
-
-Используйте [test.describe.configure()](/api/class-test.mdx#test-describe-configure), чтобы изменить количество повторов для конкретного файла или группы тестов.
+Используйте [test.describe.configure()](/api/class-test.mdx#test-describe-configure), чтобы изменить количество повторных попыток для конкретного файла или группы тестов.
 
 Используйте [testConfig.retries](/api/class-testconfig.mdx#test-config-retries), чтобы изменить эту опцию для всех проектов.
 
@@ -397,13 +373,11 @@ testProject.retries
 
 ### snapshotDir {#test-project-snapshot-dir}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.snapshotDir</x-search>
+Базовая директория, относительно файла конфигурации, для файлов снимков, созданных с помощью `toMatchSnapshot`. По умолчанию [testProject.testDir](/api/class-testproject.mdx#test-project-test-dir).
 
-Базовый каталог, относительно конфигурационного файла, для файлов снимков, созданных с помощью `toMatchSnapshot`. По умолчанию [testProject.testDir](/api/class-testproject.mdx#test-project-test-dir).
+Директория для каждого теста может быть доступна через [testInfo.snapshotDir](/api/class-testinfo.mdx#test-info-snapshot-dir) и [testInfo.snapshotPath()](/api/class-testinfo.mdx#test-info-snapshot-path).
 
-Каталог для каждого теста можно получить через [testInfo.snapshotDir](/api/class-testinfo.mdx#test-info-snapshot-dir) и [testInfo.snapshotPath()](/api/class-testinfo.mdx#test-info-snapshot-path).
-
-Этот путь будет служить в качестве базового каталога для каталога снимков каждого тестового файла. Установив `snapshotDir` в `'snapshots'`, [testInfo.snapshotDir](/api/class-testinfo.mdx#test-info-snapshot-dir) будет разрешен в `snapshots/a.spec.js-snapshots`.
+Этот путь будет служить базовой директорией для каждой директории снимков тестового файла. Установив `snapshotDir` в `'snapshots'`, [testInfo.snapshotDir](/api/class-testinfo.mdx#test-info-snapshot-dir) будет разрешаться в `snapshots/a.spec.js-snapshots`.
 
 **Использование**
 
@@ -418,8 +392,6 @@ testProject.snapshotDir
 
 ### snapshotPathTemplate {#test-project-snapshot-path-template}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.28</font><x-search>testProject.snapshotPathTemplate</x-search>
-
 Эта опция настраивает шаблон, контролирующий расположение снимков, создаваемых [expect(page).toHaveScreenshot()](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1), [expect(locator).toMatchAriaSnapshot()](/api/class-locatorassertions.mdx#locator-assertions-to-match-aria-snapshot-2) и [expect(value).toMatchSnapshot()](/api/class-snapshotassertions.mdx#snapshot-assertions-to-match-snapshot-1).
 
 Вы можете настроить шаблоны для каждого утверждения отдельно в [testConfig.expect](/api/class-testconfig.mdx#test-config-expect).
@@ -432,7 +404,7 @@ import { defineConfig } from '@playwright/test';
 export default defineConfig({
   testDir: './tests',
 
-  // Один шаблон для всех утверждений
+  // Единый шаблон для всех утверждений
   snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}{ext}',
 
   // Шаблоны, специфичные для утверждений
@@ -452,7 +424,7 @@ export default defineConfig({
 
 **Детали**
 
-Значение может включать некоторые "токены", которые будут заменены на фактические значения во время выполнения теста.
+Значение может включать некоторые "токены", которые будут заменены фактическими значениями во время выполнения теста.
 
 Рассмотрим следующую структуру файлов:
 
@@ -476,27 +448,27 @@ test.describe('suite', () => {
 ```
 
 Список поддерживаемых токенов:
-* `{arg}` - Относительный путь снимка **без расширения**. Это происходит от аргументов, переданных в `toHaveScreenshot()`, `toMatchAriaSnapshot()` или `toMatchSnapshot()`; если вызвано без аргументов, это будет автоматически сгенерированное имя снимка.
+* `{arg}` - Относительный путь снимка **без расширения**. Это берется из аргументов, переданных в `toHaveScreenshot()`, `toMatchAriaSnapshot()` или `toMatchSnapshot()`; если вызвано без аргументов, это будет автоматически сгенерированное имя снимка.
   * Значение: `foo/bar/baz`
 * `{ext}` - Расширение снимка (с ведущей точкой).
   * Значение: `.png`
 * `{platform}` - Значение `process.platform`.
-* `{projectName}` - Имя проекта, очищенное от символов файловой системы, если таковое имеется.
+* `{projectName}` - Имя проекта, очищенное от недопустимых символов файловой системы, если есть.
   * Значение: `''` (пустая строка).
-* `{snapshotDir}` - [testProject.snapshotDir](/api/class-testproject.mdx#test-project-snapshot-dir).
-  * Значение: `/home/playwright/tests` (так как `snapshotDir` не указано в конфигурации, оно по умолчанию равно `testDir`)
-* `{testDir}` - [testProject.testDir](/api/class-testproject.mdx#test-project-test-dir).
-  * Значение: `/home/playwright/tests` (абсолютный путь, так как `testDir` разрешается относительно каталога с конфигурацией)
-* `{testFileDir}` - Директории в относительном пути от `testDir` к **тестовому файлу**.
+* `{snapshotDir}` - [testProject.snapshotDir](/api/class-testproject.mdx#test-project-snapshot-dir) проекта.
+  * Значение: `/home/playwright/tests` (так как `snapshotDir` не указан в конфигурации, он по умолчанию равен `testDir`)
+* `{testDir}` - [testProject.testDir](/api/class-testproject.mdx#test-project-test-dir) проекта.
+  * Значение: `/home/playwright/tests` (абсолютный путь, так как `testDir` разрешается относительно директории с конфигурацией)
+* `{testFileDir}` - Директории в относительном пути от `testDir` до **тестового файла**.
   * Значение: `page`
 * `{testFileName}` - Имя тестового файла с расширением.
   * Значение: `page-click.spec.ts`
-* `{testFilePath}` - Относительный путь от `testDir` к **тестовому файлу**.
+* `{testFilePath}` - Относительный путь от `testDir` до **тестового файла**.
   * Значение: `page/page-click.spec.ts`
-* `{testName}` - Имя теста, очищенное от символов файловой системы, включая родительские описания, но исключая имя файла.
+* `{testName}` - Имя теста, очищенное от недопустимых символов файловой системы, включая родительские описания, но исключая имя файла.
   * Значение: `suite-test-should-work`
 
-Каждый токен может быть предшествован одним символом, который будет использоваться **только если** этот токен имеет ненулевое значение.
+Каждый токен может быть предшествован одним символом, который будет использоваться **только если** этот токен имеет непустое значение.
 
 Рассмотрим следующую конфигурацию:
 
@@ -515,23 +487,21 @@ export default defineConfig({
 
 В этой конфигурации:
 1. Первый проект **не имеет** имени, поэтому его снимки будут храниться в `<configDir>/__screenshots__/example.spec.ts/...`.
-1. Второй проект **имеет** имя, поэтому его снимки будут храниться в `<configDir>/__screenshots__/chromium/example.spec.ts/...`.
-1. Поскольку `snapshotPathTemplate` разрешается в относительный путь, он будет разрешен относительно `configDir`.
-1. Прямые слэши `"/"` могут использоваться в качестве разделителей путей на любой платформе.
+2. Второй проект **имеет** имя, поэтому его снимки будут храниться в `<configDir>/__screenshots__/chromium/example.spec.ts/..`.
+3. Так как `snapshotPathTemplate` разрешается в относительный путь, он будет разрешаться относительно `configDir`.
+4. Прямые слэши `"/"` могут использоваться как разделители путей на любой платформе.
 
 ---
 
 ### teardown {#test-project-teardown}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.34</font><x-search>testProject.teardown</x-search>
+Имя проекта, который должен быть выполнен после завершения этого и всех зависимых проектов. Teardown полезен для очистки любых ресурсов, приобретенных этим проектом.
 
-Имя проекта, который должен быть выполнен после завершения этого и всех зависимых проектов. Teardown полезен для очистки любых ресурсов, полученных этим проектом.
-
-Передача аргумента `--no-deps` игнорирует [testProject.teardown](/api/class-testproject.mdx#test-project-teardown) и ведет себя так, как будто он не был указан.
+Передача аргумента `--no-deps` игнорирует [testProject.teardown](/api/class-testproject.mdx#test-project-teardown) и ведет себя так, как если бы он не был указан.
 
 **Использование**
 
-Распространенный шаблон - это зависимость "настройки", которая имеет соответствующий "очиститель":
+Общая схема - это зависимость "setup", которая имеет соответствующий "teardown":
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -573,11 +543,9 @@ export default defineConfig({
 
 ### testDir {#test-project-test-dir}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.testDir</x-search>
+Директория, которая будет рекурсивно сканироваться на наличие тестовых файлов. По умолчанию это директория файла конфигурации.
 
-Каталог, который будет рекурсивно просканирован для тестовых файлов. По умолчанию это каталог конфигурационного файла.
-
-Каждый проект может использовать другой каталог. Вот пример, который запускает дымовые тесты в трех браузерах и все остальные тесты в стабильном браузере Chrome.
+Каждый проект может использовать другую директорию. Вот пример, который запускает smoke-тесты в трех браузерах и все остальные тесты в стабильной версии браузера Chrome.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -632,11 +600,9 @@ testProject.testDir
 
 ### testIgnore {#test-project-test-ignore}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.testIgnore</x-search>
+Файлы, соответствующие одному из этих шаблонов, не выполняются как тестовые файлы. Сопоставление выполняется с абсолютным путем файла. Строки рассматриваются как шаблоны glob.
 
-Файлы, соответствующие одному из этих шаблонов, не выполняются как тестовые файлы. Сопоставление выполняется по абсолютному пути файла. Строки обрабатываются как шаблоны glob.
-
-Например, `'**/test-assets/**'` будет игнорировать любые файлы в каталоге `test-assets`.
+Например, `'**/test-assets/**'` будет игнорировать любые файлы в директории `test-assets`.
 
 Используйте [testConfig.testIgnore](/api/class-testconfig.mdx#test-config-test-ignore), чтобы изменить эту опцию для всех проектов.
 
@@ -653,11 +619,9 @@ testProject.testIgnore
 
 ### testMatch {#test-project-test-match}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.testMatch</x-search>
+Только файлы, соответствующие одному из этих шаблонов, выполняются как тестовые файлы. Сопоставление выполняется с абсолютным путем файла. Строки рассматриваются как шаблоны glob.
 
-Только файлы, соответствующие одному из этих шаблонов, выполняются как тестовые файлы. Сопоставление выполняется по абсолютному пути файла. Строки обрабатываются как шаблоны glob.
-
-По умолчанию Playwright ищет файлы, соответствующие следующему шаблону glob: `**/*.@(spec|test).?(c|m)[jt]s?(x)`. Это означает, что JavaScript или TypeScript файлы с суффиксом `".test"` или `".spec"`, например `login-screen.wrong-credentials.spec.ts`.
+По умолчанию Playwright ищет файлы, соответствующие следующему шаблону glob: `**/*.@(spec|test).?(c|m)[jt]s?(x)`. Это означает файлы JavaScript или TypeScript с суффиксом `".test"` или `".spec"`, например, `login-screen.wrong-credentials.spec.ts`.
 
 Используйте [testConfig.testMatch](/api/class-testconfig.mdx#test-config-test-match), чтобы изменить эту опцию для всех проектов.
 
@@ -674,11 +638,9 @@ testProject.testMatch
 
 ### timeout {#test-project-timeout}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.timeout</x-search>
-
 Тайм-аут для каждого теста в миллисекундах. По умолчанию 30 секунд.
 
-Это базовый тайм-аут для всех тестов. Каждый тест может настроить свой собственный тайм-аут с помощью [test.setTimeout()](/api/class-test.mdx#test-set-timeout). Каждый файл или группа тестов могут настроить тайм-аут с помощью [test.describe.configure()](/api/class-test.mdx#test-describe-configure).
+Это базовый тайм-аут для всех тестов. Каждый тест может настроить свой собственный тайм-аут с помощью [test.setTimeout()](/api/class-test.mdx#test-set-timeout). Каждый файл или группа тестов может настроить тайм-аут с помощью [test.describe.configure()](/api/class-test.mdx#test-describe-configure).
 
 Используйте [testConfig.timeout](/api/class-testconfig.mdx#test-config-timeout), чтобы изменить эту опцию для всех проектов.
 
@@ -695,9 +657,7 @@ testProject.timeout
 
 ### use {#test-project-use}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.use</x-search>
-
-Опции для всех тестов в этом проекте, например [testOptions.browserName](/api/class-testoptions.mdx#test-options-browser-name). Узнайте больше о [конфигурации](../test-configuration.mdx) и смотрите [доступные опции][TestOptions].
+Опции для всех тестов в этом проекте, например, [testOptions.browserName](/api/class-testoptions.mdx#test-options-browser-name). Узнайте больше о [конфигурации](../test-configuration.mdx) и смотрите [доступные опции][TestOptions].
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -724,105 +684,3 @@ testProject.use
 
 **Тип**
 - [TestOptions]
-
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
-[APIRequest]: /api/class-apirequest.mdx "APIRequest"
-[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
-[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
-[Browser]: /api/class-browser.mdx "Browser"
-[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
-[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
-[BrowserType]: /api/class-browsertype.mdx "BrowserType"
-[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
-[Clock]: /api/class-clock.mdx "Clock"
-[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
-[Coverage]: /api/class-coverage.mdx "Coverage"
-[Dialog]: /api/class-dialog.mdx "Dialog"
-[Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
-[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
-[FileChooser]: /api/class-filechooser.mdx "FileChooser"
-[Frame]: /api/class-frame.mdx "Frame"
-[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
-[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
-[JSHandle]: /api/class-jshandle.mdx "JSHandle"
-[Keyboard]: /api/class-keyboard.mdx "Keyboard"
-[Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
-[Logger]: /api/class-logger.mdx "Logger"
-[Mouse]: /api/class-mouse.mdx "Mouse"
-[Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
-[Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
-[Request]: /api/class-request.mdx "Request"
-[Response]: /api/class-response.mdx "Response"
-[Route]: /api/class-route.mdx "Route"
-[Selectors]: /api/class-selectors.mdx "Selectors"
-[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
-[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
-[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: /api/class-tracing.mdx "Tracing"
-[Video]: /api/class-video.mdx "Video"
-[WebError]: /api/class-weberror.mdx "WebError"
-[WebSocket]: /api/class-websocket.mdx "WebSocket"
-[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
-[Worker]: /api/class-worker.mdx "Worker"
-[Fixtures]: /api/class-fixtures.mdx "Fixtures"
-[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
-[FullProject]: /api/class-fullproject.mdx "FullProject"
-[Location]: /api/class-location.mdx "Location"
-[Test]: /api/class-test.mdx "Test"
-[TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestInfo]: /api/class-testinfo.mdx "TestInfo"
-[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
-[TestOptions]: /api/class-testoptions.mdx "TestOptions"
-[TestProject]: /api/class-testproject.mdx "TestProject"
-[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
-[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
-[Reporter]: /api/class-reporter.mdx "Reporter"
-[Suite]: /api/class-suite.mdx "Suite"
-[TestCase]: /api/class-testcase.mdx "TestCase"
-[TestError]: /api/class-testerror.mdx "TestError"
-[TestResult]: /api/class-testresult.mdx "TestResult"
-[TestStep]: /api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
-
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
-[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
-[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
-[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
-[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
-[URL]: https://nodejs.org/api/url.html "URL"
-[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"

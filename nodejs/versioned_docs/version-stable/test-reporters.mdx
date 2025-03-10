@@ -1,6 +1,6 @@
 ---
 id: test-reporters
-title: "Репортеры"
+title: "Отчётчики"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -8,13 +8,13 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Введение
 
-Playwright Test поставляется с несколькими встроенными репортерами для различных нужд и возможностью предоставления пользовательских репортеров. Самый простой способ попробовать встроенные репортеры — передать опцию `--reporter` [в командной строке](./test-cli.mdx).
+Playwright Test поставляется с несколькими встроенными отчётчиками для различных нужд и возможностью предоставления пользовательских отчётчиков. Самый простой способ попробовать встроенные отчётчики — это передать опцию командной строки `--reporter`.
 
 ```bash
 npx playwright test --reporter=line
 ```
 
-Для большего контроля вы можете указать репортеры программно в [файле конфигурации](./test-configuration.mdx).
+Для большего контроля вы можете указать отчётчики программно в [файле конфигурации](./test-configuration.mdx).
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -24,9 +24,9 @@ export default defineConfig({
 });
 ```
 
-### Несколько репортеров
+### Несколько отчётчиков
 
-Вы можете использовать несколько репортеров одновременно. Например, вы можете использовать `'list'` для красивого вывода в терминале и `'json'` для получения подробного json-файла с результатами тестов.
+Вы можете использовать несколько отчётчиков одновременно. Например, вы можете использовать `'list'` для красивого вывода в терминале и `'json'`, чтобы получить подробный json-файл с результатами тестов.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -34,31 +34,31 @@ import { defineConfig } from '@playwright/test';
 export default defineConfig({
   reporter: [
     ['list'],
-    ['json', { outputFile: 'test-results.json' }]
+    ['json', {  outputFile: 'test-results.json' }]
   ],
 });
 ```
 
-### Репортеры в CI
+### Отчётчики на CI
 
-Вы можете использовать разные репортеры локально и в CI. Например, использование краткого репортера `'dot'` позволяет избежать избыточного вывода. Это значение по умолчанию в CI.
+Вы можете использовать разные отчётчики локально и на CI. Например, использование лаконичного отчётчика `'dot'` позволяет избежать избыточного вывода. Это значение по умолчанию на CI.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  // Краткий 'dot' для CI, по умолчанию 'list' при локальном запуске
+  // Лаконичный 'dot' для CI, по умолчанию 'list' при локальном запуске
   reporter: process.env.CI ? 'dot' : 'list',
 });
 ```
 
-## Встроенные репортеры
+## Встроенные отчётчики
 
-Все встроенные репортеры показывают подробную информацию о сбоях и в основном различаются по уровню подробности для успешных запусков.
+Все встроенные отчётчики показывают подробную информацию о сбоях и в основном различаются по степени подробности для успешных запусков.
 
-### Репортер списка
+### Отчётчик List
 
-Репортер списка является значением по умолчанию (за исключением CI, где по умолчанию используется репортер `dot`). Он выводит строку для каждого теста, который выполняется.
+Отчётчик List является значением по умолчанию (за исключением CI, где по умолчанию используется отчётчик `dot`). Он выводит строку для каждого выполняемого теста.
 
 ```bash
 npx playwright test --reporter=list
@@ -100,17 +100,17 @@ export default defineConfig({
 });
 ```
 
-Репортер списка поддерживает следующие параметры конфигурации и переменные окружения:
+Отчёт List поддерживает следующие параметры конфигурации и переменные окружения:
 
-| Имя переменной окружения | Параметр конфигурации репортера | Описание | По умолчанию
+| Имя переменной окружения | Опция конфигурации отчётчика | Описание | По умолчанию
 |---|---|---|---|
-| `PLAYWRIGHT_LIST_PRINT_STEPS` | `printSteps` | Указывает, следует ли выводить каждый шаг на отдельной строке. | `false`
-| `PLAYWRIGHT_FORCE_TTY` | | Указывает, следует ли производить вывод, подходящий для живого терминала. Если указано число, оно также будет использоваться как ширина терминала. | `true`, когда терминал находится в режиме TTY, `false` в противном случае.
-| `FORCE_COLOR` | | Указывает, следует ли производить цветной вывод. | `true`, когда терминал находится в режиме TTY, `false` в противном случае.
+| `PLAYWRIGHT_LIST_PRINT_STEPS` | `printSteps` | Печатать ли каждый шаг на отдельной строке. | `false`
+| `PLAYWRIGHT_FORCE_TTY` | | Создавать ли вывод, подходящий для живого терминала. Если указано число, оно также будет использоваться в качестве ширины терминала.  | `true`, когда терминал находится в режиме TTY, `false` в противном случае.
+| `FORCE_COLOR` | | Создавать ли цветной вывод. | `true`, когда терминал находится в режиме TTY, `false` в противном случае.
 
-### Линейный репортер
+### Отчётчик Line
 
-Линейный репортер более лаконичен, чем репортер списка. Он использует одну строку для отчета о последнем завершенном тесте и выводит сбои по мере их возникновения. Линейный репортер полезен для больших наборов тестов, так как показывает прогресс, но не засоряет вывод, перечисляя все тесты.
+Отчётчик Line более лаконичен, чем отчётчик List. Он использует одну строку для отчёта о последнем завершённом тесте и выводит сбои по мере их возникновения. Отчётчик Line полезен для больших наборов тестов, где он показывает прогресс, но не засоряет вывод, перечисляя все тесты.
 
 ```bash
 npx playwright test --reporter=line
@@ -139,16 +139,16 @@ Running 124 tests using 6 workers
 [23/124] gitignore.spec.ts - should respect nested .gitignore
 ```
 
-Линейный отчет поддерживает следующие параметры конфигурации и переменные окружения:
+Отчёт Line поддерживает следующие параметры конфигурации и переменные окружения:
 
-| Имя переменной окружения | Параметр конфигурации репортера | Описание | По умолчанию
+| Имя переменной окружения | Опция конфигурации отчётчика | Описание | По умолчанию
 |---|---|---|---|
-| `PLAYWRIGHT_FORCE_TTY` | | Указывает, следует ли производить вывод, подходящий для живого терминала. Если указано число, оно также будет использоваться как ширина терминала. | `true`, когда терминал находится в режиме TTY, `false` в противном случае.
-| `FORCE_COLOR` | | Указывает, следует ли производить цветной вывод. | `true`, когда терминал находится в режиме TTY, `false` в противном случае.
+| `PLAYWRIGHT_FORCE_TTY` | | Создавать ли вывод, подходящий для живого терминала. Если указано число, оно также будет использоваться в качестве ширины терминала.  | `true`, когда терминал находится в режиме TTY, `false` в противном случае.
+| `FORCE_COLOR` | | Создавать ли цветной вывод. | `true`, когда терминал находится в режиме TTY, `false` в противном случае.
 
-### Точечный репортер
+### Отчётчик Dot
 
-Точечный репортер очень лаконичен — он производит только один символ за успешный тест. Это значение по умолчанию в CI и полезно, когда вы не хотите много вывода.
+Отчётчик Dot очень лаконичен — он выводит только один символ для каждого успешного выполнения теста. Это значение по умолчанию на CI и полезно, когда вы не хотите большого объёма вывода.
 
 ```bash
 npx playwright test --reporter=dot
@@ -170,35 +170,35 @@ Running 124 tests using 6 workers
 ······F·············································
 ```
 
-Один символ отображается для каждого теста, который был выполнен, указывая его статус:
+Один символ отображается для каждого выполненного теста, указывая его статус:
 
 | Символ | Описание
 |---|---|
 | `·` | Пройден
 | `F` | Провален
-| `×` | Провален или истек по времени — и будет повторен
-| `±` | Пройден при повторе (неустойчивый)
-| `T` | Истек по времени
+| `×` | Провален или истекло время - будет повторен
+| `±` | Пройден при повторе (нестабильный)
+| `T` | Истекло время
 | `°` | Пропущен
 
-Точечный отчет поддерживает следующие параметры конфигурации и переменные окружения:
+Отчёт Dot поддерживает следующие параметры конфигурации и переменные окружения:
 
-| Имя переменной окружения | Параметр конфигурации репортера | Описание | По умолчанию
+| Имя переменной окружения | Опция конфигурации отчётчика | Описание | По умолчанию
 |---|---|---|---|
-| `PLAYWRIGHT_FORCE_TTY` | | Указывает, следует ли производить вывод, подходящий для живого терминала. Если указано число, оно также будет использоваться как ширина терминала. | `true`, когда терминал находится в режиме TTY, `false` в противном случае.
-| `FORCE_COLOR` | | Указывает, следует ли производить цветной вывод. | `true`, когда терминал находится в режиме TTY, `false` в противном случае.
+| `PLAYWRIGHT_FORCE_TTY` | | Создавать ли вывод, подходящий для живого терминала. Если указано число, оно также будет использоваться в качестве ширины терминала.  | `true`, когда терминал находится в режиме TTY, `false` в противном случае.
+| `FORCE_COLOR` | | Создавать ли цветной вывод. | `true`, когда терминал находится в режиме TTY, `false` в противном случае.
 
-### HTML репортер
+### Отчётчик HTML
 
-HTML репортер создает самодостаточную папку, которая содержит отчет о выполнении теста, который можно обслуживать как веб-страницу.
+Отчётчик HTML создаёт автономную папку, содержащую отчёт о выполнении теста, который можно открыть как веб-страницу.
 
 ```bash
 npx playwright test --reporter=html
 ```
 
-По умолчанию HTML отчет открывается автоматически, если некоторые тесты провалились. Вы можете контролировать это поведение с помощью свойства `open` в конфигурации Playwright или переменной окружения `PLAYWRIGHT_HTML_OPEN`. Возможные значения для этого свойства: `always`, `never` и `on-failure` (по умолчанию).
+По умолчанию HTML-отчёт открывается автоматически, если некоторые из тестов не прошли. Вы можете контролировать это поведение с помощью свойства `open` в конфигурации Playwright или переменной окружения `PLAYWRIGHT_HTML_OPEN`. Возможные значения для этого свойства: `always`, `never` и `on-failure` (по умолчанию).
 
-Вы также можете настроить `host` и `port`, которые используются для обслуживания HTML отчета.
+Вы также можете настроить `host` и `port`, которые используются для предоставления HTML-отчёта.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -208,7 +208,7 @@ export default defineConfig({
 });
 ```
 
-По умолчанию отчет записывается в папку `playwright-report` в текущем рабочем каталоге. Вы можете переопределить это местоположение, используя переменную окружения `PLAYWRIGHT_HTML_OUTPUT_DIR` или конфигурацию репортера.
+По умолчанию отчёт записывается в папку `playwright-report` в текущем рабочем каталоге. Можно изменить это расположение, используя переменную окружения `PLAYWRIGHT_HTML_OUTPUT_DIR` или конфигурацию отчётчика.
 
 В файле конфигурации передайте параметры напрямую:
 
@@ -220,7 +220,7 @@ export default defineConfig({
 });
 ```
 
-Если вы загружаете вложения из папки данных в другое место, вы можете использовать параметр `attachmentsBaseURL`, чтобы указать HTML отчету, где их искать.
+Если вы загружаете вложения из папки данных в другое место, вы можете использовать опцию `attachmentsBaseURL`, чтобы указать HTML-отчёту, где их искать.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -230,37 +230,37 @@ export default defineConfig({
 });
 ```
 
-Быстрый способ открыть отчет последнего выполнения теста:
+Быстрый способ открыть отчёт о последнем запуске теста:
 
 ```bash
 npx playwright show-report
 ```
 
-Или, если есть имя пользовательской папки:
+Или если указано нестандартное имя папки:
 
 ```bash
 npx playwright show-report my-report
 ```
 
-HTML отчет поддерживает следующие параметры конфигурации и переменные окружения:
+Отчёт HTML поддерживает следующие параметры конфигурации и переменные окружения:
 
-| Имя переменной окружения | Параметр конфигурации репортера | Описание | По умолчанию
+| Имя переменной окружения | Опция конфигурации отчётчика | Описание | По умолчанию
 |---|---|---|---|
-| `PLAYWRIGHT_HTML_OUTPUT_DIR` | `outputFolder` | Директория для сохранения отчета. | `playwright-report`
-| `PLAYWRIGHT_HTML_OPEN` | `open` | Когда открывать HTML отчет в браузере, одно из `'always'`, `'never'` или `'on-failure'` | `'on-failure'`
-| `PLAYWRIGHT_HTML_HOST` | `host` | Когда отчет открывается в браузере, он будет обслуживаться с привязкой к этому имени хоста. | `localhost`
-| `PLAYWRIGHT_HTML_PORT` | `port` | Когда отчет открывается в браузере, он будет обслуживаться на этом порту. | `9323` или любой доступный порт, если `9323` недоступен.
-| `PLAYWRIGHT_HTML_ATTACHMENTS_BASE_URL` | `attachmentsBaseURL` | Отдельное местоположение, куда загружаются вложения из подкаталога `data`. Необходимо только в том случае, если вы загружаете отчет и `data` отдельно в разные места. | `data/`
+| `PLAYWRIGHT_HTML_OUTPUT_DIR` | `outputFolder` | Каталог для сохранения отчёта. | `playwright-report`
+| `PLAYWRIGHT_HTML_OPEN` | `open` | Когда открывать HTML-отчёт в браузере, одно из `'always'`, `'never'` или `'on-failure'` | `'on-failure'`
+| `PLAYWRIGHT_HTML_HOST` | `host` | Когда отчёт открывается в браузере, он будет предоставлен с привязкой к этому имени хоста. | `localhost`
+| `PLAYWRIGHT_HTML_PORT` | `port` | Когда отчёт открывается в браузере, он будет предоставлен на этом порту. | `9323` или любой доступный порт, если `9323` недоступен.
+| `PLAYWRIGHT_HTML_ATTACHMENTS_BASE_URL` | `attachmentsBaseURL` | Отдельное расположение, куда загружаются вложения из подкаталога `data`. Необходимо только в случае, если вы загружаете отчёт и `data` отдельно в разные места. | `data/`
 
-### Blob репортер
+### Отчётчик Blob
 
-Blob отчеты содержат все детали о выполнении теста и могут быть использованы позже для создания любого другого отчета. Их основная функция — облегчить объединение отчетов из [шардированных тестов](./test-sharding.mdx).
+Отчёты Blob содержат все детали о выполнении теста и могут быть использованы позже для создания любого другого отчёта. Их основная функция — облегчить объединение отчётов из [разделённых тестов](./test-sharding.mdx).
 
 ```bash
 npx playwright test --reporter=blob
 ```
 
-По умолчанию отчет записывается в директорию `blob-report` в каталоге package.json или текущем рабочем каталоге (если файл package.json не найден). Имя файла отчета выглядит как `report-<hash>.zip` или `report-<hash>-<shard_number>.zip`, когда используется [шардинг](./test-sharding.mdx). Хэш — это необязательное значение, вычисляемое из `--grep`, `--grepInverted`, `--project` и фильтров файлов, переданных в качестве аргументов командной строки. Хэш гарантирует, что запуск Playwright с разными опциями командной строки будет производить разные, но стабильные между запусками имена отчетов. Имя выходного файла можно переопределить в файле конфигурации или передать как переменную окружения `'PLAYWRIGHT_BLOB_OUTPUT_FILE'`.
+По умолчанию отчёт записывается в каталог `blob-report` в каталоге package.json или в текущем рабочем каталоге (если package.json не найден). Имя файла отчёта выглядит как `report-<hash>.zip` или `report-<hash>-<shard_number>.zip`, когда используется [разделение](./test-sharding.mdx). Хэш — это необязательное значение, вычисляемое из `--grep`, `--grepInverted`, `--project` и фильтров файлов, переданных в качестве аргументов командной строки. Хэш гарантирует, что запуск Playwright с различными параметрами командной строки создаст разные, но стабильные между запусками имена отчётов. Имя выходного файла можно переопределить в файле конфигурации или передать в качестве переменной окружения `'PLAYWRIGHT_BLOB_OUTPUT_FILE'`.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -270,17 +270,17 @@ export default defineConfig({
 });
 ```
 
-Blob отчет поддерживает следующие параметры конфигурации и переменные окружения:
+Отчёт Blob поддерживает следующие параметры конфигурации и переменные окружения:
 
-| Имя переменной окружения | Параметр конфигурации репортера | Описание | По умолчанию
+| Имя переменной окружения | Опция конфигурации отчётчика | Описание | По умолчанию
 |---|---|---|---|
-| `PLAYWRIGHT_BLOB_OUTPUT_DIR` | `outputDir` | Директория для сохранения вывода. Существующее содержимое удаляется перед записью нового отчета. | `blob-report`
-| `PLAYWRIGHT_BLOB_OUTPUT_NAME` | `fileName` | Имя файла отчета. | `report-<project>-<hash>-<shard_number>.zip`
-| `PLAYWRIGHT_BLOB_OUTPUT_FILE` | `outputFile` | Полный путь к выходному файлу. Если определено, `outputDir` и `fileName` будут игнорироваться. | `undefined`
+| `PLAYWRIGHT_BLOB_OUTPUT_DIR` | `outputDir` | Каталог для сохранения вывода. Существующее содержимое удаляется перед записью нового отчёта. | `blob-report`
+| `PLAYWRIGHT_BLOB_OUTPUT_NAME` | `fileName` | Имя файла отчёта. | `report-<project>-<hash>-<shard_number>.zip`
+| `PLAYWRIGHT_BLOB_OUTPUT_FILE` | `outputFile` | Полный путь к выходному файлу. Если определено, `outputDir` и `fileName` будут проигнорированы. | `undefined`
 
-### JSON репортер
+### Отчётчик JSON
 
-JSON репортер создает объект со всей информацией о выполнении теста.
+Отчётчик JSON создаёт объект со всей информацией о выполнении теста.
 
 Скорее всего, вы захотите записать JSON в файл. При запуске с `--reporter=json` используйте переменную окружения `PLAYWRIGHT_JSON_OUTPUT_NAME`:
 
@@ -328,19 +328,19 @@ export default defineConfig({
 });
 ```
 
-JSON отчет поддерживает следующие параметры конфигурации и переменные окружения:
+Отчёт JSON поддерживает следующие параметры конфигурации и переменные окружения:
 
-| Имя переменной окружения | Параметр конфигурации репортера | Описание | По умолчанию
+| Имя переменной окружения | Опция конфигурации отчётчика | Описание | По умолчанию
 |---|---|---|---|
-| `PLAYWRIGHT_JSON_OUTPUT_DIR` | | Директория для сохранения выходного файла. Игнорируется, если указан выходной файл. | `cwd` или каталог конфигурации.
-| `PLAYWRIGHT_JSON_OUTPUT_NAME` | `outputFile` | Базовое имя файла для вывода, относительно выходной директории. | JSON отчет выводится в stdout.
-| `PLAYWRIGHT_JSON_OUTPUT_FILE` | `outputFile` | Полный путь к выходному файлу. Если определено, `PLAYWRIGHT_JSON_OUTPUT_DIR` и `PLAYWRIGHT_JSON_OUTPUT_NAME` будут игнорироваться. | JSON отчет выводится в stdout.
+| `PLAYWRIGHT_JSON_OUTPUT_DIR` | | Каталог для сохранения выходного файла. Игнорируется, если указан выходной файл. | `cwd` или каталог конфигурации.
+| `PLAYWRIGHT_JSON_OUTPUT_NAME` | `outputFile` | Базовое имя файла для вывода, относительно каталога вывода. | Отчёт JSON выводится в stdout.
+| `PLAYWRIGHT_JSON_OUTPUT_FILE` | `outputFile` | Полный путь к выходному файлу. Если определено, `PLAYWRIGHT_JSON_OUTPUT_DIR` и `PLAYWRIGHT_JSON_OUTPUT_NAME` будут проигнорированы. | Отчёт JSON выводится в stdout.
 
-### JUnit репортер
+### Отчётчик JUnit
 
-JUnit репортер создает отчет в формате JUnit-style xml.
+Отчётчик JUnit создаёт отчёт в формате xml в стиле JUnit.
 
-Скорее всего, вы захотите записать отчет в xml файл. При запуске с `--reporter=junit` используйте переменную окружения `PLAYWRIGHT_JUNIT_OUTPUT_NAME`:
+Скорее всего, вы захотите записать отчёт в xml-файл. При запуске с `--reporter=junit` используйте переменную окружения `PLAYWRIGHT_JUNIT_OUTPUT_NAME`:
 
 <Tabs
   groupId="bash-flavor"
@@ -386,37 +386,37 @@ export default defineConfig({
 });
 ```
 
-JUnit отчет поддерживает следующие параметры конфигурации и переменные окружения:
+Отчёт JUnit поддерживает следующие параметры конфигурации и переменные окружения:
 
-| Имя переменной окружения | Параметр конфигурации репортера | Описание | По умолчанию
+| Имя переменной окружения | Опция конфигурации отчётчика | Описание | По умолчанию
 |---|---|---|---|
-| `PLAYWRIGHT_JUNIT_OUTPUT_DIR` | | Директория для сохранения выходного файла. Игнорируется, если выходной файл не указан. | `cwd` или каталог конфигурации.
-| `PLAYWRIGHT_JUNIT_OUTPUT_NAME` | `outputFile` | Базовое имя файла для вывода, относительно выходной директории. | JUnit отчет выводится в stdout.
-| `PLAYWRIGHT_JUNIT_OUTPUT_FILE` | `outputFile` | Полный путь к выходному файлу. Если определено, `PLAYWRIGHT_JUNIT_OUTPUT_DIR` и `PLAYWRIGHT_JUNIT_OUTPUT_NAME` будут игнорироваться. | JUnit отчет выводится в stdout.
-| `PLAYWRIGHT_JUNIT_STRIP_ANSI` | `stripANSIControlSequences` | Указывает, следует ли удалять управляющие последовательности ANSI из текста перед записью его в отчет. | По умолчанию текст вывода добавляется как есть.
-| `PLAYWRIGHT_JUNIT_INCLUDE_PROJECT_IN_TEST_NAME` | `includeProjectInTestName` | Указывает, следует ли включать имя проекта Playwright в каждое тестовое имя в качестве префикса. | По умолчанию не включается.
-| `PLAYWRIGHT_JUNIT_SUITE_ID` |  | Значение атрибута `id` в корневом элементе `<testsuites/>` отчета. | Пустая строка.
-| `PLAYWRIGHT_JUNIT_SUITE_NAME` |  | Значение атрибута `name` в корневом элементе `<testsuites/>` отчета. | Пустая строка.
+| `PLAYWRIGHT_JUNIT_OUTPUT_DIR` | | Каталог для сохранения выходного файла. Игнорируется, если выходной файл не указан. | `cwd` или каталог конфигурации.
+| `PLAYWRIGHT_JUNIT_OUTPUT_NAME` | `outputFile` | Базовое имя файла для вывода, относительно каталога вывода. | Отчёт JUnit выводится в stdout.
+| `PLAYWRIGHT_JUNIT_OUTPUT_FILE` | `outputFile` | Полный путь к выходному файлу. Если определено, `PLAYWRIGHT_JUNIT_OUTPUT_DIR` и `PLAYWRIGHT_JUNIT_OUTPUT_NAME` будут проигнорированы. | Отчёт JUnit выводится в stdout.
+| `PLAYWRIGHT_JUNIT_STRIP_ANSI` | `stripANSIControlSequences` | Удалять ли ANSI управляющие последовательности из текста перед записью в отчёт. | По умолчанию текст выводится как есть.
+| `PLAYWRIGHT_JUNIT_INCLUDE_PROJECT_IN_TEST_NAME` | `includeProjectInTestName` | Включать ли имя проекта Playwright в каждое тестовое задание в качестве префикса имени. | По умолчанию не включается.
+| `PLAYWRIGHT_JUNIT_SUITE_ID` |  | Значение атрибута `id` в корневой записи `<testsuites/>` отчёта. | Пустая строка.
+| `PLAYWRIGHT_JUNIT_SUITE_NAME` |  | Значение атрибута `name` в корневой записи `<testsuites/>` отчёта. | Пустая строка.
 
 ### Аннотации GitHub Actions
 
-Вы можете использовать встроенный репортер `github`, чтобы получить автоматические аннотации ошибок при запуске в GitHub Actions.
+Вы можете использовать встроенный отчётчик `github`, чтобы получить автоматические аннотации сбоев при запуске в GitHub Actions.
 
-Обратите внимание, что все остальные репортеры также работают в GitHub Actions, но не предоставляют аннотации. Также не рекомендуется использовать этот тип аннотаций, если вы запускаете свои тесты с помощью матричной стратегии, так как трассировки ошибок будут умножаться и затенять представление файлов GitHub.
+Обратите внимание, что все другие отчётчики также работают в GitHub Actions, но не предоставляют аннотаций. Также не рекомендуется использовать этот тип аннотаций, если вы запускаете тесты с помощью стратегии матрицы, так как сбои в трассировке стека будут умножаться и затруднять просмотр файлов в GitHub.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  // 'github' для GitHub Actions CI для генерации аннотаций, плюс краткий 'dot'
+  // 'github' для GitHub Actions CI для генерации аннотаций, плюс лаконичный 'dot'
   // по умолчанию 'list' при локальном запуске
   reporter: process.env.CI ? 'github' : 'list',
 });
 ```
 
-## Пользовательские репортеры
+## Пользовательские отчётчики
 
-Вы можете создать пользовательский репортер, реализовав класс с некоторыми методами репортера. Узнайте больше о [Reporter] API.
+Вы можете создать пользовательский отчётчик, реализовав класс с некоторыми методами отчётчика. Узнайте больше о [Reporter] API.
 
 ```js title="my-awesome-reporter.ts"
 import type {
@@ -425,26 +425,26 @@ import type {
 
 class MyReporter implements Reporter {
   onBegin(config: FullConfig, suite: Suite) {
-    console.log(`Запуск с ${suite.allTests().length} тестами`);
+    console.log(`Starting the run with ${suite.allTests().length} tests`);
   }
 
   onTestBegin(test: TestCase, result: TestResult) {
-    console.log(`Запуск теста ${test.title}`);
+    console.log(`Starting test ${test.title}`);
   }
 
   onTestEnd(test: TestCase, result: TestResult) {
-    console.log(`Завершение теста ${test.title}: ${result.status}`);
+    console.log(`Finished test ${test.title}: ${result.status}`);
   }
 
   onEnd(result: FullResult) {
-    console.log(`Завершение запуска: ${result.status}`);
+    console.log(`Finished the run: ${result.status}`);
   }
 }
 
 export default MyReporter;
 ```
 
-Теперь используйте этот репортер с [testConfig.reporter](/api/class-testconfig.mdx#test-config-reporter).
+Теперь используйте этот отчётчик с [testConfig.reporter](/api/class-testconfig.mdx#test-config-reporter).
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -454,15 +454,122 @@ export default defineConfig({
 });
 ```
 
-Или просто передайте путь к файлу репортера как опцию `--reporter` в командной строке:
+Или просто передайте путь к файлу отчётчика в качестве опции командной строки `--reporter`:
 
 ```bash
 npx playwright test --reporter="./myreporter/my-awesome-reporter.ts"
 ```
 
-Вот краткий список реализаций открытых репортеров, которые вы можете изучить при написании собственного репортера:
+Вот краткий список реализаций отчётчиков с открытым исходным кодом, которые вы можете изучить при написании собственного отчётчика:
 * [Allure Reporter](https://github.com/allure-framework/allure-js/tree/main/packages/allure-playwright)
 * [Github Actions Reporter](https://github.com/estruyf/playwright-github-actions-reporter)
 * [Mail Reporter](https://github.com/estruyf/playwright-mail-reporter)
 * [ReportPortal](https://github.com/reportportal/agent-js-playwright)
 * [Monocart](https://github.com/cenfun/monocart-reporter)
+
+
+[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
+[APIRequest]: /api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
+[Browser]: /api/class-browser.mdx "Browser"
+[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[Clock]: /api/class-clock.mdx "Clock"
+[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: /api/class-coverage.mdx "Coverage"
+[Dialog]: /api/class-dialog.mdx "Dialog"
+[Download]: /api/class-download.mdx "Download"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[Frame]: /api/class-frame.mdx "Frame"
+[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
+[JSHandle]: /api/class-jshandle.mdx "JSHandle"
+[Keyboard]: /api/class-keyboard.mdx "Keyboard"
+[Locator]: /api/class-locator.mdx "Locator"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
+[Logger]: /api/class-logger.mdx "Logger"
+[Mouse]: /api/class-mouse.mdx "Mouse"
+[Page]: /api/class-page.mdx "Page"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
+[Playwright]: /api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
+[Request]: /api/class-request.mdx "Request"
+[Response]: /api/class-response.mdx "Response"
+[Route]: /api/class-route.mdx "Route"
+[Selectors]: /api/class-selectors.mdx "Selectors"
+[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
+[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: /api/class-tracing.mdx "Tracing"
+[Video]: /api/class-video.mdx "Video"
+[WebError]: /api/class-weberror.mdx "WebError"
+[WebSocket]: /api/class-websocket.mdx "WebSocket"
+[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[Worker]: /api/class-worker.mdx "Worker"
+[Fixtures]: /api/class-fixtures.mdx "Fixtures"
+[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
+[FullProject]: /api/class-fullproject.mdx "FullProject"
+[Location]: /api/class-location.mdx "Location"
+[Test]: /api/class-test.mdx "Test"
+[TestConfig]: /api/class-testconfig.mdx "TestConfig"
+[TestInfo]: /api/class-testinfo.mdx "TestInfo"
+[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
+[TestOptions]: /api/class-testoptions.mdx "TestOptions"
+[TestProject]: /api/class-testproject.mdx "TestProject"
+[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
+[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
+[Reporter]: /api/class-reporter.mdx "Reporter"
+[Suite]: /api/class-suite.mdx "Suite"
+[TestCase]: /api/class-testcase.mdx "TestCase"
+[TestError]: /api/class-testerror.mdx "TestError"
+[TestResult]: /api/class-testresult.mdx "TestResult"
+[TestStep]: /api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
+
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
+[Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

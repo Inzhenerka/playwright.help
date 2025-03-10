@@ -6,48 +6,50 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-Каждый раз, когда страница отправляет запрос на сетевой ресурс, происходит следующая последовательность событий, генерируемых [Page]:
-* [page.on('request')](/api/class-page.mdx#page-event-request) генерируется, когда запрос инициируется страницей.
-* [page.on('response')](/api/class-page.mdx#page-event-response) генерируется, когда/если статус ответа и заголовки получены для запроса.
+
+Когда страница отправляет запрос на сетевой ресурс, [Page] генерирует следующую последовательность событий:
+* [page.on('request')](/api/class-page.mdx#page-event-request) генерируется, когда запрос отправляется страницей.
+* [page.on('response')](/api/class-page.mdx#page-event-response) генерируется, когда/если получены статус и заголовки ответа на запрос.
 * [page.on('requestfinished')](/api/class-page.mdx#page-event-request-finished) генерируется, когда тело ответа загружено и запрос завершен.
 
-Если запрос не удался на каком-либо этапе, то вместо события `'requestfinished'` (и, возможно, вместо события 'response') генерируется событие [page.on('requestfailed')](/api/class-page.mdx#page-event-request-failed).
+Если запрос не удается на каком-то этапе, то вместо события `'requestfinished'` (и, возможно, вместо события 'response') генерируется событие [page.on('requestfailed')](/api/class-page.mdx#page-event-request-failed).
 
 :::note
 
-HTTP-ошибки, такие как 404 или 503, все еще считаются успешными ответами с точки зрения HTTP, поэтому запрос завершится с событием `'requestfinished'`.
+Ответы с HTTP ошибками, такие как 404 или 503, все равно считаются успешными с точки зрения HTTP, поэтому запрос завершится событием `'requestfinished'`.
 :::
 
-Если запрос получает ответ 'redirect', запрос успешно завершается с событием `requestfinished`, и новый запрос отправляется на перенаправленный URL.
+Если запрос получает ответ 'redirect', запрос успешно завершается событием `requestfinished`, и новый запрос отправляется на перенаправленный URL.
+
 
 ---
 
-## Методы
+## Methods
 
 ### allHeaders {#request-all-headers}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.15</font><x-search>request.allHeaders</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>request.allHeaders</x-search>
 
-Объект со всеми HTTP-заголовками запроса, связанными с этим запросом. Имена заголовков приведены к нижнему регистру.
+Объект со всеми HTTP заголовками запроса, связанными с этим запросом. Имена заголовков приведены к нижнему регистру.
 
-**Использование**
+**Usage**
 
 ```js
 await request.allHeaders();
 ```
 
-**Возвращает**
+**Returns**
 - [Promise]&lt;[Object]&lt;[string], [string]&gt;&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-all-headers-return"/><a href="#request-all-headers-return" class="list-anchor">#</a>
 
 ---
 
 ### failure {#request-failure}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.failure</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.failure</x-search>
 
-Метод возвращает `null`, если этот запрос не завершился неудачей, как сообщается событием `requestfailed`.
+Метод возвращает `null`, если только этот запрос не завершился неудачей, как сообщается событием `requestfailed`.
 
-**Использование**
+**Usage**
 
 Пример логирования всех неудачных запросов:
 
@@ -57,34 +59,34 @@ page.on('requestfailed', request => {
 });
 ```
 
-**Возвращает**
+**Returns**
 - [null] | [Object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-failure-return"/><a href="#request-failure-return" class="list-anchor">#</a>
   - `errorText` [string]
     
-    Читаемое сообщение об ошибке, например, `'net::ERR_FAILED'`.
+    Человекочитаемое сообщение об ошибке, например, `'net::ERR_FAILED'`.
 
 ---
 
 ### frame {#request-frame}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.frame</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.frame</x-search>
 
 Возвращает [Frame], который инициировал этот запрос.
 
-**Использование**
+**Usage**
 
 ```js
 const frameUrl = request.frame().url();
 ```
 
-**Возвращает**
+**Returns**
 - [Frame]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-frame-return"/><a href="#request-frame-return" class="list-anchor">#</a>
 
-**Подробности**
+**Details**
 
-Обратите внимание, что в некоторых случаях фрейм может быть недоступен, и этот метод вызовет ошибку.
-* Когда запрос исходит от Service Worker. Вы можете использовать `request.serviceWorker()`, чтобы это проверить.
-* Когда запрос на навигацию инициируется до создания соответствующего фрейма. Вы можете использовать [request.isNavigationRequest()](/api/class-request.mdx#request-is-navigation-request), чтобы это проверить.
+Обратите внимание, что в некоторых случаях фрейм недоступен, и этот метод вызовет ошибку.
+* Когда запрос исходит из Service Worker. Вы можете использовать `request.serviceWorker()`, чтобы это проверить.
+* Когда навигационный запрос отправляется до создания соответствующего фрейма. Вы можете использовать [request.isNavigationRequest()](/api/class-request.mdx#request-is-navigation-request), чтобы это проверить.
 
 Вот пример, который обрабатывает все случаи:
 
@@ -101,56 +103,56 @@ else
 
 ### headerValue {#request-header-value}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.15</font><x-search>request.headerValue</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>request.headerValue</x-search>
 
-Возвращает значение заголовка, соответствующего имени. Имя нечувствительно к регистру.
+Возвращает значение заголовка, соответствующего имени. Имя не чувствительно к регистру.
 
-**Использование**
+**Usage**
 
 ```js
 await request.headerValue(name);
 ```
 
-**Аргументы**
+**Arguments**
 - `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-header-value-option-name"/><a href="#request-header-value-option-name" class="list-anchor">#</a>
   
   Имя заголовка.
 
-**Возвращает**
+**Returns**
 - [Promise]&lt;[null] | [string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-header-value-return"/><a href="#request-header-value-return" class="list-anchor">#</a>
 
 ---
 
 ### headers {#request-headers}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.headers</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.headers</x-search>
 
-Объект с HTTP-заголовками запроса. Имена заголовков приведены к нижнему регистру. Обратите внимание, что этот метод не возвращает заголовки, связанные с безопасностью, включая заголовки, связанные с cookie. Вы можете использовать [request.allHeaders()](/api/class-request.mdx#request-all-headers) для получения полного списка заголовков, включая информацию о `cookie`.
+Объект с HTTP заголовками запроса. Имена заголовков приведены к нижнему регистру. Обратите внимание, что этот метод не возвращает заголовки, связанные с безопасностью, включая связанные с cookie. Вы можете использовать [request.allHeaders()](/api/class-request.mdx#request-all-headers) для полного списка заголовков, включающего информацию о `cookie`.
 
-**Использование**
+**Usage**
 
 ```js
 request.headers();
 ```
 
-**Возвращает**
+**Returns**
 - [Object]&lt;[string], [string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-headers-return"/><a href="#request-headers-return" class="list-anchor">#</a>
 
 ---
 
 ### headersArray {#request-headers-array}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.15</font><x-search>request.headersArray</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>request.headersArray</x-search>
 
-Массив со всеми HTTP-заголовками запроса, связанными с этим запросом. В отличие от [request.allHeaders()](/api/class-request.mdx#request-all-headers), имена заголовков НЕ приведены к нижнему регистру. Заголовки с несколькими записями, такие как `Set-Cookie`, появляются в массиве несколько раз.
+Массив со всеми HTTP заголовками запроса, связанными с этим запросом. В отличие от [request.allHeaders()](/api/class-request.mdx#request-all-headers), имена заголовков НЕ приведены к нижнему регистру. Заголовки с несколькими записями, такие как `Set-Cookie`, появляются в массиве несколько раз.
 
-**Использование**
+**Usage**
 
 ```js
 await request.headersArray();
 ```
 
-**Возвращает**
+**Returns**
 - [Promise]&lt;[Array]&lt;[Object]&gt;&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-headers-array-return"/><a href="#request-headers-array-return" class="list-anchor">#</a>
   - `name` [string]
     
@@ -163,102 +165,102 @@ await request.headersArray();
 
 ### isNavigationRequest {#request-is-navigation-request}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.isNavigationRequest</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.isNavigationRequest</x-search>
 
 Является ли этот запрос навигационным для фрейма.
 
-Некоторые запросы на навигацию инициируются до создания соответствующего фрейма и, следовательно, не имеют [request.frame()](/api/class-request.mdx#request-frame) доступным.
+Некоторые навигационные запросы отправляются до создания соответствующего фрейма, и поэтому [request.frame()](/api/class-request.mdx#request-frame) недоступен.
 
-**Использование**
+**Usage**
 
 ```js
 request.isNavigationRequest();
 ```
 
-**Возвращает**
+**Returns**
 - [boolean]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-is-navigation-request-return"/><a href="#request-is-navigation-request-return" class="list-anchor">#</a>
 
 ---
 
 ### method {#request-method}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.method</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.method</x-search>
 
 Метод запроса (GET, POST и т.д.)
 
-**Использование**
+**Usage**
 
 ```js
 request.method();
 ```
 
-**Возвращает**
+**Returns**
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-method-return"/><a href="#request-method-return" class="list-anchor">#</a>
 
 ---
 
 ### postData {#request-post-data}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.postData</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.postData</x-search>
 
-Тело POST запроса, если таковое имеется.
+Тело запроса, если оно есть.
 
-**Использование**
+**Usage**
 
 ```js
 request.postData();
 ```
 
-**Возвращает**
+**Returns**
 - [null] | [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-post-data-return"/><a href="#request-post-data-return" class="list-anchor">#</a>
 
 ---
 
 ### postDataBuffer {#request-post-data-buffer}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.postDataBuffer</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.postDataBuffer</x-search>
 
-Тело POST запроса в двоичном виде, если таковое имеется.
+Тело запроса в бинарной форме, если оно есть.
 
-**Использование**
+**Usage**
 
 ```js
 request.postDataBuffer();
 ```
 
-**Возвращает**
+**Returns**
 - [null] | [Buffer]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-post-data-buffer-return"/><a href="#request-post-data-buffer-return" class="list-anchor">#</a>
 
 ---
 
 ### postDataJSON {#request-post-data-json}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.postDataJSON</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.postDataJSON</x-search>
 
-Возвращает разобранное тело запроса для `form-urlencoded` и JSON в качестве резервного варианта, если таковое имеется.
+Возвращает разобранное тело запроса для `form-urlencoded` и JSON в качестве резервного варианта, если оно есть.
 
-Когда ответ имеет тип `application/x-www-form-urlencoded`, будет возвращен объект ключ/значение значений. В противном случае он будет разобран как JSON.
+Когда ответ `application/x-www-form-urlencoded`, возвращается объект ключ/значение значений. В противном случае он будет разобран как JSON.
 
-**Использование**
+**Usage**
 
 ```js
 request.postDataJSON();
 ```
 
-**Возвращает**
+**Returns**
 - [null] | [Serializable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-post-data-json-return"/><a href="#request-post-data-json-return" class="list-anchor">#</a>
 
 ---
 
 ### redirectedFrom {#request-redirected-from}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.redirectedFrom</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.redirectedFrom</x-search>
 
 Запрос, который был перенаправлен сервером на этот, если таковой имеется.
 
-Когда сервер отвечает с перенаправлением, Playwright создает новый объект [Request]. Эти два запроса связаны методами `redirectedFrom()` и `redirectedTo()`. Когда произошло несколько перенаправлений сервера, можно построить всю цепочку перенаправлений, повторно вызывая `redirectedFrom()`.
+Когда сервер отвечает перенаправлением, Playwright создает новый объект [Request]. Два запроса связаны методами `redirectedFrom()` и `redirectedTo()`. Когда произошло несколько перенаправлений сервера, можно построить всю цепочку перенаправлений, многократно вызывая `redirectedFrom()`.
 
-**Использование**
+**Usage**
 
 Например, если веб-сайт `http://example.com` перенаправляет на `https://example.com`:
 
@@ -274,18 +276,18 @@ const response = await page.goto('https://google.com');
 console.log(response.request().redirectedFrom()); // null
 ```
 
-**Возвращает**
+**Returns**
 - [null] | [Request]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-redirected-from-return"/><a href="#request-redirected-from-return" class="list-anchor">#</a>
 
 ---
 
 ### redirectedTo {#request-redirected-to}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.redirectedTo</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.redirectedTo</x-search>
 
-Новый запрос, отправленный браузером, если сервер ответил с перенаправлением.
+Новый запрос, отправленный браузером, если сервер ответил перенаправлением.
 
-**Использование**
+**Usage**
 
 Этот метод является противоположностью [request.redirectedFrom()](/api/class-request.mdx#request-redirected-from):
 
@@ -293,104 +295,104 @@ console.log(response.request().redirectedFrom()); // null
 console.log(request.redirectedFrom().redirectedTo() === request); // true
 ```
 
-**Возвращает**
+**Returns**
 - [null] | [Request]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-redirected-to-return"/><a href="#request-redirected-to-return" class="list-anchor">#</a>
 
 ---
 
 ### resourceType {#request-resource-type}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.resourceType</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.resourceType</x-search>
 
-Содержит тип ресурса запроса, как его воспринимает движок рендеринга. ResourceType будет одним из следующих: `document`, `stylesheet`, `image`, `media`, `font`, `script`, `texttrack`, `xhr`, `fetch`, `eventsource`, `websocket`, `manifest`, `other`.
+Содержит тип ресурса запроса, как он воспринимается движком рендеринга. ResourceType будет одним из следующих: `document`, `stylesheet`, `image`, `media`, `font`, `script`, `texttrack`, `xhr`, `fetch`, `eventsource`, `websocket`, `manifest`, `other`.
 
-**Использование**
+**Usage**
 
 ```js
 request.resourceType();
 ```
 
-**Возвращает**
+**Returns**
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-resource-type-return"/><a href="#request-resource-type-return" class="list-anchor">#</a>
 
 ---
 
 ### response {#request-response}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.response</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.response</x-search>
 
 Возвращает соответствующий объект [Response], или `null`, если ответ не был получен из-за ошибки.
 
-**Использование**
+**Usage**
 
 ```js
 await request.response();
 ```
 
-**Возвращает**
+**Returns**
 - [Promise]&lt;[null] | [Response]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-response-return"/><a href="#request-response-return" class="list-anchor">#</a>
 
 ---
 
 ### serviceWorker {#request-service-worker}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.24</font><x-search>request.serviceWorker</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.24</font><x-search>request.serviceWorker</x-search>
 
-Служебный [Worker], который выполняет запрос.
+[Worker] Service, который выполняет запрос.
 
-**Использование**
+**Usage**
 
 ```js
 request.serviceWorker();
 ```
 
-**Возвращает**
+**Returns**
 - [null] | [Worker]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-service-worker-return"/><a href="#request-service-worker-return" class="list-anchor">#</a>
 
-**Подробности**
+**Details**
 
 Этот метод доступен только в Chromium. Его безопасно вызывать при использовании других браузеров, но он всегда будет возвращать `null`.
 
-Запросы, исходящие из Service Worker, не имеют [request.frame()](/api/class-request.mdx#request-frame) доступным.
+Запросы, исходящие из Service Worker, не имеют доступного [request.frame()](/api/class-request.mdx#request-frame).
 
 ---
 
 ### sizes {#request-sizes}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.15</font><x-search>request.sizes</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>request.sizes</x-search>
 
 Возвращает информацию о размере ресурса для данного запроса.
 
-**Использование**
+**Usage**
 
 ```js
 await request.sizes();
 ```
 
-**Возвращает**
+**Returns**
 - [Promise]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-sizes-return"/><a href="#request-sizes-return" class="list-anchor">#</a>
   - `requestBodySize` [number]
     
-    Размер тела запроса (нагрузка данных POST) в байтах. Установлено в 0, если тела нет.
+    Размер тела запроса (POST данных) в байтах. Установлено в 0, если тела не было.
   - `requestHeadersSize` [number]
     
-    Общее количество байтов от начала HTTP-запроса до (и включая) двойной CRLF перед телом.
+    Общее количество байтов от начала HTTP сообщения запроса до (и включая) двойной CRLF перед телом.
   - `responseBodySize` [number]
     
     Размер полученного тела ответа (закодированного) в байтах.
   - `responseHeadersSize` [number]
     
-    Общее количество байтов от начала HTTP-ответа до (и включая) двойной CRLF перед телом.
+    Общее количество байтов от начала HTTP сообщения ответа до (и включая) двойной CRLF перед телом.
 
 ---
 
 ### timing {#request-timing}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.timing</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.timing</x-search>
 
-Возвращает информацию о времени ресурса для данного запроса. Большинство значений времени становятся доступными после получения ответа, `responseEnd` становится доступным, когда запрос завершается. Найдите дополнительную информацию в [API временных ресурсов](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming).
+Возвращает информацию о времени загрузки ресурса для данного запроса. Большинство значений времени становятся доступными при получении ответа, `responseEnd` становится доступным, когда запрос завершен. Подробнее см. [Resource Timing API](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming).
 
-**Использование**
+**Usage**
 
 ```js
 const requestFinishedPromise = page.waitForEvent('requestfinished');
@@ -399,51 +401,51 @@ const request = await requestFinishedPromise;
 console.log(request.timing());
 ```
 
-**Возвращает**
+**Returns**
 - [Object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-timing-return"/><a href="#request-timing-return" class="list-anchor">#</a>
   - `startTime` [number]
     
     Время начала запроса в миллисекундах, прошедших с 1 января 1970 года 00:00:00 UTC
   - `domainLookupStart` [number]
     
-    Время сразу перед тем, как браузер начинает поиск доменного имени для ресурса. Значение указывается в миллисекундах относительно `startTime`, -1, если недоступно.
+    Время непосредственно перед тем, как браузер начинает поиск доменного имени для ресурса. Значение указано в миллисекундах относительно `startTime`, -1, если недоступно.
   - `domainLookupEnd` [number]
     
-    Время сразу после того, как браузер начинает поиск доменного имени для ресурса. Значение указывается в миллисекундах относительно `startTime`, -1, если недоступно.
+    Время непосредственно после того, как браузер начинает поиск доменного имени для ресурса. Значение указано в миллисекундах относительно `startTime`, -1, если недоступно.
   - `connectStart` [number]
     
-    Время сразу перед тем, как пользовательский агент начинает устанавливать соединение с сервером для получения ресурса. Значение указывается в миллисекундах относительно `startTime`, -1, если недоступно.
+    Время непосредственно перед тем, как пользовательский агент начинает устанавливать соединение с сервером для получения ресурса. Значение указано в миллисекундах относительно `startTime`, -1, если недоступно.
   - `secureConnectionStart` [number]
     
-    Время сразу перед тем, как браузер начинает процесс рукопожатия для обеспечения текущего соединения. Значение указывается в миллисекундах относительно `startTime`, -1, если недоступно.
+    Время непосредственно перед тем, как браузер начинает процесс рукопожатия для обеспечения текущего соединения. Значение указано в миллисекундах относительно `startTime`, -1, если недоступно.
   - `connectEnd` [number]
     
-    Время сразу перед тем, как пользовательский агент начинает устанавливать соединение с сервером для получения ресурса. Значение указывается в миллисекундах относительно `startTime`, -1, если недоступно.
+    Время непосредственно перед тем, как пользовательский агент начинает устанавливать соединение с сервером для получения ресурса. Значение указано в миллисекундах относительно `startTime`, -1, если недоступно.
   - `requestStart` [number]
     
-    Время сразу перед тем, как браузер начинает запрашивать ресурс у сервера, кэша или локального ресурса. Значение указывается в миллисекундах относительно `startTime`, -1, если недоступно.
+    Время непосредственно перед тем, как браузер начинает запрашивать ресурс с сервера, из кэша или локального ресурса. Значение указано в миллисекундах относительно `startTime`, -1, если недоступно.
   - `responseStart` [number]
     
-    Время сразу после того, как браузер получает первый байт ответа от сервера, кэша или локального ресурса. Значение указывается в миллисекундах относительно `startTime`, -1, если недоступно.
+    Время непосредственно после того, как браузер получает первый байт ответа от сервера, из кэша или локального ресурса. Значение указано в миллисекундах относительно `startTime`, -1, если недоступно.
   - `responseEnd` [number]
     
-    Время сразу после того, как браузер получает последний байт ресурса или сразу перед закрытием транспортного соединения, в зависимости от того, что произойдет первым. Значение указывается в миллисекундах относительно `startTime`, -1, если недоступно.
+    Время непосредственно после того, как браузер получает последний байт ресурса или непосредственно перед закрытием транспортного соединения, в зависимости от того, что произойдет раньше. Значение указано в миллисекундах относительно `startTime`, -1, если недоступно.
 
 ---
 
 ### url {#request-url}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.url</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.url</x-search>
 
 URL запроса.
 
-**Использование**
+**Usage**
 
 ```js
 request.url();
 ```
 
-**Возвращает**
+**Returns**
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-url-return"/><a href="#request-url-return" class="list-anchor">#</a>
 
 
@@ -549,6 +551,6 @@ request.url();
 [URL]: https://nodejs.org/api/url.html "URL"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
-[все доступные теги изображений]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"
-[Регистр артефактов Microsoft]: https://mcr.microsoft.com/en-us/product/playwright/about "Регистр артефактов Microsoft"
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
 [Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

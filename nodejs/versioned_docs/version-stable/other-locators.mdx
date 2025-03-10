@@ -10,569 +10,209 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 :::note
 
-Посмотрите основной [гид по локаторам](./locators) для наиболее распространенных и рекомендуемых локаторов.
+Ознакомьтесь с основным [руководством по локаторам](./locators) для наиболее распространенных и рекомендуемых локаторов.
 :::
 
-В дополнение к рекомендуемым локаторам, таким как [page.getByRole()](/api/class-page.mdx#page-get-by-role) и [page.getByText()](/api/class-page.mdx#page-get-by-text), Playwright поддерживает различные другие локаторы, описанные в этом руководстве.
+В дополнение к рекомендуемым локаторам, таким как [page.getByRole()](/api/class-page.mdx#page-get-by-role) и [page.getByText()](/api/class-page.mdx#page-get-by-text), Playwright поддерживает множество других локаторов, описанных в этом руководстве.
 
 ## CSS локатор
 
 :::note
 
-Мы рекомендуем отдавать предпочтение [видимым пользователю локаторам](./locators.mdx#quick-guide), таким как текст или доступная роль, вместо использования CSS, который связан с реализацией и может сломаться при изменении страницы.
+Мы рекомендуем отдавать приоритет [локаторам, видимым пользователю](./locators.mdx#quick-guide), таким как текст или доступная роль, вместо использования CSS, который привязан к реализации и может сломаться при изменении страницы.
 :::
 
-Playwright может находить элемент по CSS-селектору.
+Playwright может находить элемент по CSS селектору.
 
-```js
-await page.locator('css=button').click();
-```
-
-Playwright расширяет стандартные CSS-селекторы двумя способами:
-* CSS-селекторы проникают в открытый shadow DOM.
+Playwright расширяет стандартные CSS селекторы двумя способами:
+* CSS селекторы проникают в открытый теневой DOM.
 * Playwright добавляет пользовательские псевдоклассы, такие как `:visible`, `:has-text()`, `:has()`, `:is()`, `:nth-match()` и другие.
 
 ### CSS: соответствие по тексту
 
-Playwright включает ряд CSS-псевдоклассов для соответствия элементов по их текстовому содержимому.
-- `article:has-text("Playwright")` - `:has-text()` соответствует любому элементу, содержащему указанный текст где-то внутри, возможно, в дочернем или потомственном элементе. Сравнение нечувствительно к регистру, обрезает пробелы и ищет подстроку.
-  
-  Например, `article:has-text("Playwright")` соответствует `<article><div>Playwright</div></article>`.
-  
-  Обратите внимание, что `:has-text()` следует использовать вместе с другими CSS-спецификаторами, иначе он будет соответствовать всем элементам, содержащим указанный текст, включая `<body>`.
-  
-  ```js
-  // Неправильно, будет соответствовать многим элементам, включая <body>
-  await page.locator(':has-text("Playwright")').click();
-  // Правильно, соответствует только элементу <article>
-  await page.locator('article:has-text("Playwright")').click();
-  ```
-  
-- `#nav-bar :text("Home")` - псевдокласс `:text()` соответствует наименьшему элементу, содержащему указанный текст. Сравнение нечувствительно к регистру, обрезает пробелы и ищет подстроку.
-  
-  Например, это найдет элемент с текстом "Home" где-то внутри элемента `#nav-bar`:
-  
-  ```js
-  await page.locator('#nav-bar :text("Home")').click();
-  ```
-  
-- `#nav-bar :text-is("Home")` - псевдокласс `:text-is()` соответствует наименьшему элементу с точным текстом. Точное соответствие чувствительно к регистру, обрезает пробелы и ищет полную строку.
-  
-  Например, `:text-is("Log")` не соответствует `<button>Log in</button>`, потому что `<button>` содержит один текстовый узел `"Log in"`, который не равен `"Log"`. Однако `:text-is("Log")` соответствует `<button> Log <span>in</span></button>`, потому что `<button>` содержит текстовый узел `" Log "`.
-  
-  Аналогично, `:text-is("Download")` не будет соответствовать `<button>download</button>`, потому что это чувствительно к регистру.
-* `#nav-bar :text-matches("reg?ex", "i")` - псевдокласс `:text-matches()` соответствует наименьшему элементу с текстовым содержимым, соответствующим [регулярному выражению, похожему на JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
-  
-  Например, `:text-matches("Log\s*in", "i")` соответствует `<button>Login</button>` и `<button>log IN</button>`.
+Playwright включает ряд CSS псевдоклассов для соответствия элементов по их текстовому содержимому.
 
 :::note
 
-Сравнение текста всегда нормализует пробелы. Например, оно превращает несколько пробелов в один, заменяет переносы строк на пробелы и игнорирует начальные и конечные пробелы.
+Сопоставление текста всегда нормализует пробелы. Например, оно превращает несколько пробелов в один, превращает разрывы строк в пробелы и игнорирует начальные и конечные пробелы.
 :::
 
 :::note
-Элементы ввода типа `button` и `submit` соответствуют по своему `value`, а не по текстовому содержимому. Например, `:text("Log in")` соответствует `<input type=button value="Log in">`.
+Элементы ввода типа `button` и `submit` сопоставляются по их `value`, а не по текстовому содержимому. Например, `:text("Log in")` соответствует `<input type=button value="Log in">`.
 :::
 
 ### CSS: соответствие только видимым элементам
 
-Playwright поддерживает псевдокласс `:visible` в CSS-селекторах. Например, `css=button` соответствует всем кнопкам на странице, в то время как `css=button:visible` соответствует только видимым кнопкам. Это полезно для различения элементов, которые очень похожи, но отличаются по видимости.
+Playwright поддерживает псевдокласс `:visible` в CSS селекторах. Например, `css=button` соответствует всем кнопкам на странице, в то время как `css=button:visible` соответствует только видимым кнопкам. Это полезно для различения элементов, которые очень похожи, но отличаются видимостью.
 
-Рассмотрим страницу с двумя кнопками, первая невидима, а вторая видима.
-
-```html
-<button style='display: none'>Невидимая</button>
-<button>Видимая</button>
-```
-
-* Это найдет обе кнопки и вызовет ошибку [строгости](./locators.mdx#strictness):
-  
-  ```js
-  await page.locator('button').click();
-  ```
-  
-* Это найдет только вторую кнопку, потому что она видима, и затем кликнет по ней.
-  
-  ```js
-  await page.locator('button:visible').click();
-  ```
-  
 ### CSS: элементы, содержащие другие элементы
 
-Псевдокласс `:has()` является [экспериментальным CSS-псевдоклассом](https://developer.mozilla.org/en-US/docs/Web/CSS/:has). Он возвращает элемент, если любой из селекторов, переданных в качестве параметров относительно `:scope` данного элемента, соответствует хотя бы одному элементу.
-
-Следующий фрагмент возвращает текстовое содержимое элемента `<article>`, который содержит `<div class=promo>` внутри.
-
-```js
-await page.locator('article:has(div.promo)').textContent();
-```
+Псевдокласс `:has()` является [экспериментальным CSS псевдоклассом](https://developer.mozilla.org/en-US/docs/Web/CSS/:has). Он возвращает элемент, если любой из селекторов, переданных в качестве параметров относительно `:scope` данного элемента, соответствует хотя бы одному элементу.
 
 ### CSS: элементы, соответствующие одному из условий
 
-Список CSS-селекторов, разделенный запятыми, будет соответствовать всем элементам, которые могут быть выбраны одним из селекторов в этом списке.
+Список CSS селекторов, разделенных запятыми, будет соответствовать всем элементам, которые могут быть выбраны одним из селекторов в этом списке.
 
-```js
-// Кликает по <button>, который имеет текст "Log in" или "Sign in".
-await page.locator('button:has-text("Log in"), button:has-text("Sign in")').click();
-```
+Псевдокласс `:is()` является [экспериментальным CSS псевдоклассом](https://developer.mozilla.org/en-US/docs/Web/CSS/:is), который может быть полезен для указания списка дополнительных условий для элемента.
 
-Псевдокласс `:is()` является [экспериментальным CSS-псевдоклассом](https://developer.mozilla.org/en-US/docs/Web/CSS/:is), который может быть полезен для указания списка дополнительных условий для элемента.
-
-### CSS: соответствие элементов на основе расположения
+### CSS: соответствие элементов на основе макета
 
 :::note
 
-Соответствие на основе расположения может привести к неожиданным результатам. Например, другой элемент может быть соответствующим, когда расположение изменяется на один пиксель.
+Соответствие на основе макета может давать неожиданные результаты. Например, другой элемент может быть выбран, когда макет изменяется на один пиксель.
 :::
 
-Иногда трудно придумать хороший селектор для целевого элемента, когда у него нет отличительных признаков. В этом случае использование CSS-псевдоклассов расположения Playwright может помочь. Их можно комбинировать с обычным CSS, чтобы точно указать один из нескольких вариантов.
+Иногда сложно придумать хороший селектор для целевого элемента, если у него нет отличительных черт. В этом случае использование CSS псевдоклассов макета Playwright может помочь. Их можно комбинировать с обычным CSS, чтобы точно указать один из нескольких вариантов.
 
-Например, `input:right-of(:text("Password"))` соответствует полю ввода, которое находится справа от текста "Password" - полезно, когда на странице есть несколько полей ввода, которые трудно различить.
-
-Обратите внимание, что псевдоклассы расположения полезны в дополнение к чему-то еще, например, `input`. Если вы используете псевдокласс расположения отдельно, например, `:right-of(:text("Password"))`, скорее всего, вы получите не то поле ввода, которое ищете, а какой-то пустой элемент между текстом и целевым полем ввода.
-
-Псевдоклассы расположения используют [bounding client rect](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect) для вычисления расстояния и относительного положения элементов.
-* `:right-of(div > button)` - соответствует элементам, которые находятся справа от любого элемента, соответствующего внутреннему селектору, на любом вертикальном уровне.
-* `:left-of(div > button)` - соответствует элементам, которые находятся слева от любого элемента, соответствующего внутреннему селектору, на любом вертикальном уровне.
-* `:above(div > button)` - соответствует элементам, которые находятся выше любого из элементов, соответствующих внутреннему селектору, на любом горизонтальном уровне.
-* `:below(div > button)` - соответствует элементам, которые находятся ниже любого из элементов, соответствующих внутреннему селектору, на любом горизонтальном уровне.
-* `:near(div > button)` - соответствует элементам, которые находятся рядом (в пределах 50 CSS пикселей) с любым из элементов, соответствующих внутреннему селектору.
-
-Обратите внимание, что полученные соответствия сортируются по расстоянию до опорного элемента, поэтому вы можете использовать [locator.first()](/api/class-locator.mdx#locator-first), чтобы выбрать ближайший. Это полезно только в случае, если у вас есть что-то вроде списка похожих элементов, где ближайший очевидно является правильным. Однако использование [locator.first()](/api/class-locator.mdx#locator-first) в других случаях, скорее всего, не сработает так, как ожидалось - он не будет нацеливаться на элемент, который вы ищете, а на какой-то другой элемент, который оказывается ближайшим, например, на случайный пустой `<div>`, или на элемент, который прокручен и в данный момент не виден.
-
-```js
-// Заполнить поле ввода справа от "Username".
-await page.locator('input:right-of(:text("Username"))').fill('value');
-
-// Кликнуть по кнопке рядом с промо-картой.
-await page.locator('button:near(.promo-card)').click();
-
-// Кликнуть по радио-кнопке в списке, ближайшей к "Label 3".
-await page.locator('[type=radio]:left-of(:text("Label 3"))').first().click();
-```
-
-Все псевдоклассы расположения поддерживают необязательное максимальное расстояние в пикселях в качестве последнего аргумента. Например, `button:near(:text("Username"), 120)` соответствует кнопке, которая находится на расстоянии не более 120 CSS пикселей от элемента с текстом "Username".
+Псевдоклассы макета используют [bounding client rect](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect) для вычисления расстояния и относительного положения элементов.
 
 ### CSS: выбор n-го совпадения из результата запроса
 
 :::note
 
-Обычно возможно различить элементы по какому-либо атрибуту или текстовому содержимому, что более устойчиво к изменениям страницы.
+Обычно можно различать элементы по какому-либо атрибуту или текстовому содержимому, что более устойчиво к изменениям страницы.
 :::
 
-Иногда на странице содержится несколько похожих элементов, и трудно выбрать конкретный. Например:
-
-```html
-<section> <button>Купить</button> </section>
-<article><div> <button>Купить</button> </div></article>
-<div><div> <button>Купить</button> </div></div>
-```
-
-В этом случае `:nth-match(:text("Купить"), 3)` выберет третью кнопку из приведенного выше фрагмента. Обратите внимание, что индекс начинается с единицы.
-
-```js
-// Кликнуть по третьей кнопке "Купить"
-await page.locator(':nth-match(:text("Купить"), 3)').click();
-```
-
-`:nth-match()` также полезен для ожидания, пока указанное количество элементов появится, используя [locator.waitFor()](/api/class-locator.mdx#locator-wait-for).
-
-```js
-// Ожидать, пока все три кнопки станут видимыми
-await page.locator(':nth-match(:text("Купить"), 3)').waitFor();
-```
-
-:::note
-В отличие от [`:nth-child()`](https://developer.mozilla.org/en-US/docs/Web/CSS/:nth-child), элементы не обязательно должны быть соседями, они могут находиться где угодно на странице. В приведенном выше фрагменте все три кнопки соответствуют селектору `:text("Купить")`, и `:nth-match()` выбирает третью кнопку.
-:::
+Иногда страница содержит несколько похожих элементов, и сложно выбрать конкретный. В этом случае `:nth-match()` может быть полезен для ожидания, пока не появится указанное количество элементов, используя [locator.waitFor()](/api/class-locator.mdx#locator-wait-for).
 
 ## Локатор n-го элемента
 
-Вы можете сузить запрос до n-го совпадения, используя локатор `nth=`, передавая индекс, начинающийся с нуля.
-
-```js
-// Кликнуть по первой кнопке
-await page.locator('button').locator('nth=0').click();
-
-// Кликнуть по последней кнопке
-await page.locator('button').locator('nth=-1').click();
-```
+Вы можете сузить запрос до n-го совпадения, используя локатор `nth=`, передавая индекс, начиная с нуля.
 
 ## Локатор родительского элемента
 
-Когда вам нужно нацелиться на родительский элемент какого-либо другого элемента, чаще всего следует использовать [locator.filter()](/api/class-locator.mdx#locator-filter) по локатору дочернего элемента. Например, рассмотрим следующую структуру DOM:
+Когда вам нужно нацелиться на родительский элемент какого-либо другого элемента, чаще всего следует [locator.filter()](/api/class-locator.mdx#locator-filter) по локатору дочернего элемента.
 
-```html
-<li><label>Привет</label></li>
-<li><label>Мир</label></li>
-```
-
-Если вы хотите нацелиться на родительский `<li>` метки с текстом `"Привет"`, использование [locator.filter()](/api/class-locator.mdx#locator-filter) будет наиболее эффективным:
-
-```js
-const child = page.getByText('Привет');
-const parent = page.getByRole('listitem').filter({ has: child });
-```
-
-В качестве альтернативы, если вы не можете найти подходящий локатор для родительского элемента, используйте `xpath=..`. Обратите внимание, что этот метод не так надежен, потому что любые изменения в структуре DOM сломают ваши тесты. Предпочитайте [locator.filter()](/api/class-locator.mdx#locator-filter), когда это возможно.
-
-```js
-const parent = page.getByText('Привет').locator('xpath=..');
-```
-
-## Локатор React
+## React локатор
 
 :::note
 
-Локатор React является экспериментальным и имеет префикс `_`. Функциональность может измениться в будущем.
+React локатор является экспериментальным и имеет префикс `_`. Функциональность может измениться в будущем.
 :::
 
-Локатор React позволяет находить элементы по имени компонента и значениям свойств. Синтаксис очень похож на [CSS-селекторы атрибутов](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) и поддерживает все операторы селекторов атрибутов CSS.
+React локатор позволяет находить элементы по имени их компонента и значениям свойств. Синтаксис очень похож на [CSS селекторы атрибутов](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) и поддерживает все операторы селекторов атрибутов CSS.
 
-В локаторе React имена компонентов записываются в **CamelCase**.
-
-```js
-await page.locator('_react=BookItem').click();
-```
-
-Больше примеров:
-- соответствие по **компоненту**: `_react=BookItem`
-- соответствие по компоненту и **точному значению свойства**, чувствительному к регистру: `_react=BookItem[author = "Steven King"]`
-- соответствие только по значению свойства, **недоступному к регистру**: `_react=[author = "steven king" i]`
-- соответствие по компоненту и **истинному значению свойства**: `_react=MyButton[enabled]`
-- соответствие по компоненту и **логическому значению**: `_react=MyButton[enabled = false]`
-- соответствие по значению свойства **подстроки**: `_react=[author *= "King"]`
-- соответствие по компоненту и **нескольким свойствам**: `_react=BookItem[author *= "king" i][year = 1990]`
-- соответствие по **вложенному** значению свойства: `_react=[some.nested.value = 12]`
-- соответствие по компоненту и значению свойства **префикса**: `_react=BookItem[author ^= "Steven"]`
-- соответствие по компоненту и значению свойства **суффикса**: `_react=BookItem[author $= "Steven"]`
-- соответствие по компоненту и **ключу**: `_react=BookItem[key = '2']`
-- соответствие по значению свойства **regex**: `_react=[author = /Steven(\\s+King)?/i]`
-
-Чтобы найти имена элементов React в дереве, используйте [React DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi).
+В React локаторе имена компонентов записываются в **CamelCase**.
 
 :::note
 
-Локатор React поддерживает React 15 и выше.
+React локатор поддерживает React 15 и выше.
 :::
 
 :::note
-Локатор React, а также [React DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi), работают только с **неминифицированными** сборками приложений.
+React локатор, как и [React DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi), работает только с **неминифицированными** сборками приложений.
 :::
 
-## Локатор Vue
+## Vue локатор
 
 :::note
 
-Локатор Vue является экспериментальным и имеет префикс `_`. Функциональность может измениться в будущем.
+Vue локатор является экспериментальным и имеет префикс `_`. Функциональность может измениться в будущем.
 :::
 
-Локатор Vue позволяет находить элементы по имени компонента и значениям свойств. Синтаксис очень похож на [CSS-селекторы атрибутов](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) и поддерживает все операторы селекторов атрибутов CSS.
+Vue локатор позволяет находить элементы по имени их компонента и значениям свойств. Синтаксис очень похож на [CSS селекторы атрибутов](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) и поддерживает все операторы селекторов атрибутов CSS.
 
-В локаторе Vue имена компонентов записываются в **kebab-case**.
-
-```js
-await page.locator('_vue=book-item').click();
-```
-
-Больше примеров:
-- соответствие по **компоненту**: `_vue=book-item`
-- соответствие по компоненту и **точному значению свойства**, чувствительному к регистру: `_vue=book-item[author = "Steven King"]`
-- соответствие только по значению свойства, **недоступному к регистру**: `_vue=[author = "steven king" i]`
-- соответствие по компоненту и **истинному значению свойства**: `_vue=my-button[enabled]`
-- соответствие по компоненту и **логическому значению**: `_vue=my-button[enabled = false]`
-- соответствие по значению свойства **подстроки**: `_vue=[author *= "King"]`
-- соответствие по компоненту и **нескольким свойствам**: `_vue=book-item[author *= "king" i][year = 1990]`
-- соответствие по **вложенному** значению свойства: `_vue=[some.nested.value = 12]`
-- соответствие по компоненту и значению свойства **префикса**: `_vue=book-item[author ^= "Steven"]`
-- соответствие по компоненту и значению свойства **суффикса**: `_vue=book-item[author $= "Steven"]`
-- соответствие по значению свойства **regex**: `_vue=[author = /Steven(\\s+King)?/i]`
-
-Чтобы найти имена элементов Vue в дереве, используйте [Vue DevTools](https://chrome.google.com/webstore/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd?hl=en).
+В Vue локаторе имена компонентов записываются в **kebab-case**.
 
 :::note
 
-Локатор Vue поддерживает Vue2 и выше.
+Vue локатор поддерживает Vue2 и выше.
 :::
 
 :::note
-Локатор Vue, а также [Vue DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi), работают только с **неминифицированными** сборками приложений.
+Vue локатор, как и [Vue DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi), работает только с **неминифицированными** сборками приложений.
 :::
 
 ## XPath локатор
 
 :::warning
 
-Мы рекомендуем отдавать предпочтение [видимым пользователю локаторам](./locators.mdx#quick-guide), таким как текст или доступная роль, вместо использования XPath, который связан с реализацией и легко ломается при изменении страницы.
+Мы рекомендуем отдавать приоритет [локаторам, видимым пользователю](./locators.mdx#quick-guide), таким как текст или доступная роль, вместо использования XPath, который привязан к реализации и легко ломается при изменении страницы.
 :::
 
 XPath локаторы эквивалентны вызову [`Document.evaluate`](https://developer.mozilla.org/en/docs/Web/API/Document/evaluate).
 
-```js
-await page.locator('xpath=//button').click();
-```
-
 :::note
-Любая строка селектора, начинающаяся с `//` или `..`, считается селектором xpath. Например, Playwright преобразует `'//html/body'` в `'xpath=//html/body'`.
+Любая строка селектора, начинающаяся с `//` или `..`, считается XPath селектором. Например, Playwright преобразует `'//html/body'` в `'xpath=//html/body'`.
 :::
 
 :::note
-XPath не проникает в shadow roots.
+XPath не проникает в теневые корни.
 :::
 
-### Объединение XPath
+### XPath объединение
 
-Оператор пайпа (`|`) может быть использован для указания нескольких селекторов в XPath. Он будет соответствовать всем элементам, которые могут быть выбраны одним из селекторов в этом списке.
-
-```js
-// Ожидает либо диалог подтверждения, либо индикатор загрузки.
-await page.locator(
-    `//span[contains(@class, 'spinner__loading')]|//div[@id='confirmation']`
-).waitFor();
-```
+Оператор `|` может быть использован для указания нескольких селекторов в XPath. Он будет соответствовать всем элементам, которые могут быть выбраны одним из селекторов в этом списке.
 
 ## Перенаправление метки на элемент управления формы
 
 :::warning
 
-Мы рекомендуем [локализовать по тексту метки](./locators.mdx#locate-by-label) вместо того, чтобы полагаться на перенаправление метки на элемент управления.
+Мы рекомендуем [находить по тексту метки](./locators.mdx#locate-by-label) вместо использования перенаправления метки на элемент управления.
 :::
 
-Целевые действия ввода в Playwright автоматически различают метки и элементы управления, поэтому вы можете нацелиться на метку, чтобы выполнить действие на связанном элементе управления.
-
-Например, рассмотрим следующую структуру DOM: `<label for="password">Пароль:</label><input id="password" type="password">`. Вы можете нацелиться на метку по ее тексту "Пароль", используя [page.getByText()](/api/class-page.mdx#page-get-by-text). Однако следующие действия будут выполнены на вводе, а не на метке:
-- [locator.click()](/api/class-locator.mdx#locator-click) кликнет по метке и автоматически сфокусирует поле ввода;
-- [locator.fill()](/api/class-locator.mdx#locator-fill) заполнит поле ввода;
-- [locator.inputValue()](/api/class-locator.mdx#locator-input-value) вернет значение поля ввода;
-- [locator.selectText()](/api/class-locator.mdx#locator-select-text) выделит текст в поле ввода;
-- [locator.setInputFiles()](/api/class-locator.mdx#locator-set-input-files) установит файлы для поля ввода с `type=file`;
-- [locator.selectOption()](/api/class-locator.mdx#locator-select-option) выберет опцию из выпадающего списка.
-
-```js
-// Заполнить ввод, нацеливаясь на метку.
-await page.getByText('Пароль').fill('секрет');
-```
-
-Однако другие методы будут нацеливаться на саму метку, например [expect(locator).toHaveText()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text) будет утверждать текстовое содержимое метки, а не поля ввода.
-
-```js
-// Заполнить ввод, нацеливаясь на метку.
-await expect(page.locator('label')).toHaveText('Пароль');
-```
+Целевые действия ввода в Playwright автоматически различают метки и элементы управления, поэтому вы можете нацелиться на метку для выполнения действия на связанном элементе управления.
 
 ## Устаревший текстовый локатор
 
 :::warning
 
-Мы рекомендуем современный [текстовый локатор](./locators.mdx#get-by-text) вместо этого.
+Мы рекомендуем использовать современный [текстовый локатор](./locators.mdx#get-by-text) вместо этого.
 :::
 
-Устаревший текстовый локатор соответствует элементам, которые содержат переданный текст.
+Устаревший текстовый локатор соответствует элементам, содержащим переданный текст.
 
-```js
-await page.locator('text=Log in').click();
-```
-
-Устаревший текстовый локатор имеет несколько вариантов:
-- `text=Log in` - по умолчанию соответствие нечувствительно к регистру, обрезает пробелы и ищет подстроку. Например, `text=Log` соответствует `<button>Log in</button>`.
-  
-  ```js
-  await page.locator('text=Log in').click();
-  ```
+Устаревший текстовый локатор имеет несколько вариаций:
+- `text=Log in` - по умолчанию сопоставление нечувствительно к регистру, обрезает пробелы и ищет подстроку. Например, `text=Log` соответствует `<button>Log in</button>`.
   
 - `text="Log in"` - текстовое содержимое может быть экранировано одинарными или двойными кавычками для поиска текстового узла с точным содержимым после обрезки пробелов.
   
-  Например, `text="Log"` не соответствует `<button>Log in</button>`, потому что `<button>` содержит один текстовый узел `"Log in"`, который не равен `"Log"`. Однако `text="Log"` соответствует `<button> Log <span>in</span></button>`, потому что `<button>` содержит текстовый узел `" Log "`. Этот точный режим подразумевает чувствительное к регистру соответствие, поэтому `text="Download"` не будет соответствовать `<button>download</button>`.
-  
-  Текст в кавычках следует обычным правилам экранирования, например, используйте `\"` для экранирования двойной кавычки в строке с двойными кавычками: `text="foo\"bar"`.
-  
-  ```js
-  await page.locator('text="Log in"').click();
-  ```
-  
-- `/Log\s*in/i` - текст может быть [регулярным выражением, похожим на JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp), заключенным в символы `/`. Например, `text=/Log\s*in/i` соответствует `<button>Login</button>` и `<button>log IN</button>`.
-  
-  ```js
-  await page.locator('text=/Log\\s*in/i').click();
-  ```
-  
+- `/Log\s*in/i` - содержимое может быть [регулярным выражением, похожим на JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp), заключенным в символы `/`.
+
 :::note
 
-Строковые селекторы, начинающиеся и заканчивающиеся кавычкой (либо `"` или `'`), считаются устаревшими текстовыми локаторами. Например, `"Log in"` преобразуется в `text="Log in"` внутренне.
+Строковые селекторы, начинающиеся и заканчивающиеся кавычкой (либо `"` либо `'`), считаются устаревшими текстовыми локаторами. Например, `"Log in"` внутренне преобразуется в `text="Log in"`.
 :::
 
 :::note
-Сравнение всегда нормализует пробелы. Например, оно превращает несколько пробелов в один, заменяет переносы строк на пробелы и игнорирует начальные и конечные пробелы.
+Сопоставление всегда нормализует пробелы. Например, оно превращает несколько пробелов в один, превращает разрывы строк в пробелы и игнорирует начальные и конечные пробелы.
 :::
 
 :::note
-Элементы ввода типа `button` и `submit` соответствуют по своему `value`, а не по текстовому содержимому. Например, `text=Log in` соответствует `<input type=button value="Log in">`.
+Элементы ввода типа `button` и `submit` сопоставляются по их `value`, а не по текстовому содержимому. Например, `text=Log in` соответствует `<input type=button value="Log in">`.
 :::
 
 ## id, data-testid, data-test-id, data-test селекторы
 
 :::warning
 
-Мы рекомендуем [локализовать по тестовому id](./locators.mdx#locate-by-test-id) вместо этого.
+Мы рекомендуем [находить по тестовому id](./locators.mdx#locate-by-test-id) вместо этого.
 :::
 
-Playwright поддерживает сокращенный способ выбора элементов с использованием определенных атрибутов. В настоящее время поддерживаются только следующие атрибуты:
+Playwright поддерживает сокращения для выбора элементов с использованием определенных атрибутов. В настоящее время поддерживаются только следующие атрибуты:
 - `id`
 - `data-testid`
 - `data-test-id`
 - `data-test`
 
-```js
-// Заполнить ввод с id "username"
-await page.locator('id=username').fill('value');
-
-// Кликнуть по элементу с data-test-id "submit"
-await page.locator('data-test-id=submit').click();
-```
-
 :::note
-Селекторы атрибутов не являются CSS-селекторами, поэтому любые специфические для CSS элементы, такие как `:enabled`, не поддерживаются. Для получения дополнительных возможностей используйте правильный [css](#css-locator) селектор, например, `css=[data-test="login"]:enabled`.
+Селекторы атрибутов не являются CSS селекторами, поэтому все, что специфично для CSS, например `:enabled`, не поддерживается. Для получения дополнительных возможностей используйте правильный [css](#css-locator) селектор, например `css=[data-test="login"]:enabled`.
 :::
 
 ## Цепочка селекторов
 
 :::warning
 
-Мы рекомендуем [цеплять локаторы](./locators.mdx#matching-inside-a-locator) вместо этого.
+Мы рекомендуем [цепочку локаторов](./locators.mdx#matching-inside-a-locator) вместо этого.
 :::
 
-Селекторы, определенные как `engine=body` или в сокращенной форме, могут быть объединены с помощью токена `>>`, например, `selector1 >> selector2 >> selectors3`. Когда селекторы объединены, следующий запрашивается относительно результата предыдущего.
-
-Например,
-
-```txt
-css=article >> css=.bar > .baz >> css=span[attr=value]
-```
-
-эквивалентен
-
-```js
-document
-    .querySelector('article')
-    .querySelector('.bar > .baz')
-    .querySelector('span[attr=value]');
-```
-
-Если селектору нужно включать `>>` в теле, он должен быть экранирован внутри строки, чтобы не путаться с разделителем цепочки, например, `text="some >> text"`.
+Селекторы, определенные как `engine=body` или в краткой форме, могут быть объединены с помощью токена `>>`, например, `selector1 >> selector2 >> selectors3`. Когда селекторы объединены в цепочку, следующий запрашивается относительно результата предыдущего.
 
 ### Промежуточные совпадения
 
 :::warning
 
-Мы рекомендуем [фильтровать по другому локатору](./locators.mdx#filter-by-childdescendant), чтобы находить элементы, которые содержат другие элементы.
+Мы рекомендуем [фильтрацию по другому локатору](./locators.mdx#filter-by-childdescendant) для нахождения элементов, содержащих другие элементы.
 :::
 
-По умолчанию объединенные селекторы разрешаются в элемент, запрашиваемый последним селектором. Селектор может быть префиксирован `*`, чтобы захватить элементы, которые запрашиваются промежуточным селектором.
-
-Например, `css=article >> text=Hello` захватывает элемент с текстом `Hello`, а `*css=article >> text=Hello` (обратите внимание на `*`) захватывает элемент `article`, который содержит какой-то элемент с текстом `Hello`.
-
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
-[APIRequest]: /api/class-apirequest.mdx "APIRequest"
-[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
-[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
-[Browser]: /api/class-browser.mdx "Browser"
-[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
-[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
-[BrowserType]: /api/class-browsertype.mdx "BrowserType"
-[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
-[Clock]: /api/class-clock.mdx "Clock"
-[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
-[Coverage]: /api/class-coverage.mdx "Coverage"
-[Dialog]: /api/class-dialog.mdx "Dialog"
-[Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
-[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
-[FileChooser]: /api/class-filechooser.mdx "FileChooser"
-[Frame]: /api/class-frame.mdx "Frame"
-[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
-[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
-[JSHandle]: /api/class-jshandle.mdx "JSHandle"
-[Keyboard]: /api/class-keyboard.mdx "Keyboard"
-[Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
-[Logger]: /api/class-logger.mdx "Logger"
-[Mouse]: /api/class-mouse.mdx "Mouse"
-[Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
-[Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
-[Request]: /api/class-request.mdx "Request"
-[Response]: /api/class-response.mdx "Response"
-[Route]: /api/class-route.mdx "Route"
-[Selectors]: /api/class-selectors.mdx "Selectors"
-[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
-[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
-[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: /api/class-tracing.mdx "Tracing"
-[Video]: /api/class-video.mdx "Video"
-[WebError]: /api/class-weberror.mdx "WebError"
-[WebSocket]: /api/class-websocket.mdx "WebSocket"
-[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
-[Worker]: /api/class-worker.mdx "Worker"
-[Fixtures]: /api/class-fixtures.mdx "Fixtures"
-[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
-[FullProject]: /api/class-fullproject.mdx "FullProject"
-[Location]: /api/class-location.mdx "Location"
-[Test]: /api/class-test.mdx "Test"
-[TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestInfo]: /api/class-testinfo.mdx "TestInfo"
-[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
-[TestOptions]: /api/class-testoptions.mdx "TestOptions"
-[TestProject]: /api/class-testproject.mdx "TestProject"
-[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
-[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
-[Reporter]: /api/class-reporter.mdx "Reporter"
-[Suite]: /api/class-suite.mdx "Suite"
-[TestCase]: /api/class-testcase.mdx "TestCase"
-[TestError]: /api/class-testerror.mdx "TestError"
-[TestResult]: /api/class-testresult.mdx "TestResult"
-[TestStep]: /api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
-
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
-[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
-[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
-[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
-[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
-[URL]: https://nodejs.org/api/url.html "URL"
-[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
-
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
-[Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"
+По умолчанию, цепочка селекторов разрешается в элемент, запрашиваемый последним селектором. Селектор может быть префиксирован `*`, чтобы захватить элементы, запрашиваемые промежуточным селектором.
