@@ -66,13 +66,13 @@ export default {
       title: "Playwright",
       logo: {
         alt: "Playwright logo",
-        src: "img/playwright-logo.svg",
+        src: "img/playwright-inzhenerka.png",
       },
       items: [
         {
           type: "doc",
           docId: "intro",
-          label: "Docs",
+          label: "Документация",
           position: "left",
         },
         {
@@ -88,10 +88,10 @@ export default {
           "aria-label": "GitHub repository",
         },
         {
-          href: "https://aka.ms/playwright/discord",
+          href: "https://t.me/+xgMQWT0kBlUxNDNi",
           position: "right",
-          className: "header-discord-link",
-          "aria-label": "Discord server",
+          className: "header-telegram-link",
+          "aria-label": "Чат Инженерки в Telegram",
         },
         {
           label: 'Node.js',
@@ -121,9 +121,14 @@ export default {
         },
         {
           to: '/community/welcome',
-          label: 'Community',
+          label: 'Сообщество',
           position: 'left',
           activeBaseRegex: `/community/`,
+        },
+        {
+          label: 'Обучение',
+          position: 'left',
+          href: "https://inzhenerka.tech/testing",
         },
       ],
     },
@@ -142,12 +147,8 @@ export default {
               href: "https://inzhenerka.tech/playwright",
             },
             {
-              label: "Обучающие видео",
-              to: "/community/learn-videos",
-            },
-            {
-              label: "Обзорные видео",
-              to: "/community/feature-videos",
+              label: "Видео по тестированию",
+              to: "/community/inzhenerka-videos",
             },
           ],
         },
@@ -155,20 +156,12 @@ export default {
           title: "Сообщество",
           items: [
             {
-              label: "Stack Overflow",
-              href: "https://stackoverflow.com/questions/tagged/playwright",
+              label: "Блог",
+              href: "https://inzhenerka.tech/blog",
             },
             {
-              label: "Discord",
-              href: "https://aka.ms/playwright/discord",
-            },
-            {
-              label: "Twitter",
-              href: "https://twitter.com/playwrightweb",
-            },
-            {
-              label: "LinkedIn",
-              href: "https://www.linkedin.com/company/playwrightweb",
+              label: "Чат инженеров",
+              href: "https://t.me/+xgMQWT0kBlUxNDNi",
             },
           ],
         },
@@ -176,20 +169,16 @@ export default {
           title: "Другое",
           items: [
             {
+              label: "YouTube",
+              href: "https://www.youtube.com/playlist?list=PLNC5acZON2ZCls51Qb-TOGqSvfzJnsazr",
+            },
+            {
+              label: "RuTube",
+              href: "https://rutube.ru/plst/891241",
+            },
+            {
               label: "GitHub",
               href: "https://github.com/microsoft/playwright",
-            },
-            {
-              label: "YouTube",
-              href: "https://www.youtube.com/channel/UC46Zj8pDH5tDosqm1gd7WTg",
-            },
-            {
-              label: "Blog",
-              href: "https://dev.to/playwright",
-            },
-            {
-              label: "Ambassadors",
-              href: "/community/ambassadors",
             },
           ],
         },

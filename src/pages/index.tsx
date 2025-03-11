@@ -229,7 +229,12 @@ const Home: React.FC = () => {
             >
               Начать работу
             </Link>
-            <GitHubStarButton owner="microsoft" repo={siteConfig.customFields.repositoryName as string}/>
+            <Link
+                className={styles.getStarted}
+                to="https://inzhenerka.tech/playwright"
+            >
+              Пройти обучение
+            </Link>
           </div>
         </div>
       </header>
@@ -243,10 +248,10 @@ const Home: React.FC = () => {
                 <h2>Это перевод</h2>
                 <p>
                     Сайт является переведенной версией оригинальной документации по Playwright. Мы приглашаем всех желающих вносить правки и улучшения в перевод, чтобы сделать его ещё точнее и полезнее для сообщества.
-                    Если вы заметили неточность или хотите помочь улучшить перевод, присылайте правки в <a href="https://github.com/Inzhenerka/playwright.inzhenerka.tech" target="_blank" rel="noreferrer noopener">репозиторий</a> или в <a href="https://t.me/inzhenerkatech_sup" target="_blank" rel="noreferrer noopener">поддержку</a>.
+                    Если вы заметили неточность или хотите помочь улучшить перевод, присылайте правки в <a href="https://github.com/Inzhenerka/playwright.help" target="_blank" rel="noreferrer noopener">репозиторий</a> или в <a href="https://t.me/inzhenerkatech_sup" target="_blank" rel="noreferrer noopener">поддержку</a>.
                 </p>
                 <p>
-                    Сайт полностью дублирует оригинальный, поэтому для перевода любой страницы достаточно заменить адрес <b>https://playwright.dev</b> на <b>https://playwright.<span style={{color: '#45ba4b'}}>inzhenerka.tech</span></b>.
+                    Сайт полностью дублирует оригинальный, поэтому для перевода любой страницы достаточно заменить адрес <b>https://playwright.dev</b> на <b>https://playwright<span style={{color: '#45ba4b'}}>.help</span></b>.
                 </p>
               </div>
             </div>
