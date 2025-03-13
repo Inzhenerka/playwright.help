@@ -1,83 +1,70 @@
-# playwright.dev
+# playwright.help
 
-This website is built using [Docusaurus](https://docusaurus.io/). Content is pulled from the microsoft/playwright repo.
+Полная документация Playwright, переведенная на русский язык.
 
-## Development
+Сайт создан с помощью [Docusaurus](https://docusaurus.io/). Контент частично берётся из репозитория microsoft/playwright.
 
-### Setup the repo
+## Разработка
+
+### Настройка репозитория
 
 ```sh
 npm install
 ```
 
-### Roll docs
-
-```sh
-SRC_DIR=../playwright npm run roll
-```
-
-### Remove old release
-
-```sh
-node src/versions.js --delete 1.16
-```
-
-### Run dev server
+### Запуск сервера разработки
 
 ```sh
 npm run start-nodejs
 ```
 
-> [!IMPORTANT]  
-> The docs will start up in "current release" mode by default. To see the latest version of the docs (and likely your changes), visit `/next` or press shift 5 times.
+См. `package.json` для других языков (Java, Python, .NET).
 
-See `package.json` for other languages (java, python, .NET).
-
-### Run prod build and serve
+### Сборка продакшен-версии и запуск сервера
 
 ```sh
 npm run build
 npm run serve
 ```
 
-### Running this on Windows
+### Запуск на Windows
 
-To roll the docs in PowerShell, make sure you set the env variable correctly, i.e.:
+Чтобы обновить документацию в PowerShell, убедитесь, что переменная окружения задана корректно, например:
 
 ```powershell
 $env:SRC_DIR="C:\Users\user\src\playwright"; npm run roll
 ```
 
-### Run end-to-end tests
+### Запуск сквозных (end-to-end) тестов
 
-#### Run on local machine
+#### Локальный запуск
 
-Run this on one terminal:
+В одном терминале запустите:
 
 ```sh
 npm run start-nodejs
 ```
 
-and this on another, it will automatically use the local docusaurus server:
+В другом терминале запустите (будет использоваться локальный сервер docusaurus):
 
 ```sh
 npx playwright test nodejs
 ```
 
-#### Run on different environment
+#### Запуск в другом окружении
 
-You can set the `BASE_URL=https://playwright.dev` env var, otherwise `http://localhost:3000` gets used by default.
+Вы можете задать переменную окружения `BASE_URL=https://playwright.help`, иначе по умолчанию используется `http://localhost:3000`.
 
-### Publishing Doc Changes After a Release
+### Публикация изменений документации после релиза
 
-#### Cherry-picking
+#### Cherry-picking (выборочное применение изменений)
 
-1. Go to the [Cherry-picking GitHub Actions workflow](https://github.com/microsoft/playwright/actions/workflows/cherry_pick_into_release_branch.yml)
-1. Execute it with the version number e.g. `1.25` and a comma separate list of commit SHA hashes (from the main branch)
-1. Wait for a PR [getting created](https://github.com/microsoft/playwright/pulls), review it and merge it
+1. Перейдите в [Cherry-picking GitHub Actions workflow](https://github.com/microsoft/playwright/actions/workflows/cherry_pick_into_release_branch.yml)
+2. Запустите его, указав номер версии (например, `1.25`) и список SHA-хешей коммитов через запятую (из основной ветки).
+3. Дождитесь [создания PR](https://github.com/microsoft/playwright/pulls), проведите ревью и выполните слияние.
 
-#### Stable docs rolling
+#### Обновление стабильной документации
 
-1. Go to the [Release GitHub Actions workflow](https://github.com/microsoft/playwright.dev/actions/workflows/roll-stable.yml)
-1. Execute it and wait for the PR [getting created](https://github.com/microsoft/playwright.dev/pulls). The PR will copy changes from the release branch in playwright repo.
-2. Review the PR and merge it.
+1. Перейдите в [Release GitHub Actions workflow](https://github.com/microsoft/playwright.dev/actions/workflows/roll-stable.yml)
+2. Запустите его и дождитесь [создания PR](https://github.com/microsoft/playwright.dev/pulls). Этот PR перенесёт изменения из релизной ветки репозитория playwright.
+3. Проведите ревью и выполните слияние PR.
