@@ -55,6 +55,15 @@ export default {
   onBrokenMarkdownLinks: "throw",
   scripts: ["/js/redirection.js"],
   favicon: "img/playwright-logo.svg",
+  i18n: {
+    defaultLocale: "ru",
+    locales: ["ru"],
+    localeConfigs: {
+      ru: {
+        htmlLang: "ru-RU",
+      },
+    },
+  },
   themeConfig: {
     colorMode: {
       defaultMode: "dark",

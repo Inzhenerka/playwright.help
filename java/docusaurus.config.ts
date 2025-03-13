@@ -55,6 +55,15 @@ module.exports = {
   onBrokenMarkdownLinks: "throw",
   scripts: ["/java/js/redirection.js"],
   favicon: "img/playwright-logo.svg",
+  i18n: {
+    defaultLocale: "ru",
+    locales: ["ru"],
+    localeConfigs: {
+      ru: {
+        htmlLang: "ru-RU",
+      },
+    },
+  },
   themeConfig: {
     colorMode: {
       defaultMode: "dark",
