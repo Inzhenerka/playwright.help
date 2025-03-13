@@ -34,6 +34,9 @@ let plugins = [
     }),
   ],
   require.resolve("@docusaurus/plugin-content-pages"),
+  ['docusaurus-plugin-yandex-metrica', {
+    counterID: '100339848',
+  }]
 ];
 
 if (isProd) {
@@ -42,12 +45,12 @@ if (isProd) {
 
 export default {
   title: "Playwright .NET",
-  tagline: "Fast and reliable end-to-end testing for modern web apps",
+  tagline: "Быстрое и надежное сквозное тестирование современных веб-приложений",
   // Repo config for GitHub Pages
-  url: "https://playwright.dev",
+  url: "https://playwright.help",
   baseUrl: "/dotnet/",
-  organizationName: "microsoft",
-  projectName: "playwright.dev",
+  organizationName: "Inzhenerka",
+  projectName: "playwright.help",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "throw",
   scripts: ["/dotnet/js/redirection.js"],
@@ -63,16 +66,16 @@ export default {
       additionalLanguages: ['csharp', 'bash', 'batch', 'powershell'],
     },
     navbar: {
-      title: "Playwright for .NET",
+      title: "Playwright для .NET",
       logo: {
         alt: "Playwright logo",
-        src: "img/playwright-logo.svg",
+        src: "img/playwright-inzhenerka.png",
       },
       items: [
         {
           type: "doc",
           docId: "intro",
-          label: "Docs",
+          label: "Документация",
           position: "left",
         },
         {
@@ -88,10 +91,10 @@ export default {
           "aria-label": "GitHub repository",
         },
         {
-          href: "https://aka.ms/playwright/discord",
+          href: "https://t.me/+xgMQWT0kBlUxNDNi",
           position: "right",
-          className: "header-discord-link",
-          "aria-label": "Discord server",
+          className: "header-telegram-link",
+          "aria-label": "Чат Инженерки в Telegram",
         },
         {
           label: '.NET',
@@ -121,9 +124,15 @@ export default {
         },
         {
           to: '/community/welcome',
-          label: 'Community',
+          label: 'Сообщество',
           position: 'left',
           activeBaseRegex: `/community/`,
+        },
+
+        {
+          label: 'Обучение',
+          position: 'left',
+          href: "https://inzhenerka.tech/testing",
         },
       ],
     },
@@ -131,77 +140,61 @@ export default {
       style: "dark",
       links: [
         {
-          title: "Learn",
+          title: "Обучение",
           items: [
             {
-              label: "Getting started",
+              label: "Начало работы",
               to: "docs/intro",
             },
             {
-              label: "Playwright Training",
-              href: "https://learn.microsoft.com/en-us/training/modules/build-with-playwright/",
+              label: "Тренажер по Playwright ⭐",
+              href: "https://inzhenerka.tech/playwright",
             },
             {
-              label: "Learn Videos",
-              to: "/community/learn-videos",
-            },
-            {
-              label: "Feature Videos",
-              to: "/community/feature-videos",
+              label: "Видео по тестированию",
+              to: "/community/inzhenerka-videos",
             },
           ],
         },
         {
-          title: "Community",
+          title: "Сообщество",
           items: [
             {
-              label: "Stack Overflow",
-              href: "https://stackoverflow.com/questions/tagged/playwright",
+              label: "Блог",
+              href: "https://inzhenerka.tech/blog",
             },
             {
-              label: "Discord",
-              href: "https://aka.ms/playwright/discord",
-            },
-            {
-              label: "Twitter",
-              href: "https://twitter.com/playwrightweb",
-            },
-            {
-              label: "LinkedIn",
-              href: "https://www.linkedin.com/company/playwrightweb",
+              label: "Чат инженеров",
+              href: "https://t.me/+xgMQWT0kBlUxNDNi",
             },
           ],
         },
         {
-          title: "More",
+          title: "Другое",
           items: [
+            {
+              label: "YouTube",
+              href: "https://www.youtube.com/playlist?list=PLNC5acZON2ZCls51Qb-TOGqSvfzJnsazr",
+            },
+            {
+              label: "RuTube",
+              href: "https://rutube.ru/plst/891241",
+            },
             {
               label: "GitHub",
               href: "https://github.com/microsoft/playwright-dotnet",
             },
-            {
-              label: "YouTube",
-              href: "https://www.youtube.com/channel/UC46Zj8pDH5tDosqm1gd7WTg",
-            },
-            {
-              label: "Blog",
-              href: "https://dev.to/playwright",
-            },
-            {
-              label: "Ambassadors",
-              href: "/community/ambassadors",
-            },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Microsoft`,
+      copyright: `${new Date().getFullYear()} ООО "ИНЖЕНЕРКАТЕХ". На основе материалов Microsoft`,
     },
     algolia: {
       indexName: 'playwright-dotnet',
       appId: 'K09ICMCV6X',
       apiKey: 'a5b64422711c37ab6a0ce4d86d16cdd9',
     },
-    image: 'https://repository-images.githubusercontent.com/221981891/8c5c6942-c91f-4df1-825f-4cf474056bd7',
+    image: '/img/playwright-cover.jpg',
   },
   themes: [
     [
