@@ -10,7 +10,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ElementHandle представляет собой элемент DOM на странице. ElementHandles могут быть созданы с помощью метода [page.$()](/api/class-page.mdx#page-query-selector).
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
 Использование ElementHandle не рекомендуется, вместо этого используйте объекты [Locator] и утверждения, ориентированные на веб.
 :::
@@ -20,13 +20,13 @@ const hrefElement = await page.$('a');
 await hrefElement.click();
 ```
 
-ElementHandle предотвращает сборку мусора для элемента DOM, если дескриптор не был освобожден с помощью [jsHandle.dispose()](/api/class-jshandle.mdx#js-handle-dispose). ElementHandles автоматически освобождаются, когда их родительский фрейм переходит по ссылке.
+ElementHandle предотвращает сборку мусора для DOM-элемента, если только дескриптор не будет удален с помощью [jsHandle.dispose()](/api/class-jshandle.mdx#js-handle-dispose). ElementHandles автоматически удаляются, когда их исходный фрейм переходит на другую страницу.
 
 Экземпляры ElementHandle могут использоваться в качестве аргумента в методах [page.$eval()](/api/class-page.mdx#page-eval-on-selector) и [page.evaluate()](/api/class-page.mdx#page-evaluate).
 
-Разница между [Locator] и ElementHandle заключается в том, что ElementHandle указывает на конкретный элемент, в то время как [Locator] захватывает логику получения элемента.
+Разница между [Locator] и ElementHandle заключается в том, что ElementHandle указывает на конкретный элемент, в то время как [Locator] захватывает логику того, как получить элемент.
 
-В приведенном ниже примере дескриптор указывает на конкретный элемент DOM на странице. Если этот элемент изменит текст или будет использован React для рендеринга совершенно другого компонента, дескриптор все равно будет указывать на тот самый элемент DOM. Это может привести к неожиданному поведению.
+В примере ниже дескриптор указывает на конкретный DOM-элемент на странице. Если этот элемент изменяет текст или используется React для рендеринга совершенно другого компонента, дескриптор все равно указывает на этот самый DOM-элемент. Это может привести к неожиданным поведением.
 
 ```js
 const handle = await page.$('text=Submit');
@@ -35,7 +35,7 @@ await handle.hover();
 await handle.click();
 ```
 
-С помощью локатора каждый раз, когда используется `element`, актуальный элемент DOM находится на странице с использованием селектора. Таким образом, в приведенном ниже фрагменте базовый элемент DOM будет найден дважды.
+С локатором каждый раз, когда используется `element`, актуальный DOM-элемент находится на странице с использованием селектора. Таким образом, в приведенном ниже фрагменте подлежащий DOM-элемент будет найден дважды.
 
 ```js
 const locator = page.getByText('Submit');
@@ -46,19 +46,19 @@ await locator.click();
 
 ---
 
-## Методы
+## Methods
 
 ### boundingBox {#element-handle-bounding-box}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.boundingBox</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.boundingBox</x-search>
 
-Этот метод возвращает ограничивающий прямоугольник элемента или `null`, если элемент не виден. Ограничивающий прямоугольник рассчитывается относительно основного фрейма - что обычно совпадает с окном браузера.
+Этот метод возвращает ограничивающий прямоугольник элемента или `null`, если элемент не виден. Ограничивающий прямоугольник рассчитывается относительно области просмотра основного фрейма - которая обычно совпадает с окном браузера.
 
 Прокрутка влияет на возвращаемый ограничивающий прямоугольник, аналогично [Element.getBoundingClientRect](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect). Это означает, что `x` и/или `y` могут быть отрицательными.
 
 Элементы из дочерних фреймов возвращают ограничивающий прямоугольник относительно основного фрейма, в отличие от [Element.getBoundingClientRect](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect).
 
-Предполагая, что страница статична, безопасно использовать координаты ограничивающего прямоугольника для выполнения ввода. Например, следующий фрагмент должен кликнуть в центре элемента.
+Предполагая, что страница статична, безопасно использовать координаты ограничивающего прямоугольника для выполнения ввода. Например, следующий фрагмент должен кликнуть в центр элемента.
 
 **Использование**
 
@@ -71,10 +71,10 @@ await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
 - [Promise]&lt;[null] | [Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-bounding-box-return"/><a href="#element-handle-bounding-box-return" class="list-anchor">#</a>
   - `x` [number]
     
-    координата x элемента в пикселях.
+    x-координата элемента в пикселях.
   - `y` [number]
     
-    координата y элемента в пикселях.
+    y-координата элемента в пикселях.
   - `width` [number]
     
     ширина элемента в пикселях.
@@ -86,9 +86,9 @@ await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
 
 ### contentFrame {#element-handle-content-frame}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.contentFrame</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.contentFrame</x-search>
 
-Возвращает контентный фрейм для дескрипторов элементов, ссылающихся на узлы iframe, или `null` в противном случае.
+Возвращает фрейм содержимого для дескрипторов элементов, ссылающихся на узлы iframe, или `null` в противном случае.
 
 **Использование**
 
@@ -103,7 +103,7 @@ await elementHandle.contentFrame();
 
 ### ownerFrame {#element-handle-owner-frame}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.ownerFrame</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.ownerFrame</x-search>
 
 Возвращает фрейм, содержащий данный элемент.
 
@@ -120,19 +120,19 @@ await elementHandle.ownerFrame();
 
 ### waitForElementState {#element-handle-wait-for-element-state}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.waitForElementState</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.waitForElementState</x-search>
 
 Возвращает, когда элемент удовлетворяет [state](/api/class-elementhandle.mdx#element-handle-wait-for-element-state-option-state).
 
-В зависимости от параметра [state](/api/class-elementhandle.mdx#element-handle-wait-for-element-state-option-state) этот метод ожидает, пока не пройдет одна из проверок [actionability](../actionability.mdx). Этот метод выбрасывает исключение, когда элемент отсоединяется во время ожидания, если не ожидается состояние `"hidden"`.
-* `"visible"` Ожидать, пока элемент не станет [видимым](../actionability.mdx#visible).
-* `"hidden"` Ожидать, пока элемент не станет [невидимым](../actionability.mdx#visible) или не будет отсоединен. Обратите внимание, что ожидание скрытия не выбрасывает исключение, когда элемент отсоединяется.
-* `"stable"` Ожидать, пока элемент не станет как [видимым](../actionability.mdx#visible), так и [стабильным](../actionability.mdx#stable).
-* `"enabled"` Ожидать, пока элемент не станет [включенным](../actionability.mdx#enabled).
-* `"disabled"` Ожидать, пока элемент не станет [выключенным](../actionability.mdx#enabled).
-* `"editable"` Ожидать, пока элемент не станет [редактируемым](../actionability.mdx#editable).
+В зависимости от параметра [state](/api/class-elementhandle.mdx#element-handle-wait-for-element-state-option-state), этот метод ожидает, пока не пройдет одна из проверок [actionability](../actionability.mdx). Этот метод выбрасывает исключение, когда элемент отсоединяется во время ожидания, если только не ожидается состояние `"hidden"`.
+* `"visible"` Ожидание, пока элемент не станет [видимым](../actionability.mdx#visible).
+* `"hidden"` Ожидание, пока элемент не станет [невидимым](../actionability.mdx#visible) или не будет отсоединен. Обратите внимание, что ожидание скрытия не выбрасывает исключение, когда элемент отсоединяется.
+* `"stable"` Ожидание, пока элемент не станет одновременно [видимым](../actionability.mdx#visible) и [стабильным](../actionability.mdx#stable).
+* `"enabled"` Ожидание, пока элемент не станет [включенным](../actionability.mdx#enabled).
+* `"disabled"` Ожидание, пока элемент не станет [выключенным](../actionability.mdx#enabled).
+* `"editable"` Ожидание, пока элемент не станет [редактируемым](../actionability.mdx#editable).
 
-Если элемент не удовлетворяет условию в течение [timeout](/api/class-elementhandle.mdx#element-handle-wait-for-element-state-option-timeout) миллисекунд, этот метод выбрасывает исключение.
+Если элемент не удовлетворяет условию в течение [timeout](/api/class-elementhandle.mdx#element-handle-wait-for-element-state-option-timeout) миллисекунд, этот метод выбросит исключение.
 
 **Использование**
 
@@ -144,31 +144,30 @@ await elementHandle.waitForElementState(state, options);
 **Аргументы**
 - `state` "visible" | "hidden" | "stable" | "enabled" | "disabled" | "editable"<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-wait-for-element-state-option-state"/><a href="#element-handle-wait-for-element-state-option-state" class="list-anchor">#</a>
   
-  Состояние, которое нужно ожидать, см. ниже для получения дополнительных сведений.
-- `options` [Object] *(необязательно)*
-  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-wait-for-element-state-option-timeout"/><a href="#element-handle-wait-for-element-state-option-timeout" class="list-anchor">#</a>
+  Состояние, которое нужно ожидать, см. ниже для более подробной информации.
+- `options` [Object] *(optional)*
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-wait-for-element-state-option-timeout"/><a href="#element-handle-wait-for-element-state-option-timeout" class="list-anchor">#</a>
     
-    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить через опцию `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+    Максимальное время в миллисекундах. По умолчанию `0` - без тайм-аута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
 **Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-wait-for-element-state-return"/><a href="#element-handle-wait-for-element-state-return" class="list-anchor">#</a>
 
 ---
 
-## Устарело
+## Deprecated
 
 ### $ {#element-handle-query-selector}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>elementHandle.$</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>elementHandle.$</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [page.locator()](/api/class-page.mdx#page-locator) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Используйте основанный на локаторах [page.locator()](/api/class-page.mdx#page-locator) вместо этого. Подробнее о [локаторах](../locators.mdx).
 
 :::
 
-
-Метод находит элемент, соответствующий указанному селектору, в поддереве `ElementHandle`. Если ни один элемент не соответствует селектору, возвращает `null`.
+Метод находит элемент, соответствующий указанному селектору в поддереве `ElementHandle`. Если элементы, соответствующие селектору, не найдены, возвращает `null`.
 
 **Использование**
 
@@ -179,7 +178,7 @@ await elementHandle.$(selector);
 **Аргументы**
 - `selector` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-query-selector-option-selector"/><a href="#element-handle-query-selector-option-selector" class="list-anchor">#</a>
   
-  Селектор для запроса.
+  Селектор для поиска.
 
 **Возвращает**
 - [Promise]&lt;[null] | [ElementHandle]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-query-selector-return"/><a href="#element-handle-query-selector-return" class="list-anchor">#</a>
@@ -188,16 +187,15 @@ await elementHandle.$(selector);
 
 ### $$ {#element-handle-query-selector-all}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>elementHandle.$$</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>elementHandle.$$</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [page.locator()](/api/class-page.mdx#page-locator) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Используйте основанный на локаторах [page.locator()](/api/class-page.mdx#page-locator) вместо этого. Подробнее о [локаторах](../locators.mdx).
 
 :::
 
-
-Метод находит все элементы, соответствующие указанному селектору, в поддереве `ElementHandle`. Если ни один элемент не соответствует селектору, возвращает пустой массив.
+Метод находит все элементы, соответствующие указанному селектору в поддереве `ElementHandle`. Если элементы, соответствующие селектору, не найдены, возвращает пустой массив.
 
 **Использование**
 
@@ -208,7 +206,7 @@ await elementHandle.$$(selector);
 **Аргументы**
 - `selector` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-query-selector-all-option-selector"/><a href="#element-handle-query-selector-all-option-selector" class="list-anchor">#</a>
   
-  Селектор для запроса.
+  Селектор для поиска.
 
 **Возвращает**
 - [Promise]&lt;[Array]&lt;[ElementHandle]&gt;&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-query-selector-all-return"/><a href="#element-handle-query-selector-all-return" class="list-anchor">#</a>
@@ -217,20 +215,19 @@ await elementHandle.$$(selector);
 
 ### $eval {#element-handle-eval-on-selector}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>elementHandle.$eval</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>elementHandle.$eval</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Этот метод не ждет, пока элемент пройдет проверки на возможность действия, и поэтому может привести к ненадежным тестам. Используйте [locator.evaluate()](/api/class-locator.mdx#locator-evaluate), другие методы помощников [Locator] или утверждения, ориентированные на веб.
+Этот метод не ожидает, пока элемент пройдет проверки на возможность действия, и поэтому может привести к нестабильным тестам. Вместо этого используйте [locator.evaluate()](/api/class-locator.mdx#locator-evaluate), другие вспомогательные методы [Locator] или утверждения, ориентированные на веб.
 
 :::
 
+Возвращает возвращаемое значение [pageFunction](/api/class-elementhandle.mdx#element-handle-eval-on-selector-option-expression).
 
-Возвращает значение, возвращаемое [pageFunction](/api/class-elementhandle.mdx#element-handle-eval-on-selector-option-expression).
+Метод находит элемент, соответствующий указанному селектору в поддереве `ElementHandle`, и передает его в качестве первого аргумента в [pageFunction](/api/class-elementhandle.mdx#element-handle-eval-on-selector-option-expression). Если ни один элемент не соответствует селектору, метод выдает ошибку.
 
-Метод находит элемент, соответствующий указанному селектору, в поддереве `ElementHandle` и передает его в качестве первого аргумента в [pageFunction](/api/class-elementhandle.mdx#element-handle-eval-on-selector-option-expression). Если ни один элемент не соответствует селектору, метод выбрасывает ошибку.
-
-Если [pageFunction](/api/class-elementhandle.mdx#element-handle-eval-on-selector-option-expression) возвращает [Promise], то [elementHandle.$eval()](/api/class-elementhandle.mdx#element-handle-eval-on-selector) будет ждать разрешения промиса и вернет его значение.
+Если [pageFunction](/api/class-elementhandle.mdx#element-handle-eval-on-selector-option-expression) возвращает [Promise], то [elementHandle.$eval()](/api/class-elementhandle.mdx#element-handle-eval-on-selector) будет ожидать разрешения промиса и возвращать его значение.
 
 **Использование**
 
@@ -246,8 +243,8 @@ expect(await tweetHandle.$eval('.retweets', node => node.innerText)).toBe('10');
   Селектор для запроса.
 - `pageFunction` [function]\([Element]\) | [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-eval-on-selector-option-expression"/><a href="#element-handle-eval-on-selector-option-expression" class="list-anchor">#</a>
   
-  Функция, которая будет оценена в контексте страницы.
-- `arg` [EvaluationArgument] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-eval-on-selector-option-arg"/><a href="#element-handle-eval-on-selector-option-arg" class="list-anchor">#</a>
+  Функция для выполнения в контексте страницы.
+- `arg` [EvaluationArgument] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-eval-on-selector-option-arg"/><a href="#element-handle-eval-on-selector-option-arg" class="list-anchor">#</a>
   
   Необязательный аргумент для передачи в [pageFunction](/api/class-elementhandle.mdx#element-handle-eval-on-selector-option-expression).
 
@@ -258,20 +255,19 @@ expect(await tweetHandle.$eval('.retweets', node => node.innerText)).toBe('10');
 
 ### $$eval {#element-handle-eval-on-selector-all}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>elementHandle.$$eval</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>elementHandle.$$eval</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-В большинстве случаев [locator.evaluateAll()](/api/class-locator.mdx#locator-evaluate-all), другие методы помощников [Locator] и утверждения, ориентированные на веб, выполняют свою работу лучше.
+В большинстве случаев [locator.evaluateAll()](/api/class-locator.mdx#locator-evaluate-all), другие вспомогательные методы [Locator] и утверждения, ориентированные на веб, выполняют работу лучше.
 
 :::
 
+Возвращает возвращаемое значение [pageFunction](/api/class-elementhandle.mdx#element-handle-eval-on-selector-all-option-expression).
 
-Возвращает значение, возвращаемое [pageFunction](/api/class-elementhandle.mdx#element-handle-eval-on-selector-all-option-expression).
+Метод находит все элементы, соответствующие указанному селектору в поддереве `ElementHandle`, и передает массив найденных элементов в качестве первого аргумента в [pageFunction](/api/class-elementhandle.mdx#element-handle-eval-on-selector-all-option-expression).
 
-Метод находит все элементы, соответствующие указанному селектору, в поддереве `ElementHandle` и передает массив найденных элементов в качестве первого аргумента в [pageFunction](/api/class-elementhandle.mdx#element-handle-eval-on-selector-all-option-expression).
-
-Если [pageFunction](/api/class-elementhandle.mdx#element-handle-eval-on-selector-all-option-expression) возвращает [Promise], то [elementHandle.$$eval()](/api/class-elementhandle.mdx#element-handle-eval-on-selector-all) будет ждать разрешения промиса и вернет его значение.
+Если [pageFunction](/api/class-elementhandle.mdx#element-handle-eval-on-selector-all-option-expression) возвращает [Promise], то [elementHandle.$$eval()](/api/class-elementhandle.mdx#element-handle-eval-on-selector-all) будет ожидать разрешения промиса и возвращать его значение.
 
 **Использование**
 
@@ -295,8 +291,8 @@ expect(await feedHandle.$$eval('.tweet', nodes =>
   Селектор для запроса.
 - `pageFunction` [function]\([Array]&lt;[Element]&gt;\) | [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-eval-on-selector-all-option-expression"/><a href="#element-handle-eval-on-selector-all-option-expression" class="list-anchor">#</a>
   
-  Функция, которая будет оценена в контексте страницы.
-- `arg` [EvaluationArgument] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-eval-on-selector-all-option-arg"/><a href="#element-handle-eval-on-selector-all-option-arg" class="list-anchor">#</a>
+  Функция для выполнения в контексте страницы.
+- `arg` [EvaluationArgument] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-eval-on-selector-all-option-arg"/><a href="#element-handle-eval-on-selector-all-option-arg" class="list-anchor">#</a>
   
   Необязательный аргумент для передачи в [pageFunction](/api/class-elementhandle.mdx#element-handle-eval-on-selector-all-option-expression).
 
@@ -307,25 +303,24 @@ expect(await feedHandle.$$eval('.tweet', nodes =>
 
 ### check {#element-handle-check}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.check</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.check</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.check()](/api/class-locator.mdx#locator-check) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Используйте основанный на локаторах [locator.check()](/api/class-locator.mdx#locator-check) вместо этого. Подробнее о [локаторах](../locators.mdx).
 
 :::
 
-
 Этот метод отмечает элемент, выполняя следующие шаги:
-1. Убедитесь, что элемент является флажком или радио-вводом. Если нет, этот метод выбрасывает исключение. Если элемент уже отмечен, этот метод возвращает сразу.
-1. Ожидать проверки [actionability](../actionability.mdx) на элементе, если не установлена опция [force](/api/class-elementhandle.mdx#element-handle-check-option-force).
-1. Прокрутить элемент в видимость, если это необходимо.
-1. Использовать [page.mouse](/api/class-page.mdx#page-mouse), чтобы кликнуть в центре элемента.
-1. Убедитесь, что элемент теперь отмечен. Если нет, этот метод выбрасывает исключение.
+1. Убедитесь, что элемент является флажком или радиокнопкой. Если нет, этот метод выдает ошибку. Если элемент уже отмечен, этот метод возвращается немедленно.
+1. Ожидайте проверки [actionability](../actionability.mdx) на элементе, если не установлена опция [force](/api/class-elementhandle.mdx#element-handle-check-option-force).
+1. Прокрутите элемент в вид, если это необходимо.
+1. Используйте [page.mouse](/api/class-page.mdx#page-mouse) для нажатия в центре элемента.
+1. Убедитесь, что элемент теперь отмечен. Если нет, этот метод выдает ошибку.
 
-Если элемент будет отсоединен от DOM в любой момент во время действия, этот метод выбрасывает исключение.
+Если элемент отсоединен от DOM в любой момент во время действия, этот метод выдает ошибку.
 
-Когда все шаги в совокупности не завершились в течение указанного [timeout](/api/class-elementhandle.mdx#element-handle-check-option-timeout), этот метод выбрасывает [TimeoutError]. Передача нулевого таймаута отключает это.
+Когда все шаги в совокупности не завершены в течение указанного [timeout](/api/class-elementhandle.mdx#element-handle-check-option-timeout), этот метод выдает [TimeoutError]. Передача нулевого таймаута отключает это.
 
 **Использование**
 
@@ -335,32 +330,32 @@ await elementHandle.check(options);
 ```
 
 **Аргументы**
-- `options` [Object] *(необязательно)*
-  - `force` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-check-option-force"/><a href="#element-handle-check-option-force" class="list-anchor">#</a>
+- `options` [Object] *(optional)*
+  - `force` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-check-option-force"/><a href="#element-handle-check-option-force" class="list-anchor">#</a>
     
-    Нужно ли обойти проверки [actionability](../actionability.mdx). По умолчанию `false`.
-  - `noWaitAfter` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-check-option-no-wait-after"/><a href="#element-handle-check-option-no-wait-after" class="list-anchor">#</a>
+    Следует ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
+  - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-check-option-no-wait-after"/><a href="#element-handle-check-option-no-wait-after" class="list-anchor">#</a>
     
-    :::warning[Устарело]
-    Эта опция не имеет эффекта.
+    :::warning[Deprecated]
+    Этот параметр не имеет эффекта.
     :::
     
     
-    Эта опция не имеет эффекта.
-  - `position` [Object] *(необязательно)* <font size="2">Добавлено в: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-check-option-position"/><a href="#element-handle-check-option-position" class="list-anchor">#</a>
+    Этот параметр не имеет эффекта.
+  - `position` [Object] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-check-option-position"/><a href="#element-handle-check-option-position" class="list-anchor">#</a>
     - `x` [number]
       
       
     - `y` [number]
       
       
-    Точка, используемая относительно верхнего левого угла области заполнения элемента. Если не указано, используется какая-то видимая точка элемента.
-  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-check-option-timeout"/><a href="#element-handle-check-option-timeout" class="list-anchor">#</a>
+    Точка для использования относительно верхнего левого угла рамки элемента. Если не указано, используется видимая точка элемента.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-check-option-timeout"/><a href="#element-handle-check-option-timeout" class="list-anchor">#</a>
     
-    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить через опцию `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) методов.
-  - `trial` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-check-option-trial"/><a href="#element-handle-check-option-trial" class="list-anchor">#</a>
+    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью параметра `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+  - `trial` [boolean] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-check-option-trial"/><a href="#element-handle-check-option-trial" class="list-anchor">#</a>
     
-    Когда установлено, этот метод выполняет только проверки [actionability](../actionability.mdx) и пропускает действие. По умолчанию `false`. Полезно, чтобы дождаться, пока элемент будет готов к действию, не выполняя его.
+    Если установлено, этот метод выполняет только проверки [actionability](../actionability.mdx) и пропускает действие. По умолчанию `false`. Полезно для ожидания, пока элемент будет готов к действию без его выполнения.
 
 **Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-check-return"/><a href="#element-handle-check-return" class="list-anchor">#</a>
@@ -369,24 +364,23 @@ await elementHandle.check(options);
 
 ### click {#element-handle-click}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.click</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.click</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.click()](/api/class-locator.mdx#locator-click) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Используйте основанный на локаторах [locator.click()](/api/class-locator.mdx#locator-click) вместо этого. Подробнее о [локаторах](../locators.mdx).
 
 :::
 
-
 Этот метод кликает по элементу, выполняя следующие шаги:
-1. Ожидать проверки [actionability](../actionability.mdx) на элементе, если не установлена опция [force](/api/class-elementhandle.mdx#element-handle-click-option-force).
-1. Прокрутить элемент в видимость, если это необходимо.
-1. Использовать [page.mouse](/api/class-page.mdx#page-mouse), чтобы кликнуть в центре элемента или в указанной [позиции](/api/class-elementhandle.mdx#element-handle-click-option-position).
-1. Ожидать, пока инициированные навигации либо не завершатся успешно, либо не потерпят неудачу, если не установлена опция [noWaitAfter](/api/class-elementhandle.mdx#element-handle-click-option-no-wait-after).
+1. Ожидайте проверки [actionability](../actionability.mdx) на элементе, если не установлена опция [force](/api/class-elementhandle.mdx#element-handle-click-option-force).
+1. Прокрутите элемент в вид, если это необходимо.
+1. Используйте [page.mouse](/api/class-page.mdx#page-mouse) для нажатия в центре элемента или указанной [position](/api/class-elementhandle.mdx#element-handle-click-option-position).
+1. Ожидайте, пока инициированные навигации либо завершатся успешно, либо неудачно, если не установлена опция [noWaitAfter](/api/class-elementhandle.mdx#element-handle-click-option-no-wait-after).
 
-Если элемент будет отсоединен от DOM в любой момент во время действия, этот метод выбрасывает исключение.
+Если элемент отсоединен от DOM в любой момент во время действия, этот метод выдает ошибку.
 
-Когда все шаги в совокупности не завершились в течение указанного [timeout](/api/class-elementhandle.mdx#element-handle-click-option-timeout), этот метод выбрасывает [TimeoutError]. Передача нулевого таймаута отключает это.
+Когда все шаги в совокупности не завершены в течение указанного [timeout](/api/class-elementhandle.mdx#element-handle-click-option-timeout), этот метод выдает [TimeoutError]. Передача нулевого таймаута отключает это.
 
 **Использование**
 
@@ -396,44 +390,44 @@ await elementHandle.click(options);
 ```
 
 **Аргументы**
-- `options` [Object] *(необязательно)*
-  - `button` "left" | "right" | "middle" *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-option-button"/><a href="#element-handle-click-option-button" class="list-anchor">#</a>
+- `options` [Object] *(optional)*
+  - `button` "left" | "right" | "middle" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-option-button"/><a href="#element-handle-click-option-button" class="list-anchor">#</a>
     
     По умолчанию `left`.
-  - `clickCount` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-option-click-count"/><a href="#element-handle-click-option-click-count" class="list-anchor">#</a>
+  - `clickCount` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-option-click-count"/><a href="#element-handle-click-option-click-count" class="list-anchor">#</a>
     
-    по умолчанию 1. См. [UIEvent.detail].
-  - `delay` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-option-delay"/><a href="#element-handle-click-option-delay" class="list-anchor">#</a>
+    По умолчанию 1. См. [UIEvent.detail].
+  - `delay` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-option-delay"/><a href="#element-handle-click-option-delay" class="list-anchor">#</a>
     
     Время ожидания между `mousedown` и `mouseup` в миллисекундах. По умолчанию 0.
-  - `force` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-option-force"/><a href="#element-handle-click-option-force" class="list-anchor">#</a>
+  - `force` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-option-force"/><a href="#element-handle-click-option-force" class="list-anchor">#</a>
     
-    Нужно ли обойти проверки [actionability](../actionability.mdx). По умолчанию `false`.
-  - `modifiers` [Array]&lt;"Alt" | "Control" | "ControlOrMeta" | "Meta" | "Shift"&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-option-modifiers"/><a href="#element-handle-click-option-modifiers" class="list-anchor">#</a>
+    Следует ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
+  - `modifiers` [Array]&lt;"Alt" | "Control" | "ControlOrMeta" | "Meta" | "Shift"&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-option-modifiers"/><a href="#element-handle-click-option-modifiers" class="list-anchor">#</a>
     
-    Модификаторы клавиш для нажатия. Обеспечивает, что только эти модификаторы нажаты во время операции, а затем восстанавливает текущие модификаторы. Если не указано, используются текущие нажатые модификаторы. "ControlOrMeta" разрешается в "Control" на Windows и Linux и в "Meta" на macOS.
-  - `noWaitAfter` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-option-no-wait-after"/><a href="#element-handle-click-option-no-wait-after" class="list-anchor">#</a>
+    Модификаторные клавиши для нажатия. Обеспечивает, что только эти модификаторы нажаты во время операции, а затем восстанавливает текущие модификаторы. Если не указано, используются текущие нажатые модификаторы. "ControlOrMeta" разрешается в "Control" на Windows и Linux и в "Meta" на macOS.
+  - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-option-no-wait-after"/><a href="#element-handle-click-option-no-wait-after" class="list-anchor">#</a>
     
-    :::warning[Устарело]
-    Эта опция в будущем будет по умолчанию `true`.
+    :::warning[Deprecated]
+    Этот параметр по умолчанию будет `true` в будущем.
     :::
     
     
-    Действия, инициирующие навигацию, ожидают, пока эти навигации произойдут и страницы начнут загружаться. Вы можете отказаться от ожидания, установив этот флаг. Вам потребуется эта опция только в исключительных случаях, таких как навигация к недоступным страницам. По умолчанию `false`.
-  - `position` [Object] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-option-position"/><a href="#element-handle-click-option-position" class="list-anchor">#</a>
+    Действия, инициирующие навигации, ожидают, пока эти навигации произойдут и страницы начнут загружаться. Вы можете отказаться от ожидания, установив этот флаг. Вам понадобится этот параметр только в исключительных случаях, таких как навигация на недоступные страницы. По умолчанию `false`.
+  - `position` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-option-position"/><a href="#element-handle-click-option-position" class="list-anchor">#</a>
     - `x` [number]
       
       
     - `y` [number]
       
       
-    Точка, используемая относительно верхнего левого угла области заполнения элемента. Если не указано, используется какая-то видимая точка элемента.
-  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-option-timeout"/><a href="#element-handle-click-option-timeout" class="list-anchor">#</a>
+    Точка для использования относительно верхнего левого угла рамки элемента. Если не указано, используется видимая точка элемента.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-option-timeout"/><a href="#element-handle-click-option-timeout" class="list-anchor">#</a>
     
-    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить через опцию `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) методов.
-  - `trial` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-option-trial"/><a href="#element-handle-click-option-trial" class="list-anchor">#</a>
+    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью параметра `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+  - `trial` [boolean] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-option-trial"/><a href="#element-handle-click-option-trial" class="list-anchor">#</a>
     
-    Когда установлено, этот метод выполняет только проверки [actionability](../actionability.mdx) и пропускает действие. По умолчанию `false`. Полезно, чтобы дождаться, пока элемент будет готов к действию, не выполняя его.
+    Если установлено, этот метод выполняет только проверки [actionability](../actionability.mdx) и пропускает действие. По умолчанию `false`. Полезно для ожидания, пока элемент будет готов к действию без его выполнения.
 
 **Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-click-return"/><a href="#element-handle-click-return" class="list-anchor">#</a>
@@ -442,27 +436,26 @@ await elementHandle.click(options);
 
 ### dblclick {#element-handle-dblclick}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.dblclick</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.dblclick</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.dblclick()](/api/class-locator.mdx#locator-dblclick) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Используйте основанный на локаторах [locator.dblclick()](/api/class-locator.mdx#locator-dblclick) вместо этого. Подробнее о [локаторах](../locators.mdx).
 
 :::
 
-
 Этот метод выполняет двойной клик по элементу, выполняя следующие шаги:
-1. Ожидать проверки [actionability](../actionability.mdx) на элементе, если не установлена опция [force](/api/class-elementhandle.mdx#element-handle-dblclick-option-force).
-1. Прокрутить элемент в видимость, если это необходимо.
-1. Использовать [page.mouse](/api/class-page.mdx#page-mouse), чтобы дважды кликнуть в центре элемента или в указанной [позиции](/api/class-elementhandle.mdx#element-handle-dblclick-option-position).
+1. Ожидание проверки [actionability](../actionability.mdx) на элементе, если не установлен параметр [force](/api/class-elementhandle.mdx#element-handle-dblclick-option-force).
+1. Прокрутка элемента в видимую область, если это необходимо.
+1. Использование [page.mouse](/api/class-page.mdx#page-mouse) для двойного клика в центре элемента или в указанной [позиции](/api/class-elementhandle.mdx#element-handle-dblclick-option-position).
 
-Если элемент будет отсоединен от DOM в любой момент во время действия, этот метод выбрасывает исключение.
+Если элемент отсоединяется от DOM в любой момент во время действия, этот метод выбрасывает исключение.
 
-Когда все шаги в совокупности не завершились в течение указанного [timeout](/api/class-elementhandle.mdx#element-handle-dblclick-option-timeout), этот метод выбрасывает [TimeoutError]. Передача нулевого таймаута отключает это.
+Когда все шаги в совокупности не завершены в течение указанного [timeout](/api/class-elementhandle.mdx#element-handle-dblclick-option-timeout), этот метод выбрасывает [TimeoutError]. Передача нулевого таймаута отключает это.
 
 :::note
 
-`elementHandle.dblclick()` вызывает два события `click` и одно событие `dblclick`.
+`elementHandle.dblclick()` генерирует два события `click` и одно событие `dblclick`.
 :::
 
 **Использование**
@@ -473,41 +466,41 @@ await elementHandle.dblclick(options);
 ```
 
 **Аргументы**
-- `options` [Object] *(необязательно)*
-  - `button` "left" | "right" | "middle" *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dblclick-option-button"/><a href="#element-handle-dblclick-option-button" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `button` "left" | "right" | "middle" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dblclick-option-button"/><a href="#element-handle-dblclick-option-button" class="list-anchor">#</a>
     
     По умолчанию `left`.
-  - `delay` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dblclick-option-delay"/><a href="#element-handle-dblclick-option-delay" class="list-anchor">#</a>
+  - `delay` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dblclick-option-delay"/><a href="#element-handle-dblclick-option-delay" class="list-anchor">#</a>
     
     Время ожидания между `mousedown` и `mouseup` в миллисекундах. По умолчанию 0.
-  - `force` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dblclick-option-force"/><a href="#element-handle-dblclick-option-force" class="list-anchor">#</a>
+  - `force` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dblclick-option-force"/><a href="#element-handle-dblclick-option-force" class="list-anchor">#</a>
     
-    Нужно ли обойти проверки [actionability](../actionability.mdx). По умолчанию `false`.
-  - `modifiers` [Array]&lt;"Alt" | "Control" | "ControlOrMeta" | "Meta" | "Shift"&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dblclick-option-modifiers"/><a href="#element-handle-dblclick-option-modifiers" class="list-anchor">#</a>
+    Следует ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
+  - `modifiers` [Array]&lt;"Alt" | "Control" | "ControlOrMeta" | "Meta" | "Shift"&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dblclick-option-modifiers"/><a href="#element-handle-dblclick-option-modifiers" class="list-anchor">#</a>
     
-    Модификаторы клавиш для нажатия. Обеспечивает, что только эти модификаторы нажаты во время операции, а затем восстанавливает текущие модификаторы. Если не указано, используются текущие нажатые модификаторы. "ControlOrMeta" разрешается в "Control" на Windows и Linux и в "Meta" на macOS.
-  - `noWaitAfter` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dblclick-option-no-wait-after"/><a href="#element-handle-dblclick-option-no-wait-after" class="list-anchor">#</a>
+    Модификаторные клавиши для нажатия. Гарантирует, что только эти модификаторы нажаты во время операции, а затем восстанавливает текущие модификаторы. Если не указано, используются текущие нажатые модификаторы. "ControlOrMeta" разрешается как "Control" на Windows и Linux и как "Meta" на macOS.
+  - `noWaitAfter` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dblclick-option-no-wait-after"/><a href="#element-handle-dblclick-option-no-wait-after" class="list-anchor">#</a>
     
-    :::warning[Устарело]
-    Эта опция не имеет эффекта.
+    :::warning[Deprecated]
+    Этот параметр не имеет эффекта.
     :::
     
     
-    Эта опция не имеет эффекта.
-  - `position` [Object] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dblclick-option-position"/><a href="#element-handle-dblclick-option-position" class="list-anchor">#</a>
+    Этот параметр не имеет эффекта.
+  - `position` [Object] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dblclick-option-position"/><a href="#element-handle-dblclick-option-position" class="list-anchor">#</a>
     - `x` [number]
       
       
     - `y` [number]
       
       
-    Точка, используемая относительно верхнего левого угла области заполнения элемента. Если не указано, используется какая-то видимая точка элемента.
-  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dblclick-option-timeout"/><a href="#element-handle-dblclick-option-timeout" class="list-anchor">#</a>
+    Точка, используемая относительно верхнего левого угла рамки элемента. Если не указано, используется видимая точка элемента.
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dblclick-option-timeout"/><a href="#element-handle-dblclick-option-timeout" class="list-anchor">#</a>
     
-    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить через опцию `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) методов.
-  - `trial` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dblclick-option-trial"/><a href="#element-handle-dblclick-option-trial" class="list-anchor">#</a>
+    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью параметра `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+  - `trial` [boolean] *(опционально)* <font size="2">Добавлено в: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dblclick-option-trial"/><a href="#element-handle-dblclick-option-trial" class="list-anchor">#</a>
     
-    Когда установлено, этот метод выполняет только проверки [actionability](../actionability.mdx) и пропускает действие. По умолчанию `false`. Полезно, чтобы дождаться, пока элемент будет готов к действию, не выполняя его.
+    Если установлено, этот метод выполняет только проверки [actionability](../actionability.mdx) и пропускает действие. По умолчанию `false`. Полезно для ожидания, пока элемент будет готов к действию без его выполнения.
 
 **Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dblclick-return"/><a href="#element-handle-dblclick-return" class="list-anchor">#</a>
@@ -516,16 +509,15 @@ await elementHandle.dblclick(options);
 
 ### dispatchEvent {#element-handle-dispatch-event}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.dispatchEvent</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.dispatchEvent</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.dispatchEvent()](/api/class-locator.mdx#locator-dispatch-event) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Используйте основанный на локаторах [locator.dispatchEvent()](/api/class-locator.mdx#locator-dispatch-event) вместо этого. Подробнее о [локаторах](../locators.mdx).
 
 :::
 
-
-Приведенный ниже фрагмент вызывает событие `click` на элементе. Независимо от состояния видимости элемента, `click` вызывается. Это эквивалентно вызову [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
+Пример ниже генерирует событие `click` на элементе. Независимо от состояния видимости элемента, `click` генерируется. Это эквивалентно вызову [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
 **Использование**
 
@@ -533,9 +525,9 @@ await elementHandle.dblclick(options);
 await elementHandle.dispatchEvent('click');
 ```
 
-Под капотом он создает экземпляр события на основе данного [type](/api/class-elementhandle.mdx#element-handle-dispatch-event-option-type), инициализирует его свойствами [eventInit](/api/class-elementhandle.mdx#element-handle-dispatch-event-option-event-init) и вызывает его на элементе. События по умолчанию являются `composed`, `cancelable` и всплывают.
+Внутри создается экземпляр события на основе указанного [type](/api/class-elementhandle.mdx#element-handle-dispatch-event-option-type), инициализируется с помощью свойств [eventInit](/api/class-elementhandle.mdx#element-handle-dispatch-event-option-event-init) и генерируется на элементе. События по умолчанию `composed`, `cancelable` и всплывают.
 
-Поскольку [eventInit](/api/class-elementhandle.mdx#element-handle-dispatch-event-option-event-init) является специфичным для события, пожалуйста, обратитесь к документации по событиям для списков начальных свойств:
+Поскольку [eventInit](/api/class-elementhandle.mdx#element-handle-dispatch-event-option-event-init) специфичен для события, пожалуйста, обратитесь к документации по событиям для списков начальных свойств:
 * [DeviceMotionEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceMotionEvent/DeviceMotionEvent)
 * [DeviceOrientationEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent/DeviceOrientationEvent)
 * [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent/DragEvent)
@@ -547,7 +539,7 @@ await elementHandle.dispatchEvent('click');
 * [TouchEvent](https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/TouchEvent)
 * [WheelEvent](https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent/WheelEvent)
 
-Вы также можете указать `JSHandle` в качестве значения свойства, если хотите, чтобы живые объекты были переданы в событие:
+Вы также можете указать `JSHandle` в качестве значения свойства, если хотите, чтобы живые объекты передавались в событие:
 
 ```js
 // Обратите внимание, что вы можете создать DataTransfer только в Chromium и Firefox
@@ -558,10 +550,10 @@ await elementHandle.dispatchEvent('dragstart', { dataTransfer });
 **Аргументы**
 - `type` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dispatch-event-option-type"/><a href="#element-handle-dispatch-event-option-type" class="list-anchor">#</a>
   
-  Тип DOM-события: `"click"`, `"dragstart"` и т.д.
-- `eventInit` [EvaluationArgument] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dispatch-event-option-event-init"/><a href="#element-handle-dispatch-event-option-event-init" class="list-anchor">#</a>
+  Тип DOM события: `"click"`, `"dragstart"`, и т.д.
+- `eventInit` [EvaluationArgument] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dispatch-event-option-event-init"/><a href="#element-handle-dispatch-event-option-event-init" class="list-anchor">#</a>
   
-  Необязательные свойства инициализации, специфичные для события.
+  Опциональные специфичные для события свойства инициализации.
 
 **Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-dispatch-event-return"/><a href="#element-handle-dispatch-event-return" class="list-anchor">#</a>
@@ -570,20 +562,19 @@ await elementHandle.dispatchEvent('dragstart', { dataTransfer });
 
 ### fill {#element-handle-fill}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.fill</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.fill</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.fill()](/api/class-locator.mdx#locator-fill) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Используйте основанный на локаторах [locator.fill()](/api/class-locator.mdx#locator-fill) вместо этого. Подробнее о [локаторах](../locators.mdx).
 
 :::
 
+Этот метод ожидает проверки [actionability](../actionability.mdx), фокусируется на элементе, заполняет его и генерирует событие `input` после заполнения. Обратите внимание, что вы можете передать пустую строку, чтобы очистить поле ввода.
 
-Этот метод ожидает проверки [actionability](../actionability.mdx), фокусирует элемент, заполняет его и вызывает событие `input` после заполнения. Обратите внимание, что вы можете передать пустую строку, чтобы очистить поле ввода.
+Если целевой элемент не является элементом `<input>`, `<textarea>` или `[contenteditable]`, этот метод выбрасывает ошибку. Однако, если элемент находится внутри элемента `<label>`, который имеет ассоциированный [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), будет заполнен именно этот контрол.
 
-Если целевой элемент не является элементом `<input>`, `<textarea>` или `[contenteditable]`, этот метод выбрасывает ошибку. Однако, если элемент находится внутри элемента `<label>`, который имеет связанный [контроль](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), будет заполнен именно контроль.
-
-Чтобы отправить детализированные события клавиатуры, используйте [locator.pressSequentially()](/api/class-locator.mdx#locator-press-sequentially).
+Для отправки более детализированных событий клавиатуры используйте [locator.pressSequentially()](/api/class-locator.mdx#locator-press-sequentially).
 
 **Использование**
 
@@ -595,22 +586,22 @@ await elementHandle.fill(value, options);
 **Аргументы**
 - `value` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-fill-option-value"/><a href="#element-handle-fill-option-value" class="list-anchor">#</a>
   
-  Значение, которое нужно установить для элемента `<input>`, `<textarea>` или `[contenteditable]`.
-- `options` [Object] *(необязательно)*
-  - `force` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.13</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-fill-option-force"/><a href="#element-handle-fill-option-force" class="list-anchor">#</a>
+  Значение для установки в элемент `<input>`, `<textarea>` или `[contenteditable]`.
+- `options` [Object] *(опционально)*
+  - `force` [boolean] *(опционально)* <font size="2">Добавлено в: v1.13</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-fill-option-force"/><a href="#element-handle-fill-option-force" class="list-anchor">#</a>
     
-    Нужно ли обойти проверки [actionability](../actionability.mdx). По умолчанию `false`.
-  - `noWaitAfter` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-fill-option-no-wait-after"/><a href="#element-handle-fill-option-no-wait-after" class="list-anchor">#</a>
+    Следует ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
+  - `noWaitAfter` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-fill-option-no-wait-after"/><a href="#element-handle-fill-option-no-wait-after" class="list-anchor">#</a>
     
-    :::warning[Устарело]
-    Эта опция не имеет эффекта.
+    :::warning[Deprecated]
+    Этот параметр не имеет эффекта.
     :::
     
     
-    Эта опция не имеет эффекта.
-  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-fill-option-timeout"/><a href="#element-handle-fill-option-timeout" class="list-anchor">#</a>
+    Этот параметр не имеет эффекта.
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-fill-option-timeout"/><a href="#element-handle-fill-option-timeout" class="list-anchor">#</a>
     
-    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить через опцию `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) методов.
+    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью параметра `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
 **Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-fill-return"/><a href="#element-handle-fill-return" class="list-anchor">#</a>
@@ -619,14 +610,13 @@ await elementHandle.fill(value, options);
 
 ### focus {#element-handle-focus}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.focus</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.focus</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.focus()](/api/class-locator.mdx#locator-focus) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Используйте основанный на локаторах [locator.focus()](/api/class-locator.mdx#locator-focus) вместо этого. Подробнее о [локаторах](../locators.mdx).
 
 :::
-
 
 Вызывает [focus](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus) на элементе.
 
@@ -643,14 +633,13 @@ await elementHandle.focus();
 
 ### getAttribute {#element-handle-get-attribute}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.getAttribute</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.getAttribute</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.getAttribute()](/api/class-locator.mdx#locator-get-attribute) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Use locator-based [locator.getAttribute()](/api/class-locator.mdx#locator-get-attribute) instead. Read more about [locators](../locators.mdx).
 
 :::
-
 
 Возвращает значение атрибута элемента.
 
@@ -672,23 +661,22 @@ await elementHandle.getAttribute(name);
 
 ### hover {#element-handle-hover}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.hover</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.hover</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.hover()](/api/class-locator.mdx#locator-hover) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Use locator-based [locator.hover()](/api/class-locator.mdx#locator-hover) instead. Read more about [locators](../locators.mdx).
 
 :::
 
-
 Этот метод наводит курсор на элемент, выполняя следующие шаги:
-1. Ожидать проверки [actionability](../actionability.mdx) на элементе, если не установлена опция [force](/api/class-elementhandle.mdx#element-handle-hover-option-force).
-1. Прокрутить элемент в видимость, если это необходимо.
-1. Использовать [page.mouse](/api/class-page.mdx#page-mouse), чтобы навести курсор на центр элемента или в указанной [позиции](/api/class-elementhandle.mdx#element-handle-hover-option-position).
+1. Ожидание проверки [actionability](../actionability.mdx) на элементе, если не установлена опция [force](/api/class-elementhandle.mdx#element-handle-hover-option-force).
+2. Прокрутка элемента в видимую область, если это необходимо.
+3. Использование [page.mouse](/api/class-page.mdx#page-mouse) для наведения на центр элемента или указанную [position](/api/class-elementhandle.mdx#element-handle-hover-option-position).
 
-Если элемент будет отсоединен от DOM в любой момент во время действия, этот метод выбрасывает исключение.
+Если элемент отсоединяется от DOM в любой момент во время действия, этот метод выбрасывает исключение.
 
-Когда все шаги в совокупности не завершились в течение указанного [timeout](/api/class-elementhandle.mdx#element-handle-hover-option-timeout), этот метод выбрасывает [TimeoutError]. Передача нулевого таймаута отключает это.
+Если все шаги не завершены в течение указанного [timeout](/api/class-elementhandle.mdx#element-handle-hover-option-timeout), этот метод выбрасывает [TimeoutError]. Установка нулевого таймаута отключает это.
 
 **Использование**
 
@@ -698,35 +686,35 @@ await elementHandle.hover(options);
 ```
 
 **Аргументы**
-- `options` [Object] *(необязательно)*
-  - `force` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-hover-option-force"/><a href="#element-handle-hover-option-force" class="list-anchor">#</a>
+- `options` [Object] *(optional)*
+  - `force` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-hover-option-force"/><a href="#element-handle-hover-option-force" class="list-anchor">#</a>
     
-    Нужно ли обойти проверки [actionability](../actionability.mdx). По умолчанию `false`.
-  - `modifiers` [Array]&lt;"Alt" | "Control" | "ControlOrMeta" | "Meta" | "Shift"&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-hover-option-modifiers"/><a href="#element-handle-hover-option-modifiers" class="list-anchor">#</a>
+    Нужно ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
+  - `modifiers` [Array]&lt;"Alt" | "Control" | "ControlOrMeta" | "Meta" | "Shift"&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-hover-option-modifiers"/><a href="#element-handle-hover-option-modifiers" class="list-anchor">#</a>
     
-    Модификаторы клавиш для нажатия. Обеспечивает, что только эти модификаторы нажаты во время операции, а затем восстанавливает текущие модификаторы. Если не указано, используются текущие нажатые модификаторы. "ControlOrMeta" разрешается в "Control" на Windows и Linux и в "Meta" на macOS.
-  - `noWaitAfter` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-hover-option-no-wait-after"/><a href="#element-handle-hover-option-no-wait-after" class="list-anchor">#</a>
+    Модификаторы клавиш для нажатия. Гарантирует, что только эти модификаторы нажаты во время операции, а затем восстанавливает текущие модификаторы. Если не указано, используются текущие нажатые модификаторы. "ControlOrMeta" разрешается как "Control" на Windows и Linux и как "Meta" на macOS.
+  - `noWaitAfter` [boolean] *(optional)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-hover-option-no-wait-after"/><a href="#element-handle-hover-option-no-wait-after" class="list-anchor">#</a>
     
-    :::warning[Устарело]
+    :::warning[Deprecated]
     Эта опция не имеет эффекта.
     :::
     
     
     Эта опция не имеет эффекта.
-  - `position` [Object] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-hover-option-position"/><a href="#element-handle-hover-option-position" class="list-anchor">#</a>
+  - `position` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-hover-option-position"/><a href="#element-handle-hover-option-position" class="list-anchor">#</a>
     - `x` [number]
       
       
     - `y` [number]
       
       
-    Точка, используемая относительно верхнего левого угла области заполнения элемента. Если не указано, используется какая-то видимая точка элемента.
-  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-hover-option-timeout"/><a href="#element-handle-hover-option-timeout" class="list-anchor">#</a>
+    Точка, используемая относительно верхнего левого угла рамки элемента. Если не указано, используется видимая точка элемента.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-hover-option-timeout"/><a href="#element-handle-hover-option-timeout" class="list-anchor">#</a>
     
-    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить через опцию `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) методов.
-  - `trial` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-hover-option-trial"/><a href="#element-handle-hover-option-trial" class="list-anchor">#</a>
+    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+  - `trial` [boolean] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-hover-option-trial"/><a href="#element-handle-hover-option-trial" class="list-anchor">#</a>
     
-    Когда установлено, этот метод выполняет только проверки [actionability](../actionability.mdx) и пропускает действие. По умолчанию `false`. Полезно, чтобы дождаться, пока элемент будет готов к действию, не выполняя его.
+    Если установлено, этот метод выполняет только проверки [actionability](../actionability.mdx) и пропускает действие. По умолчанию `false`. Полезно для ожидания, пока элемент будет готов к действию без его выполнения.
 
 **Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-hover-return"/><a href="#element-handle-hover-return" class="list-anchor">#</a>
@@ -735,14 +723,13 @@ await elementHandle.hover(options);
 
 ### innerHTML {#element-handle-inner-html}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.innerHTML</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.innerHTML</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.innerHTML()](/api/class-locator.mdx#locator-inner-html) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Use locator-based [locator.innerHTML()](/api/class-locator.mdx#locator-inner-html) instead. Read more about [locators](../locators.mdx).
 
 :::
-
 
 Возвращает `element.innerHTML`.
 
@@ -759,14 +746,13 @@ await elementHandle.innerHTML();
 
 ### innerText {#element-handle-inner-text}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.innerText</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.innerText</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.innerText()](/api/class-locator.mdx#locator-inner-text) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Use locator-based [locator.innerText()](/api/class-locator.mdx#locator-inner-text) instead. Read more about [locators](../locators.mdx).
 
 :::
-
 
 Возвращает `element.innerText`.
 
@@ -783,18 +769,17 @@ await elementHandle.innerText();
 
 ### inputValue {#element-handle-input-value}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.13</font><x-search>elementHandle.inputValue</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.13</font><x-search>elementHandle.inputValue</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.inputValue()](/api/class-locator.mdx#locator-input-value) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Use locator-based [locator.inputValue()](/api/class-locator.mdx#locator-input-value) instead. Read more about [locators](../locators.mdx).
 
 :::
 
-
 Возвращает `input.value` для выбранного элемента `<input>`, `<textarea>` или `<select>`.
 
-Выбрасывает исключение для не входных элементов. Однако, если элемент находится внутри элемента `<label>`, который имеет связанный [контроль](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), возвращает значение контроля.
+Выбрасывает исключение для не-вводных элементов. Однако, если элемент находится внутри элемента `<label>`, который имеет ассоциированный [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), возвращает значение этого контрола.
 
 **Использование**
 
@@ -804,10 +789,10 @@ await elementHandle.inputValue(options);
 ```
 
 **Аргументы**
-- `options` [Object] *(необязательно)*
-  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-input-value-option-timeout"/><a href="#element-handle-input-value-option-timeout" class="list-anchor">#</a>
+- `options` [Object] *(optional)*
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-input-value-option-timeout"/><a href="#element-handle-input-value-option-timeout" class="list-anchor">#</a>
     
-    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить через опцию `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) методов.
+    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
 **Возвращает**
 - [Promise]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-input-value-return"/><a href="#element-handle-input-value-return" class="list-anchor">#</a>
@@ -816,16 +801,15 @@ await elementHandle.inputValue(options);
 
 ### isChecked {#element-handle-is-checked}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.isChecked</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.isChecked</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.isChecked()](/api/class-locator.mdx#locator-is-checked) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Use locator-based [locator.isChecked()](/api/class-locator.mdx#locator-is-checked) instead. Read more about [locators](../locators.mdx).
 
 :::
 
-
-Возвращает, отмечен ли элемент. Выбрасывает исключение, если элемент не является флажком или радио-вводом.
+Возвращает, отмечен ли элемент. Выбрасывает исключение, если элемент не является флажком или радиокнопкой.
 
 **Использование**
 
@@ -840,16 +824,15 @@ await elementHandle.isChecked();
 
 ### isDisabled {#element-handle-is-disabled}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.isDisabled</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.isDisabled</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.isDisabled()](/api/class-locator.mdx#locator-is-disabled) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Use locator-based [locator.isDisabled()](/api/class-locator.mdx#locator-is-disabled) instead. Read more about [locators](../locators.mdx).
 
 :::
 
-
-Возвращает, отключен ли элемент, противоположный [enabled](../actionability.mdx#enabled).
+Возвращает, отключен ли элемент, противоположность [enabled](../actionability.mdx#enabled).
 
 **Использование**
 
@@ -864,14 +847,13 @@ await elementHandle.isDisabled();
 
 ### isEditable {#element-handle-is-editable}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.isEditable</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.isEditable</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.isEditable()](/api/class-locator.mdx#locator-is-editable) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Use locator-based [locator.isEditable()](/api/class-locator.mdx#locator-is-editable) instead. Read more about [locators](../locators.mdx).
 
 :::
-
 
 Возвращает, является ли элемент [редактируемым](../actionability.mdx#editable).
 
@@ -888,16 +870,15 @@ await elementHandle.isEditable();
 
 ### isEnabled {#element-handle-is-enabled}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.isEnabled</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.isEnabled</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.isEnabled()](/api/class-locator.mdx#locator-is-enabled) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Use locator-based [locator.isEnabled()](/api/class-locator.mdx#locator-is-enabled) instead. Read more about [locators](../locators.mdx).
 
 :::
 
-
-Возвращает, включен ли элемент [enabled](../actionability.mdx#enabled).
+Возвращает, является ли элемент [включенным](../actionability.mdx#enabled).
 
 **Использование**
 
@@ -912,16 +893,15 @@ await elementHandle.isEnabled();
 
 ### isHidden {#element-handle-is-hidden}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.isHidden</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.isHidden</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.isHidden()](/api/class-locator.mdx#locator-is-hidden) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Use locator-based [locator.isHidden()](/api/class-locator.mdx#locator-is-hidden) instead. Read more about [locators](../locators.mdx).
 
 :::
 
-
-Возвращает, скрыт ли элемент, противоположный [visible](../actionability.mdx#visible).
+Возвращает, скрыт ли элемент, противоположность [видимости](../actionability.mdx#visible).
 
 **Использование**
 
@@ -936,16 +916,15 @@ await elementHandle.isHidden();
 
 ### isVisible {#element-handle-is-visible}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.isVisible</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.isVisible</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.isVisible()](/api/class-locator.mdx#locator-is-visible) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Use locator-based [locator.isVisible()](/api/class-locator.mdx#locator-is-visible) instead. Read more about [locators](../locators.mdx).
 
 :::
 
-
-Возвращает, виден ли элемент [visible](../actionability.mdx#visible).
+Возвращает, является ли элемент [видимым](../actionability.mdx#visible).
 
 **Использование**
 
@@ -960,28 +939,27 @@ await elementHandle.isVisible();
 
 ### press {#element-handle-press}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.press</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.press</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.press()](/api/class-locator.mdx#locator-press) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Use locator-based [locator.press()](/api/class-locator.mdx#locator-press) instead. Read more about [locators](../locators.mdx).
 
 :::
 
-
 Фокусирует элемент, а затем использует [keyboard.down()](/api/class-keyboard.mdx#keyboard-down) и [keyboard.up()](/api/class-keyboard.mdx#keyboard-up).
 
-[key](/api/class-elementhandle.mdx#element-handle-press-option-key) может указывать на предполагаемое значение [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) или один символ для генерации текста. Расширенный набор значений [key](/api/class-elementhandle.mdx#element-handle-press-option-key) можно найти [здесь](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values). Примеры клавиш:
+[key](/api/class-elementhandle.mdx#element-handle-press-option-key) может указать предполагаемое значение [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) или один символ для генерации текста. Надмножество значений [key](/api/class-elementhandle.mdx#element-handle-press-option-key) можно найти [здесь](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values). Примеры клавиш:
 
 `F1` - `F12`, `Digit0`- `Digit9`, `KeyA`- `KeyZ`, `Backquote`, `Minus`, `Equal`, `Backslash`, `Backspace`, `Tab`, `Delete`, `Escape`, `ArrowDown`, `End`, `Enter`, `Home`, `Insert`, `PageDown`, `PageUp`, `ArrowRight`, `ArrowUp` и т.д.
 
-Также поддерживаются следующие сочетания модификаторов: `Shift`, `Control`, `Alt`, `Meta`, `ShiftLeft`, `ControlOrMeta`.
+Также поддерживаются следующие модификационные сочетания: `Shift`, `Control`, `Alt`, `Meta`, `ShiftLeft`, `ControlOrMeta`.
 
-Удерживание `Shift` будет печатать текст, соответствующий [key](/api/class-elementhandle.mdx#element-handle-press-option-key) в верхнем регистре.
+Удержание `Shift` напечатает текст, соответствующий [key](/api/class-elementhandle.mdx#element-handle-press-option-key) в верхнем регистре.
 
-Если [key](/api/class-elementhandle.mdx#element-handle-press-option-key) является одним символом, он чувствителен к регистру, поэтому значения `a` и `A` будут генерировать разные соответствующие тексты.
+Если [key](/api/class-elementhandle.mdx#element-handle-press-option-key) является одним символом, он чувствителен к регистру, поэтому значения `a` и `A` будут генерировать разные тексты.
 
-Сочетания клавиш, такие как `key: "Control+o"`, `key: "Control++` или `key: "Control+Shift+T"` также поддерживаются. Когда указано с модификатором, модификатор удерживается и нажимается во время нажатия последующей клавиши.
+Также поддерживаются сочетания клавиш, такие как `key: "Control+o"`, `key: "Control++` или `key: "Control+Shift+T"`. При указании с модификатором, модификатор нажимается и удерживается, пока не будет нажата последующая клавиша.
 
 **Использование**
 
@@ -993,22 +971,21 @@ await elementHandle.press(key, options);
 **Аргументы**
 - `key` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-press-option-key"/><a href="#element-handle-press-option-key" class="list-anchor">#</a>
   
-  Имя клавиши для нажатия или символ для генерации, например `ArrowLeft` или `a`.
-- `options` [Object] *(необязательно)*
-  - `delay` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-press-option-delay"/><a href="#element-handle-press-option-delay" class="list-anchor">#</a>
+  Название клавиши для нажатия или символ для генерации, например, `ArrowLeft` или `a`.
+- `options` [Object] *(optional)*
+  - `delay` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-press-option-delay"/><a href="#element-handle-press-option-delay" class="list-anchor">#</a>
     
     Время ожидания между `keydown` и `keyup` в миллисекундах. По умолчанию 0.
-  - `noWaitAfter` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-press-option-no-wait-after"/><a href="#element-handle-press-option-no-wait-after" class="list-anchor">#</a>
+  - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-press-option-no-wait-after"/><a href="#element-handle-press-option-no-wait-after" class="list-anchor">#</a>
     
-    :::warning[Устарело]
-    Эта опция будет по умолчанию `true` в будущем.
+    :::warning[Deprecated]
+    Этот параметр по умолчанию будет `true` в будущем.
     :::
     
+    Действия, инициирующие навигацию, ожидают, пока эти навигации произойдут и страницы начнут загружаться. Вы можете отказаться от ожидания, установив этот флаг. Вам понадобится этот параметр только в исключительных случаях, таких как навигация на недоступные страницы. По умолчанию `false`.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-press-option-timeout"/><a href="#element-handle-press-option-timeout" class="list-anchor">#</a>
     
-    Действия, инициирующие навигации, ожидают, пока эти навигации произойдут и страницы начнут загружаться. Вы можете отказаться от ожидания, установив этот флаг. Вам потребуется эта опция только в исключительных случаях, таких как навигация к недоступным страницам. По умолчанию `false`.
-  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-press-option-timeout"/><a href="#element-handle-press-option-timeout" class="list-anchor">#</a>
-    
-    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить через опцию `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) методов.
+    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью параметра `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
 **Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-press-return"/><a href="#element-handle-press-return" class="list-anchor">#</a>
@@ -1017,18 +994,17 @@ await elementHandle.press(key, options);
 
 ### screenshot {#element-handle-screenshot}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.screenshot</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.screenshot</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный на локаторе [locator.screenshot()](/api/class-locator.mdx#locator-screenshot) вместо этого. Узнайте больше о [локаторах](../locators.mdx).
+Use locator-based [locator.screenshot()](/api/class-locator.mdx#locator-screenshot) instead. Read more about [locators](../locators.mdx).
 
 :::
 
+Этот метод делает скриншот страницы, обрезанный до размера и положения этого конкретного элемента. Если элемент перекрыт другими элементами, он не будет фактически виден на скриншоте. Если элемент является прокручиваемым контейнером, на скриншоте будет виден только текущий прокручиваемый контент.
 
-Этот метод захватывает скриншот страницы, обрезанный по размеру и положению этого конкретного элемента. Если элемент перекрыт другими элементами, он не будет фактически виден на скриншоте. Если элемент является прокручиваемым контейнером, только текущий прокрученный контент будет виден на скриншоте.
-
-Этот метод ожидает проверки [actionability](../actionability.mdx), затем прокручивает элемент в видимость перед тем, как сделать скриншот. Если элемент отсоединен от DOM, метод выбрасывает ошибку.
+Этот метод ожидает проверки [actionability](../actionability.mdx), затем прокручивает элемент в видимую область перед тем, как сделать скриншот. Если элемент отсоединен от DOM, метод выдает ошибку.
 
 Возвращает буфер с захваченным скриншотом.
 
@@ -1040,44 +1016,44 @@ await elementHandle.screenshot(options);
 ```
 
 **Аргументы**
-- `options` [Object] *(необязательно)*
-  - `animations` "disabled" | "allow" *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-animations"/><a href="#element-handle-screenshot-option-animations" class="list-anchor">#</a>
+- `options` [Object] *(optional)*
+  - `animations` "disabled" | "allow" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-animations"/><a href="#element-handle-screenshot-option-animations" class="list-anchor">#</a>
     
-    Когда установлено в `"disabled"`, останавливает CSS-анимации, CSS-переходы и веб-анимации. Анимации обрабатываются по-разному в зависимости от их продолжительности:
-    * конечные анимации быстро завершаются, чтобы сработало событие `transitionend`.
+    При установке в `"disabled"`, останавливает CSS-анимации, CSS-переходы и веб-анимации. Анимации получают разное обращение в зависимости от их продолжительности:
+    * конечные анимации быстро перематываются до завершения, так что они вызовут событие `transitionend`.
     * бесконечные анимации отменяются до начального состояния, а затем воспроизводятся после скриншота.
     
     По умолчанию `"allow"`, что оставляет анимации нетронутыми.
-  - `caret` "hide" | "initial" *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-caret"/><a href="#element-handle-screenshot-option-caret" class="list-anchor">#</a>
+  - `caret` "hide" | "initial" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-caret"/><a href="#element-handle-screenshot-option-caret" class="list-anchor">#</a>
     
-    Когда установлено в `"hide"`, скриншот скроет текстовый курсор. Когда установлено в `"initial"`, поведение текстового курсора не изменится. По умолчанию `"hide"`.
-  - `mask` [Array]&lt;[Locator]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-mask"/><a href="#element-handle-screenshot-option-mask" class="list-anchor">#</a>
+    При установке в `"hide"`, скриншот скроет текстовый курсор. При установке в `"initial"`, поведение текстового курсора не будет изменено. По умолчанию `"hide"`.
+  - `mask` [Array]&lt;[Locator]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-mask"/><a href="#element-handle-screenshot-option-mask" class="list-anchor">#</a>
     
-    Укажите локаторы, которые должны быть замаскированы при создании скриншота. Замаскированные элементы будут перекрыты розовым квадратом `#FF00FF` (настраиваемым с помощью [maskColor](/api/class-elementhandle.mdx#element-handle-screenshot-option-mask-color)), который полностью покрывает его ограничивающий прямоугольник. Маска также применяется к невидимым элементам, см. [Сопоставление только видимых элементов](../locators.mdx#matching-only-visible-elements), чтобы отключить это.
-  - `maskColor` [string] *(необязательно)* <font size="2">Добавлено в: v1.35</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-mask-color"/><a href="#element-handle-screenshot-option-mask-color" class="list-anchor">#</a>
+    Укажите локаторы, которые должны быть замаскированы при создании скриншота. Замаскированные элементы будут покрыты розовым прямоугольником `#FF00FF` (настраивается с помощью [maskColor](/api/class-elementhandle.mdx#element-handle-screenshot-option-mask-color)), который полностью покрывает их ограничивающий прямоугольник. Маска также применяется к невидимым элементам, см. [Matching only visible elements](../locators.mdx#matching-only-visible-elements) для отключения этого.
+  - `maskColor` [string] *(optional)* <font size="2">Added in: v1.35</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-mask-color"/><a href="#element-handle-screenshot-option-mask-color" class="list-anchor">#</a>
     
-    Укажите цвет наложенного квадрата для замаскированных элементов в [формате цвета CSS](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value). Цвет по умолчанию - розовый `#FF00FF`.
-  - `omitBackground` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-omit-background"/><a href="#element-handle-screenshot-option-omit-background" class="list-anchor">#</a>
+    Укажите цвет наложения для замаскированных элементов в [CSS-формате цвета](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value). Цвет по умолчанию - розовый `#FF00FF`.
+  - `omitBackground` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-omit-background"/><a href="#element-handle-screenshot-option-omit-background" class="list-anchor">#</a>
     
-    Скрывает белый фон по умолчанию и позволяет захватывать скриншоты с прозрачностью. Не применяется к изображениям `jpeg`. По умолчанию `false`.
-  - `path` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-path"/><a href="#element-handle-screenshot-option-path" class="list-anchor">#</a>
+    Скрывает белый фон по умолчанию и позволяет делать скриншоты с прозрачностью. Не применимо к изображениям `jpeg`. По умолчанию `false`.
+  - `path` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-path"/><a href="#element-handle-screenshot-option-path" class="list-anchor">#</a>
     
-    Путь к файлу для сохранения изображения. Тип скриншота будет определен по расширению файла. Если [path](/api/class-elementhandle.mdx#element-handle-screenshot-option-path) является относительным путем, то он разрешается относительно текущего рабочего каталога. Если путь не указан, изображение не будет сохранено на диск.
-  - `quality` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-quality"/><a href="#element-handle-screenshot-option-quality" class="list-anchor">#</a>
+    Путь к файлу для сохранения изображения. Тип скриншота будет определен по расширению файла. Если [path](/api/class-elementhandle.mdx#element-handle-screenshot-option-path) является относительным путем, то он разрешается относительно текущей рабочей директории. Если путь не указан, изображение не будет сохранено на диск.
+  - `quality` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-quality"/><a href="#element-handle-screenshot-option-quality" class="list-anchor">#</a>
     
-    Качество изображения от 0 до 100. Не применяется к изображениям `png`.
-  - `scale` "css" | "device" *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-scale"/><a href="#element-handle-screenshot-option-scale" class="list-anchor">#</a>
+    Качество изображения, от 0 до 100. Не применимо к изображениям `png`.
+  - `scale` "css" | "device" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-scale"/><a href="#element-handle-screenshot-option-scale" class="list-anchor">#</a>
     
-    Когда установлено в `"css"`, скриншот будет иметь один пиксель на каждый CSS-пиксель на странице. Для устройств с высоким разрешением это позволит сохранить скриншоты небольшими. Использование опции `"device"` приведет к тому, что скриншоты будут иметь один пиксель на каждый пиксель устройства, поэтому скриншоты для устройств с высоким разрешением будут в два раза больше или даже больше.
+    При установке в `"css"`, скриншот будет иметь один пиксель на каждый css-пиксель на странице. Для устройств с высоким разрешением это позволит уменьшить размер скриншотов. Использование опции `"device"` создаст один пиксель на каждый пиксель устройства, так что скриншоты устройств с высоким разрешением будут в два раза больше или даже больше.
     
     По умолчанию `"device"`.
-  - `style` [string] *(необязательно)* <font size="2">Добавлено в: v1.41</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-style"/><a href="#element-handle-screenshot-option-style" class="list-anchor">#</a>
+  - `style` [string] *(optional)* <font size="2">Added in: v1.41</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-style"/><a href="#element-handle-screenshot-option-style" class="list-anchor">#</a>
     
-    Текст таблицы стилей, который будет применен при создании скриншота. Здесь вы можете скрыть динамические элементы, сделать элементы невидимыми или изменить их свойства, чтобы помочь вам создавать повторяемые скриншоты. Эта таблица стилей проникает в Shadow DOM и применяется к внутренним фреймам.
-  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-timeout"/><a href="#element-handle-screenshot-option-timeout" class="list-anchor">#</a>
+    Текст стиля, который будет применен при создании скриншота. Здесь вы можете скрыть динамические элементы, сделать элементы невидимыми или изменить их свойства, чтобы помочь вам создавать повторяемые скриншоты. Этот стиль проникает в Shadow DOM и применяется к внутренним фреймам.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-timeout"/><a href="#element-handle-screenshot-option-timeout" class="list-anchor">#</a>
     
-    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить через опцию `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) методов.
-  - `type` "png" | "jpeg" *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-type"/><a href="#element-handle-screenshot-option-type" class="list-anchor">#</a>
+    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью параметра `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+  - `type` "png" | "jpeg" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-screenshot-option-type"/><a href="#element-handle-screenshot-option-type" class="list-anchor">#</a>
     
     Укажите тип скриншота, по умолчанию `png`.
 
@@ -1088,8 +1064,595 @@ await elementHandle.screenshot(options);
 
 ### scrollIntoViewIfNeeded {#element-handle-scroll-into-view-if-needed}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>elementHandle.scrollIntoViewIfNeeded</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.scrollIntoViewIfNeeded</x-search>
 
-:::warning[Не рекомендуется]
+:::warning[Discouraged]
 
-Используйте основанный
+Use locator-based [locator.scrollIntoViewIfNeeded()](/api/class-locator.mdx#locator-scroll-into-view-if-needed) instead. Read more about [locators](../locators.mdx).
+
+:::
+
+Этот метод ожидает проверки [actionability](../actionability.mdx), затем пытается прокрутить элемент в видимую область, если он не полностью виден, как это определено `ratio` [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API).
+
+Вызывает ошибку, если `elementHandle` не указывает на элемент, [подключенный](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) к Document или ShadowRoot.
+
+Смотрите [scrolling](../input.mdx#scrolling) для альтернативных способов прокрутки.
+
+**Использование**
+
+```js
+await elementHandle.scrollIntoViewIfNeeded();
+await elementHandle.scrollIntoViewIfNeeded(options);
+```
+
+**Аргументы**
+- `options` [Object] *(optional)*
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-scroll-into-view-if-needed-option-timeout"/><a href="#element-handle-scroll-into-view-if-needed-option-timeout" class="list-anchor">#</a>
+    
+    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+
+**Возвращает**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-scroll-into-view-if-needed-return"/><a href="#element-handle-scroll-into-view-if-needed-return" class="list-anchor">#</a>
+
+---
+
+### selectOption {#element-handle-select-option}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.selectOption</x-search>
+
+:::warning[Discouraged]
+
+Use locator-based [locator.selectOption()](/api/class-locator.mdx#locator-select-option) instead. Read more about [locators](../locators.mdx).
+
+:::
+
+Этот метод ожидает проверки [actionability](../actionability.mdx), ждет, пока все указанные опции будут присутствовать в элементе `<select>`, и выбирает эти опции.
+
+Если целевой элемент не является элементом `<select>`, этот метод вызывает ошибку. Однако, если элемент находится внутри элемента `<label>`, который имеет ассоциированный [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), будет использован этот control.
+
+Возвращает массив значений опций, которые были успешно выбраны.
+
+Вызывает событие `change` и `input`, как только все предоставленные опции были выбраны.
+
+**Использование**
+
+```js
+// Single selection matching the value or label
+handle.selectOption('blue');
+
+// single selection matching the label
+handle.selectOption({ label: 'Blue' });
+
+// multiple selection
+handle.selectOption(['red', 'green', 'blue']);
+```
+
+**Аргументы**
+- `values` [null] | [string] | [ElementHandle] | [Array]&lt;[string]&gt; | [Object] | [Array]&lt;[ElementHandle]&gt; | [Array]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-select-option-option-values"/><a href="#element-handle-select-option-option-values" class="list-anchor">#</a>
+  - `value` [string] *(optional)*
+    
+    Совпадение по `option.value`. Необязательно.
+  - `label` [string] *(optional)*
+    
+    Совпадение по `option.label`. Необязательно.
+  - `index` [number] *(optional)*
+    
+    Совпадение по индексу. Необязательно.
+  
+  Опции для выбора. Если у `<select>` есть атрибут `multiple`, выбираются все совпадающие опции, в противном случае выбирается только первая опция, совпадающая с одной из переданных. Строковые значения совпадают как с значениями, так и с метками. Опция считается совпадающей, если все указанные свойства совпадают.
+- `options` [Object] *(optional)*
+  - `force` [boolean] *(optional)* <font size="2">Added in: v1.13</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-select-option-option-force"/><a href="#element-handle-select-option-option-force" class="list-anchor">#</a>
+    
+    Нужно ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
+  - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-select-option-option-no-wait-after"/><a href="#element-handle-select-option-option-no-wait-after" class="list-anchor">#</a>
+    
+    :::warning[Deprecated]
+    Эта опция не имеет эффекта.
+    :::
+    
+    
+    Эта опция не имеет эффекта.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-select-option-option-timeout"/><a href="#element-handle-select-option-option-timeout" class="list-anchor">#</a>
+    
+    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+
+**Возвращает**
+- [Promise]&lt;[Array]&lt;[string]&gt;&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-select-option-return"/><a href="#element-handle-select-option-return" class="list-anchor">#</a>
+
+---
+
+### selectText {#element-handle-select-text}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.selectText</x-search>
+
+:::warning[Discouraged]
+
+Use locator-based [locator.selectText()](/api/class-locator.mdx#locator-select-text) instead. Read more about [locators](../locators.mdx).
+
+:::
+
+Этот метод ожидает проверки [actionability](../actionability.mdx), затем фокусируется на элементе и выделяет весь его текстовый контент.
+
+Если элемент находится внутри элемента `<label>`, который имеет ассоциированный [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), фокусируется и выделяет текст в этом control.
+
+**Использование**
+
+```js
+await elementHandle.selectText();
+await elementHandle.selectText(options);
+```
+
+**Аргументы**
+- `options` [Object] *(optional)*
+  - `force` [boolean] *(optional)* <font size="2">Added in: v1.13</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-select-text-option-force"/><a href="#element-handle-select-text-option-force" class="list-anchor">#</a>
+    
+    Нужно ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-select-text-option-timeout"/><a href="#element-handle-select-text-option-timeout" class="list-anchor">#</a>
+    
+    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+
+**Возвращает**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-select-text-return"/><a href="#element-handle-select-text-return" class="list-anchor">#</a>
+
+---
+
+### setChecked {#element-handle-set-checked}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>elementHandle.setChecked</x-search>
+
+:::warning[Discouraged]
+
+Use locator-based [locator.setChecked()](/api/class-locator.mdx#locator-set-checked) instead. Read more about [locators](../locators.mdx).
+
+:::
+
+Этот метод отмечает или снимает отметку с элемента, выполняя следующие шаги:
+1. Убедитесь, что элемент является флажком или радиокнопкой. Если нет, этот метод вызывает ошибку.
+1. Если элемент уже имеет правильное состояние отметки, этот метод возвращается немедленно.
+1. Ожидайте проверки [actionability](../actionability.mdx) на совпадающем элементе, если не установлена опция [force](/api/class-elementhandle.mdx#element-handle-set-checked-option-force). Если элемент отсоединяется во время проверок, все действие повторяется.
+1. Прокрутите элемент в видимую область, если это необходимо.
+1. Используйте [page.mouse](/api/class-page.mdx#page-mouse) для клика в центре элемента.
+1. Убедитесь, что элемент теперь отмечен или не отмечен. Если нет, этот метод вызывает ошибку.
+
+Когда все шаги в совокупности не завершены в течение указанного [timeout](/api/class-elementhandle.mdx#element-handle-set-checked-option-timeout), этот метод вызывает [TimeoutError]. Передача нулевого таймаута отключает это.
+
+**Использование**
+
+```js
+await elementHandle.setChecked(checked);
+await elementHandle.setChecked(checked, options);
+```
+
+**Аргументы**
+- `checked` [boolean]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-set-checked-option-checked"/><a href="#element-handle-set-checked-option-checked" class="list-anchor">#</a>
+  
+  Нужно ли отметить или снять отметку с флажка.
+- `options` [Object] *(optional)*
+  - `force` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-set-checked-option-force"/><a href="#element-handle-set-checked-option-force" class="list-anchor">#</a>
+    
+    Нужно ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
+  - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-set-checked-option-no-wait-after"/><a href="#element-handle-set-checked-option-no-wait-after" class="list-anchor">#</a>
+    
+    :::warning[Deprecated]
+    Эта опция не имеет эффекта.
+    :::
+    
+    
+    Эта опция не имеет эффекта.
+  - `position` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-set-checked-option-position"/><a href="#element-handle-set-checked-option-position" class="list-anchor">#</a>
+    - `x` [number]
+      
+      
+    - `y` [number]
+      
+      
+    Точка для использования относительно верхнего левого угла рамки элемента. Если не указано, используется видимая точка элемента.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-set-checked-option-timeout"/><a href="#element-handle-set-checked-option-timeout" class="list-anchor">#</a>
+    
+    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+  - `trial` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-set-checked-option-trial"/><a href="#element-handle-set-checked-option-trial" class="list-anchor">#</a>
+    
+    Если установлено, этот метод выполняет только проверки [actionability](../actionability.mdx) и пропускает действие. По умолчанию `false`. Полезно для ожидания, пока элемент будет готов к действию без его выполнения.
+
+**Возвращает**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-set-checked-return"/><a href="#element-handle-set-checked-return" class="list-anchor">#</a>
+
+---
+
+### setInputFiles {#element-handle-set-input-files}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.setInputFiles</x-search>
+
+:::warning[Discouraged]
+
+Use locator-based [locator.setInputFiles()](/api/class-locator.mdx#locator-set-input-files) instead. Read more about [locators](../locators.mdx).
+
+:::
+
+Устанавливает значение файлового ввода в указанные пути к файлам или файлы. Если некоторые из `filePaths` являются относительными путями, они разрешаются относительно текущей рабочей директории. Для пустого массива очищает выбранные файлы. Для входов с атрибутом `[webkitdirectory]` поддерживается только один путь к директории.
+
+Этот метод ожидает, что [ElementHandle] указывает на [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input). Однако, если элемент находится внутри элемента `<label>`, который имеет ассоциированный [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), он нацелен на контроль вместо этого.
+
+**Использование**
+
+```js
+await elementHandle.setInputFiles(files);
+await elementHandle.setInputFiles(files, options);
+```
+
+**Аргументы**
+- `files` [string] | [Array]&lt;[string]&gt; | [Object] | [Array]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-set-input-files-option-files"/><a href="#element-handle-set-input-files-option-files" class="list-anchor">#</a>
+  - `name` [string]
+    
+    Имя файла
+  - `mimeType` [string]
+    
+    Тип файла
+  - `buffer` [Buffer]
+    
+    Содержимое файла
+- `options` [Object] *(optional)*
+  - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-set-input-files-option-no-wait-after"/><a href="#element-handle-set-input-files-option-no-wait-after" class="list-anchor">#</a>
+    
+    :::warning[Deprecated]
+    This option has no effect.
+    :::
+    
+    
+    This option has no effect.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-set-input-files-option-timeout"/><a href="#element-handle-set-input-files-option-timeout" class="list-anchor">#</a>
+    
+    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+
+**Возвращает**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-set-input-files-return"/><a href="#element-handle-set-input-files-return" class="list-anchor">#</a>
+
+---
+
+### tap {#element-handle-tap}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.tap</x-search>
+
+:::warning[Discouraged]
+
+Use locator-based [locator.tap()](/api/class-locator.mdx#locator-tap) instead. Read more about [locators](../locators.mdx).
+
+:::
+
+Этот метод выполняет нажатие на элемент, выполняя следующие шаги:
+1. Ожидание [actionability](../actionability.mdx) проверок на элементе, если только не установлена опция [force](/api/class-elementhandle.mdx#element-handle-tap-option-force).
+1. Прокрутка элемента в видимую область, если это необходимо.
+1. Использование [page.touchscreen](/api/class-page.mdx#page-touchscreen) для нажатия в центр элемента или указанную [position](/api/class-elementhandle.mdx#element-handle-tap-option-position).
+
+Если элемент отсоединяется от DOM в любой момент во время действия, этот метод выбрасывает исключение.
+
+Когда все шаги в совокупности не завершены в течение указанного [timeout](/api/class-elementhandle.mdx#element-handle-tap-option-timeout), этот метод выбрасывает [TimeoutError]. Передача нулевого таймаута отключает это.
+
+:::note
+
+`elementHandle.tap()` требует, чтобы опция `hasTouch` контекста браузера была установлена в true.
+:::
+
+**Использование**
+
+```js
+await elementHandle.tap();
+await elementHandle.tap(options);
+```
+
+**Аргументы**
+- `options` [Object] *(optional)*
+  - `force` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-tap-option-force"/><a href="#element-handle-tap-option-force" class="list-anchor">#</a>
+    
+    Нужно ли обходить [actionability](../actionability.mdx) проверки. По умолчанию `false`.
+  - `modifiers` [Array]&lt;"Alt" | "Control" | "ControlOrMeta" | "Meta" | "Shift"&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-tap-option-modifiers"/><a href="#element-handle-tap-option-modifiers" class="list-anchor">#</a>
+    
+    Модификаторные клавиши для нажатия. Обеспечивает, что только эти модификаторы нажаты во время операции, а затем восстанавливает текущие модификаторы обратно. Если не указано, используются текущие нажатые модификаторы. "ControlOrMeta" разрешается в "Control" на Windows и Linux и в "Meta" на macOS.
+  - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-tap-option-no-wait-after"/><a href="#element-handle-tap-option-no-wait-after" class="list-anchor">#</a>
+    
+    :::warning[Deprecated]
+    This option has no effect.
+    :::
+    
+    
+    This option has no effect.
+  - `position` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-tap-option-position"/><a href="#element-handle-tap-option-position" class="list-anchor">#</a>
+    - `x` [number]
+      
+      
+    - `y` [number]
+      
+      
+    Точка для использования относительно верхнего левого угла рамки элемента. Если не указано, используется видимая точка элемента.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-tap-option-timeout"/><a href="#element-handle-tap-option-timeout" class="list-anchor">#</a>
+    
+    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+  - `trial` [boolean] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-tap-option-trial"/><a href="#element-handle-tap-option-trial" class="list-anchor">#</a>
+    
+    Если установлено, этот метод выполняет только [actionability](../actionability.mdx) проверки и пропускает действие. По умолчанию `false`. Полезно для ожидания, пока элемент будет готов к действию без его выполнения.
+
+**Возвращает**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-tap-return"/><a href="#element-handle-tap-return" class="list-anchor">#</a>
+
+---
+
+### textContent {#element-handle-text-content}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.textContent</x-search>
+
+:::warning[Discouraged]
+
+Use locator-based [locator.textContent()](/api/class-locator.mdx#locator-text-content) instead. Read more about [locators](../locators.mdx).
+
+:::
+
+Возвращает `node.textContent`.
+
+**Использование**
+
+```js
+await elementHandle.textContent();
+```
+
+**Возвращает**
+- [Promise]&lt;[null] | [string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-text-content-return"/><a href="#element-handle-text-content-return" class="list-anchor">#</a>
+
+---
+
+### type {#element-handle-type}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.type</x-search>
+
+:::warning Deprecated
+
+In most cases, you should use [locator.fill()](/api/class-locator.mdx#locator-fill) instead. You only need to press keys one by one if there is special keyboard handling on the page - in this case use [locator.pressSequentially()](/api/class-locator.mdx#locator-press-sequentially).
+
+:::
+
+Фокусируется на элементе, а затем отправляет событие `keydown`, `keypress`/`input` и `keyup` для каждого символа в тексте.
+
+Чтобы нажать специальную клавишу, такую как `Control` или `ArrowDown`, используйте [elementHandle.press()](/api/class-elementhandle.mdx#element-handle-press).
+
+**Использование**
+
+**Аргументы**
+- `text` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-type-option-text"/><a href="#element-handle-type-option-text" class="list-anchor">#</a>
+  
+  Текст для ввода в фокусированный элемент.
+- `options` [Object] *(optional)*
+  - `delay` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-type-option-delay"/><a href="#element-handle-type-option-delay" class="list-anchor">#</a>
+    
+    Время ожидания между нажатиями клавиш в миллисекундах. По умолчанию 0.
+  - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-type-option-no-wait-after"/><a href="#element-handle-type-option-no-wait-after" class="list-anchor">#</a>
+    
+    :::warning[Deprecated]
+    This option has no effect.
+    :::
+    
+    
+    This option has no effect.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-type-option-timeout"/><a href="#element-handle-type-option-timeout" class="list-anchor">#</a>
+    
+    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Возвращает**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-type-return"/><a href="#element-handle-type-return" class="list-anchor">#</a>
+
+---
+
+### uncheck {#element-handle-uncheck}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.uncheck</x-search>
+
+:::warning[Discouraged]
+
+Use locator-based [locator.uncheck()](/api/class-locator.mdx#locator-uncheck) instead. Read more about [locators](../locators.mdx).
+
+:::
+
+Этот метод снимает отметку с элемента, выполняя следующие шаги:
+1. Убедитесь, что элемент является флажком или радиокнопкой. Если нет, этот метод выбрасывает исключение. Если элемент уже снят с отметки, этот метод возвращается немедленно.
+1. Ожидание [actionability](../actionability.mdx) проверок на элементе, если только не установлена опция [force](/api/class-elementhandle.mdx#element-handle-uncheck-option-force).
+1. Прокрутка элемента в видимую область, если это необходимо.
+1. Использование [page.mouse](/api/class-page.mdx#page-mouse) для нажатия в центр элемента.
+1. Убедитесь, что элемент теперь снят с отметки. Если нет, этот метод выбрасывает исключение.
+
+Если элемент отсоединяется от DOM в любой момент во время действия, этот метод выбрасывает исключение.
+
+Когда все шаги в совокупности не завершены в течение указанного [timeout](/api/class-elementhandle.mdx#element-handle-uncheck-option-timeout), этот метод выбрасывает [TimeoutError]. Передача нулевого таймаута отключает это.
+
+**Использование**
+
+```js
+await elementHandle.uncheck();
+await elementHandle.uncheck(options);
+```
+
+**Аргументы**
+- `options` [Object] *(optional)*
+  - `force` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-uncheck-option-force"/><a href="#element-handle-uncheck-option-force" class="list-anchor">#</a>
+    
+    Нужно ли обходить [actionability](../actionability.mdx) проверки. По умолчанию `false`.
+  - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-uncheck-option-no-wait-after"/><a href="#element-handle-uncheck-option-no-wait-after" class="list-anchor">#</a>
+    
+    :::warning[Deprecated]
+    This option has no effect.
+    :::
+    
+    
+    This option has no effect.
+  - `position` [Object] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-uncheck-option-position"/><a href="#element-handle-uncheck-option-position" class="list-anchor">#</a>
+    - `x` [number]
+      
+      
+    - `y` [number]
+      
+      
+    Точка для использования относительно верхнего левого угла рамки элемента. Если не указано, используется видимая точка элемента.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-uncheck-option-timeout"/><a href="#element-handle-uncheck-option-timeout" class="list-anchor">#</a>
+    
+    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  - `trial` [boolean] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-uncheck-option-trial"/><a href="#element-handle-uncheck-option-trial" class="list-anchor">#</a>
+    
+    Если установлено, этот метод выполняет только [actionability](../actionability.mdx) проверки и пропускает действие. По умолчанию `false`. Полезно для ожидания, пока элемент будет готов к действию без его выполнения.
+
+**Возвращает**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-uncheck-return"/><a href="#element-handle-uncheck-return" class="list-anchor">#</a>
+
+---
+
+### waitForSelector {#element-handle-wait-for-selector}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>elementHandle.waitForSelector</x-search>
+
+:::warning[Discouraged]
+
+Используйте веб-утверждения, которые проверяют видимость, или основанные на локаторах [locator.waitFor()](/api/class-locator.mdx#locator-wait-for).
+
+:::
+
+Возвращает элемент, указанный селектором, когда он удовлетворяет опции [state](/api/class-elementhandle.mdx#element-handle-wait-for-selector-option-state). Возвращает `null`, если ожидание для `hidden` или `detached`.
+
+Ожидает, пока [selector](/api/class-elementhandle.mdx#element-handle-wait-for-selector-option-selector) относительно элемента удовлетворит опцию [state](/api/class-elementhandle.mdx#element-handle-wait-for-selector-option-state) (либо появится/исчезнет из DOM, либо станет видимым/скрытым). Если в момент вызова метода [selector](/api/class-elementhandle.mdx#element-handle-wait-for-selector-option-selector) уже удовлетворяет условию, метод вернется немедленно. Если селектор не удовлетворяет условию в течение [timeout](/api/class-elementhandle.mdx#element-handle-wait-for-selector-option-timeout) миллисекунд, функция выбросит исключение.
+
+**Использование**
+
+```js
+await page.setContent(`<div><span></span></div>`);
+const div = await page.$('div');
+// Ожидание селектора 'span' относительно div.
+const span = await div.waitForSelector('span', { state: 'attached' });
+```
+
+:::note
+Этот метод не работает через навигации, используйте [page.waitForSelector()](/api/class-page.mdx#page-wait-for-selector) вместо этого.
+:::
+
+**Аргументы**
+- `selector` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-wait-for-selector-option-selector"/><a href="#element-handle-wait-for-selector-option-selector" class="list-anchor">#</a>
+  
+  Селектор для запроса.
+- `options` [Object] *(опционально)*
+  - `state` "attached" | "detached" | "visible" | "hidden" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-wait-for-selector-option-state"/><a href="#element-handle-wait-for-selector-option-state" class="list-anchor">#</a>
+    
+    По умолчанию `'visible'`. Может быть:
+    * `'attached'` - ожидание, пока элемент будет присутствовать в DOM.
+    * `'detached'` - ожидание, пока элемент не будет присутствовать в DOM.
+    * `'visible'` - ожидание, пока элемент не будет иметь пустую ограничивающую рамку и не будет `visibility:hidden`. Обратите внимание, что элемент без какого-либо содержимого или с `display:none` имеет пустую ограничивающую рамку и не считается видимым.
+    * `'hidden'` - ожидание, пока элемент либо не будет отсоединен от DOM, либо не будет иметь пустую ограничивающую рамку или `visibility:hidden`. Это противоположно опции `'visible'`.
+  - `strict` [boolean] *(опционально)* <font size="2">Добавлено в: v1.15</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-wait-for-selector-option-strict"/><a href="#element-handle-wait-for-selector-option-strict" class="list-anchor">#</a>
+    
+    Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов выбрасывает исключение.
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-wait-for-selector-option-timeout"/><a href="#element-handle-wait-for-selector-option-timeout" class="list-anchor">#</a>
+    
+    Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить через опцию `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+
+**Возвращает**
+- [Promise]&lt;[null] | [ElementHandle]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="element-handle-wait-for-selector-return"/><a href="#element-handle-wait-for-selector-return" class="list-anchor">#</a>
+
+
+[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
+[APIRequest]: /api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
+[Browser]: /api/class-browser.mdx "Browser"
+[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[Clock]: /api/class-clock.mdx "Clock"
+[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: /api/class-coverage.mdx "Coverage"
+[Dialog]: /api/class-dialog.mdx "Dialog"
+[Download]: /api/class-download.mdx "Download"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[Frame]: /api/class-frame.mdx "Frame"
+[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
+[JSHandle]: /api/class-jshandle.mdx "JSHandle"
+[Keyboard]: /api/class-keyboard.mdx "Keyboard"
+[Locator]: /api/class-locator.mdx "Locator"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
+[Logger]: /api/class-logger.mdx "Logger"
+[Mouse]: /api/class-mouse.mdx "Mouse"
+[Page]: /api/class-page.mdx "Page"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
+[Playwright]: /api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
+[Request]: /api/class-request.mdx "Request"
+[Response]: /api/class-response.mdx "Response"
+[Route]: /api/class-route.mdx "Route"
+[Selectors]: /api/class-selectors.mdx "Selectors"
+[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
+[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: /api/class-tracing.mdx "Tracing"
+[Video]: /api/class-video.mdx "Video"
+[WebError]: /api/class-weberror.mdx "WebError"
+[WebSocket]: /api/class-websocket.mdx "WebSocket"
+[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[Worker]: /api/class-worker.mdx "Worker"
+[Fixtures]: /api/class-fixtures.mdx "Fixtures"
+[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
+[FullProject]: /api/class-fullproject.mdx "FullProject"
+[Location]: /api/class-location.mdx "Location"
+[Test]: /api/class-test.mdx "Test"
+[TestConfig]: /api/class-testconfig.mdx "TestConfig"
+[TestInfo]: /api/class-testinfo.mdx "TestInfo"
+[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
+[TestOptions]: /api/class-testoptions.mdx "TestOptions"
+[TestProject]: /api/class-testproject.mdx "TestProject"
+[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
+[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
+[Reporter]: /api/class-reporter.mdx "Reporter"
+[Suite]: /api/class-suite.mdx "Suite"
+[TestCase]: /api/class-testcase.mdx "TestCase"
+[TestError]: /api/class-testerror.mdx "TestError"
+[TestResult]: /api/class-testresult.mdx "TestResult"
+[TestStep]: /api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
+
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
+[Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"
