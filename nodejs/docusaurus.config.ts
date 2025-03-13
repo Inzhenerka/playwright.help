@@ -34,6 +34,9 @@ let plugins = [
     }),
   ],
   require.resolve("@docusaurus/plugin-content-pages"),
+  ['docusaurus-plugin-yandex-metrica', {
+    counterID: '100339848',
+  }]
 ];
 
 if (isProd) {
