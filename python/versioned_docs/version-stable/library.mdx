@@ -1,12 +1,12 @@
 ---
 id: library
-title: "Getting started - Library"
+title: "Начало работы - Библиотека"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Installation
+## Установка
 
 ### Pip
 
@@ -29,11 +29,11 @@ conda install playwright
 playwright install
 ```
 
-These commands download the Playwright package and install browser binaries for Chromium, Firefox and WebKit. To modify this behavior see [installation parameters](./browsers.mdx#install-browsers).
+Эти команды загружают пакет Playwright и устанавливают бинарные файлы браузеров для Chromium, Firefox и WebKit. Чтобы изменить это поведение, см. [параметры установки](./browsers.mdx#install-browsers).
 
-## Usage
+## Использование
 
-Once installed, you can `import` Playwright in a Python script, and launch any of the 3 browsers (`chromium`, `firefox` and `webkit`).
+После установки вы можете `import` Playwright в Python-скрипт и запускать любой из 3 браузеров (`chromium`, `firefox` и `webkit`).
 
 ```py
 from playwright.sync_api import sync_playwright
@@ -46,7 +46,7 @@ with sync_playwright() as p:
     browser.close()
 ```
 
-Playwright supports two variations of the API: synchronous and asynchronous. If your modern project uses [asyncio](https://docs.python.org/3/library/asyncio.html), you should use async API:
+Playwright поддерживает две вариации API: синхронную и асинхронную. Если ваш современный проект использует [asyncio](https://docs.python.org/3/library/asyncio.html), вы должны использовать асинхронное API:
 
 ```py
 import asyncio
@@ -63,9 +63,9 @@ async def main():
 asyncio.run(main())
 ```
 
-## First script
+## Первый скрипт
 
-In our first script, we will navigate to `https://playwright.dev/` and take a screenshot in WebKit.
+В нашем первом скрипте мы перейдем на `https://playwright.dev/` и сделаем скриншот в WebKit.
 
 ```py
 from playwright.sync_api import sync_playwright
@@ -78,27 +78,27 @@ with sync_playwright() as p:
     browser.close()
 ```
 
-By default, Playwright runs the browsers in headless mode. To see the browser UI, set [headless](/api/class-browsertype.mdx#browser-type-launch-option-headless) option to `False`. You can also use [slow_mo](/api/class-browsertype.mdx#browser-type-launch-option-slow-mo) to slow down execution. Learn more in the debugging tools [section](./debug.mdx).
+По умолчанию Playwright запускает браузеры в безголовом режиме. Чтобы увидеть интерфейс браузера, установите опцию [headless](/api/class-browsertype.mdx#browser-type-launch-option-headless) в `False`. Вы также можете использовать [slow_mo](/api/class-browsertype.mdx#browser-type-launch-option-slow-mo) для замедления выполнения. Узнайте больше в разделе инструментов отладки [section](./debug.mdx).
 
 ```py
 firefox.launch(headless=False, slow_mo=50)
 ```
 
-## Interactive mode (REPL)
+## Интерактивный режим (REPL)
 
-You can launch the interactive python REPL:
+Вы можете запустить интерактивный python REPL:
 
 ```bash
 python
 ```
 
-and then launch Playwright within it for quick experimentation:
+а затем запустить Playwright в нем для быстрой экспериментации:
 
 ```py
 from playwright.sync_api import sync_playwright
 playwright = sync_playwright().start()
-# Use playwright.chromium, playwright.firefox or playwright.webkit
-# Pass headless=False to launch() to see the browser UI
+# Используйте playwright.chromium, playwright.firefox или playwright.webkit
+# Передайте headless=False в launch(), чтобы увидеть интерфейс браузера
 browser = playwright.chromium.launch()
 page = browser.new_page()
 page.goto("https://playwright.dev/")
@@ -107,7 +107,7 @@ browser.close()
 playwright.stop()
 ```
 
-Async REPL such as `asyncio` REPL:
+Асинхронный REPL, такой как `asyncio` REPL:
 
 ```bash
 python -m asyncio
@@ -126,7 +126,7 @@ await playwright.stop()
 
 ## Pyinstaller
 
-You can use Playwright with [Pyinstaller](https://www.pyinstaller.org/) to create standalone executables.
+Вы можете использовать Playwright с [Pyinstaller](https://www.pyinstaller.org/) для создания автономных исполняемых файлов.
 
 ```py title="main.py"
 from playwright.sync_api import sync_playwright
@@ -139,7 +139,7 @@ with sync_playwright() as p:
     browser.close()
 ```
 
-If you want to bundle browsers with the executables:
+Если вы хотите упаковать браузеры с исполняемыми файлами:
 
 <Tabs
   groupId="bash-flavor"
@@ -180,24 +180,24 @@ pyinstaller -F main.py
 
 :::note
 
-Bundling the browsers with the executables will generate bigger binaries. It is recommended to only bundle the browsers you use.
+Упаковка браузеров с исполняемыми файлами приведет к созданию более крупных бинарных файлов. Рекомендуется упаковывать только те браузеры, которые вы используете.
 :::
 
-## Known issues
+## Известные проблемы
 
-### `time.sleep()` leads to outdated state
+### `time.sleep()` приводит к устаревшему состоянию
 
-Most likely you don't need to wait manually, since Playwright has [auto-waiting](./actionability.mdx). If you still rely on it, you should use `page.wait_for_timeout(5000)` instead of `time.sleep(5)` and it is better to not wait for a timeout at all, but sometimes it is useful for debugging. In these cases, use our wait (`wait_for_timeout`) method instead of the `time` module. This is because we internally rely on asynchronous operations and when using `time.sleep(5)` they can't get processed correctly.
+Скорее всего, вам не нужно ждать вручную, так как Playwright имеет [автоожидание](./actionability.mdx). Если вы все же полагаетесь на это, вы должны использовать `page.wait_for_timeout(5000)` вместо `time.sleep(5)`, и лучше вообще не ждать тайм-аута, но иногда это полезно для отладки. В этих случаях используйте наш метод ожидания (`wait_for_timeout`) вместо модуля `time`. Это связано с тем, что мы внутренне полагаемся на асинхронные операции, и при использовании `time.sleep(5)` они не могут быть обработаны корректно.
 
-### incompatible with `SelectorEventLoop` of `asyncio` on Windows
+### несовместимость с `SelectorEventLoop` из `asyncio` на Windows
 
-Playwright runs the driver in a subprocess, so it requires `ProactorEventLoop` of `asyncio` on Windows because `SelectorEventLoop` does not supports async subprocesses.
+Playwright запускает драйвер в подпроцессе, поэтому он требует `ProactorEventLoop` из `asyncio` на Windows, потому что `SelectorEventLoop` не поддерживает асинхронные подпроцессы.
 
-On Windows Python 3.7, Playwright sets the default event loop to `ProactorEventLoop` as it is default on Python 3.8+.
+На Windows Python 3.7 Playwright устанавливает цикл событий по умолчанию на `ProactorEventLoop`, так как это значение по умолчанию в Python 3.8+.
 
-### Threading
+### Потоки
 
-Playwright's API is not thread-safe. If you are using Playwright in a multi-threaded environment, you should create a playwright instance per thread. See [threading issue](https://github.com/microsoft/playwright-python/issues/623) for more details.
+API Playwright не является потокобезопасным. Если вы используете Playwright в многопоточном окружении, вы должны создавать экземпляр Playwright для каждого потока. Подробнее см. [проблему с потоками](https://github.com/microsoft/playwright-python/issues/623).
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"

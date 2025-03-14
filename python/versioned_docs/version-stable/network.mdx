@@ -1,25 +1,25 @@
 ---
 id: network
-title: "Network"
+title: "Сеть"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright provides APIs to **monitor** and **modify** browser network traffic, both HTTP and HTTPS. Any requests that a page does, including [XHRs](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) requests, can be tracked, modified and handled.
+Playwright предоставляет API для **мониторинга** и **модификации** сетевого трафика браузера, как HTTP, так и HTTPS. Любые запросы, которые делает страница, включая [XHR](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) и [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) запросы, могут быть отслежены, изменены и обработаны.
 
-## Mock APIs
+## Мокирование API
 
-Check out our [API mocking guide](./mock.mdx) to learn more on how to
-- mock API requests and never hit the API
-- perform the API request and modify the response
-- use HAR files to mock network requests.
+Ознакомьтесь с нашим [руководством по мокированию API](./mock.mdx), чтобы узнать больше о том, как
+- мокировать API-запросы и никогда не обращаться к API
+- выполнять API-запрос и изменять ответ
+- использовать HAR-файлы для мокирования сетевых запросов.
 
-## HTTP Authentication
+## HTTP-аутентификация
 
-Perform HTTP Authentication.
+Выполнение HTTP-аутентификации.
 
 <Tabs
   groupId="python-flavor"
@@ -53,13 +53,13 @@ await page.goto("https://example.com")
 </TabItem>
 </Tabs>
 
-## HTTP Proxy
+## HTTP-прокси
 
-You can configure pages to load over the HTTP(S) proxy or SOCKSv5. Proxy can be either set globally for the entire browser, or for each browser context individually.
+Вы можете настроить страницы для загрузки через HTTP(S) прокси или SOCKSv5. Прокси может быть установлен глобально для всего браузера или для каждого контекста браузера отдельно.
 
-You can optionally specify username and password for HTTP(S) proxy, you can also specify hosts to bypass the [proxy](/api/class-browser.mdx#browser-new-context-option-proxy) for.
+Вы можете дополнительно указать имя пользователя и пароль для HTTP(S) прокси, а также указать хосты, которые нужно обойти [прокси](/api/class-browser.mdx#browser-new-context-option-proxy).
 
-Here is an example of a global proxy:
+Вот пример глобального прокси:
 
 <Tabs
   groupId="python-flavor"
@@ -93,7 +93,7 @@ browser = await chromium.launch(proxy={
 </TabItem>
 </Tabs>
 
-Its also possible to specify it per context:
+Также возможно указать его для каждого контекста:
 
 <Tabs
   groupId="python-flavor"
@@ -121,9 +121,9 @@ context = await browser.new_context(proxy={"server": "http://myproxy.com:3128"})
 </TabItem>
 </Tabs>
 
-## Network events
+## Сетевые события
 
-You can monitor all the [Request]s and [Response]s:
+Вы можете отслеживать все [Request] и [Response]:
 
 <Tabs
   groupId="python-flavor"
@@ -142,7 +142,7 @@ def run(playwright: Playwright):
     chromium = playwright.chromium
     browser = chromium.launch()
     page = browser.new_page()
-    # Subscribe to "request" and "response" events.
+    # Подписка на события "request" и "response".
     page.on("request", lambda request: print(">>", request.method, request.url))
     page.on("response", lambda response: print("<<", response.status, response.url))
     page.goto("https://example.com")
@@ -163,7 +163,7 @@ async def run(playwright: Playwright):
     chromium = playwright.chromium
     browser = await chromium.launch()
     page = await browser.new_page()
-    # Subscribe to "request" and "response" events.
+    # Подписка на события "request" и "response".
     page.on("request", lambda request: print(">>", request.method, request.url))
     page.on("response", lambda response: print("<<", response.status, response.url))
     await page.goto("https://example.com")
@@ -178,7 +178,7 @@ asyncio.run(main())
 </TabItem>
 </Tabs>
 
-Or wait for a network response after the button click with [page.expect_response()](/api/class-page.mdx#page-wait-for-response):
+Или дождаться сетевого ответа после нажатия кнопки с помощью [page.expect_response()](/api/class-page.mdx#page-wait-for-response):
 
 <Tabs
   groupId="python-flavor"
@@ -191,7 +191,7 @@ Or wait for a network response after the button click with [page.expect_response
 <TabItem value="sync">
 
 ```py
-# Use a glob url pattern
+# Используйте шаблон URL с глобальными символами
 with page.expect_response("**/api/fetch_data") as response_info:
     page.get_by_text("Update").click()
 response = response_info.value
@@ -201,7 +201,7 @@ response = response_info.value
 <TabItem value="async">
 
 ```py
-# Use a glob url pattern
+# Используйте шаблон URL с глобальными символами
 async with page.expect_response("**/api/fetch_data") as response_info:
     await page.get_by_text("Update").click()
 response = await response_info.value
@@ -210,9 +210,9 @@ response = await response_info.value
 </TabItem>
 </Tabs>
 
-#### Variations
+#### Вариации
 
-Wait for [Response]s with [page.expect_response()](/api/class-page.mdx#page-wait-for-response)
+Ожидание [Response] с [page.expect_response()](/api/class-page.mdx#page-wait-for-response)
 
 <Tabs
   groupId="python-flavor"
@@ -225,12 +225,12 @@ Wait for [Response]s with [page.expect_response()](/api/class-page.mdx#page-wait
 <TabItem value="sync">
 
 ```py
-# Use a regular expression
+# Используйте регулярное выражение
 with page.expect_response(re.compile(r"\.jpeg$")) as response_info:
     page.get_by_text("Update").click()
 response = response_info.value
 
-# Use a predicate taking a response object
+# Используйте предикат, принимающий объект ответа
 with page.expect_response(lambda response: token in response.url) as response_info:
     page.get_by_text("Update").click()
 response = response_info.value
@@ -240,12 +240,12 @@ response = response_info.value
 <TabItem value="async">
 
 ```py
-# Use a regular expression
+# Используйте регулярное выражение
 async with page.expect_response(re.compile(r"\.jpeg$")) as response_info:
     await page.get_by_text("Update").click()
 response = await response_info.value
 
-# Use a predicate taking a response object
+# Используйте предикат, принимающий объект ответа
 async with page.expect_response(lambda response: token in response.url) as response_info:
     await page.get_by_text("Update").click()
 response = await response_info.value
@@ -254,7 +254,7 @@ response = await response_info.value
 </TabItem>
 </Tabs>
 
-## Handle requests
+## Обработка запросов
 
 <Tabs
   groupId="python-flavor"
@@ -286,11 +286,11 @@ await page.goto("https://example.com")
 </TabItem>
 </Tabs>
 
-You can mock API endpoints via handling the network requests in your Playwright script.
+Вы можете мокировать конечные точки API, обрабатывая сетевые запросы в вашем скрипте Playwright.
 
-#### Variations
+#### Вариации
 
-Set up route on the entire browser context with [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route) or page with [page.route()](/api/class-page.mdx#page-route). It will apply to popup windows and opened links.
+Настройте маршрут для всего контекста браузера с помощью [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route) или страницы с помощью [page.route()](/api/class-page.mdx#page-route). Это будет применяться к всплывающим окнам и открытым ссылкам.
 
 <Tabs
   groupId="python-flavor"
@@ -322,7 +322,7 @@ await page.goto("https://example.com")
 </TabItem>
 </Tabs>
 
-## Modify requests
+## Изменение запросов
 
 <Tabs
   groupId="python-flavor"
@@ -335,14 +335,14 @@ await page.goto("https://example.com")
 <TabItem value="sync">
 
 ```py
-# Delete header
+# Удаление заголовка
 def handle_route(route):
     headers = route.request.headers
     del headers["x-secret"]
     route.continue_(headers=headers)
 page.route("**/*", handle_route)
 
-# Continue requests as POST.
+# Продолжение запросов как POST.
 page.route("**/*", lambda route: route.continue_(method="POST"))
 ```
 
@@ -350,25 +350,25 @@ page.route("**/*", lambda route: route.continue_(method="POST"))
 <TabItem value="async">
 
 ```py
-# Delete header
+# Удаление заголовка
 async def handle_route(route):
     headers = route.request.headers
     del headers["x-secret"]
     await route.continue_(headers=headers)
 await page.route("**/*", handle_route)
 
-# Continue requests as POST.
+# Продолжение запросов как POST.
 await page.route("**/*", lambda route: route.continue_(method="POST"))
 ```
 
 </TabItem>
 </Tabs>
 
-You can continue requests with modifications. Example above removes an HTTP header from the outgoing requests.
+Вы можете продолжать запросы с модификациями. Пример выше удаляет HTTP-заголовок из исходящих запросов.
 
-## Abort requests
+## Прерывание запросов
 
-You can abort requests using [page.route()](/api/class-page.mdx#page-route) and [route.abort()](/api/class-route.mdx#route-abort).
+Вы можете прерывать запросы, используя [page.route()](/api/class-page.mdx#page-route) и [route.abort()](/api/class-route.mdx#route-abort).
 
 <Tabs
   groupId="python-flavor"
@@ -383,7 +383,7 @@ You can abort requests using [page.route()](/api/class-page.mdx#page-route) and 
 ```py
 page.route("**/*.{png,jpg,jpeg}", lambda route: route.abort())
 
-# Abort based on the request type
+# Прерывание на основе типа запроса
 page.route("**/*", lambda route: route.abort() if route.request.resource_type == "image"  else route.continue_())
 ```
 
@@ -393,16 +393,16 @@ page.route("**/*", lambda route: route.abort() if route.request.resource_type ==
 ```py
 await page.route("**/*.{png,jpg,jpeg}", lambda route: route.abort())
 
-# Abort based on the request type
+# Прерывание на основе типа запроса
 await page.route("**/*", lambda route: route.abort() if route.request.resource_type == "image"  else route.continue_())
 ```
 
 </TabItem>
 </Tabs>
 
-## Modify responses
+## Изменение ответов
 
-To modify a response use [APIRequestContext] to get the original response and then pass the response to [route.fulfill()](/api/class-route.mdx#route-fulfill). You can override individual fields on the response via options:
+Чтобы изменить ответ, используйте [APIRequestContext] для получения оригинального ответа, а затем передайте ответ в [route.fulfill()](/api/class-route.mdx#route-fulfill). Вы можете переопределить отдельные поля в ответе с помощью опций:
 
 <Tabs
   groupId="python-flavor"
@@ -410,23 +410,23 @@ To modify a response use [APIRequestContext] to get the original response and th
   values={[
     {label: 'Sync', value: 'sync'},
     {label: 'Async', value: 'async'}
-  ]
-}>
+  ]}
+>
 <TabItem value="sync">
 
 ```py
 def handle_route(route: Route) -> None:
-    # Fetch original response.
+    # Получить оригинальный ответ.
     response = route.fetch()
-    # Add a prefix to the title.
+    # Добавить префикс к заголовку.
     body = response.text()
     body = body.replace("<title>", "<title>My prefix:")
     route.fulfill(
-        # Pass all fields from the response.
+        # Передать все поля из ответа.
         response=response,
-        # Override response body.
+        # Переопределить тело ответа.
         body=body,
-        # Force content type to be html.
+        # Принудительно установить тип контента как html.
         headers={**response.headers, "content-type": "text/html"},
     )
 
@@ -438,17 +438,17 @@ page.route("**/title.html", handle_route)
 
 ```py
 async def handle_route(route: Route) -> None:
-    # Fetch original response.
+    # Получить оригинальный ответ.
     response = await route.fetch()
-    # Add a prefix to the title.
+    # Добавить префикс к заголовку.
     body = await response.text()
     body = body.replace("<title>", "<title>My prefix:")
     await route.fulfill(
-        # Pass all fields from the response.
+        # Передать все поля из ответа.
         response=response,
-        # Override response body.
+        # Переопределить тело ответа.
         body=body,
-        # Force content type to be html.
+        # Принудительно установить тип контента как html.
         headers={**response.headers, "content-type": "text/html"},
     )
 
@@ -458,34 +458,34 @@ await page.route("**/title.html", handle_route)
 </TabItem>
 </Tabs>
 
-## Glob URL patterns
+## Шаблоны URL с глобами
 
-Playwright uses simplified glob patterns for URL matching in network interception methods like [page.route()](/api/class-page.mdx#page-route) or [page.expect_response()](/api/class-page.mdx#page-wait-for-response). These patterns support basic wildcards:
-1. Asterisks:
-   - A single `*` matches any characters except `/`
-   - A double `**` matches any characters including `/`
-1. Question mark `?` matches any single character except `/`
-1. Curly braces `{}` can be used to match a list of options separated by commas `,`
-1. Square brackets `[]` can be used to match a set of characters
-1. Backslash `\` can be used to escape any of special characters (note to escape backslash itself as `\\`)
+Playwright использует упрощенные шаблоны с глобами для сопоставления URL в методах перехвата сети, таких как [page.route()](/api/class-page.mdx#page-route) или [page.expect_response()](/api/class-page.mdx#page-wait-for-response). Эти шаблоны поддерживают базовые подстановочные знаки:
+1. Звездочки:
+   - Одиночная `*` соответствует любым символам, кроме `/`
+   - Двойная `**` соответствует любым символам, включая `/`
+1. Вопросительный знак `?` соответствует любому одиночному символу, кроме `/`
+1. Фигурные скобки `{}` могут использоваться для сопоставления списка опций, разделенных запятыми `,`
+1. Квадратные скобки `[]` могут использоваться для сопоставления набора символов
+1. Обратный слэш `\` может использоваться для экранирования любых специальных символов (обратите внимание, что сам обратный слэш нужно экранировать как `\\`)
 
-Examples:
-- `https://example.com/*.js` matches `https://example.com/file.js` but not `https://example.com/path/file.js`
-- `https://example.com/\\?page=1` matches `https://example.com/?page=1` but not `https://example.com`
-- `**/v[0-9]*` matches `https://example.com/v1/` but not `https://example.com/vote/`
-- `**/*.js` matches both `https://example.com/file.js` and `https://example.com/path/file.js`
-- `**/*.{png,jpg,jpeg}` matches all image requests
+Примеры:
+- `https://example.com/*.js` соответствует `https://example.com/file.js`, но не `https://example.com/path/file.js`
+- `https://example.com/\\?page=1` соответствует `https://example.com/?page=1`, но не `https://example.com`
+- `**/v[0-9]*` соответствует `https://example.com/v1/`, но не `https://example.com/vote/`
+- `**/*.js` соответствует как `https://example.com/file.js`, так и `https://example.com/path/file.js`
+- `**/*.{png,jpg,jpeg}` соответствует всем запросам изображений
 
-Important notes:
-- The glob pattern must match the entire URL, not just a part of it.
-- When using globs for URL matching, consider the full URL structure, including the protocol and path separators.
-- For more complex matching requirements, consider using [RegExp] instead of glob patterns.
+Важные заметки:
+- Шаблон с глобами должен соответствовать всему URL, а не только его части.
+- При использовании глобов для сопоставления URL учитывайте полную структуру URL, включая протокол и разделители пути.
+- Для более сложных требований к сопоставлению рассмотрите возможность использования [RegExp] вместо шаблонов с глобами.
 
 ## WebSockets
 
-Playwright supports [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) inspection, mocking and modifying out of the box. See our [API mocking guide](./mock.mdx#mock-websockets) to learn how to mock WebSockets.
+Playwright поддерживает инспекцию, имитацию и модификацию [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) из коробки. Ознакомьтесь с нашим [руководством по имитации API](./mock.mdx#mock-websockets), чтобы узнать, как имитировать WebSockets.
 
-Every time a WebSocket is created, the [page.on("websocket")](/api/class-page.mdx#page-event-web-socket) event is fired. This event contains the [WebSocket] instance for further web socket frames inspection:
+Каждый раз, когда создается WebSocket, срабатывает событие [page.on("websocket")](/api/class-page.mdx#page-event-web-socket). Это событие содержит экземпляр [WebSocket] для дальнейшей инспекции фреймов веб-сокета:
 
 ```python
 def on_web_socket(ws):
@@ -497,12 +497,12 @@ def on_web_socket(ws):
 page.on("websocket", on_web_socket)
 ```
 
-## Missing Network Events and Service Workers
+## Отсутствующие сетевые события и Service Workers
 
-Playwright's built-in [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route) and [page.route()](/api/class-page.mdx#page-route) allow your tests to natively route requests and perform mocking and interception.
-1. If you're using Playwright's native [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route) and [page.route()](/api/class-page.mdx#page-route), and it appears network events are missing, disable Service Workers by setting [service_workers](/api/class-browser.mdx#browser-new-context-option-service-workers) to `'block'`.
-1. It might be that you are using a mock tool such as Mock Service Worker (MSW). While this tool works out of the box for mocking responses, it adds its own Service Worker that takes over the network requests, hence making them invisible to [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route) and [page.route()](/api/class-page.mdx#page-route). If you are interested in both network testing and mocking, consider using built-in [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route) and [page.route()](/api/class-page.mdx#page-route) for [response mocking](#handle-requests).
-1. If you're interested in not solely using Service Workers for testing and network mocking, but in routing and listening for requests made by Service Workers themselves, please see [this experimental feature](https://github.com/microsoft/playwright/issues/15684).
+Встроенные функции Playwright [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route) и [page.route()](/api/class-page.mdx#page-route) позволяют вашим тестам нативно маршрутизировать запросы и выполнять имитацию и перехват.
+1. Если вы используете нативные функции Playwright [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route) и [page.route()](/api/class-page.mdx#page-route), и кажется, что сетевые события отсутствуют, отключите Service Workers, установив [service_workers](/api/class-browser.mdx#browser-new-context-option-service-workers) в `'block'`.
+1. Возможно, вы используете инструмент имитации, такой как Mock Service Worker (MSW). Хотя этот инструмент работает из коробки для имитации ответов, он добавляет свой собственный Service Worker, который берет на себя сетевые запросы, делая их невидимыми для [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route) и [page.route()](/api/class-page.mdx#page-route). Если вас интересует как тестирование сети, так и имитация, рассмотрите возможность использования встроенных функций [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route) и [page.route()](/api/class-page.mdx#page-route) для [имитации ответов](#handle-requests).
+1. Если вас интересует не только использование Service Workers для тестирования и имитации сети, но и маршрутизация и прослушивание запросов, сделанных самими Service Workers, пожалуйста, ознакомьтесь с [этой экспериментальной функцией](https://github.com/microsoft/playwright/issues/15684).
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"

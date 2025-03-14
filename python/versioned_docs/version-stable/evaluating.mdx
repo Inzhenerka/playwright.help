@@ -1,16 +1,16 @@
 ---
 id: evaluating
-title: "Evaluating JavaScript"
+title: "Выполнение JavaScript"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright scripts run in your Playwright environment. Your page scripts run in the browser page environment. Those environments don't intersect, they are running in different virtual machines in different processes and even potentially on different computers.
+Скрипты Playwright выполняются в вашей среде Playwright. Скрипты страницы выполняются в среде браузерной страницы. Эти среды не пересекаются, они работают в разных виртуальных машинах в разных процессах и даже потенциально на разных компьютерах.
 
-The [page.evaluate()](/api/class-page.mdx#page-evaluate) API can run a JavaScript function in the context of the web page and bring results back to the Playwright environment. Browser globals like `window` and `document` can be used in `evaluate`.
+API [page.evaluate()](/api/class-page.mdx#page-evaluate) может выполнять JavaScript-функцию в контексте веб-страницы и возвращать результаты в среду Playwright. Глобальные объекты браузера, такие как `window` и `document`, могут использоваться в `evaluate`.
 
 <Tabs
   groupId="python-flavor"
@@ -36,7 +36,7 @@ href = await page.evaluate('() => document.location.href')
 </TabItem>
 </Tabs>
 
-If the result is a Promise or if the function is asynchronous evaluate will automatically wait until it's resolved:
+Если результат является Promise или если функция асинхронная, evaluate автоматически дождется ее разрешения:
 
 <Tabs
   groupId="python-flavor"
@@ -68,11 +68,11 @@ status = await page.evaluate("""async () => {
 </TabItem>
 </Tabs>
 
-## Different environments
+## Разные среды
 
-Evaluated scripts run in the browser environment, while your test runs in a testing environments. This means you cannot use variables from your test in the page and vice versa. Instead, you should pass them explicitly as an argument.
+Выполняемые скрипты работают в среде браузера, в то время как ваш тест выполняется в тестовой среде. Это означает, что вы не можете использовать переменные из вашего теста на странице и наоборот. Вместо этого вы должны передавать их явно в качестве аргумента.
 
-The following snippet is **WRONG** because it uses the variable directly:
+Следующий фрагмент **НЕПРАВИЛЬНЫЙ**, потому что он использует переменную напрямую:
 
 <Tabs
   groupId="python-flavor"
@@ -87,7 +87,7 @@ The following snippet is **WRONG** because it uses the variable directly:
 ```py
 data = "some data"
 result = page.evaluate("""() => {
-  // WRONG: there is no "data" in the web page.
+  // НЕПРАВИЛЬНО: на веб-странице нет "data".
   window.myApp.use(data)
 }""")
 ```
@@ -98,7 +98,7 @@ result = page.evaluate("""() => {
 ```py
 data = "some data"
 result = await page.evaluate("""() => {
-  // WRONG: there is no "data" in the web page.
+  // НЕПРАВИЛЬНО: на веб-странице нет "data".
   window.myApp.use(data)
 }""")
 ```
@@ -106,7 +106,7 @@ result = await page.evaluate("""() => {
 </TabItem>
 </Tabs>
 
-The following snippet is **CORRECT** because it passes the value explicitly as an argument:
+Следующий фрагмент **ПРАВИЛЬНЫЙ**, потому что он передает значение явно в качестве аргумента:
 
 <Tabs
   groupId="python-flavor"
@@ -120,7 +120,7 @@ The following snippet is **CORRECT** because it passes the value explicitly as a
 
 ```py
 data = "some data"
-# Pass |data| as a parameter.
+# Передайте |data| в качестве параметра.
 result = page.evaluate("""data => {
   window.myApp.use(data)
 }""", data)
@@ -131,7 +131,7 @@ result = page.evaluate("""data => {
 
 ```py
 data = "some data"
-# Pass |data| as a parameter.
+# Передайте |data| в качестве параметра.
 result = await page.evaluate("""data => {
   window.myApp.use(data)
 }""", data)
@@ -140,9 +140,9 @@ result = await page.evaluate("""data => {
 </TabItem>
 </Tabs>
 
-## Evaluation Argument
+## Аргумент для выполнения
 
-Playwright evaluation methods like [page.evaluate()](/api/class-page.mdx#page-evaluate) take a single optional argument. This argument can be a mix of [Serializable] values and [JSHandle] instances. Handles are automatically converted to the value they represent.
+Методы выполнения Playwright, такие как [page.evaluate()](/api/class-page.mdx#page-evaluate), принимают один необязательный аргумент. Этот аргумент может быть смесью значений [Serializable] и экземпляров [JSHandle]. Обработчики автоматически преобразуются в представляемое ими значение.
 
 <Tabs
   groupId="python-flavor"
@@ -155,42 +155,42 @@ Playwright evaluation methods like [page.evaluate()](/api/class-page.mdx#page-ev
 <TabItem value="sync">
 
 ```py
-# A primitive value.
+# Примитивное значение.
 page.evaluate('num => num', 42)
 
-# An array.
+# Массив.
 page.evaluate('array => array.length', [1, 2, 3])
 
-# An object.
+# Объект.
 page.evaluate('object => object.foo', { 'foo': 'bar' })
 
-# A single handle.
+# Один обработчик.
 button = page.evaluate_handle('window.button')
 page.evaluate('button => button.textContent', button)
 
-# Alternative notation using JSHandle.evaluate.
+# Альтернативная нотация с использованием JSHandle.evaluate.
 button.evaluate('(button, from) => button.textContent.substring(from)', 5)
 
-# Object with multiple handles.
+# Объект с несколькими обработчиками.
 button1 = page.evaluate_handle('window.button1')
 button2 = page.evaluate_handle('.button2')
 page.evaluate("""o => o.button1.textContent + o.button2.textContent""",
     { 'button1': button1, 'button2': button2 })
 
-# Object destructuring works. Note that property names must match
-# between the destructured object and the argument.
-# Also note the required parenthesis.
+# Деструктуризация объекта работает. Обратите внимание, что имена свойств должны совпадать
+# между деструктурированным объектом и аргументом.
+# Также обратите внимание на обязательные скобки.
 page.evaluate("""
     ({ button1, button2 }) => button1.textContent + button2.textContent""",
     { 'button1': button1, 'button2': button2 })
 
-# Array works as well. Arbitrary names can be used for destructuring.
-# Note the required parenthesis.
+# Массив также работает. Для деструктуризации можно использовать произвольные имена.
+# Обратите внимание на обязательные скобки.
 page.evaluate("""
     ([b1, b2]) => b1.textContent + b2.textContent""",
     [button1, button2])
 
-# Any mix of serializables and handles works.
+# Любая смесь сериализуемых и обработчиков работает.
 page.evaluate("""
     x => x.button1.textContent + x.list[0].textContent + String(x.foo)""",
     { 'button1': button1, 'list': [button2], 'foo': None })
@@ -200,43 +200,43 @@ page.evaluate("""
 <TabItem value="async">
 
 ```py
-# A primitive value.
+# Примитивное значение.
 await page.evaluate('num => num', 42)
 
-# An array.
+# Массив.
 await page.evaluate('array => array.length', [1, 2, 3])
 
-# An object.
+# Объект.
 await page.evaluate('object => object.foo', { 'foo': 'bar' })
 
-# A single handle.
+# Один обработчик.
 button = await page.evaluate_handle('button')
 await page.evaluate('button => button.textContent', button)
 
-# Alternative notation using JSHandle.evaluate.
+# Альтернативная нотация с использованием JSHandle.evaluate.
 await button.evaluate('(button, from) => button.textContent.substring(from)', 5)
 
-# Object with multiple handles.
+# Объект с несколькими обработчиками.
 button1 = await page.evaluate_handle('window.button1')
 button2 = await page.evaluate_handle('window.button2')
 await page.evaluate("""
     o => o.button1.textContent + o.button2.textContent""",
     { 'button1': button1, 'button2': button2 })
 
-# Object destructuring works. Note that property names must match
-# between the destructured object and the argument.
-# Also note the required parenthesis.
+# Деструктуризация объекта работает. Обратите внимание, что имена свойств должны совпадать
+# между деструктурированным объектом и аргументом.
+# Также обратите внимание на обязательные скобки.
 await page.evaluate("""
     ({ button1, button2 }) => button1.textContent + button2.textContent""",
     { 'button1': button1, 'button2': button2 })
 
-# Array works as well. Arbitrary names can be used for destructuring.
-# Note the required parenthesis.
+# Массив также работает. Для деструктуризации можно использовать произвольные имена.
+# Обратите внимание на обязательные скобки.
 await page.evaluate("""
     ([b1, b2]) => b1.textContent + b2.textContent""",
     [button1, button2])
 
-# Any mix of serializables and handles works.
+# Любая смесь сериализуемых и обработчиков работает.
 await page.evaluate("""
     x => x.button1.textContent + x.list[0].textContent + String(x.foo)""",
     { 'button1': button1, 'list': [button2], 'foo': None })
@@ -245,20 +245,20 @@ await page.evaluate("""
 </TabItem>
 </Tabs>
 
-## Init scripts
+## Скрипты инициализации
 
-Sometimes it is convenient to evaluate something in the page before it starts loading. For example, you might want to setup some mocks or test data.
+Иногда удобно выполнить что-то на странице до того, как она начнет загружаться. Например, вы можете захотеть настроить некоторые моки или тестовые данные.
 
-In this case, use [page.add_init_script()](/api/class-page.mdx#page-add-init-script) or [browser_context.add_init_script()](/api/class-browsercontext.mdx#browser-context-add-init-script). In the example below, we will replace `Math.random()` with a constant value.
+В этом случае используйте [page.add_init_script()](/api/class-page.mdx#page-add-init-script) или [browser_context.add_init_script()](/api/class-browsercontext.mdx#browser-context-add-init-script). В примере ниже мы заменим `Math.random()` на постоянное значение.
 
-First, create a `preload.js` file that contains the mock.
+Сначала создайте файл `preload.js`, содержащий мок.
 
 ```js
 // preload.js
 Math.random = () => 42;
 ```
 
-Next, add init script to the page.
+Затем добавьте скрипт инициализации на страницу.
 
 <Tabs
   groupId="python-flavor"
@@ -271,7 +271,7 @@ Next, add init script to the page.
 <TabItem value="sync">
 
 ```py
-# In your test, assuming the "preload.js" file is in the "mocks" directory.
+# В вашем тесте, предполагая, что файл "preload.js" находится в каталоге "mocks".
 page.add_init_script(path="mocks/preload.js")
 ```
 
@@ -279,7 +279,7 @@ page.add_init_script(path="mocks/preload.js")
 <TabItem value="async">
 
 ```py
-# In your test, assuming the "preload.js" file is in the "mocks" directory.
+# В вашем тесте, предполагая, что файл "preload.js" находится в каталоге "mocks".
 await page.add_init_script(path="mocks/preload.js")
 ```
 

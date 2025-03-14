@@ -1,33 +1,33 @@
 ---
 id: writing-tests
-title: "Writing tests"
+title: "Написание тестов"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright tests are simple, they
-- **perform actions**, and
-- **assert the state** against expectations.
+Тесты Playwright просты, они
+- **выполняют действия**, и
+- **проверяют состояние** на соответствие ожиданиям.
 
-There is no need to wait for anything prior to performing an action: Playwright automatically waits for the wide range of [actionability](./actionability.mdx) checks to pass prior to performing each action.
+Нет необходимости ждать чего-либо перед выполнением действия: Playwright автоматически ожидает, пока не пройдут различные проверки [доступности](./actionability.mdx) перед выполнением каждого действия.
 
-There is also no need to deal with the race conditions when performing the checks - Playwright assertions are designed in a way that they describe the expectations that need to be eventually met.
+Также нет необходимости иметь дело с условиями гонки при выполнении проверок - утверждения Playwright разработаны таким образом, чтобы описывать ожидания, которые должны быть в конечном итоге выполнены.
 
-That's it! These design choices allow Playwright users to forget about flaky timeouts and racy checks in their tests altogether.
+Вот и все! Эти проектные решения позволяют пользователям Playwright полностью забыть о ненадежных таймаутах и гонках в своих тестах.
 
-**You will learn**
-- [How to write the first test](/writing-tests.mdx#first-test)
-- [How to perform actions](/writing-tests.mdx#actions)
-- [How to use assertions](/writing-tests.mdx#assertions)
-- [How tests run in isolation](/writing-tests.mdx#test-isolation)
-- [How to use test hooks](/writing-tests.mdx#using-fixtures)
+**Вы узнаете**
+- [Как написать первый тест](/writing-tests.mdx#first-test)
+- [Как выполнять действия](/writing-tests.mdx#actions)
+- [Как использовать утверждения](/writing-tests.mdx#assertions)
+- [Как тесты выполняются изолированно](/writing-tests.mdx#test-isolation)
+- [Как использовать хуки тестов](/writing-tests.mdx#using-fixtures)
 
-## First test
+## Первый тест
 
-Take a look at the following example to see how to write a test. Note how the file name follows the `test_` prefix convention as well as each test name.
+Посмотрите на следующий пример, чтобы увидеть, как написать тест. Обратите внимание, как имя файла следует соглашению с префиксом `test_`, а также каждое имя теста.
 
 ```python title="test_example.py"
 import re
@@ -36,68 +36,68 @@ from playwright.sync_api import Page, expect
 def test_has_title(page: Page):
     page.goto("https://playwright.dev/")
 
-    # Expect a title "to contain" a substring.
+    # Ожидаем, что заголовок "содержит" подстроку.
     expect(page).to_have_title(re.compile("Playwright"))
 
 def test_get_started_link(page: Page):
     page.goto("https://playwright.dev/")
 
-    # Click the get started link.
+    # Кликните по ссылке "Get started".
     page.get_by_role("link", name="Get started").click()
 
-    # Expects page to have a heading with the name of Installation.
+    # Ожидаем, что на странице будет заголовок с именем Installation.
     expect(page.get_by_role("heading", name="Installation")).to_be_visible()
 ```
 
-## Actions
+## Действия
 
-### Navigation
+### Навигация
 
-Most of the tests will start with navigating page to the URL. After that, test will be able to interact with the page elements.
+Большинство тестов начнется с перехода на страницу по URL. После этого тест сможет взаимодействовать с элементами страницы.
 
 ```python
 page.goto("https://playwright.dev/")
 ```
 
-Playwright will wait for page to reach the load state prior to moving forward. Learn more about the [page.goto()](/api/class-page.mdx#page-goto) options.
+Playwright будет ждать, пока страница достигнет состояния загрузки, прежде чем двигаться дальше. Узнайте больше о параметрах [page.goto()](/api/class-page.mdx#page-goto).
 
-### Interactions
+### Взаимодействия
 
-Performing actions starts with locating the elements. Playwright uses [Locators API](./locators.mdx) for that. Locators represent a way to find element(s) on the page at any moment, learn more about the [different types](./locators.mdx) of locators available. Playwright will wait for the element to be [actionable](./actionability.mdx) prior to performing the action, so there is no need to wait for it to become available.
+Выполнение действий начинается с поиска элементов. Для этого Playwright использует [API локаторов](./locators.mdx). Локаторы представляют собой способ найти элемент(ы) на странице в любой момент, узнайте больше о [различных типах](./locators.mdx) доступных локаторов. Playwright будет ждать, пока элемент станет [доступным для действия](./actionability.mdx), прежде чем выполнять действие, поэтому нет необходимости ждать, пока он станет доступным.
 
 ```python
-# Create a locator.
+# Создайте локатор.
 get_started = page.get_by_role("link", name="Get started")
 
-# Click it.
+# Кликните по нему.
 get_started.click()
 ```
 
-In most cases, it'll be written in one line:
+В большинстве случаев это будет написано в одну строку:
 
 ```python
 page.get_by_role("link", name="Get started").click()
 ```
 
-### Basic actions
+### Основные действия
 
-This is the list of the most popular Playwright actions. Note that there are many more, so make sure to check the [Locator API](./api/class-locator.mdx) section to learn more about them.
+Это список самых популярных действий Playwright. Обратите внимание, что их гораздо больше, поэтому обязательно ознакомьтесь с разделом [API локаторов](./api/class-locator.mdx), чтобы узнать о них больше.
 
-| Action | Description |
+| Действие | Описание |
 | :- | :- |
-| [locator.check()](/api/class-locator.mdx#locator-check) | Check the input checkbox |
-| [locator.click()](/api/class-locator.mdx#locator-click) | Click the element |
-| [locator.uncheck()](/api/class-locator.mdx#locator-uncheck) | Uncheck the input checkbox |
-| [locator.hover()](/api/class-locator.mdx#locator-hover) | Hover mouse over the element |
-| [locator.fill()](/api/class-locator.mdx#locator-fill) | Fill the form field, input text |
-| [locator.focus()](/api/class-locator.mdx#locator-focus) | Focus the element |
-| [locator.press()](/api/class-locator.mdx#locator-press) | Press single key |
-| [locator.set_input_files()](/api/class-locator.mdx#locator-set-input-files) | Pick files to upload |
-| [locator.select_option()](/api/class-locator.mdx#locator-select-option) | Select option in the drop down |
+| [locator.check()](/api/class-locator.mdx#locator-check) | Установить флажок ввода |
+| [locator.click()](/api/class-locator.mdx#locator-click) | Кликнуть по элементу |
+| [locator.uncheck()](/api/class-locator.mdx#locator-uncheck) | Снять флажок ввода |
+| [locator.hover()](/api/class-locator.mdx#locator-hover) | Навести курсор мыши на элемент |
+| [locator.fill()](/api/class-locator.mdx#locator-fill) | Заполнить поле формы, ввести текст |
+| [locator.focus()](/api/class-locator.mdx#locator-focus) | Сфокусироваться на элементе |
+| [locator.press()](/api/class-locator.mdx#locator-press) | Нажать одну клавишу |
+| [locator.set_input_files()](/api/class-locator.mdx#locator-set-input-files) | Выбрать файлы для загрузки |
+| [locator.select_option()](/api/class-locator.mdx#locator-select-option) | Выбрать опцию в выпадающем списке |
 
-## Assertions
+## Утверждения
 
-Playwright includes [assertions](./test-assertions.mdx) that will wait until the expected condition is met. Using these assertions allows making the tests non-flaky and resilient. For example, this code will wait until the page gets the title containing "Playwright":
+Playwright включает [утверждения](./test-assertions.mdx), которые будут ждать, пока ожидаемое условие не будет выполнено. Использование этих утверждений позволяет сделать тесты надежными и устойчивыми. Например, этот код будет ждать, пока страница не получит заголовок, содержащий "Playwright":
 
 ```python
 import re
@@ -106,40 +106,40 @@ from playwright.sync_api import expect
 expect(page).to_have_title(re.compile("Playwright"))
 ```
 
-Here is the list of the most popular async assertions. Note that there are [many more](./test-assertions.mdx) to get familiar with:
+Вот список самых популярных асинхронных утверждений. Обратите внимание, что есть [много других](./test-assertions.mdx), с которыми стоит ознакомиться:
 
-| Assertion | Description |
+| Утверждение | Описание |
 | :- | :- |
-| [expect(locator).to_be_checked()](/api/class-locatorassertions.mdx#locator-assertions-to-be-checked) | Checkbox is checked |
-| [expect(locator).to_be_enabled()](/api/class-locatorassertions.mdx#locator-assertions-to-be-enabled) | Control is enabled |
-| [expect(locator).to_be_visible()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible) | Element is visible |
-| [expect(locator).to_contain_text()](/api/class-locatorassertions.mdx#locator-assertions-to-contain-text) | Element contains text |
-| [expect(locator).to_have_attribute()](/api/class-locatorassertions.mdx#locator-assertions-to-have-attribute) | Element has attribute |
-| [expect(locator).to_have_count()](/api/class-locatorassertions.mdx#locator-assertions-to-have-count) | List of elements has given length |
-| [expect(locator).to_have_text()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text) | Element matches text |
-| [expect(locator).to_have_value()](/api/class-locatorassertions.mdx#locator-assertions-to-have-value) | Input element has value |
-| [expect(page).to_have_title()](/api/class-pageassertions.mdx#page-assertions-to-have-title) | Page has title |
-| [expect(page).to_have_url()](/api/class-pageassertions.mdx#page-assertions-to-have-url) | Page has URL |
+| [expect(locator).to_be_checked()](/api/class-locatorassertions.mdx#locator-assertions-to-be-checked) | Флажок установлен |
+| [expect(locator).to_be_enabled()](/api/class-locatorassertions.mdx#locator-assertions-to-be-enabled) | Элемент управления включен |
+| [expect(locator).to_be_visible()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible) | Элемент виден |
+| [expect(locator).to_contain_text()](/api/class-locatorassertions.mdx#locator-assertions-to-contain-text) | Элемент содержит текст |
+| [expect(locator).to_have_attribute()](/api/class-locatorassertions.mdx#locator-assertions-to-have-attribute) | Элемент имеет атрибут |
+| [expect(locator).to_have_count()](/api/class-locatorassertions.mdx#locator-assertions-to-have-count) | Список элементов имеет заданную длину |
+| [expect(locator).to_have_text()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text) | Элемент соответствует тексту |
+| [expect(locator).to_have_value()](/api/class-locatorassertions.mdx#locator-assertions-to-have-value) | Элемент ввода имеет значение |
+| [expect(page).to_have_title()](/api/class-pageassertions.mdx#page-assertions-to-have-title) | Страница имеет заголовок |
+| [expect(page).to_have_url()](/api/class-pageassertions.mdx#page-assertions-to-have-url) | Страница имеет URL |
 
-### Test isolation
+### Изоляция тестов
 
-The Playwright Pytest plugin is based on the concept of test fixtures such as the [built in page fixture](./test-runners.mdx), which is passed into your test. Pages are [isolated between tests due to the Browser Context](./browser-contexts), which is equivalent to a brand new browser profile, where every test gets a fresh environment, even when multiple tests run in a single Browser.
+Плагин Playwright для Pytest основан на концепции фикстур тестов, таких как [встроенная фикстура страницы](./test-runners.mdx), которая передается в ваш тест. Страницы [изолированы между тестами благодаря контексту браузера](./browser-contexts), который эквивалентен совершенно новому профилю браузера, где каждый тест получает свежую среду, даже когда несколько тестов выполняются в одном браузере.
 
 ```python title="test_example.py"
 from playwright.sync_api import Page
 
 def test_example_test(page: Page):
   pass
-  # "page" belongs to an isolated BrowserContext, created for this specific test.
+  # "page" принадлежит изолированному BrowserContext, созданному для этого конкретного теста.
 
 def test_another_test(page: Page):
   pass
-  # "page" in this second test is completely isolated from the first test.
+  # "page" во втором тесте полностью изолирована от первого теста.
 ```
 
-### Using fixtures
+### Использование фикстур
 
-You can use various [fixtures](https://docs.pytest.org/en/6.2.x/fixture.html#autouse-fixtures-fixtures-you-don-t-have-to-request) to execute code before or after your tests and to share objects between them. A `function` scoped fixture e.g. with autouse behaves like a beforeEach/afterEach. And a `module` scoped fixture with autouse behaves like a beforeAll/afterAll which runs before all and after all the tests.
+Вы можете использовать различные [фикстуры](https://docs.pytest.org/en/6.2.x/fixture.html#autouse-fixtures-fixtures-you-don-t-have-to-request) для выполнения кода до или после ваших тестов и для совместного использования объектов между ними. Фикстура с областью действия `function`, например, с autouse, ведет себя как beforeEach/afterEach. А фикстура с областью действия `module` с autouse ведет себя как beforeAll/afterAll, которая выполняется перед всеми и после всех тестов.
 
 ```python title="test_example.py"
 import pytest
@@ -148,24 +148,24 @@ from playwright.sync_api import Page, expect
 @pytest.fixture(scope="function", autouse=True)
 def before_each_after_each(page: Page):
     
-    print("before the test runs")
+    print("перед выполнением теста")
 
-    # Go to the starting url before each test.
+    # Переходите на начальный URL перед каждым тестом.
     page.goto("https://playwright.dev/")
     yield
     
-    print("after the test runs")
+    print("после выполнения теста")
 
 def test_main_navigation(page: Page):
-    # Assertions use the expect API.
+    # Утверждения используют API expect.
     expect(page).to_have_url("https://playwright.dev/")
 ```
 
-## What's next
-- [Run single test, multiple tests, headed mode](./running-tests.mdx)
-- [Generate tests with Codegen](./codegen-intro.mdx)
-- [See a trace of your tests](./trace-viewer-intro.mdx)
-- [Run tests on CI with GitHub Actions](./ci-intro.mdx)
+## Что дальше
+- [Запуск одного теста, нескольких тестов, в режиме с интерфейсом](./running-tests.mdx)
+- [Генерация тестов с помощью Codegen](./codegen-intro.mdx)
+- [Просмотр трассировки ваших тестов](./trace-viewer-intro.mdx)
+- [Запуск тестов на CI с помощью GitHub Actions](./ci-intro.mdx)
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"

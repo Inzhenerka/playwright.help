@@ -6,41 +6,38 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+Класс Accessibility предоставляет методы для инспектирования дерева доступности Chromium. Дерево доступности используется вспомогательными технологиями, такими как [скринридеры](https://en.wikipedia.org/wiki/Screen_reader) или [переключатели](https://en.wikipedia.org/wiki/Switch_access).
 
-The Accessibility class provides methods for inspecting Chromium's accessibility tree. The accessibility tree is used by assistive technology such as [screen readers](https://en.wikipedia.org/wiki/Screen_reader) or [switches](https://en.wikipedia.org/wiki/Switch_access).
+Доступность — это очень специфичная для платформы вещь. На разных платформах существуют разные скринридеры, которые могут давать совершенно разные результаты.
 
-Accessibility is a very platform-specific thing. On different platforms, there are different screen readers that might have wildly different output.
+Рендеринг-движки Chromium, Firefox и WebKit имеют концепцию "дерева доступности", которое затем переводится в различные платформенно-специфичные API. Пространство имен Accessibility предоставляет доступ к этому дереву доступности.
 
-Rendering engines of Chromium, Firefox and WebKit have a concept of "accessibility tree", which is then translated into different platform-specific APIs. Accessibility namespace gives access to this Accessibility Tree.
-
-Most of the accessibility tree gets filtered out when converting from internal browser AX Tree to Platform-specific AX-Tree or by assistive technologies themselves. By default, Playwright tries to approximate this filtering, exposing only the "interesting" nodes of the tree.
-
+Большая часть дерева доступности отфильтровывается при преобразовании из внутреннего AX-дерева браузера в платформенно-специфичное AX-дерево или самими вспомогательными технологиями. По умолчанию Playwright пытается приблизительно воспроизвести эту фильтрацию, показывая только "интересные" узлы дерева.
 
 ---
 
-## Deprecated
+## Устарело
 
 ### snapshot {#accessibility-snapshot}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>accessibility.snapshot</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>accessibility.snapshot</x-search>
 
-:::warning Deprecated
+:::warning Устарело
 
-This method is deprecated. Please use other libraries such as [Axe](https://www.deque.com/axe/) if you need to test page accessibility. See our Node.js [guide](https://playwright.dev/docs/accessibility-testing) for integration with Axe.
+Этот метод устарел. Пожалуйста, используйте другие библиотеки, такие как [Axe](https://www.deque.com/axe/), если вам нужно тестировать доступность страницы. См. наш [руководство](https://playwright.dev/docs/accessibility-testing) по интеграции с Axe для Node.js.
 
 :::
 
-
-Captures the current state of the accessibility tree. The returned object represents the root accessible node of the page.
+Фиксирует текущее состояние дерева доступности. Возвращаемый объект представляет корневой доступный узел страницы.
 
 :::note
 
-The Chromium accessibility tree contains nodes that go unused on most platforms and by most screen readers. Playwright will discard them as well for an easier to process tree, unless [interesting_only](/api/class-accessibility.mdx#accessibility-snapshot-option-interesting-only) is set to `false`.
+Дерево доступности Chromium содержит узлы, которые не используются на большинстве платформ и большинством скринридеров. Playwright также отбрасывает их для более простого в обработке дерева, если только [interesting_only](/api/class-accessibility.mdx#accessibility-snapshot-option-interesting-only) не установлен в `false`.
 :::
 
-**Usage**
+**Использование**
 
-An example of dumping the entire accessibility tree:
+Пример вывода всего дерева доступности:
 
 <Tabs
   groupId="python-flavor"
@@ -68,7 +65,7 @@ print(snapshot)
 </TabItem>
 </Tabs>
 
-An example of logging the focused node's name:
+Пример логирования имени сфокусированного узла:
 
 <Tabs
   groupId="python-flavor"
@@ -118,95 +115,94 @@ if node:
 </TabItem>
 </Tabs>
 
-**Arguments**
-- `interesting_only` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="accessibility-snapshot-option-interesting-only"/><a href="#accessibility-snapshot-option-interesting-only" class="list-anchor">#</a>
+**Аргументы**
+- `interesting_only` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="accessibility-snapshot-option-interesting-only"/><a href="#accessibility-snapshot-option-interesting-only" class="list-anchor">#</a>
   
-  Prune uninteresting nodes from the tree. Defaults to `true`.
-- `root` [ElementHandle] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="accessibility-snapshot-option-root"/><a href="#accessibility-snapshot-option-root" class="list-anchor">#</a>
+  Обрезать неинтересные узлы из дерева. По умолчанию `true`.
+- `root` [ElementHandle] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="accessibility-snapshot-option-root"/><a href="#accessibility-snapshot-option-root" class="list-anchor">#</a>
   
-  The root DOM element for the snapshot. Defaults to the whole page.
+  Корневой DOM элемент для снимка. По умолчанию вся страница.
 
-**Returns**
+**Возвращает**
 - [NoneType] | [Dict]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="accessibility-snapshot-return"/><a href="#accessibility-snapshot-return" class="list-anchor">#</a>
   - `role` [str]
     
-    The [role](https://www.w3.org/TR/wai-aria/#usage_intro).
+    [Роль](https://www.w3.org/TR/wai-aria/#usage_intro).
   - `name` [str]
     
-    A human readable name for the node.
+    Читаемое человеком имя для узла.
   - `value` [str] | [float]
     
-    The current value of the node, if applicable.
+    Текущее значение узла, если применимо.
   - `description` [str]
     
-    An additional human readable description of the node, if applicable.
+    Дополнительное читаемое человеком описание узла, если применимо.
   - `keyshortcuts` [str]
     
-    Keyboard shortcuts associated with this node, if applicable.
+    Сочетания клавиш, связанные с этим узлом, если применимо.
   - `roledescription` [str]
     
-    A human readable alternative to the role, if applicable.
+    Читаемая человеком альтернатива роли, если применимо.
   - `valuetext` [str]
     
-    A description of the current value, if applicable.
+    Описание текущего значения, если применимо.
   - `disabled` [bool]
     
-    Whether the node is disabled, if applicable.
+    Является ли узел отключенным, если применимо.
   - `expanded` [bool]
     
-    Whether the node is expanded or collapsed, if applicable.
+    Является ли узел развернутым или свернутым, если применимо.
   - `focused` [bool]
     
-    Whether the node is focused, if applicable.
+    Является ли узел сфокусированным, если применимо.
   - `modal` [bool]
     
-    Whether the node is [modal](https://en.wikipedia.org/wiki/Modal_window), if applicable.
+    Является ли узел [модальным](https://en.wikipedia.org/wiki/Modal_window), если применимо.
   - `multiline` [bool]
     
-    Whether the node text input supports multiline, if applicable.
+    Поддерживает ли ввод текста в узле многострочность, если применимо.
   - `multiselectable` [bool]
     
-    Whether more than one child can be selected, if applicable.
+    Может ли быть выбрано более одного дочернего элемента, если применимо.
   - `readonly` [bool]
     
-    Whether the node is read only, if applicable.
+    Является ли узел только для чтения, если применимо.
   - `required` [bool]
     
-    Whether the node is required, if applicable.
+    Является ли узел обязательным, если применимо.
   - `selected` [bool]
     
-    Whether the node is selected in its parent node, if applicable.
+    Является ли узел выбранным в родительском узле, если применимо.
   - `checked` [bool] | "mixed"
     
-    Whether the checkbox is checked, or "mixed", if applicable.
+    Является ли флажок установленным, или "смешанным", если применимо.
   - `pressed` [bool] | "mixed"
     
-    Whether the toggle button is checked, or "mixed", if applicable.
+    Является ли кнопка-переключатель нажатой, или "смешанной", если применимо.
   - `level` [int]
     
-    The level of a heading, if applicable.
+    Уровень заголовка, если применимо.
   - `valuemin` [float]
     
-    The minimum value in a node, if applicable.
+    Минимальное значение в узле, если применимо.
   - `valuemax` [float]
     
-    The maximum value in a node, if applicable.
+    Максимальное значение в узле, если применимо.
   - `autocomplete` [str]
     
-    What kind of autocomplete is supported by a control, if applicable.
+    Какой тип автозаполнения поддерживается элементом управления, если применимо.
   - `haspopup` [str]
     
-    What kind of popup is currently being shown for a node, if applicable.
+    Какой тип всплывающего окна в данный момент отображается для узла, если применимо.
   - `invalid` [str]
     
-    Whether and in what way this node's value is invalid, if applicable.
+    Является ли и каким образом значение этого узла недействительным, если применимо.
   - `orientation` [str]
     
-    Whether the node is oriented horizontally or vertically, if applicable.
+    Ориентирован ли узел горизонтально или вертикально, если применимо.
   - `children` [List]\[[Dict]\]
     
-    Child nodes, if any, if applicable.
-
+    Дочерние узлы, если есть, если применимо.
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

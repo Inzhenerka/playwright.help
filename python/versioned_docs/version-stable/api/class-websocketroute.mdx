@@ -6,12 +6,11 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+Когда маршрут [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) настроен с помощью [page.route_web_socket()](/api/class-page.mdx#page-route-web-socket) или [browser_context.route_web_socket()](/api/class-browsercontext.mdx#browser-context-route-web-socket), объект `WebSocketRoute` позволяет обрабатывать WebSocket, как это делает реальный сервер.
 
-Whenever a [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) route is set up with [page.route_web_socket()](/api/class-page.mdx#page-route-web-socket) or [browser_context.route_web_socket()](/api/class-browsercontext.mdx#browser-context-route-web-socket), the `WebSocketRoute` object allows to handle the WebSocket, like an actual server would do.
+**Мокирование**
 
-**Mocking**
-
-By default, the routed WebSocket will not connect to the server. This way, you can mock entire communcation over the WebSocket. Here is an example that responds to a `"request"` with a `"response"`.
+По умолчанию маршрутизированный WebSocket не подключается к серверу. Таким образом, вы можете имитировать всю коммуникацию через WebSocket. Вот пример, который отвечает на `"request"` с `"response"`.
 
 <Tabs
   groupId="python-flavor"
@@ -49,9 +48,9 @@ await page.route_web_socket("wss://example.com/ws", lambda ws: ws.on_message(
 </TabItem>
 </Tabs>
 
-Since we do not call [web_socket_route.connect_to_server](/api/class-websocketroute.mdx#web-socket-route-connect-to-server) inside the WebSocket route handler, Playwright assumes that WebSocket will be mocked, and opens the WebSocket inside the page automatically.
+Поскольку мы не вызываем [web_socket_route.connect_to_server](/api/class-websocketroute.mdx#web-socket-route-connect-to-server) внутри обработчика маршрута WebSocket, Playwright предполагает, что WebSocket будет имитирован, и автоматически открывает WebSocket внутри страницы.
 
-Here is another example that handles JSON messages:
+Вот еще один пример, который обрабатывает JSON-сообщения:
 
 <Tabs
   groupId="python-flavor"
@@ -91,11 +90,11 @@ await page.route_web_socket("wss://example.com/ws", lambda ws: ws.on_message(
 </TabItem>
 </Tabs>
 
-**Intercepting**
+**Перехват**
 
-Alternatively, you may want to connect to the actual server, but intercept messages in-between and modify or block them. Calling [web_socket_route.connect_to_server](/api/class-websocketroute.mdx#web-socket-route-connect-to-server) returns a server-side `WebSocketRoute` instance that you can send messages to, or handle incoming messages.
+В качестве альтернативы, вы можете подключиться к реальному серверу, но перехватывать сообщения между ними и изменять или блокировать их. Вызов [web_socket_route.connect_to_server](/api/class-websocketroute.mdx#web-socket-route-connect-to-server) возвращает серверный экземпляр `WebSocketRoute`, к которому вы можете отправлять сообщения или обрабатывать входящие сообщения.
 
-Below is an example that modifies some messages sent by the page to the server. Messages sent from the server to the page are left intact, relying on the default forwarding.
+Ниже приведен пример, который изменяет некоторые сообщения, отправляемые страницей на сервер. Сообщения, отправляемые с сервера на страницу, остаются нетронутыми, полагаясь на стандартную пересылку.
 
 <Tabs
   groupId="python-flavor"
@@ -141,13 +140,13 @@ await page.route_web_socket("/ws", handler)
 </TabItem>
 </Tabs>
 
-After connecting to the server, all **messages are forwarded** between the page and the server by default.
+После подключения к серверу все **сообщения пересылаются** между страницей и сервером по умолчанию.
 
-However, if you call [web_socket_route.on_message()](/api/class-websocketroute.mdx#web-socket-route-on-message) on the original route, messages from the page to the server **will not be forwarded** anymore, but should instead be handled by the [handler](/api/class-websocketroute.mdx#web-socket-route-on-message-option-handler).
+Однако, если вы вызываете [web_socket_route.on_message()](/api/class-websocketroute.mdx#web-socket-route-on-message) на оригинальном маршруте, сообщения от страницы к серверу **больше не будут пересылаться**, но должны обрабатываться [обработчиком](/api/class-websocketroute.mdx#web-socket-route-on-message-option-handler).
 
-Similarly, calling [web_socket_route.on_message()](/api/class-websocketroute.mdx#web-socket-route-on-message) on the server-side WebSocket will **stop forwarding messages** from the server to the page, and [handler](/api/class-websocketroute.mdx#web-socket-route-on-message-option-handler) should take care of them.
+Аналогично, вызов [web_socket_route.on_message()](/api/class-websocketroute.mdx#web-socket-route-on-message) на серверном WebSocket **прекратит пересылку сообщений** от сервера к странице, и [обработчик](/api/class-websocketroute.mdx#web-socket-route-on-message-option-handler) должен позаботиться о них.
 
-The following example blocks some messages in both directions. Since it calls [web_socket_route.on_message()](/api/class-websocketroute.mdx#web-socket-route-on-message) in both directions, there is no automatic forwarding at all.
+Следующий пример блокирует некоторые сообщения в обоих направлениях. Поскольку он вызывает [web_socket_route.on_message()](/api/class-websocketroute.mdx#web-socket-route-on-message) в обоих направлениях, автоматической пересылки вообще нет.
 
 <Tabs
   groupId="python-flavor"
@@ -198,7 +197,6 @@ await page.route_web_socket("/ws", handler)
 
 </TabItem>
 </Tabs>
-
 
 ---
 
@@ -208,24 +206,24 @@ await page.route_web_socket("/ws", handler)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.close</x-search>
 
-Closes one side of the WebSocket connection.
+Закрывает одну сторону WebSocket соединения.
 
-**Usage**
+**Использование**
 
 ```python
 web_socket_route.close()
 web_socket_route.close(**kwargs)
 ```
 
-**Arguments**
-- `code` [int] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-option-code"/><a href="#web-socket-route-close-option-code" class="list-anchor">#</a>
+**Аргументы**
+- `code` [int] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-option-code"/><a href="#web-socket-route-close-option-code" class="list-anchor">#</a>
   
-  Optional [close code](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#code).
-- `reason` [str] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-option-reason"/><a href="#web-socket-route-close-option-reason" class="list-anchor">#</a>
+  Опциональный [код закрытия](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#code).
+- `reason` [str] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-option-reason"/><a href="#web-socket-route-close-option-reason" class="list-anchor">#</a>
   
-  Optional [close reason](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason).
+  Опциональная [причина закрытия](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason).
 
-**Returns**
+**Возвращает**
 - [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-return"/><a href="#web-socket-route-close-return" class="list-anchor">#</a>
 
 ---
@@ -234,20 +232,20 @@ web_socket_route.close(**kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.on_close</x-search>
 
-Allows to handle [`WebSocket.close`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close).
+Позволяет обрабатывать [`WebSocket.close`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close).
 
-By default, closing one side of the connection, either in the page or on the server, will close the other side. However, when [web_socket_route.on_close()](/api/class-websocketroute.mdx#web-socket-route-on-close) handler is set up, the default forwarding of closure is disabled, and handler should take care of it.
+По умолчанию, закрытие одной стороны соединения, будь то на странице или на сервере, закроет другую сторону. Однако, когда настроен обработчик [web_socket_route.on_close()](/api/class-websocketroute.mdx#web-socket-route-on-close), стандартная пересылка закрытия отключается, и обработчик должен позаботиться об этом.
 
-**Usage**
+**Использование**
 
 ```python
 web_socket_route.on_close(handler)
 ```
 
-**Arguments**
+**Аргументы**
 - `handler` [Callable]\[[int] | [undefined]\]:[Promise]\[[Any]\] | [Any]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-close-option-handler"/><a href="#web-socket-route-on-close-option-handler" class="list-anchor">#</a>
   
-  Function that will handle WebSocket closure. Received an optional [close code](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#code) and an optional [close reason](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason).
+  Функция, которая будет обрабатывать закрытие WebSocket. Получает опциональный [код закрытия](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#code) и опциональную [причину закрытия](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason).
 
 ---
 
@@ -255,24 +253,24 @@ web_socket_route.on_close(handler)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.on_message</x-search>
 
-This method allows to handle messages that are sent by the WebSocket, either from the page or from the server.
+Этот метод позволяет обрабатывать сообщения, которые отправляются через WebSocket, будь то со страницы или с сервера.
 
-When called on the original WebSocket route, this method handles messages sent from the page. You can handle this messages by responding to them with [web_socket_route.send()](/api/class-websocketroute.mdx#web-socket-route-send), forwarding them to the server-side connection returned by [web_socket_route.connect_to_server](/api/class-websocketroute.mdx#web-socket-route-connect-to-server) or do something else.
+Когда вызывается на оригинальном маршруте WebSocket, этот метод обрабатывает сообщения, отправленные со страницы. Вы можете обрабатывать эти сообщения, отвечая на них с помощью [web_socket_route.send()](/api/class-websocketroute.mdx#web-socket-route-send), пересылая их на серверное соединение, возвращенное [web_socket_route.connect_to_server](/api/class-websocketroute.mdx#web-socket-route-connect-to-server), или делая что-то еще.
 
-Once this method is called, messages are not automatically forwarded to the server or to the page - you should do that manually by calling [web_socket_route.send()](/api/class-websocketroute.mdx#web-socket-route-send). See examples at the top for more details.
+После вызова этого метода сообщения не пересылаются автоматически на сервер или на страницу - вы должны сделать это вручную, вызвав [web_socket_route.send()](/api/class-websocketroute.mdx#web-socket-route-send). См. примеры в начале для более подробной информации.
 
-Calling this method again will override the handler with a new one.
+Повторный вызов этого метода заменит обработчик на новый.
 
-**Usage**
+**Использование**
 
 ```python
 web_socket_route.on_message(handler)
 ```
 
-**Arguments**
+**Аргументы**
 - `handler` [Callable]\[[str]\]:[Promise]\[[Any]\] | [Any]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-message-option-handler"/><a href="#web-socket-route-on-message-option-handler" class="list-anchor">#</a>
   
-  Function that will handle messages.
+  Функция, которая будет обрабатывать сообщения.
 
 ---
 
@@ -280,18 +278,18 @@ web_socket_route.on_message(handler)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.send</x-search>
 
-Sends a message to the WebSocket. When called on the original WebSocket, sends the message to the page. When called on the result of [web_socket_route.connect_to_server](/api/class-websocketroute.mdx#web-socket-route-connect-to-server), sends the message to the server. See examples at the top for more details.
+Отправляет сообщение в WebSocket. Когда вызывается на оригинальном WebSocket, отправляет сообщение на страницу. Когда вызывается на результате [web_socket_route.connect_to_server](/api/class-websocketroute.mdx#web-socket-route-connect-to-server), отправляет сообщение на сервер. См. примеры в начале для более подробной информации.
 
-**Usage**
+**Использование**
 
 ```python
 web_socket_route.send(message)
 ```
 
-**Arguments**
+**Аргументы**
 - `message` [str] | [bytes]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-send-option-message"/><a href="#web-socket-route-send-option-message" class="list-anchor">#</a>
   
-  Message to send.
+  Сообщение для отправки.
 
 ---
 
@@ -301,21 +299,21 @@ web_socket_route.send(message)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.connect_to_server</x-search>
 
-By default, routed WebSocket does not connect to the server, so you can mock entire WebSocket communication. This method connects to the actual WebSocket server, and returns the server-side [WebSocketRoute] instance, giving the ability to send and receive messages from the server.
+По умолчанию маршрутизированный WebSocket не подключается к серверу, поэтому вы можете имитировать всю коммуникацию через WebSocket. Этот метод подключается к реальному серверу WebSocket и возвращает серверный экземпляр [WebSocketRoute], предоставляя возможность отправлять и получать сообщения с сервера.
 
-Once connected to the server:
-* Messages received from the server will be **automatically forwarded** to the WebSocket in the page, unless [web_socket_route.on_message()](/api/class-websocketroute.mdx#web-socket-route-on-message) is called on the server-side `WebSocketRoute`.
-* Messages sent by the [`WebSocket.send()`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send) call in the page will be **automatically forwarded** to the server, unless [web_socket_route.on_message()](/api/class-websocketroute.mdx#web-socket-route-on-message) is called on the original `WebSocketRoute`.
+После подключения к серверу:
+* Сообщения, полученные с сервера, будут **автоматически пересылаться** в WebSocket на странице, если только [web_socket_route.on_message()](/api/class-websocketroute.mdx#web-socket-route-on-message) не вызван на серверной стороне `WebSocketRoute`.
+* Сообщения, отправленные вызовом [`WebSocket.send()`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send) на странице, будут **автоматически пересылаться** на сервер, если только [web_socket_route.on_message()](/api/class-websocketroute.mdx#web-socket-route-on-message) не вызван на оригинальном `WebSocketRoute`.
 
-See examples at the top for more details.
+См. примеры в начале для более подробной информации.
 
-**Usage**
+**Использование**
 
 ```python
 web_socket_route.connect_to_server
 ```
 
-**Returns**
+**Возвращает**
 - [WebSocketRoute]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-connect-to-server-return"/><a href="#web-socket-route-connect-to-server-return" class="list-anchor">#</a>
 
 ---
@@ -324,15 +322,15 @@ web_socket_route.connect_to_server
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.url</x-search>
 
-URL of the WebSocket created in the page.
+URL WebSocket, созданного на странице.
 
-**Usage**
+**Использование**
 
 ```python
 web_socket_route.url
 ```
 
-**Returns**
+**Возвращает**
 - [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-url-return"/><a href="#web-socket-route-url-return" class="list-anchor">#</a>
 
 

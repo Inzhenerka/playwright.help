@@ -6,18 +6,18 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-For every attachment downloaded by the page, [page.on("download")](/api/class-page.mdx#page-event-download) event is emitted. All these attachments are downloaded into a temporary folder. You can obtain the download url, file name and payload stream using the [Download] object from the event.
+Для каждого вложения, загружаемого страницей, генерируется событие [page.on("download")](/api/class-page.mdx#page-event-download). Все эти вложения загружаются во временную папку. Вы можете получить URL загрузки, имя файла и поток данных, используя объект [Download] из события.
 
-You can specify where to persist downloaded files using the [downloads_path](/api/class-browsertype.mdx#browser-type-launch-option-downloads-path) option in [browser_type.launch()](/api/class-browsertype.mdx#browser-type-launch).
+Вы можете указать, где сохранять загруженные файлы, используя опцию [downloads_path](/api/class-browsertype.mdx#browser-type-launch-option-downloads-path) в [browser_type.launch()](/api/class-browsertype.mdx#browser-type-launch).
 
 :::note
 
-Downloaded files are deleted when the browser context that produced them is closed.
+Загруженные файлы удаляются, когда контекст браузера, который их создал, закрывается.
 :::
 
-Here is the simplest way to handle the file download:
+Вот самый простой способ обработки загрузки файла:
 
 <Tabs
   groupId="python-flavor"
@@ -30,13 +30,13 @@ Here is the simplest way to handle the file download:
 <TabItem value="sync">
 
 ```py
-# Start waiting for the download
+# Начать ожидание загрузки
 with page.expect_download() as download_info:
-    # Perform the action that initiates download
+    # Выполнить действие, инициирующее загрузку
     page.get_by_text("Download file").click()
 download = download_info.value
 
-# Wait for the download process to complete and save the downloaded file somewhere
+# Дождаться завершения процесса загрузки и сохранить загруженный файл куда-либо
 download.save_as("/path/to/save/at/" + download.suggested_filename)
 ```
 
@@ -44,22 +44,22 @@ download.save_as("/path/to/save/at/" + download.suggested_filename)
 <TabItem value="async">
 
 ```py
-# Start waiting for the download
+# Начать ожидание загрузки
 async with page.expect_download() as download_info:
-    # Perform the action that initiates download
+    # Выполнить действие, инициирующее загрузку
     await page.get_by_text("Download file").click()
 download = await download_info.value
 
-# Wait for the download process to complete and save the downloaded file somewhere
+# Дождаться завершения процесса загрузки и сохранить загруженный файл куда-либо
 await download.save_as("/path/to/save/at/" + download.suggested_filename)
 ```
 
 </TabItem>
 </Tabs>
 
-#### Variations
+#### Вариации
 
-If you have no idea what initiates the download, you can still handle the event:
+Если вы не знаете, что инициирует загрузку, вы все равно можете обработать событие:
 
 <Tabs
   groupId="python-flavor"
@@ -87,11 +87,11 @@ page.on("download", handle_download)
 </TabItem>
 </Tabs>
 
-Note that handling the event forks the control flow and makes the script harder to follow. Your scenario might end while you are downloading a file since your main control flow is not awaiting for this operation to resolve.
+Обратите внимание, что обработка события разветвляет поток управления и делает скрипт труднее для понимания. Ваш сценарий может завершиться, пока вы загружаете файл, так как ваш основной поток управления не ожидает завершения этой операции.
 
 :::note
 
-For uploading files, see the [uploading files](./input.mdx#upload-files) section.
+Для загрузки файлов смотрите раздел [загрузка файлов](./input.mdx#upload-files).
 :::
 
 

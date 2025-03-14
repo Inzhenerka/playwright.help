@@ -1,18 +1,18 @@
 ---
 id: mock
-title: "Mock APIs"
+title: "Мокирование API"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Web APIs are usually implemented as HTTP endpoints. Playwright provides APIs to **mock** and **modify** network traffic, both HTTP and HTTPS. Any requests that a page does, including [XHRs](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) requests, can be tracked, modified and mocked. With Playwright you can also mock using HAR files that contain multiple network requests made by the page.
+Веб-API обычно реализуются как HTTP-эндпоинты. Playwright предоставляет API для **мокирования** и **модификации** сетевого трафика, как HTTP, так и HTTPS. Любые запросы, которые делает страница, включая [XHRs](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) и [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) запросы, могут быть отслежены, изменены и замокированы. С помощью Playwright вы также можете мокировать, используя HAR-файлы, содержащие несколько сетевых запросов, сделанных страницей.
 
-## Mock API requests
+## Мокирование API-запросов
 
-The following code will intercept all the calls to `*/**/api/v1/fruits` and will return a custom response instead. No requests to the API will be made. The test goes to the URL that uses the mocked route and asserts that mock data is present on the page.
+Следующий код перехватит все вызовы к `*/**/api/v1/fruits` и вернет пользовательский ответ вместо этого. Запросы к API не будут выполнены. Тест переходит на URL, который использует замокированный маршрут, и проверяет, что замокированные данные присутствуют на странице.
 
 <Tabs
   groupId="python-flavor"
@@ -64,15 +64,15 @@ async def test_mock_the_fruit_api(page: Page):
 </TabItem>
 </Tabs>
 
-You can see from the trace of the example test that the API was never called, it was however fulfilled with the mock data. ![api mocking trace](https://github.com/microsoft/playwright/assets/13063165/3dc14cbf-c100-4efc-ac21-d7b52d698b53)
+Вы можете увидеть из трассировки теста, что API никогда не вызывался, однако он был выполнен с замокированными данными. ![api mocking trace](https://github.com/microsoft/playwright/assets/13063165/3dc14cbf-c100-4efc-ac21-d7b52d698b53)
 
-Read more about [advanced networking](./network.mdx).
+Подробнее о [продвинутой работе с сетью](./network.mdx).
 
-## Modify API responses
+## Модификация ответов API
 
-Sometimes, it is essential to make an API request, but the response needs to be patched to allow for reproducible testing. In that case, instead of mocking the request, one can perform the request and fulfill it with the modified response.
+Иногда необходимо выполнить запрос к API, но ответ нужно изменить для обеспечения воспроизводимого тестирования. В этом случае, вместо мокирования запроса, можно выполнить запрос и выполнить его с измененным ответом.
 
-In the example below we intercept the call to the fruit API and add a new fruit called 'Loquat', to the data. We then go to the url and assert that this data is there:
+В примере ниже мы перехватываем вызов к API фруктов и добавляем новый фрукт под названием 'Loquat' в данные. Затем мы переходим на URL и проверяем, что эти данные присутствуют:
 
 <Tabs
   groupId="python-flavor"
@@ -128,24 +128,24 @@ async def test_gets_the_json_from_api_and_adds_a_new_fruit(page: Page):
 </TabItem>
 </Tabs>
 
-In the trace of our test we can see that the API was called and the response was modified. ![trace of test showing api being called and fulfilled](https://github.com/microsoft/playwright/assets/13063165/8b8dd82d-1b3e-428e-871b-840581fed439)
+В трассировке нашего теста мы можем увидеть, что API был вызван и ответ был изменен. ![trace of test showing api being called and fulfilled](https://github.com/microsoft/playwright/assets/13063165/8b8dd82d-1b3e-428e-871b-840581fed439)
 
-By inspecting the response we can see that our new fruit was added to the list. ![trace of test showing the mock response](https://github.com/microsoft/playwright/assets/13063165/03e6c87c-4ecc-47e8-9ca0-30fface25e9d)
+При проверке ответа мы можем увидеть, что наш новый фрукт был добавлен в список. ![trace of test showing the mock response](https://github.com/microsoft/playwright/assets/13063165/03e6c87c-4ecc-47e8-9ca0-30fface25e9d)
 
-Read more about [advanced networking](./network.mdx).
+Подробнее о [продвинутой работе с сетью](./network.mdx).
 
-## Mocking with HAR files
+## Мокирование с использованием HAR-файлов
 
-A HAR file is an [HTTP Archive](http://www.softwareishard.com/blog/har-12-spec/) file that contains a record of all the network requests that are made when a page is loaded. It contains information about the request and response headers, cookies, content, timings, and more. You can use HAR files to mock network requests in your tests. You'll need to:
-1. Record a HAR file.
-1. Commit the HAR file alongside the tests.
-1. Route requests using the saved HAR files in the tests.
+HAR-файл — это [HTTP Archive](http://www.softwareishard.com/blog/har-12-spec/) файл, который содержит запись всех сетевых запросов, сделанных при загрузке страницы. Он содержит информацию о заголовках запроса и ответа, куки, содержимом, времени и многом другом. Вы можете использовать HAR-файлы для мокирования сетевых запросов в ваших тестах. Вам нужно:
+1. Записать HAR-файл.
+1. Закоммитить HAR-файл вместе с тестами.
+1. Маршрутизировать запросы, используя сохраненные HAR-файлы в тестах.
 
-### Recording a HAR file
+### Запись HAR-файла
 
-To record a HAR file we use [page.route_from_har()](/api/class-page.mdx#page-route-from-har) or [browser_context.route_from_har()](/api/class-browsercontext.mdx#browser-context-route-from-har) method. This method takes in the path to the HAR file and an optional object of options. The options object can contain the URL so that only requests with the URL matching the specified glob pattern will be served from the HAR File. If not specified, all requests will be served from the HAR file.
+Для записи HAR-файла мы используем метод [page.route_from_har()](/api/class-page.mdx#page-route-from-har) или [browser_context.route_from_har()](/api/class-browsercontext.mdx#browser-context-route-from-har). Этот метод принимает путь к HAR-файлу и необязательный объект с опциями. Объект опций может содержать URL, так что только запросы с URL, соответствующим указанному шаблону, будут обслуживаться из HAR-файла. Если не указано, все запросы будут обслуживаться из HAR-файла.
 
-Setting `update` option to true will create or update the HAR file with the actual network information instead of serving the requests from the HAR file. Use it when creating a test to populate the HAR with real data.
+Установка опции `update` в true создаст или обновит HAR-файл с фактической сетевой информацией вместо обслуживания запросов из HAR-файла. Используйте это при создании теста для заполнения HAR реальными данными.
 
 <Tabs
   groupId="python-flavor"
@@ -187,9 +187,9 @@ async def test_records_or_updates_the_har_file(page: Page):
 </TabItem>
 </Tabs>
 
-### Modifying a HAR file
+### Изменение HAR-файла
 
-Once you have recorded a HAR file you can modify it by opening the hashed .txt file inside your 'hars' folder and editing the JSON. This file should be committed to your source control. Anytime you run this test with `update: true` it will update your HAR file with the request from the API.
+После того как вы записали HAR-файл, вы можете изменить его, открыв хешированный .txt файл внутри вашей папки 'hars' и отредактировав JSON. Этот файл должен быть закоммичен в вашу систему контроля версий. Каждый раз, когда вы запускаете этот тест с `update: true`, он будет обновлять ваш HAR-файл с запросом от API.
 
 ```json
 [
@@ -197,13 +197,13 @@ Once you have recorded a HAR file you can modify it by opening the hashed .txt f
     "name": "Playwright",
     "id": 100
   },
-  // ... other fruits
+  // ... другие фрукты
 ]
 ```
 
-### Replaying from HAR
+### Воспроизведение из HAR
 
-Now that you have the HAR file recorded and modified the mock data, it can be used to serve matching responses in the test. For this, just turn off or simply remove the `update` option. This will run the test against the HAR file instead of hitting the API.
+Теперь, когда у вас есть записанный HAR-файл и измененные замокированные данные, его можно использовать для обслуживания соответствующих ответов в тесте. Для этого просто отключите или удалите опцию `update`. Это запустит тест против HAR-файла вместо обращения к API.
 
 <Tabs
   groupId="python-flavor"
@@ -249,30 +249,30 @@ async def test_gets_the_json_from_har_and_checks_the_new_fruit_has_been_added(pa
 </TabItem>
 </Tabs>
 
-In the trace of our test we can see that the route was fulfilled from the HAR file and the API was not called. ![trace showing the HAR file being used](https://github.com/microsoft/playwright/assets/13063165/1bd7ab66-ea4f-43c2-a4e5-ca17d4837ff1)
+В трассировке нашего теста мы можем увидеть, что маршрут был выполнен из HAR-файла, и API не был вызван. ![trace showing the HAR file being used](https://github.com/microsoft/playwright/assets/13063165/1bd7ab66-ea4f-43c2-a4e5-ca17d4837ff1)
 
-If we inspect the response we can see our new fruit was added to the JSON, which was done by manually updating the hashed `.txt` file inside the `hars` folder. ![trace showing response from HAR file](https://github.com/microsoft/playwright/assets/13063165/db3117fc-7b02-4973-9a51-29e213261a6a)
+Если мы проверим ответ, мы увидим, что наш новый фрукт был добавлен в JSON, что было сделано путем ручного обновления хешированного `.txt` файла внутри папки `hars`. ![trace showing response from HAR file](https://github.com/microsoft/playwright/assets/13063165/db3117fc-7b02-4973-9a51-29e213261a6a)
 
-HAR replay matches URL and HTTP method strictly. For POST requests, it also matches POST payloads strictly. If multiple recordings match a request, the one with the most matching headers is picked. An entry resulting in a redirect will be followed automatically.
+Воспроизведение HAR строго соответствует URL и HTTP-методу. Для POST-запросов также строго соответствуют POST-пейлоады. Если несколько записей соответствуют запросу, выбирается та, у которой больше всего совпадающих заголовков. Запись, приводящая к перенаправлению, будет автоматически следовать.
 
-Similar to when recording, if given HAR file name ends with `.zip`, it is considered an archive containing the HAR file along with network payloads stored as separate entries. You can also extract this archive, edit payloads or HAR log manually and point to the extracted har file. All the payloads will be resolved relative to the extracted har file on the file system.
+Аналогично записи, если имя HAR-файла заканчивается на `.zip`, он считается архивом, содержащим HAR-файл вместе с сетевыми пейлоадами, хранящимися как отдельные записи. Вы также можете извлечь этот архив, отредактировать пейлоады или HAR-лог вручную и указать на извлеченный HAR-файл. Все пейлоады будут разрешены относительно извлеченного HAR-файла в файловой системе.
 
-#### Recording HAR with CLI
+#### Запись HAR с помощью CLI
 
-We recommend the `update` option to record HAR file for your test. However, you can also record the HAR with Playwright CLI.
+Мы рекомендуем использовать опцию `update` для записи HAR-файла для вашего теста. Однако вы также можете записать HAR с помощью Playwright CLI.
 
-Open the browser with Playwright CLI and pass `--save-har` option to produce a HAR file. Optionally, use `--save-har-glob` to only save requests you are interested in, for example API endpoints. If the har file name ends with `.zip`, artifacts are written as separate files and are all compressed into a single `zip`.
+Откройте браузер с помощью Playwright CLI и передайте опцию `--save-har`, чтобы создать HAR-файл. При необходимости используйте `--save-har-glob`, чтобы сохранять только интересующие вас запросы, например, API-эндпоинты. Если имя HAR-файла заканчивается на `.zip`, артефакты записываются как отдельные файлы и все сжимаются в один `zip`.
 
 ```bash
-# Save API requests from example.com as "example.har" archive.
+# Сохраните API-запросы с example.com как архив "example.har".
 playwright open --save-har=example.har --save-har-glob="**/api/**" https://example.com
 ```
 
-Read more about [advanced networking](./network.mdx).
+Подробнее о [продвинутой работе с сетью](./network.mdx).
 
-## Mock WebSockets
+## Мокирование WebSockets
 
-The following code will intercept WebSocket connections and mock entire communcation over the WebSocket, instead of connecting to the server. This example responds to a `"request"` with a `"response"`.
+Следующий код перехватит WebSocket-соединения и замокирует всю коммуникацию через WebSocket, вместо подключения к серверу. Этот пример отвечает на `"request"` с `"response"`.
 
 <Tabs
   groupId="python-flavor"
@@ -310,7 +310,7 @@ await page.route_web_socket("wss://example.com/ws", lambda ws: ws.on_message(
 </TabItem>
 </Tabs>
 
-Alternatively, you may want to connect to the actual server, but intercept messages in-between and modify or block them. Here is an example that modifies some of the messages sent by the page to the server, and leaves the rest unmodified.
+В качестве альтернативы, вы можете захотеть подключиться к реальному серверу, но перехватывать сообщения между ними и изменять или блокировать их. Вот пример, который изменяет некоторые из сообщений, отправляемых страницей на сервер, и оставляет остальные без изменений.
 
 <Tabs
   groupId="python-flavor"
@@ -356,8 +356,7 @@ await page.route_web_socket("wss://example.com/ws", handler)
 </TabItem>
 </Tabs>
 
-For more details, see [WebSocketRoute].
-
+Для получения более подробной информации смотрите [WebSocketRoute].
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

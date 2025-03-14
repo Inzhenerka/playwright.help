@@ -6,16 +6,16 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
 :::note
 
-Extensions only work in Chrome / Chromium launched with a persistent context. Use custom browser args at your own risk, as some of them may break Playwright functionality.
+Расширения работают только в Chrome / Chromium, запущенном с постоянным контекстом. Используйте пользовательские аргументы браузера на свой страх и риск, так как некоторые из них могут нарушить функциональность Playwright.
 :::
 
-The snippet below retrieves the [background page](https://developer.chrome.com/extensions/background_pages) of a [Manifest v2](https://developer.chrome.com/docs/extensions/mv2/) extension whose source is located in `./my-extension`.
+Пример ниже извлекает [background page](https://developer.chrome.com/extensions/background_pages) расширения [Manifest v2](https://developer.chrome.com/docs/extensions/mv2/), исходный код которого находится в `./my-extension`.
 
-Note the use of the `chromium` channel that allows to run extensions in headless mode. Alternatively, you can launch the browser in headed mode.
+Обратите внимание на использование канала `chromium`, который позволяет запускать расширения в безголовом режиме. В качестве альтернативы, вы можете запустить браузер в режиме с интерфейсом.
 
 <Tabs
   groupId="python-flavor"
@@ -48,7 +48,7 @@ def run(playwright: Playwright):
     else:
         background_page = context.background_pages[0]
 
-    # Test the background page as you would any other page.
+    # Тестируйте background page так же, как и любую другую страницу.
     context.close()
 
 
@@ -82,7 +82,7 @@ async def run(playwright: Playwright):
     else:
         background_page = context.background_pages[0]
 
-    # Test the background page as you would any other page.
+    # Тестируйте background page так же, как и любую другую страницу.
     await context.close()
 
 
@@ -97,13 +97,13 @@ asyncio.run(main())
 </TabItem>
 </Tabs>
 
-## Testing
+## Тестирование
 
-To have the extension loaded when running tests you can use a test fixture to set the context. You can also dynamically retrieve the extension id and use it to load and test the popup page for example.
+Чтобы расширение загружалось при запуске тестов, вы можете использовать тестовый фикстур для установки контекста. Вы также можете динамически получить id расширения и использовать его для загрузки и тестирования страницы всплывающего окна, например.
 
-Note the use of the `chromium` channel that allows to run extensions in headless mode. Alternatively, you can launch the browser in headed mode.
+Обратите внимание на использование канала `chromium`, который позволяет запускать расширения в безголовом режиме. В качестве альтернативы, вы можете запустить браузер в режиме с интерфейсом.
 
-First, add fixtures that will load the extension:
+Сначала добавьте фикстуры, которые загрузят расширение:
 
 ```python title="conftest.py"
 from typing import Generator
@@ -129,12 +129,12 @@ def context(playwright: Playwright) -> Generator[BrowserContext, None, None]:
 
 @pytest.fixture()
 def extension_id(context) -> Generator[str, None, None]:
-    # for manifest v2:
+    # для manifest v2:
     # background = context.background_pages[0]
     # if not background:
     #     background = context.wait_for_event("backgroundpage")
 
-    # for manifest v3:
+    # для manifest v3:
     background = context.service_workers[0]
     if not background:
         background = context.wait_for_event("serviceworker")
@@ -144,7 +144,7 @@ def extension_id(context) -> Generator[str, None, None]:
 
 ```
 
-Then use these fixtures in a test:
+Затем используйте эти фикстуры в тесте:
 
 ```python title="test_foo.py"
 from playwright.sync_api import expect, Page

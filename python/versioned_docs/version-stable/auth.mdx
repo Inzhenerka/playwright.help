@@ -1,20 +1,20 @@
 ---
 id: auth
-title: "Authentication"
+title: "Аутентификация"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright executes tests in isolated environments called [browser contexts](./browser-contexts.mdx). This isolation model improves reproducibility and prevents cascading test failures. Tests can load existing authenticated state. This eliminates the need to authenticate in every test and speeds up test execution.
+Playwright выполняет тесты в изолированных средах, называемых [контекстами браузера](./browser-contexts.mdx). Эта модель изоляции улучшает воспроизводимость и предотвращает каскадные сбои тестов. Тесты могут загружать существующее аутентифицированное состояние. Это устраняет необходимость аутентификации в каждом тесте и ускоряет выполнение тестов.
 
-## Core concepts
+## Основные концепции
 
-Regardless of the authentication strategy you choose, you are likely to store authenticated browser state on the file system.
+Независимо от выбранной вами стратегии аутентификации, вы, вероятно, будете хранить аутентифицированное состояние браузера в файловой системе.
 
-We recommend to create `playwright/.auth` directory and add it to your `.gitignore`. Your authentication routine will produce authenticated browser state and save it to a file in this `playwright/.auth` directory. Later on, tests will reuse this state and start already authenticated.
+Мы рекомендуем создать каталог `playwright/.auth` и добавить его в ваш `.gitignore`. Ваша процедура аутентификации создаст аутентифицированное состояние браузера и сохранит его в файл в этом каталоге `playwright/.auth`. Впоследствии тесты будут повторно использовать это состояние и начинать уже аутентифицированными.
 
 <Tabs
   groupId="bash-flavor"
@@ -52,11 +52,11 @@ echo "playwright/.auth" >> .gitignore
 </TabItem>
 </Tabs>
 
-## Signing in before each test
+## Вход в систему перед каждым тестом
 
-The Playwright API can [automate interaction](./input.mdx) with a login form.
+API Playwright может [автоматизировать взаимодействие](./input.mdx) с формой входа.
 
-The following example logs into GitHub. Once these steps are executed, the browser context will be authenticated.
+Следующий пример выполняет вход в GitHub. После выполнения этих шагов контекст браузера будет аутентифицирован.
 
 <Tabs
   groupId="python-flavor"
@@ -72,11 +72,11 @@ The following example logs into GitHub. Once these steps are executed, the brows
 page = context.new_page()
 page.goto('https://github.com/login')
 
-# Interact with login form
+# Взаимодействие с формой входа
 page.get_by_label("Username or email address").fill("username")
 page.get_by_label("Password").fill("password")
 page.get_by_role("button", name="Sign in").click()
-# Continue with the test
+# Продолжение теста
 ```
 
 </TabItem>
@@ -86,27 +86,27 @@ page.get_by_role("button", name="Sign in").click()
 page = await context.new_page()
 await page.goto('https://github.com/login')
 
-# Interact with login form
+# Взаимодействие с формой входа
 await page.get_by_label("Username or email address").fill("username")
 await page.get_by_label("Password").fill("password")
 await page.get_by_role("button", name="Sign in").click()
-# Continue with the test
+# Продолжение теста
 ```
 
 </TabItem>
 </Tabs>
 
-Redoing login for every test can slow down test execution. To mitigate that, reuse existing authentication state instead.
+Повторный вход в систему для каждого теста может замедлить выполнение тестов. Чтобы этого избежать, повторно используйте существующее аутентифицированное состояние.
 
-## Reusing signed in state
+## Повторное использование аутентифицированного состояния
 
-Playwright provides a way to reuse the signed-in state in the tests. That way you can log in only once and then skip the log in step for all of the tests.
+Playwright предоставляет способ повторного использования аутентифицированного состояния в тестах. Таким образом, вы можете войти в систему только один раз, а затем пропустить шаг входа для всех тестов.
 
-Web apps use cookie-based or token-based authentication, where authenticated state is stored as [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies), in [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage) or in [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API). Playwright provides [browser_context.storage_state()](/api/class-browsercontext.mdx#browser-context-storage-state) method that can be used to retrieve storage state from authenticated contexts and then create new contexts with prepopulated state.
+Веб-приложения используют аутентификацию на основе cookies или токенов, где аутентифицированное состояние хранится в виде [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies), в [локальном хранилище](https://developer.mozilla.org/en-US/docs/Web/API/Storage) или в [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API). Playwright предоставляет метод [browser_context.storage_state()](/api/class-browsercontext.mdx#browser-context-storage-state), который можно использовать для получения состояния хранилища из аутентифицированных контекстов, а затем создания новых контекстов с предварительно заполненным состоянием.
 
-Cookies, local storage and IndexedDB state can be used across different browsers. They depend on your application's authentication model which may require some combination of cookies, local storage or IndexedDB.
+Состояние cookies, локального хранилища и IndexedDB может использоваться в разных браузерах. Они зависят от модели аутентификации вашего приложения, которая может требовать некоторой комбинации cookies, локального хранилища или IndexedDB.
 
-The following code snippet retrieves state from an authenticated context and creates a new context with that state.
+Следующий фрагмент кода получает состояние из аутентифицированного контекста и создает новый контекст с этим состоянием.
 
 <Tabs
   groupId="python-flavor"
@@ -119,10 +119,10 @@ The following code snippet retrieves state from an authenticated context and cre
 <TabItem value="sync">
 
 ```py
-# Save storage state into the file.
+# Сохранение состояния хранилища в файл.
 storage = context.storage_state(path="state.json")
 
-# Create a new context with the saved storage state.
+# Создание нового контекста с сохраненным состоянием хранилища.
 context = browser.new_context(storage_state="state.json")
 ```
 
@@ -130,21 +130,21 @@ context = browser.new_context(storage_state="state.json")
 <TabItem value="async">
 
 ```py
-# Save storage state into the file.
+# Сохранение состояния хранилища в файл.
 storage = await context.storage_state(path="state.json")
 
-# Create a new context with the saved storage state.
+# Создание нового контекста с сохраненным состоянием хранилища.
 context = await browser.new_context(storage_state="state.json")
 ```
 
 </TabItem>
 </Tabs>
 
-## Advanced scenarios
+## Продвинутые сценарии
 
-### Session storage
+### Хранилище сессий
 
-Reusing authenticated state covers [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies), [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage) and [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) based authentication. Rarely, [session storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) is used for storing information associated with the signed-in state. Session storage is specific to a particular domain and is not persisted across page loads. Playwright does not provide API to persist session storage, but the following snippet can be used to save/load session storage.
+Повторное использование аутентифицированного состояния охватывает аутентификацию на основе [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies), [локального хранилища](https://developer.mozilla.org/en-US/docs/Web/API/Storage) и [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API). Редко [хранилище сессий](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) используется для хранения информации, связанной с аутентифицированным состоянием. Хранилище сессий специфично для определенного домена и не сохраняется между загрузками страниц. Playwright не предоставляет API для сохранения хранилища сессий, но следующий фрагмент кода может быть использован для сохранения/загрузки хранилища сессий.
 
 <Tabs
   groupId="python-flavor"
@@ -158,11 +158,11 @@ Reusing authenticated state covers [cookies](https://developer.mozilla.org/en-US
 
 ```py
 import os
-# Get session storage and store as env variable
+# Получение хранилища сессий и сохранение в переменную окружения
 session_storage = page.evaluate("() => JSON.stringify(sessionStorage)")
 os.environ["SESSION_STORAGE"] = session_storage
 
-# Set session storage in a new context
+# Установка хранилища сессий в новом контексте
 session_storage = os.environ["SESSION_STORAGE"]
 context.add_init_script("""(storage => {
   if (window.location.hostname === 'example.com') {
@@ -179,11 +179,11 @@ context.add_init_script("""(storage => {
 
 ```py
 import os
-# Get session storage and store as env variable
+# Получение хранилища сессий и сохранение в переменную окружения
 session_storage = await page.evaluate("() => JSON.stringify(sessionStorage)")
 os.environ["SESSION_STORAGE"] = session_storage
 
-# Set session storage in a new context
+# Установка хранилища сессий в новом контексте
 session_storage = os.environ["SESSION_STORAGE"]
 await context.add_init_script("""(storage => {
   if (window.location.hostname === 'example.com') {

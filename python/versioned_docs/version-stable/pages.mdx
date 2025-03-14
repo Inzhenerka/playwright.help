@@ -6,9 +6,9 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Pages
+## Страницы
 
-Each [BrowserContext] can have multiple pages. A [Page] refers to a single tab or a popup window within a browser context. It should be used to navigate to URLs and interact with the page content.
+Каждый [BrowserContext] может содержать несколько страниц. [Page] относится к одной вкладке или всплывающему окну в контексте браузера. Он должен использоваться для навигации по URL-адресам и взаимодействия с содержимым страницы.
 
 <Tabs
   groupId="python-flavor"
@@ -23,14 +23,14 @@ Each [BrowserContext] can have multiple pages. A [Page] refers to a single tab o
 ```py
 page = context.new_page()
 
-# Navigate explicitly, similar to entering a URL in the browser.
+# Явная навигация, аналогично вводу URL в браузере.
 page.goto('http://example.com')
-# Fill an input.
+# Заполнение поля ввода.
 page.locator('#search').fill('query')
 
-# Navigate implicitly by clicking a link.
+# Неявная навигация путем нажатия на ссылку.
 page.locator('#submit').click()
-# Expect a new url.
+# Ожидание нового URL.
 print(page.url)
 ```
 
@@ -40,25 +40,25 @@ print(page.url)
 ```py
 page = await context.new_page()
 
-# Navigate explicitly, similar to entering a URL in the browser.
+# Явная навигация, аналогично вводу URL в браузере.
 await page.goto('http://example.com')
-# Fill an input.
+# Заполнение поля ввода.
 await page.locator('#search').fill('query')
 
-# Navigate implicitly by clicking a link.
+# Неявная навигация путем нажатия на ссылку.
 await page.locator('#submit').click()
-# Expect a new url.
+# Ожидание нового URL.
 print(page.url)
 ```
 
 </TabItem>
 </Tabs>
 
-## Multiple pages
+## Несколько страниц
 
-Each browser context can host multiple pages (tabs).
-* Each page behaves like a focused, active page. Bringing the page to front is not required.
-* Pages inside a context respect context-level emulation, like viewport sizes, custom network routes or browser locale.
+Каждый контекст браузера может содержать несколько страниц (вкладок).
+* Каждая страница ведет себя как активная страница. Перемещение страницы на передний план не требуется.
+* Страницы в контексте учитывают эмуляцию на уровне контекста, такую как размеры окна просмотра, пользовательские сетевые маршруты или локаль браузера.
 
 <Tabs
   groupId="python-flavor"
@@ -71,11 +71,11 @@ Each browser context can host multiple pages (tabs).
 <TabItem value="sync">
 
 ```py
-# create two pages
+# создание двух страниц
 page_one = context.new_page()
 page_two = context.new_page()
 
-# get pages of a browser context
+# получение страниц контекста браузера
 all_pages = context.pages
 ```
 
@@ -83,20 +83,20 @@ all_pages = context.pages
 <TabItem value="async">
 
 ```py
-# create two pages
+# создание двух страниц
 page_one = await context.new_page()
 page_two = await context.new_page()
 
-# get pages of a browser context
+# получение страниц контекста браузера
 all_pages = context.pages
 ```
 
 </TabItem>
 </Tabs>
 
-## Handling new pages
+## Обработка новых страниц
 
-The `page` event on browser contexts can be used to get new pages that are created in the context. This can be used to handle new pages opened by `target="_blank"` links.
+Событие `page` в контексте браузера может использоваться для получения новых страниц, созданных в контексте. Это может быть использовано для обработки новых страниц, открытых ссылками с `target="_blank"`.
 
 <Tabs
   groupId="python-flavor"
@@ -109,12 +109,12 @@ The `page` event on browser contexts can be used to get new pages that are creat
 <TabItem value="sync">
 
 ```py
-# Get page after a specific action (e.g. clicking a link)
+# Получение страницы после определенного действия (например, нажатия на ссылку)
 with context.expect_page() as new_page_info:
-    page.get_by_text("open new tab").click() # Opens a new tab
+    page.get_by_text("open new tab").click() # Открывает новую вкладку
 new_page = new_page_info.value
 
-# Interact with the new page normally
+# Обычное взаимодействие с новой страницей
 new_page.get_by_role("button").click()
 print(new_page.title())
 ```
@@ -123,12 +123,12 @@ print(new_page.title())
 <TabItem value="async">
 
 ```py
-# Get page after a specific action (e.g. clicking a link)
+# Получение страницы после определенного действия (например, нажатия на ссылку)
 async with context.expect_page() as new_page_info:
-    await page.get_by_text("open new tab").click() # Opens a new tab
+    await page.get_by_text("open new tab").click() # Открывает новую вкладку
 new_page = await new_page_info.value
 
-# Interact with the new page normally
+# Обычное взаимодействие с новой страницей
 await new_page.get_by_role("button").click()
 print(await new_page.title())
 ```
@@ -136,7 +136,7 @@ print(await new_page.title())
 </TabItem>
 </Tabs>
 
-If the action that triggers the new page is unknown, the following pattern can be used.
+Если действие, которое вызывает новую страницу, неизвестно, можно использовать следующий шаблон.
 
 <Tabs
   groupId="python-flavor"
@@ -149,7 +149,7 @@ If the action that triggers the new page is unknown, the following pattern can b
 <TabItem value="sync">
 
 ```py
-# Get all new pages (including popups) in the context
+# Получение всех новых страниц (включая всплывающие окна) в контексте
 def handle_page(page):
     page.wait_for_load_state()
     print(page.title())
@@ -161,7 +161,7 @@ context.on("page", handle_page)
 <TabItem value="async">
 
 ```py
-# Get all new pages (including popups) in the context
+# Получение всех новых страниц (включая всплывающие окна) в контексте
 async def handle_page(page):
     await page.wait_for_load_state()
     print(await page.title())
@@ -172,11 +172,11 @@ context.on("page", handle_page)
 </TabItem>
 </Tabs>
 
-## Handling popups
+## Обработка всплывающих окон
 
-If the page opens a pop-up (e.g. pages opened by `target="_blank"` links), you can get a reference to it by listening to the `popup` event on the page.
+Если страница открывает всплывающее окно (например, страницы, открытые ссылками с `target="_blank"`), вы можете получить ссылку на него, прослушивая событие `popup` на странице.
 
-This event is emitted in addition to the `browserContext.on('page')` event, but only for popups relevant to this page.
+Это событие генерируется в дополнение к событию `browserContext.on('page')`, но только для всплывающих окон, относящихся к этой странице.
 
 <Tabs
   groupId="python-flavor"
@@ -189,12 +189,12 @@ This event is emitted in addition to the `browserContext.on('page')` event, but 
 <TabItem value="sync">
 
 ```py
-# Get popup after a specific action (e.g., click)
+# Получение всплывающего окна после определенного действия (например, нажатия)
 with page.expect_popup() as popup_info:
     page.get_by_text("open the popup").click()
 popup = popup_info.value
 
-# Interact with the popup normally
+# Обычное взаимодействие со всплывающим окном
 popup.get_by_role("button").click()
 print(popup.title())
 ```
@@ -203,12 +203,12 @@ print(popup.title())
 <TabItem value="async">
 
 ```py
-# Get popup after a specific action (e.g., click)
+# Получение всплывающего окна после определенного действия (например, нажатия)
 async with page.expect_popup() as popup_info:
     await page.get_by_text("open the popup").click()
 popup = await popup_info.value
 
-# Interact with the popup normally
+# Обычное взаимодействие со всплывающим окном
 await popup.get_by_role("button").click()
 print(await popup.title())
 ```
@@ -216,7 +216,7 @@ print(await popup.title())
 </TabItem>
 </Tabs>
 
-If the action that triggers the popup is unknown, the following pattern can be used.
+Если действие, которое вызывает всплывающее окно, неизвестно, можно использовать следующий шаблон.
 
 <Tabs
   groupId="python-flavor"
@@ -229,7 +229,7 @@ If the action that triggers the popup is unknown, the following pattern can be u
 <TabItem value="sync">
 
 ```py
-# Get all popups when they open
+# Получение всех всплывающих окон при их открытии
 def handle_popup(popup):
     popup.wait_for_load_state()
     print(popup.title())
@@ -241,7 +241,7 @@ page.on("popup", handle_popup)
 <TabItem value="async">
 
 ```py
-# Get all popups when they open
+# Получение всех всплывающих окон при их открытии
 async def handle_popup(popup):
     await popup.wait_for_load_state()
     print(await popup.title())

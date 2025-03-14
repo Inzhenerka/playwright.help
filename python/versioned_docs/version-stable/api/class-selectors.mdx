@@ -6,23 +6,21 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-
-Selectors can be used to install custom selector engines. See [extensibility](../extensibility.mdx) for more information.
-
+Селекторы могут быть использованы для установки пользовательских движков селекторов. Подробнее см. в разделе [расширяемость](../extensibility.mdx).
 
 ---
 
-## Methods
+## Методы
 
 ### register {#selectors-register}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>selectors.register</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>selectors.register</x-search>
 
-Selectors must be registered before creating the page.
+Селекторы должны быть зарегистрированы до создания страницы.
 
-**Usage**
+**Использование**
 
-An example of registering selector engine that queries elements based on a tag name:
+Пример регистрации движка селекторов, который запрашивает элементы на основе имени тега:
 
 <Tabs
   groupId="python-flavor"
@@ -40,27 +38,27 @@ from playwright.sync_api import sync_playwright, Playwright
 def run(playwright: Playwright):
     tag_selector = """
       {
-          // Returns the first element matching given selector in the root's subtree.
+          // Возвращает первый элемент, соответствующий данному селектору в поддереве корня.
           query(root, selector) {
               return root.querySelector(selector);
           },
-          // Returns all elements matching given selector in the root's subtree.
+          // Возвращает все элементы, соответствующие данному селектору в поддереве корня.
           queryAll(root, selector) {
               return Array.from(root.querySelectorAll(selector));
           }
       }"""
 
-    # Register the engine. Selectors will be prefixed with "tag=".
+    # Зарегистрируйте движок. Селекторы будут иметь префикс "tag=".
     playwright.selectors.register("tag", tag_selector)
     browser = playwright.chromium.launch()
     page = browser.new_page()
     page.set_content('<div><button>Click me</button></div>')
 
-    # Use the selector prefixed with its name.
+    # Используйте селектор с префиксом его имени.
     button = page.locator('tag=button')
-    # Combine it with built-in locators.
+    # Комбинируйте его с встроенными локаторами.
     page.locator('tag=div').get_by_text('Click me').click()
-    # Can use it in any methods supporting selectors.
+    # Можно использовать в любых методах, поддерживающих селекторы.
     button_count = page.locator('tag=button').count()
     print(button_count)
     browser.close()
@@ -79,27 +77,27 @@ from playwright.async_api import async_playwright, Playwright
 async def run(playwright: Playwright):
     tag_selector = """
       {
-          // Returns the first element matching given selector in the root's subtree.
+          // Возвращает первый элемент, соответствующий данному селектору в поддереве корня.
           query(root, selector) {
               return root.querySelector(selector);
           },
-          // Returns all elements matching given selector in the root's subtree.
+          // Возвращает все элементы, соответствующие данному селектору в поддереве корня.
           queryAll(root, selector) {
               return Array.from(root.querySelectorAll(selector));
           }
       }"""
 
-    # Register the engine. Selectors will be prefixed with "tag=".
+    # Зарегистрируйте движок. Селекторы будут иметь префикс "tag=".
     await playwright.selectors.register("tag", tag_selector)
     browser = await playwright.chromium.launch()
     page = await browser.new_page()
     await page.set_content('<div><button>Click me</button></div>')
 
-    # Use the selector prefixed with its name.
+    # Используйте селектор с префиксом его имени.
     button = await page.query_selector('tag=button')
-    # Combine it with built-in locators.
+    # Комбинируйте его с встроенными локаторами.
     await page.locator('tag=div').get_by_text('Click me').click()
-    # Can use it in any methods supporting selectors.
+    # Можно использовать в любых методах, поддерживающих селекторы.
     button_count = await page.locator('tag=button').count()
     print(button_count)
     await browser.close()
@@ -114,41 +112,41 @@ asyncio.run(main())
 </TabItem>
 </Tabs>
 
-**Arguments**
+**Аргументы**
 - `name` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="selectors-register-option-name"/><a href="#selectors-register-option-name" class="list-anchor">#</a>
   
-  Name that is used in selectors as a prefix, e.g. `{name: 'foo'}` enables `foo=myselectorbody` selectors. May only contain `[a-zA-Z0-9_]` characters.
-- `script` [str] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="selectors-register-option-script"/><a href="#selectors-register-option-script" class="list-anchor">#</a>
+  Имя, используемое в селекторах в качестве префикса, например, `{name: 'foo'}` позволяет использовать селекторы `foo=myselectorbody`. Может содержать только символы `[a-zA-Z0-9_]`.
+- `script` [str] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="selectors-register-option-script"/><a href="#selectors-register-option-script" class="list-anchor">#</a>
   
-  Raw script content.
-- `content_script` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="selectors-register-option-content-script"/><a href="#selectors-register-option-content-script" class="list-anchor">#</a>
+  Содержимое скрипта в сыром виде.
+- `content_script` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="selectors-register-option-content-script"/><a href="#selectors-register-option-content-script" class="list-anchor">#</a>
   
-  Whether to run this selector engine in isolated JavaScript environment. This environment has access to the same DOM, but not any JavaScript objects from the frame's scripts. Defaults to `false`. Note that running as a content script is not guaranteed when this engine is used together with other registered engines.
-- `path` [Union]\[[str], [pathlib.Path]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="selectors-register-option-path"/><a href="#selectors-register-option-path" class="list-anchor">#</a>
+  Указывает, следует ли запускать этот движок селекторов в изолированной среде JavaScript. Эта среда имеет доступ к тому же DOM, но не к каким-либо объектам JavaScript из скриптов фрейма. По умолчанию `false`. Обратите внимание, что запуск в качестве контентного скрипта не гарантируется, если этот движок используется вместе с другими зарегистрированными движками.
+- `path` [Union]\[[str], [pathlib.Path]\] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="selectors-register-option-path"/><a href="#selectors-register-option-path" class="list-anchor">#</a>
   
-  Path to the JavaScript file. If `path` is a relative path, then it is resolved relative to the current working directory.
+  Путь к файлу JavaScript. Если `path` является относительным путем, то он разрешается относительно текущей рабочей директории.
 
-**Returns**
+**Возвращает**
 - [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="selectors-register-return"/><a href="#selectors-register-return" class="list-anchor">#</a>
 
 ---
 
 ### set_test_id_attribute {#selectors-set-test-id-attribute}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>selectors.set_test_id_attribute</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>selectors.set_test_id_attribute</x-search>
 
-Defines custom attribute name to be used in [page.get_by_test_id()](/api/class-page.mdx#page-get-by-test-id). `data-testid` is used by default.
+Определяет имя пользовательского атрибута, которое будет использоваться в [page.get_by_test_id()](/api/class-page.mdx#page-get-by-test-id). По умолчанию используется `data-testid`.
 
-**Usage**
+**Использование**
 
 ```python
 selectors.set_test_id_attribute(attribute_name)
 ```
 
-**Arguments**
+**Аргументы**
 - `attribute_name` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="selectors-set-test-id-attribute-option-attribute-name"/><a href="#selectors-set-test-id-attribute-option-attribute-name" class="list-anchor">#</a>
   
-  Test id attribute name.
+  Имя атрибута тестового идентификатора.
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"

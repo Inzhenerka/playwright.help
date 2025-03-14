@@ -1,75 +1,75 @@
 ---
 id: test-runners
-title: "Pytest Plugin Reference"
+title: "Справочник плагина Pytest"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright provides a [Pytest](https://docs.pytest.org/en/stable/) plugin to write end-to-end tests. To get started with it, refer to the [getting started guide](./intro.mdx).
+Playwright предоставляет плагин [Pytest](https://docs.pytest.org/en/stable/) для написания end-to-end тестов. Чтобы начать работу с ним, обратитесь к [руководству по началу работы](./intro.mdx).
 
-## Usage
+## Использование
 
-To run your tests, use [Pytest](https://docs.pytest.org/en/stable/) CLI.
+Для запуска ваших тестов используйте CLI [Pytest](https://docs.pytest.org/en/stable/).
 
 ```bash
 pytest --browser webkit --headed
 ```
 
-If you want to add the CLI arguments automatically without specifying them, you can use the [pytest.ini](https://docs.pytest.org/en/stable/reference.html#ini-options-ref) file:
+Если вы хотите добавить аргументы CLI автоматически, не указывая их, вы можете использовать файл [pytest.ini](https://docs.pytest.org/en/stable/reference.html#ini-options-ref):
 
 ```ini
-# content of pytest.ini
+# содержимое pytest.ini
 [pytest]
-# Run firefox with UI
+# Запуск firefox с UI
 addopts = --headed --browser firefox
 ```
 
-## CLI arguments
+## Аргументы CLI
 
-Note that CLI arguments are only applied to the default `browser`, `context` and `page` fixtures. If you create a browser, a context or a page with the API call like [browser.new_context()](/api/class-browser.mdx#browser-new-context), the CLI arguments are not applied.
-- `--headed`: Run tests in headed mode (default: headless).
-- `--browser`: Run tests in a different browser `chromium`, `firefox`, or `webkit`. It can be specified multiple times (default: `chromium`).
-- `--browser-channel` [Browser channel](./browsers.mdx) to be used.
-- `--slowmo` Slows down Playwright operations by the specified amount of milliseconds. Useful so that you can see what is going on (default: 0).
-- `--device` [Device](./emulation.mdx) to be emulated.
-- `--output` Directory for artifacts produced by tests (default: `test-results`).
-- `--tracing` Whether to record a [trace](./trace-viewer.mdx) for each test. `on`, `off`, or `retain-on-failure` (default: `off`).
-- `--video` Whether to record video for each test. `on`, `off`, or `retain-on-failure` (default: `off`).
-- `--screenshot` Whether to automatically capture a screenshot after each test. `on`, `off`, or `only-on-failure` (default: `off`).
-- `--full-page-screenshot` Whether to take a full page screenshot on failure. By default, only the viewport is captured. Requires `--screenshot` to be enabled (default: `off`).
+Обратите внимание, что аргументы CLI применяются только к стандартным фикстурам `browser`, `context` и `page`. Если вы создаете браузер, контекст или страницу с помощью вызова API, например [browser.new_context()](/api/class-browser.mdx#browser-new-context), аргументы CLI не применяются.
+- `--headed`: Запуск тестов в режиме с интерфейсом (по умолчанию: без интерфейса).
+- `--browser`: Запуск тестов в другом браузере `chromium`, `firefox` или `webkit`. Может быть указан несколько раз (по умолчанию: `chromium`).
+- `--browser-channel` [Канал браузера](./browsers.mdx), который будет использоваться.
+- `--slowmo` Замедляет операции Playwright на указанное количество миллисекунд. Полезно, чтобы увидеть, что происходит (по умолчанию: 0).
+- `--device` [Устройство](./emulation.mdx), которое будет эмулироваться.
+- `--output` Директория для артефактов, созданных тестами (по умолчанию: `test-results`).
+- `--tracing` Записывать ли [трассировку](./trace-viewer.mdx) для каждого теста. `on`, `off` или `retain-on-failure` (по умолчанию: `off`).
+- `--video` Записывать ли видео для каждого теста. `on`, `off` или `retain-on-failure` (по умолчанию: `off`).
+- `--screenshot` Автоматически ли делать скриншот после каждого теста. `on`, `off` или `only-on-failure` (по умолчанию: `off`).
+- `--full-page-screenshot` Делать ли скриншот всей страницы при ошибке. По умолчанию захватывается только видимая область. Требует включения `--screenshot` (по умолчанию: `off`).
 
-## Fixtures
+## Фикстуры
 
-This plugin configures Playwright-specific [fixtures for pytest](https://docs.pytest.org/en/latest/fixture.html). To use these fixtures, use the fixture name as an argument to the test function.
+Этот плагин настраивает специфичные для Playwright [фикстуры для pytest](https://docs.pytest.org/en/latest/fixture.html). Чтобы использовать эти фикстуры, используйте имя фикстуры в качестве аргумента для тестовой функции.
 
 ```py
 def test_my_app_is_working(fixture_name):
     pass
-    # Test using fixture_name
+    # Тест с использованием fixture_name
     # ...
 ```
 
-**Function scope**: These fixtures are created when requested in a test function and destroyed when the test ends.
-- `context`: New [browser context](./browser-contexts) for a test.
-- `page`: New [browser page](./pages) for a test.
-- `new_context`: Allows creating different [browser contexts](./browser-contexts) for a test. Useful for multi-user scenarios. Accepts the same parameters as [browser.new_context()](/api/class-browser.mdx#browser-new-context).
+**Область действия функции**: Эти фикстуры создаются при запросе в тестовой функции и уничтожаются, когда тест завершается.
+- `context`: Новый [контекст браузера](./browser-contexts) для теста.
+- `page`: Новая [страница браузера](./pages) для теста.
+- `new_context`: Позволяет создавать разные [контексты браузера](./browser-contexts) для теста. Полезно для сценариев с несколькими пользователями. Принимает те же параметры, что и [browser.new_context()](/api/class-browser.mdx#browser-new-context).
 
-**Session scope**: These fixtures are created when requested in a test function and destroyed when all tests end.
-- `playwright`: [Playwright](./api/class-playwright) instance.
-- `browser_type`: [BrowserType](./api/class-browsertype) instance of the current browser.
-- `browser`: [Browser](./api/class-browser) instance launched by Playwright.
-- `browser_name`: Browser name as string.
-- `browser_channel`: Browser channel as string.
-- `is_chromium`, `is_webkit`, `is_firefox`: Booleans for the respective browser types.
+**Область действия сессии**: Эти фикстуры создаются при запросе в тестовой функции и уничтожаются, когда все тесты завершаются.
+- `playwright`: Экземпляр [Playwright](./api/class-playwright).
+- `browser_type`: Экземпляр [BrowserType](./api/class-browsertype) текущего браузера.
+- `browser`: Экземпляр [Browser](./api/class-browser), запущенный Playwright.
+- `browser_name`: Имя браузера в виде строки.
+- `browser_channel`: Канал браузера в виде строки.
+- `is_chromium`, `is_webkit`, `is_firefox`: Булевы значения для соответствующих типов браузеров.
 
-**Customizing fixture options**: For `browser` and `context` fixtures, use the following fixtures to define custom launch options.
-- `browser_type_launch_args`: Override launch arguments for [browser_type.launch()](/api/class-browsertype.mdx#browser-type-launch). It should return a Dict.
-- `browser_context_args`: Override the options for [browser.new_context()](/api/class-browser.mdx#browser-new-context). It should return a Dict.
+**Настройка параметров фикстур**: Для фикстур `browser` и `context` используйте следующие фикстуры для определения пользовательских параметров запуска.
+- `browser_type_launch_args`: Переопределяет аргументы запуска для [browser_type.launch()](/api/class-browsertype.mdx#browser-type-launch). Должен возвращать Dict.
+- `browser_context_args`: Переопределяет параметры для [browser.new_context()](/api/class-browser.mdx#browser-new-context). Должен возвращать Dict.
 
-Its also possible to override the context options ([browser.new_context()](/api/class-browser.mdx#browser-new-context)) for a single test by using the `browser_context_args` marker:
+Также возможно переопределить параметры контекста ([browser.new_context()](/api/class-browser.mdx#browser-new-context)) для одного теста, используя маркер `browser_context_args`:
 
 ```python
 import pytest
@@ -80,24 +80,24 @@ def test_browser_context_args(page):
     assert page.evaluate("window.navigator.languages") == ["de-DE"]
 ```
 
-## Parallelism: Running Multiple Tests at Once
+## Параллелизм: Запуск нескольких тестов одновременно
 
-If your tests are running on a machine with a lot of CPUs, you can speed up the overall execution time of your test suite by using [`pytest-xdist`](https://pypi.org/project/pytest-xdist/) to run multiple tests at once:
+Если ваши тесты выполняются на машине с большим количеством процессоров, вы можете ускорить общее время выполнения вашего набора тестов, используя [`pytest-xdist`](https://pypi.org/project/pytest-xdist/) для одновременного запуска нескольких тестов:
 
 ```bash
-# install dependency
+# установка зависимости
 pip install pytest-xdist
-# use the --numprocesses flag
+# использование флага --numprocesses
 pytest --numprocesses auto
 ```
 
-Depending on the hardware and nature of your tests, you can set `numprocesses` to be anywhere from `2` to the number of CPUs on the machine. If set too high, you may notice unexpected behavior.
+В зависимости от оборудования и характера ваших тестов, вы можете установить `numprocesses` от `2` до количества процессоров на машине. Если установить слишком высокое значение, вы можете заметить непредвиденное поведение.
 
-See [Running Tests](./running-tests.mdx) for general information on `pytest` options.
+Смотрите [Запуск тестов](./running-tests.mdx) для общей информации о параметрах `pytest`.
 
-## Examples
+## Примеры
 
-### Configure typings for auto-completion
+### Настройка типов для автозаполнения
 
 ```py title="test_my_application.py"
 from playwright.sync_api import Page
@@ -107,11 +107,11 @@ def test_visit_admin_dashboard(page: Page):
     # ...
 ```
 
-If you're using VSCode with Pylance, these types can be inferred by enabling the `python.testing.pytestEnabled` setting so you don't need the type annotation.
+Если вы используете VSCode с Pylance, эти типы могут быть выведены автоматически, включив настройку `python.testing.pytestEnabled`, чтобы вам не нужно было указывать аннотацию типа.
 
-### Using multiple contexts
+### Использование нескольких контекстов
 
-In order to simulate multiple users, you can create multiple [`BrowserContext`](./browser-contexts) instances.
+Чтобы симулировать нескольких пользователей, вы можете создать несколько экземпляров [`BrowserContext`](./browser-contexts).
 
 ```py title="test_my_application.py"
 from playwright.sync_api import Page, BrowserContext
@@ -121,10 +121,10 @@ def test_foo(page: Page, new_context: CreateContextCallback) -> None:
     page.goto("https://example.com")
     context = new_context()
     page2 = context.new_page()
-    # page and page2 are in different contexts
+    # page и page2 находятся в разных контекстах
 ```
 
-### Skip test by browser
+### Пропуск теста для определенного браузера
 
 ```py title="test_my_application.py"
 import pytest
@@ -135,7 +135,7 @@ def test_visit_example(page):
     # ...
 ```
 
-### Run on a specific browser
+### Запуск на конкретном браузере
 
 ```py title="conftest.py"
 import pytest
@@ -146,7 +146,7 @@ def test_visit_example(page):
     # ...
 ```
 
-### Run with a custom browser channel like Google Chrome or Microsoft Edge
+### Запуск с использованием пользовательского канала браузера, например, Google Chrome или Microsoft Edge
 
 ```bash
 pytest --browser-channel chrome
@@ -157,9 +157,9 @@ def test_example(page):
     page.goto("https://example.com")
 ```
 
-### Configure base-url
+### Настройка базового URL
 
-Start Pytest with the `base-url` argument. The [`pytest-base-url`](https://github.com/pytest-dev/pytest-base-url) plugin is used for that which allows you to set the base url from the config, CLI arg or as a fixture.
+Запустите Pytest с аргументом `base-url`. Для этого используется плагин [`pytest-base-url`](https://github.com/pytest-dev/pytest-base-url), который позволяет установить базовый URL из конфигурации, аргумента CLI или как фикстуру.
 
 ```bash
 pytest --base-url http://localhost:8080
@@ -168,10 +168,10 @@ pytest --base-url http://localhost:8080
 ```py title="test_my_application.py"
 def test_visit_example(page):
     page.goto("/admin")
-    # -> Will result in http://localhost:8080/admin
+    # -> Результат будет http://localhost:8080/admin
 ```
 
-### Ignore HTTPS errors
+### Игнорирование ошибок HTTPS
 
 ```py title="conftest.py"
 import pytest
@@ -184,7 +184,7 @@ def browser_context_args(browser_context_args):
     }
 ```
 
-### Use custom viewport size
+### Использование пользовательского размера окна просмотра
 
 ```py title="conftest.py"
 import pytest
@@ -200,7 +200,7 @@ def browser_context_args(browser_context_args):
     }
 ```
 
-### Device emulation / BrowserContext option overrides
+### Эмуляция устройства / Переопределение параметров BrowserContext
 
 ```py title="conftest.py"
 import pytest
@@ -214,11 +214,11 @@ def browser_context_args(browser_context_args, playwright):
     }
 ```
 
-Or via the CLI `--device="iPhone 11 Pro"`
+Или через CLI `--device="iPhone 11 Pro"`
 
-### Using with `unittest.TestCase`
+### Использование с `unittest.TestCase`
 
-See the following example for using it with `unittest.TestCase`. This has a limitation, that only a single browser can be specified and no matrix of multiple browsers gets generated when specifying multiple.
+Смотрите следующий пример для использования с `unittest.TestCase`. Это имеет ограничение, что может быть указан только один браузер, и не создается матрица из нескольких браузеров при указании нескольких.
 
 ```py
 import pytest
@@ -238,11 +238,11 @@ class MyTest(unittest.TestCase):
         assert self.page.evaluate("1 + 1") == 2
 ```
 
-## Debugging
+## Отладка
 
-### Use with pdb
+### Использование с pdb
 
-Use the `breakpoint()` statement in your test code to pause execution and get a [pdb](https://docs.python.org/3/library/pdb.html) REPL.
+Используйте оператор `breakpoint()` в вашем тестовом коде, чтобы приостановить выполнение и получить REPL [pdb](https://docs.python.org/3/library/pdb.html).
 
 ```py
 def test_bing_is_working(page):
@@ -251,13 +251,13 @@ def test_bing_is_working(page):
     # ...
 ```
 
-## Deploy to CI
+## Развертывание в CI
 
-See the [guides for CI providers](./ci.mdx) to deploy your tests to CI/CD.
+Смотрите [руководства для провайдеров CI](./ci.mdx), чтобы развернуть ваши тесты в CI/CD.
 
-## Async Fixtures
+## Асинхронные фикстуры
 
-If you want to use async fixtures, you can use the [`pytest-playwright-asyncio`](https://pypi.org/project/pytest-playwright-asyncio/) plugin. Make sure to use `pytest-asyncio>=0.24.0` and make your tests use of [`loop_scope=session`](https://pytest-asyncio.readthedocs.io/en/latest/how-to-guides/run_session_tests_in_same_loop.html).
+Если вы хотите использовать асинхронные фикстуры, вы можете использовать плагин [`pytest-playwright-asyncio`](https://pypi.org/project/pytest-playwright-asyncio/). Убедитесь, что используете `pytest-asyncio>=0.24.0` и ваши тесты используют [`loop_scope=session`](https://pytest-asyncio.readthedocs.io/en/latest/how-to-guides/run_session_tests_in_same_loop.html).
 
 ```python
 import pytest
