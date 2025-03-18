@@ -100,12 +100,6 @@ module.exports = {
           "aria-label": "GitHub repository",
         },
         {
-          href: "https://t.me/+xgMQWT0kBlUxNDNi",
-          position: "right",
-          className: "header-telegram-link",
-          "aria-label": "Чат Инженерки в Telegram",
-        },
-        {
           label: 'Java',
           position: 'left',
           items: [
@@ -171,10 +165,6 @@ module.exports = {
             {
               label: "Блог",
               href: "https://inzhenerka.tech/blog",
-            },
-            {
-              label: "Чат инженеров",
-              href: "https://t.me/+xgMQWT0kBlUxNDNi",
             },
           ],
         },

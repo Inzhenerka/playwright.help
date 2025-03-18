@@ -13,11 +13,6 @@ module.exports = {
       href: "https://inzhenerka.tech/blog",
     },
     {
-      type: 'link',
-      label: "Чат в Телеграме",
-      href: "https://t.me/+xgMQWT0kBlUxNDNi",
-    },
-    {
       type: 'category',
       label: 'Официальные видео (англ.)',
       items: [
