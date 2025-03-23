@@ -7,184 +7,184 @@ import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-[Download] objects are dispatched by page via the [Page.onDownload(handler)](/api/class-page.mdx#page-event-download) event.
+Объекты [Download] отправляются страницей через событие [Page.onDownload(handler)](/api/class-page.mdx#page-event-download).
 
-All the downloaded files belonging to the browser context are deleted when the browser context is closed.
+Все загруженные файлы, принадлежащие контексту браузера, удаляются при закрытии контекста браузера.
 
-Download event is emitted once the download starts. Download path becomes available once download completes.
+Событие загрузки генерируется, как только начинается загрузка. Путь к загрузке становится доступным после завершения загрузки.
 
 ```java
-// Wait for the download to start
+// Ожидание начала загрузки
 Download download = page.waitForDownload(() -> {
-    // Perform the action that initiates download
+    // Выполните действие, которое инициирует загрузку
     page.getByText("Download file").click();
 });
 
-// Wait for the download process to complete and save the downloaded file somewhere
+// Ожидание завершения процесса загрузки и сохранение загруженного файла в указанное место
 download.saveAs(Paths.get("/path/to/save/at/", download.suggestedFilename()));
 ```
 
 
 ---
 
-## Methods
+## Методы
 
 ### cancel {#download-cancel}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.13</font><x-search>download.cancel</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.13</font><x-search>download.cancel</x-search>
 
-Cancels a download. Will not fail if the download is already finished or canceled. Upon successful cancellations, `download.failure()` would resolve to `'canceled'`.
+Отменяет загрузку. Не завершится с ошибкой, если загрузка уже завершена или отменена. При успешной отмене `download.failure()` вернется `'canceled'`.
 
-**Usage**
+**Использование**
 
 ```java
 Download.cancel();
 ```
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-cancel-return"/><a href="#download-cancel-return" class="list-anchor">#</a>
 
 ---
 
 ### createReadStream {#download-create-read-stream}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>download.createReadStream</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>download.createReadStream</x-search>
 
-Returns a readable stream for a successful download, or throws for a failed/canceled download.
+Возвращает поток для чтения для успешной загрузки или выбрасывает исключение для неудачной/отмененной загрузки.
 
-**Usage**
+**Использование**
 
 ```java
 Download.createReadStream();
 ```
 
-**Returns**
+**Возвращает**
 - [InputStream]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-create-read-stream-return"/><a href="#download-create-read-stream-return" class="list-anchor">#</a>
 
 ---
 
 ### delete {#download-delete}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>download.delete</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>download.delete</x-search>
 
-Deletes the downloaded file. Will wait for the download to finish if necessary.
+Удаляет загруженный файл. При необходимости будет ожидать завершения загрузки.
 
-**Usage**
+**Использование**
 
 ```java
 Download.delete();
 ```
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-delete-return"/><a href="#download-delete-return" class="list-anchor">#</a>
 
 ---
 
 ### failure {#download-failure}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>download.failure</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>download.failure</x-search>
 
-Returns download error if any. Will wait for the download to finish if necessary.
+Возвращает ошибку загрузки, если таковая имеется. При необходимости будет ожидать завершения загрузки.
 
-**Usage**
+**Использование**
 
 ```java
 Download.failure();
 ```
 
-**Returns**
+**Возвращает**
 - [null] | [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-failure-return"/><a href="#download-failure-return" class="list-anchor">#</a>
 
 ---
 
 ### page {#download-page}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>download.page</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>download.page</x-search>
 
-Get the page that the download belongs to.
+Получает страницу, к которой относится загрузка.
 
-**Usage**
+**Использование**
 
 ```java
 Download.page();
 ```
 
-**Returns**
+**Возвращает**
 - [Page]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-page-return"/><a href="#download-page-return" class="list-anchor">#</a>
 
 ---
 
 ### path {#download-path}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>download.path</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>download.path</x-search>
 
-Returns path to the downloaded file for a successful download, or throws for a failed/canceled download. The method will wait for the download to finish if necessary. The method throws when connected remotely.
+Возвращает путь к загруженному файлу для успешной загрузки или выбрасывает исключение для неудачной/отмененной загрузки. Метод будет ожидать завершения загрузки, если это необходимо. Метод выбрасывает исключение при удаленном подключении.
 
-Note that the download's file name is a random GUID, use [Download.suggestedFilename()](/api/class-download.mdx#download-suggested-filename) to get suggested file name.
+Обратите внимание, что имя файла загрузки является случайным GUID, используйте [Download.suggestedFilename()](/api/class-download.mdx#download-suggested-filename) для получения предложенного имени файла.
 
-**Usage**
+**Использование**
 
 ```java
 Download.path();
 ```
 
-**Returns**
+**Возвращает**
 - [Path]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-path-return"/><a href="#download-path-return" class="list-anchor">#</a>
 
 ---
 
 ### saveAs {#download-save-as}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>download.saveAs</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>download.saveAs</x-search>
 
-Copy the download to a user-specified path. It is safe to call this method while the download is still in progress. Will wait for the download to finish if necessary.
+Копирует загрузку в указанный пользователем путь. Этот метод можно безопасно вызывать, пока загрузка еще продолжается. При необходимости будет ожидать завершения загрузки.
 
-**Usage**
+**Использование**
 
 ```java
 download.saveAs(Paths.get("/path/to/save/at/", download.suggestedFilename()));
 ```
 
-**Arguments**
+**Аргументы**
 - `path` [Path]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-save-as-option-path"/><a href="#download-save-as-option-path" class="list-anchor">#</a>
   
-  Path where the download should be copied.
+  Путь, куда должна быть скопирована загрузка.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-save-as-return"/><a href="#download-save-as-return" class="list-anchor">#</a>
 
 ---
 
 ### suggestedFilename {#download-suggested-filename}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>download.suggestedFilename</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>download.suggestedFilename</x-search>
 
-Returns suggested filename for this download. It is typically computed by the browser from the [`Content-Disposition`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition) response header or the `download` attribute. See the spec on [whatwg](https://html.spec.whatwg.org/#downloading-resources). Different browsers can use different logic for computing it.
+Возвращает предложенное имя файла для этой загрузки. Обычно оно вычисляется браузером из заголовка ответа [`Content-Disposition`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition) или атрибута `download`. См. спецификацию на [whatwg](https://html.spec.whatwg.org/#downloading-resources). Разные браузеры могут использовать разную логику для его вычисления.
 
-**Usage**
+**Использование**
 
 ```java
 Download.suggestedFilename();
 ```
 
-**Returns**
+**Возвращает**
 - [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-suggested-filename-return"/><a href="#download-suggested-filename-return" class="list-anchor">#</a>
 
 ---
 
 ### url {#download-url}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>download.url</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>download.url</x-search>
 
-Returns downloaded url.
+Возвращает URL загруженного файла.
 
-**Usage**
+**Использование**
 
 ```java
 Download.url();
 ```
 
-**Returns**
+**Возвращает**
 - [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-url-return"/><a href="#download-url-return" class="list-anchor">#</a>
 
 

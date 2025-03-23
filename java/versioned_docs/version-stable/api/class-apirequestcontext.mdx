@@ -6,81 +6,79 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+Этот API используется для тестирования Web API. Вы можете использовать его для вызова конечных точек API, настройки микросервисов, подготовки окружения или сервиса для вашего e2e теста.
 
-This API is used for the Web API testing. You can use it to trigger API endpoints, configure micro-services, prepare environment or the service to your e2e test.
+Каждый контекст браузера Playwright имеет связанный с ним экземпляр [APIRequestContext], который разделяет хранилище cookies с контекстом браузера и может быть доступен через [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) или [Page.request()](/api/class-page.mdx#page-request). Также возможно создать новый экземпляр APIRequestContext вручную, вызвав [APIRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context).
 
-Each Playwright browser context has associated with it [APIRequestContext] instance which shares cookie storage with the browser context and can be accessed via [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) or [Page.request()](/api/class-page.mdx#page-request). It is also possible to create a new APIRequestContext instance manually by calling [APIRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context).
+**Управление cookies**
 
-**Cookie management**
+[APIRequestContext], возвращаемый [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) и [Page.request()](/api/class-page.mdx#page-request), разделяет хранилище cookies с соответствующим [BrowserContext]. Каждый API запрос будет иметь заголовок `Cookie`, заполненный значениями из контекста браузера. Если ответ API содержит заголовок `Set-Cookie`, он автоматически обновит cookies [BrowserContext], и запросы, сделанные со страницы, их подхватят. Это означает, что если вы войдете в систему с помощью этого API, ваш e2e тест будет авторизован, и наоборот.
 
-[APIRequestContext] returned by [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) and [Page.request()](/api/class-page.mdx#page-request) shares cookie storage with the corresponding [BrowserContext]. Each API request will have `Cookie` header populated with the values from the browser context. If the API response contains `Set-Cookie` header it will automatically update [BrowserContext] cookies and requests made from the page will pick them up. This means that if you log in using this API, your e2e test will be logged in and vice versa.
-
-If you want API requests to not interfere with the browser cookies you should create a new [APIRequestContext] by calling [APIRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context). Such `APIRequestContext` object will have its own isolated cookie storage.
-
+Если вы хотите, чтобы API запросы не влияли на cookies браузера, вы должны создать новый [APIRequestContext], вызвав [APIRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context). Такой объект `APIRequestContext` будет иметь собственное изолированное хранилище cookies.
 
 ---
 
-## Methods
+## Методы
 
 ### delete {#api-request-context-delete}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.delete</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.delete</x-search>
 
-Sends HTTP(S) [DELETE](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+Отправляет HTTP(S) запрос [DELETE](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE) и возвращает его ответ. Метод заполнит cookies запроса из контекста и обновит cookies контекста из ответа. Метод автоматически следует за перенаправлениями.
 
-**Usage**
+**Использование**
 
 ```java
 APIRequestContext.delete(url);
 APIRequestContext.delete(url, options);
 ```
 
-**Arguments**
+**Аргументы**
 - `url` [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-url"/><a href="#api-request-context-delete-option-url" class="list-anchor">#</a>
   
-  Target URL.
-- `options` [RequestOptions] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-params"/><a href="#api-request-context-delete-option-params" class="list-anchor">#</a>
+  Целевой URL.
+- `options` [RequestOptions] *(опционально)* <font size="2">Добавлено в: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-params"/><a href="#api-request-context-delete-option-params" class="list-anchor">#</a>
   
-  Optional request parameters.
+  Опциональные параметры запроса.
 
-**Returns**
+**Возвращает**
 - [APIResponse]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-return"/><a href="#api-request-context-delete-return" class="list-anchor">#</a>
 
 ---
 
 ### dispose {#api-request-context-dispose}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.dispose</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.dispose</x-search>
 
-All responses returned by [APIRequestContext.get()](/api/class-apirequestcontext.mdx#api-request-context-get) and similar methods are stored in the memory, so that you can later call [APIResponse.body()](/api/class-apiresponse.mdx#api-response-body).This method discards all its resources, calling any method on disposed [APIRequestContext] will throw an exception.
+Все ответы, возвращаемые [APIRequestContext.get()](/api/class-apirequestcontext.mdx#api-request-context-get) и аналогичными методами, хранятся в памяти, чтобы вы могли позже вызвать [APIResponse.body()](/api/class-apiresponse.mdx#api-response-body). Этот метод освобождает все свои ресурсы, вызов любого метода на освобожденном [APIRequestContext] вызовет исключение.
 
-**Usage**
+**Использование**
 
 ```java
 APIRequestContext.dispose();
 APIRequestContext.dispose(options);
 ```
 
-**Arguments**
-- `options` `ApiRequestContext.DisposeOptions` *(optional)*
-  - `setReason` [String] *(optional)* <font size="2">Added in: v1.45</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-dispose-option-reason"/><a href="#api-request-context-dispose-option-reason" class="list-anchor">#</a>
+**Аргументы**
+- `options` `ApiRequestContext.DisposeOptions` *(опционально)*
+  - `setReason` [String] *(опционально)* <font size="2">Добавлено в: v1.45</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-dispose-option-reason"/><a href="#api-request-context-dispose-option-reason" class="list-anchor">#</a>
     
-    The reason to be reported to the operations interrupted by the context disposal.
+    Причина, которая будет сообщена операциям, прерванным освобождением контекста.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-dispose-return"/><a href="#api-request-context-dispose-return" class="list-anchor">#</a>
 
 ---
 
 ### fetch {#api-request-context-fetch}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.fetch</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.fetch</x-search>
 
-Sends HTTP(S) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+Отправляет HTTP(S) запрос и возвращает его ответ. Метод заполнит cookies запроса из контекста и обновит cookies контекста из ответа. Метод автоматически следует за перенаправлениями.
 
-**Usage**
+**Использование**
 
-JSON objects can be passed directly to the request:
+JSON объекты могут быть переданы напрямую в запрос:
 
 ```java
 Map<String, Object> data = new HashMap();
@@ -89,16 +87,16 @@ data.put("body", "John Doe");
 request.fetch("https://example.com/api/createBook", RequestOptions.create().setMethod("post").setData(data));
 ```
 
-The common way to send file(s) in the body of a request is to upload them as form fields with `multipart/form-data` encoding, by specifiying the `multipart` parameter:
+Обычный способ отправки файла(ов) в теле запроса - загрузить их как поля формы с кодировкой `multipart/form-data`, указав параметр `multipart`:
 
 ```java
-// Pass file path to the form data constructor:
+// Передайте путь к файлу в конструктор данных формы:
 Path file = Paths.get("team.csv");
 APIResponse response = request.fetch("https://example.com/api/uploadTeamList",
   RequestOptions.create().setMethod("post").setMultipart(
     FormData.create().set("fileField", file)));
 
-// Or you can pass the file content directly as FilePayload object:
+// Или вы можете передать содержимое файла напрямую как объект FilePayload:
 FilePayload filePayload = new FilePayload("f.js", "text/javascript",
       "console.log(2022);".getBytes(StandardCharsets.UTF_8));
 APIResponse response = request.fetch("https://example.com/api/uploadScript",
@@ -106,28 +104,28 @@ APIResponse response = request.fetch("https://example.com/api/uploadScript",
     FormData.create().set("fileField", filePayload)));
 ```
 
-**Arguments**
+**Аргументы**
 - `urlOrRequest` [String] | [Request]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-url-or-request"/><a href="#api-request-context-fetch-option-url-or-request" class="list-anchor">#</a>
   
-  Target URL or Request to get all parameters from.
-- `options` [RequestOptions] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-params"/><a href="#api-request-context-fetch-option-params" class="list-anchor">#</a>
+  Целевой URL или запрос для получения всех параметров.
+- `options` [RequestOptions] *(опционально)* <font size="2">Добавлено в: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-params"/><a href="#api-request-context-fetch-option-params" class="list-anchor">#</a>
   
-  Optional request parameters.
+  Опциональные параметры запроса.
 
-**Returns**
+**Возвращает**
 - [APIResponse]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-return"/><a href="#api-request-context-fetch-return" class="list-anchor">#</a>
 
 ---
 
 ### get {#api-request-context-get}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.get</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.get</x-search>
 
-Sends HTTP(S) [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+Отправляет HTTP(S) запрос [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET) и возвращает его ответ. Метод заполнит cookies запроса из контекста и обновит cookies контекста из ответа. Метод автоматически следует за перенаправлениями.
 
-**Usage**
+**Использование**
 
-Request parameters can be configured with `params` option, they will be serialized into the URL search parameters:
+Параметры запроса могут быть настроены с помощью опции `params`, они будут сериализованы в параметры поиска URL:
 
 ```java
 request.get("https://example.com/api/getText", RequestOptions.create()
@@ -135,80 +133,80 @@ request.get("https://example.com/api/getText", RequestOptions.create()
   .setQueryParam("page", 23));
 ```
 
-**Arguments**
+**Аргументы**
 - `url` [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-url"/><a href="#api-request-context-get-option-url" class="list-anchor">#</a>
   
-  Target URL.
-- `options` [RequestOptions] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-params"/><a href="#api-request-context-get-option-params" class="list-anchor">#</a>
+  Целевой URL.
+- `options` [RequestOptions] *(опционально)* <font size="2">Добавлено в: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-params"/><a href="#api-request-context-get-option-params" class="list-anchor">#</a>
   
-  Optional request parameters.
+  Опциональные параметры запроса.
 
-**Returns**
+**Возвращает**
 - [APIResponse]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-return"/><a href="#api-request-context-get-return" class="list-anchor">#</a>
 
 ---
 
 ### head {#api-request-context-head}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.head</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.head</x-search>
 
-Sends HTTP(S) [HEAD](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+Отправляет HTTP(S) запрос [HEAD](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD) и возвращает его ответ. Метод заполнит cookies запроса из контекста и обновит cookies контекста из ответа. Метод автоматически следует за перенаправлениями.
 
-**Usage**
+**Использование**
 
 ```java
 APIRequestContext.head(url);
 APIRequestContext.head(url, options);
 ```
 
-**Arguments**
+**Аргументы**
 - `url` [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-url"/><a href="#api-request-context-head-option-url" class="list-anchor">#</a>
   
-  Target URL.
-- `options` [RequestOptions] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-params"/><a href="#api-request-context-head-option-params" class="list-anchor">#</a>
+  Целевой URL.
+- `options` [RequestOptions] *(опционально)* <font size="2">Добавлено в: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-params"/><a href="#api-request-context-head-option-params" class="list-anchor">#</a>
   
-  Optional request parameters.
+  Опциональные параметры запроса.
 
-**Returns**
+**Возвращает**
 - [APIResponse]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-return"/><a href="#api-request-context-head-return" class="list-anchor">#</a>
 
 ---
 
 ### patch {#api-request-context-patch}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.patch</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.patch</x-search>
 
-Sends HTTP(S) [PATCH](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PATCH) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+Отправляет HTTP(S) запрос [PATCH](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PATCH) и возвращает его ответ. Метод заполнит cookies запроса из контекста и обновит cookies контекста из ответа. Метод автоматически следует за перенаправлениями.
 
-**Usage**
+**Использование**
 
 ```java
 APIRequestContext.patch(url);
 APIRequestContext.patch(url, options);
 ```
 
-**Arguments**
+**Аргументы**
 - `url` [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-url"/><a href="#api-request-context-patch-option-url" class="list-anchor">#</a>
   
-  Target URL.
-- `options` [RequestOptions] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-params"/><a href="#api-request-context-patch-option-params" class="list-anchor">#</a>
+  Целевой URL.
+- `options` [RequestOptions] *(опционально)* <font size="2">Добавлено в: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-params"/><a href="#api-request-context-patch-option-params" class="list-anchor">#</a>
   
-  Optional request parameters.
+  Опциональные параметры запроса.
 
-**Returns**
+**Возвращает**
 - [APIResponse]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-return"/><a href="#api-request-context-patch-return" class="list-anchor">#</a>
 
 ---
 
 ### post {#api-request-context-post}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.post</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.post</x-search>
 
-Sends HTTP(S) [POST](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+Отправляет HTTP(S) запрос [POST](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST) и возвращает его ответ. Метод заполнит cookies запроса из контекста и обновит cookies контекста из ответа. Метод автоматически следует за перенаправлениями.
 
-**Usage**
+**Использование**
 
-JSON objects can be passed directly to the request:
+JSON объекты могут быть переданы напрямую в запрос:
 
 ```java
 Map<String, Object> data = new HashMap();
@@ -217,7 +215,7 @@ data.put("body", "John Doe");
 request.post("https://example.com/api/createBook", RequestOptions.create().setData(data));
 ```
 
-To send form data to the server use `form` option. Its value will be encoded into the request body with `application/x-www-form-urlencoded` encoding (see below how to use `multipart/form-data` form encoding to send files):
+Чтобы отправить данные формы на сервер, используйте опцию `form`. Ее значение будет закодировано в теле запроса с кодировкой `application/x-www-form-urlencoded` (см. ниже, как использовать кодировку формы `multipart/form-data` для отправки файлов):
 
 ```java
 request.post("https://example.com/api/findBook", RequestOptions.create().setForm(
@@ -225,16 +223,16 @@ request.post("https://example.com/api/findBook", RequestOptions.create().setForm
 ));
 ```
 
-The common way to send file(s) in the body of a request is to upload them as form fields with `multipart/form-data` encoding. Use [FormData] to construct request body and pass it to the request as `multipart` parameter:
+Обычный способ отправки файла(ов) в теле запроса - загрузить их как поля формы с кодировкой `multipart/form-data`. Используйте [FormData] для создания тела запроса и передайте его в запрос как параметр `multipart`:
 
 ```java
-// Pass file path to the form data constructor:
+// Передайте путь к файлу в конструктор данных формы:
 Path file = Paths.get("team.csv");
 APIResponse response = request.post("https://example.com/api/uploadTeamList",
   RequestOptions.create().setMultipart(
     FormData.create().set("fileField", file)));
 
-// Or you can pass the file content directly as FilePayload object:
+// Или вы можете передать содержимое файла напрямую как объект FilePayload:
 FilePayload filePayload1 = new FilePayload("f1.js", "text/javascript",
       "console.log(2022);".getBytes(StandardCharsets.UTF_8));
 APIResponse response = request.post("https://example.com/api/uploadScript",
@@ -242,70 +240,69 @@ APIResponse response = request.post("https://example.com/api/uploadScript",
     FormData.create().set("fileField", filePayload)));
 ```
 
-**Arguments**
+**Аргументы**
 - `url` [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-url"/><a href="#api-request-context-post-option-url" class="list-anchor">#</a>
   
-  Target URL.
-- `options` [RequestOptions] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-params"/><a href="#api-request-context-post-option-params" class="list-anchor">#</a>
+  Целевой URL.
+- `options` [RequestOptions] *(опционально)* <font size="2">Добавлено в: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-params"/><a href="#api-request-context-post-option-params" class="list-anchor">#</a>
   
-  Optional request parameters.
+  Опциональные параметры запроса.
 
-**Returns**
+**Возвращает**
 - [APIResponse]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-return"/><a href="#api-request-context-post-return" class="list-anchor">#</a>
 
 ---
 
 ### put {#api-request-context-put}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.put</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.put</x-search>
 
-Sends HTTP(S) [PUT](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PUT) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+Отправляет HTTP(S) запрос [PUT](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PUT) и возвращает его ответ. Метод заполнит cookies запроса из контекста и обновит cookies контекста из ответа. Метод автоматически следует за перенаправлениями.
 
-**Usage**
+**Использование**
 
 ```java
 APIRequestContext.put(url);
 APIRequestContext.put(url, options);
 ```
 
-**Arguments**
+**Аргументы**
 - `url` [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-url"/><a href="#api-request-context-put-option-url" class="list-anchor">#</a>
   
-  Target URL.
-- `options` [RequestOptions] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-params"/><a href="#api-request-context-put-option-params" class="list-anchor">#</a>
+  Целевой URL.
+- `options` [RequestOptions] *(опционально)* <font size="2">Добавлено в: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-params"/><a href="#api-request-context-put-option-params" class="list-anchor">#</a>
   
-  Optional request parameters.
+  Опциональные параметры запроса.
 
-**Returns**
+**Возвращает**
 - [APIResponse]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-return"/><a href="#api-request-context-put-return" class="list-anchor">#</a>
 
 ---
 
 ### storageState {#api-request-context-storage-state}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.storageState</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.storageState</x-search>
 
-Returns storage state for this request context, contains current cookies and local storage snapshot if it was passed to the constructor.
+Возвращает состояние хранилища для этого контекста запроса, содержит текущие cookies и снимок локального хранилища, если он был передан в конструктор.
 
-**Usage**
+**Использование**
 
 ```java
 APIRequestContext.storageState();
 APIRequestContext.storageState(options);
 ```
 
-**Arguments**
-- `options` `ApiRequestContext.StorageStateOptions` *(optional)*
-  - `setIndexedDB` [boolean] *(optional)* <font size="2">Added in: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-indexed-db"/><a href="#api-request-context-storage-state-option-indexed-db" class="list-anchor">#</a>
+**Аргументы**
+- `options` `ApiRequestContext.StorageStateOptions` *(опционально)*
+  - `setIndexedDB` [boolean] *(опционально)* <font size="2">Добавлено в: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-indexed-db"/><a href="#api-request-context-storage-state-option-indexed-db" class="list-anchor">#</a>
     
-    Set to `true` to include IndexedDB in the storage state snapshot.
-  - `setPath` [Path] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-path"/><a href="#api-request-context-storage-state-option-path" class="list-anchor">#</a>
+    Установите в `true`, чтобы включить IndexedDB в снимок состояния хранилища.
+  - `setPath` [Path] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-path"/><a href="#api-request-context-storage-state-option-path" class="list-anchor">#</a>
     
-    The file path to save the storage state to. If [setPath](/api/class-apirequestcontext.mdx#api-request-context-storage-state-option-path) is a relative path, then it is resolved relative to current working directory. If no path is provided, storage state is still returned, but won't be saved to the disk.
+    Путь к файлу для сохранения состояния хранилища. Если [setPath](/api/class-apirequestcontext.mdx#api-request-context-storage-state-option-path) является относительным путем, то он разрешается относительно текущей рабочей директории. Если путь не указан, состояние хранилища все равно возвращается, но не будет сохранено на диск.
 
-**Returns**
+**Возвращает**
 - [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-return"/><a href="#api-request-context-storage-state-return" class="list-anchor">#</a>
-
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"

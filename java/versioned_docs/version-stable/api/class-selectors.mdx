@@ -6,84 +6,81 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-
-Selectors can be used to install custom selector engines. See [extensibility](../extensibility.mdx) for more information.
-
+Селекторы могут быть использованы для установки пользовательских движков селекторов. Подробнее см. в разделе [расширяемость](../extensibility.mdx).
 
 ---
 
-## Methods
+## Методы
 
 ### register {#selectors-register}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>selectors.register</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до версии v1.9</font><x-search>selectors.register</x-search>
 
-Selectors must be registered before creating the page.
+Селекторы должны быть зарегистрированы до создания страницы.
 
-**Usage**
+**Использование**
 
-An example of registering selector engine that queries elements based on a tag name:
+Пример регистрации движка селекторов, который запрашивает элементы на основе имени тега:
 
 ```java
-// Script that evaluates to a selector engine instance. The script is evaluated in the page context.
+// Скрипт, который оценивается в экземпляр движка селекторов. Скрипт оценивается в контексте страницы.
 String createTagNameEngine = "{\n" +
-  "  // Returns the first element matching given selector in the root's subtree.\n" +
+  "  // Возвращает первый элемент, соответствующий данному селектору в поддереве корня.\n" +
   "  query(root, selector) {\n" +
   "    return root.querySelector(selector);\n" +
   "  },\n" +
-  "  // Returns all elements matching given selector in the root's subtree.\n" +
+  "  // Возвращает все элементы, соответствующие данному селектору в поддереве корня.\n" +
   "  queryAll(root, selector) {\n" +
   "    return Array.from(root.querySelectorAll(selector));\n" +
   "  }\n" +
   "}";
-// Register the engine. Selectors will be prefixed with "tag=".
+// Регистрируем движок. Селекторы будут иметь префикс "tag=".
 playwright.selectors().register("tag", createTagNameEngine);
 Browser browser = playwright.firefox().launch();
 Page page = browser.newPage();
 page.setContent("<div><button>Click me</button></div>");
-// Use the selector prefixed with its name.
+// Используем селектор с префиксом его имени.
 Locator button = page.locator("tag=button");
-// Combine it with built-in locators.
+// Комбинируем его с встроенными локаторами.
 page.locator("tag=div").getByText("Click me").click();
-// Can use it in any methods supporting selectors.
+// Можно использовать в любых методах, поддерживающих селекторы.
 int buttonCount = (int) page.locator("tag=button").count();
 browser.close();
 ```
 
-**Arguments**
+**Аргументы**
 - `name` [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="selectors-register-option-name"/><a href="#selectors-register-option-name" class="list-anchor">#</a>
   
-  Name that is used in selectors as a prefix, e.g. `{name: 'foo'}` enables `foo=myselectorbody` selectors. May only contain `[a-zA-Z0-9_]` characters.
+  Имя, которое используется в селекторах как префикс, например, `{name: 'foo'}` позволяет использовать селекторы `foo=myselectorbody`. Может содержать только символы `[a-zA-Z0-9_]`.
 - `script` [String] | [Path]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="selectors-register-option-script"/><a href="#selectors-register-option-script" class="list-anchor">#</a>
   
-  Script that evaluates to a selector engine instance. The script is evaluated in the page context.
-- `options` `Selectors.RegisterOptions` *(optional)*
-  - `setContentScript` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="selectors-register-option-content-script"/><a href="#selectors-register-option-content-script" class="list-anchor">#</a>
+  Скрипт, который оценивается в экземпляр движка селекторов. Скрипт оценивается в контексте страницы.
+- `options` `Selectors.RegisterOptions` *(опционально)*
+  - `setContentScript` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="selectors-register-option-content-script"/><a href="#selectors-register-option-content-script" class="list-anchor">#</a>
     
-    Whether to run this selector engine in isolated JavaScript environment. This environment has access to the same DOM, but not any JavaScript objects from the frame's scripts. Defaults to `false`. Note that running as a content script is not guaranteed when this engine is used together with other registered engines.
+    Указывает, следует ли запускать этот движок селекторов в изолированной среде JavaScript. Эта среда имеет доступ к тому же DOM, но не к каким-либо объектам JavaScript из скриптов фрейма. По умолчанию `false`. Обратите внимание, что запуск в качестве контентного скрипта не гарантируется, если этот движок используется вместе с другими зарегистрированными движками.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="selectors-register-return"/><a href="#selectors-register-return" class="list-anchor">#</a>
 
 ---
 
 ### setTestIdAttribute {#selectors-set-test-id-attribute}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>selectors.setTestIdAttribute</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>selectors.setTestIdAttribute</x-search>
 
-Defines custom attribute name to be used in [Page.getByTestId()](/api/class-page.mdx#page-get-by-test-id). `data-testid` is used by default.
+Определяет имя пользовательского атрибута, которое будет использоваться в [Page.getByTestId()](/api/class-page.mdx#page-get-by-test-id). По умолчанию используется `data-testid`.
 
-**Usage**
+**Использование**
 
 ```java
 Selectors.setTestIdAttribute(attributeName);
 ```
 
-**Arguments**
+**Аргументы**
 - `attributeName` [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="selectors-set-test-id-attribute-option-attribute-name"/><a href="#selectors-set-test-id-attribute-option-attribute-name" class="list-anchor">#</a>
   
-  Test id attribute name.
-
+  Имя атрибута тестового идентификатора.
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"

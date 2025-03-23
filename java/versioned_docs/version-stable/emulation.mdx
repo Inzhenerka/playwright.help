@@ -1,36 +1,36 @@
 ---
 id: emulation
-title: "Emulation"
+title: "Эмуляция"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-With Playwright you can test your app on any browser as well as emulate a real device such as a mobile phone or tablet. Simply configure the devices you would like to emulate and Playwright will simulate the browser behavior such as `"userAgent"`, `"screenSize"`, `"viewport"` and if it `"hasTouch"` enabled. You can also emulate the `"geolocation"`, `"locale"` and `"timezone"` for all tests or for a specific test as well as set the `"permissions"` to show notifications or change the `"colorScheme"`.
+С помощью Playwright вы можете тестировать свое приложение в любом браузере, а также эмулировать реальное устройство, такое как мобильный телефон или планшет. Просто настройте устройства, которые вы хотите эмулировать, и Playwright будет симулировать поведение браузера, такое как `"userAgent"`, `"screenSize"`, `"viewport"` и наличие `"hasTouch"`. Вы также можете эмулировать `"geolocation"`, `"locale"` и `"timezone"` для всех тестов или для конкретного теста, а также установить `"permissions"` для отображения уведомлений или изменения `"colorScheme"`.
 
-## Devices
+## Устройства
 
-Playwright can emulate various devices by specifying `setDeviceScaleFactor`, `setHasTouch`, `setIsMobile`, `setScreenSize`, `setUserAgent` and `setViewportSize` options when creating a context with [Browser.newContext()](/api/class-browser.mdx#browser-new-context).
+Playwright может эмулировать различные устройства, указывая параметры `setDeviceScaleFactor`, `setHasTouch`, `setIsMobile`, `setScreenSize`, `setUserAgent` и `setViewportSize` при создании контекста с помощью [Browser.newContext()](/api/class-browser.mdx#browser-new-context).
 
 ## Viewport
 
-The viewport is included in the device but you can override it for some tests with [Page.setViewportSize()](/api/class-page.mdx#page-set-viewport-size).
+Viewport включен в устройство, но вы можете переопределить его для некоторых тестов с помощью [Page.setViewportSize()](/api/class-page.mdx#page-set-viewport-size).
 
-Test file:
+Тестовый файл:
 
-The same works inside a test file.
+То же самое работает внутри тестового файла.
 
 ```java
-// Create context with given viewport
+// Создать контекст с заданным viewport
 BrowserContext context = browser.newContext(new Browser.NewContextOptions()
   .setViewportSize(1280, 1024));
 
-// Resize viewport for individual page
+// Изменить размер viewport для отдельной страницы
 page.setViewportSize(1600, 1200);
 
-// Emulate high-DPI
+// Эмулировать высокое разрешение DPI
 BrowserContext context = browser.newContext(new Browser.NewContextOptions()
   .setViewportSize(2560, 1440)
   .setDeviceScaleFactor(2));
@@ -38,16 +38,16 @@ BrowserContext context = browser.newContext(new Browser.NewContextOptions()
 
 ## isMobile
 
-Whether the meta viewport tag is taken into account and touch events are enabled.
+Учитывается ли мета-тег viewport и включены ли события касания.
 
 ```java
 BrowserContext context = browser.newContext(new Browser.NewContextOptions()
   .isMobile(false));
 ```
 
-## Locale & Timezone
+## Локаль и Часовой пояс
 
-Emulate the user Locale and Timezone which can be set globally for all tests in the config and then overridden for particular tests.
+Эмулируйте локаль и часовой пояс пользователя, которые могут быть установлены глобально для всех тестов в конфигурации и затем переопределены для конкретных тестов.
 
 ```java
 BrowserContext context = browser.newContext(new Browser.NewContextOptions()
@@ -55,33 +55,33 @@ BrowserContext context = browser.newContext(new Browser.NewContextOptions()
   .setTimezoneId("Europe/Berlin"));
 ```
 
-<img width="1394" alt="Bing in german lang and timezone" src="https://user-images.githubusercontent.com/13063165/220416571-ccc96ab1-44bb-4579-8430-64502fc24a15.png" />
+<img width="1394" alt="Bing на немецком языке и в часовом поясе" src="https://user-images.githubusercontent.com/13063165/220416571-ccc96ab1-44bb-4579-8430-64502fc24a15.png" />
 
-## Permissions
+## Разрешения
 
-Allow app to show system notifications.
+Разрешите приложению показывать системные уведомления.
 
 ```java
 BrowserContext context = browser.newContext(new Browser.NewContextOptions()
   .setPermissions(Arrays.asList("notifications")));
 ```
 
-Allow notifications for a specific domain.
+Разрешите уведомления для конкретного домена.
 
 ```java
 context.grantPermissions(Arrays.asList("notifications"),
   new BrowserContext.GrantPermissionsOptions().setOrigin("https://skype.com"));
 ```
 
-Revoke all permissions with [BrowserContext.clearPermissions()](/api/class-browsercontext.mdx#browser-context-clear-permissions).
+Отмените все разрешения с помощью [BrowserContext.clearPermissions()](/api/class-browsercontext.mdx#browser-context-clear-permissions).
 
 ```java
 context.clearPermissions();
 ```
 
-## Geolocation
+## Геолокация
 
-Grant `"geolocation"` permissions and set geolocation to a specific area.
+Предоставьте разрешения `"geolocation"` и установите геолокацию для конкретной области.
 
 ```java
 BrowserContext context = browser.newContext(new Browser.NewContextOptions()
@@ -89,59 +89,59 @@ BrowserContext context = browser.newContext(new Browser.NewContextOptions()
   .setPermissions(Arrays.asList("geolocation")));
 ```
 
-<img width="1394" alt="geolocation for italy on bing maps" src="https://user-images.githubusercontent.com/13063165/220417670-bb22d815-f5cd-47c4-8562-0b88165eac27.png" />
+<img width="1394" alt="геолокация для Италии на картах Bing" src="https://user-images.githubusercontent.com/13063165/220417670-bb22d815-f5cd-47c4-8562-0b88165eac27.png" />
 
-Change the location later:
+Измените местоположение позже:
 
 ```java
 context.setGeolocation(new Geolocation(48.858455, 2.294474));
 ```
 
-**Note** you can only change geolocation for all pages in the context.
+**Примечание**: вы можете изменить геолокацию только для всех страниц в контексте.
 
-## Color Scheme and Media
+## Цветовая схема и Медиа
 
-Emulate the users `"colorScheme"`. Supported values are 'light' and 'dark'. You can also emulate the media type with [Page.emulateMedia()](/api/class-page.mdx#page-emulate-media).
+Эмулируйте `"colorScheme"` пользователя. Поддерживаемые значения: 'light' и 'dark'. Вы также можете эмулировать тип медиа с помощью [Page.emulateMedia()](/api/class-page.mdx#page-emulate-media).
 
 ```java
-// Create context with dark mode
+// Создать контекст с темным режимом
 BrowserContext context = browser.newContext(new Browser.NewContextOptions()
-  .setColorScheme(ColorScheme.DARK)); // or "light"
+  .setColorScheme(ColorScheme.DARK)); // или "light"
 
-// Create page with dark mode
+// Создать страницу с темным режимом
 Page page = browser.newPage(new Browser.NewPageOptions()
-  .setColorScheme(ColorScheme.DARK)); // or "light"
+  .setColorScheme(ColorScheme.DARK)); // или "light"
 
-// Change color scheme for the page
+// Изменить цветовую схему для страницы
 page.emulateMedia(new Page.EmulateMediaOptions().setColorScheme(ColorScheme.DARK));
 
-// Change media for page
+// Изменить медиа для страницы
 page.emulateMedia(new Page.EmulateMediaOptions().setMedia(Media.PRINT));
 ```
 
-<img width="1394" alt="playwright web in dark mode" src="https://user-images.githubusercontent.com/13063165/220411638-55d2b051-4678-4da7-9f0b-ed22f5a3c47c.png" />
+<img width="1394" alt="playwright web в темном режиме" src="https://user-images.githubusercontent.com/13063165/220411638-55d2b051-4678-4da7-9f0b-ed22f5a3c47c.png" />
 
 ## User Agent
 
-The User Agent is included in the device and therefore you  will rarely need to change it however if you do need to test a different user agent you can override it with the `userAgent` property.
+User Agent включен в устройство, и поэтому вам редко потребуется его изменять, однако если вам нужно протестировать другой user agent, вы можете переопределить его с помощью свойства `userAgent`.
 
 ```java
 BrowserContext context = browser.newContext(new Browser.NewContextOptions()
   .setUserAgent("My user agent"));
 ```
 
-## Offline
+## Офлайн
 
-Emulate the network being offline.
+Эмулируйте отключение сети.
 
 ```java
 BrowserContext context = browser.newContext(new Browser.NewContextOptions()
   .setOffline(true));
 ```
 
-## JavaScript Enabled
+## Включение JavaScript
 
-Emulate a user scenario where JavaScript is disabled.
+Эмулируйте сценарий пользователя, в котором JavaScript отключен.
 
 ```java
 BrowserContext context = browser.newContext(new Browser.NewContextOptions()

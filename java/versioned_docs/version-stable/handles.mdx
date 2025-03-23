@@ -6,79 +6,79 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright can create handles to the page DOM elements or any other objects inside the page. These handles live in the Playwright process, whereas the actual objects live in the browser. There are two types of handles:
-- [JSHandle] to reference any JavaScript objects in the page
-- [ElementHandle] to reference DOM elements in the page, it has extra methods that allow performing actions on the elements and asserting their properties.
+Playwright может создавать ссылки на элементы DOM страницы или любые другие объекты внутри страницы. Эти ссылки существуют в процессе Playwright, тогда как реальные объекты находятся в браузере. Существует два типа ссылок:
+- [JSHandle] для ссылки на любые JavaScript объекты на странице
+- [ElementHandle] для ссылки на DOM элементы на странице, он имеет дополнительные методы, которые позволяют выполнять действия с элементами и проверять их свойства.
 
-Since any DOM element in the page is also a JavaScript object, any [ElementHandle] is a [JSHandle] as well.
+Поскольку любой DOM элемент на странице также является JavaScript объектом, любой [ElementHandle] также является [JSHandle].
 
-Handles are used to perform operations on those actual objects in the page. You can evaluate on a handle, get handle properties, pass handle as an evaluation parameter, serialize page object into JSON etc. See the [JSHandle] class API for these and methods.
+Ссылки используются для выполнения операций с этими реальными объектами на странице. Вы можете выполнять вычисления на ссылке, получать свойства ссылки, передавать ссылку в качестве параметра вычисления, сериализовать объект страницы в JSON и т.д. См. API класса [JSHandle] для этих и других методов.
 
-### API reference
+### Справочник API
 - [JSHandle]
 - [ElementHandle]
 
-Here is the easiest way to obtain a [JSHandle].
+Вот самый простой способ получить [JSHandle].
 
 ```java
 JSHandle jsHandle = page.evaluateHandle("window");
-//  Use jsHandle for evaluations.
+//  Используйте jsHandle для вычислений.
 ```
 
-## Element Handles
+## Ссылки на элементы
 
-:::warning[Discouraged]
+:::warning[Не рекомендуется]
 
-The use of [ElementHandle] is discouraged, use [Locator] objects and web-first assertions instead.
+Использование [ElementHandle] не рекомендуется, используйте объекты [Locator] и утверждения, ориентированные на веб, вместо этого.
 :::
 
-When [ElementHandle] is required, it is recommended to fetch it with the [Page.waitForSelector()](/api/class-page.mdx#page-wait-for-selector) or [Frame.waitForSelector()](/api/class-frame.mdx#frame-wait-for-selector) methods. These APIs wait for the element to be attached and visible.
+Когда требуется [ElementHandle], рекомендуется получать его с помощью методов [Page.waitForSelector()](/api/class-page.mdx#page-wait-for-selector) или [Frame.waitForSelector()](/api/class-frame.mdx#frame-wait-for-selector). Эти API ожидают, пока элемент не будет прикреплен и видим.
 
 ```java
-// Get the element handle
+// Получите ссылку на элемент
 JSHandle jsHandle = page.waitForSelector("#box");
 ElementHandle elementHandle = jsHandle.asElement();
 
-// Assert bounding box for the element
+// Проверьте ограничивающий прямоугольник элемента
 BoundingBox boundingBox = elementHandle.boundingBox();
 assertEquals(100, boundingBox.width);
 
-// Assert attribute for the element
+// Проверьте атрибут элемента
 String classNames = elementHandle.getAttribute("class");
 assertTrue(classNames.contains("highlighted"));
 ```
 
-## Handles as parameters
+## Ссылки в качестве параметров
 
-Handles can be passed into the [Page.evaluate()](/api/class-page.mdx#page-evaluate) and similar methods. The following snippet creates a new array in the page, initializes it with data and returns a handle to this array into Playwright. It then uses the handle in subsequent evaluations:
+Ссылки могут быть переданы в методы [Page.evaluate()](/api/class-page.mdx#page-evaluate) и аналогичные. Следующий фрагмент создает новый массив на странице, инициализирует его данными и возвращает ссылку на этот массив в Playwright. Затем он использует ссылку в последующих вычислениях:
 
 ```java
-// Create new array in page.
+// Создайте новый массив на странице.
 JSHandle myArrayHandle = page.evaluateHandle("() => {\n" +
   "  window.myArray = [1];\n" +
   "  return myArray;\n" +
   "}");
 
-// Get the length of the array.
+// Получите длину массива.
 int length = (int) page.evaluate("a => a.length", myArrayHandle);
 
-// Add one more element to the array using the handle
+// Добавьте еще один элемент в массив, используя ссылку
 Map<String, Object> arg = new HashMap<>();
 arg.put("myArray", myArrayHandle);
 arg.put("newElement", 2);
 page.evaluate("arg => arg.myArray.add(arg.newElement)", arg);
 
-// Release the object when it is no longer needed.
+// Освободите объект, когда он больше не нужен.
 myArrayHandle.dispose();
 ```
 
-## Handle Lifecycle
+## Жизненный цикл ссылок
 
-Handles can be acquired using the page methods such as [Page.evaluateHandle()](/api/class-page.mdx#page-evaluate-handle), [Page.querySelector()](/api/class-page.mdx#page-query-selector) or [Page.querySelectorAll()](/api/class-page.mdx#page-query-selector-all) or their frame counterparts [Frame.evaluateHandle()](/api/class-frame.mdx#frame-evaluate-handle), [Frame.querySelector()](/api/class-frame.mdx#frame-query-selector) or [Frame.querySelectorAll()](/api/class-frame.mdx#frame-query-selector-all). Once created, handles will retain object from [garbage collection](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_Management) unless page navigates or the handle is manually disposed via the [JSHandle.dispose()](/api/class-jshandle.mdx#js-handle-dispose) method.
+Ссылки могут быть получены с помощью методов страницы, таких как [Page.evaluateHandle()](/api/class-page.mdx#page-evaluate-handle), [Page.querySelector()](/api/class-page.mdx#page-query-selector) или [Page.querySelectorAll()](/api/class-page.mdx#page-query-selector-all) или их аналогов для фреймов [Frame.evaluateHandle()](/api/class-frame.mdx#frame-evaluate-handle), [Frame.querySelector()](/api/class-frame.mdx#frame-query-selector) или [Frame.querySelectorAll()](/api/class-frame.mdx#frame-query-selector-all). После создания ссылки будут удерживать объект от [сборки мусора](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_Management), если только страница не навигируется или ссылка не удаляется вручную с помощью метода [JSHandle.dispose()](/api/class-jshandle.mdx#js-handle-dispose).
 
-### API reference
+### Справочник API
 - [JSHandle]
 - [ElementHandle]
 - [ElementHandle.boundingBox()](/api/class-elementhandle.mdx#element-handle-bounding-box)
@@ -91,16 +91,16 @@ Handles can be acquired using the page methods such as [Page.evaluateHandle()](/
 - [Page.querySelector()](/api/class-page.mdx#page-query-selector)
 - [Page.querySelectorAll()](/api/class-page.mdx#page-query-selector-all)
 
-## Locator vs ElementHandle
+## Локатор против ElementHandle
 
 :::caution
 
-We only recommend using [ElementHandle] in the rare cases when you need to perform extensive DOM traversal on a static page. For all user actions and assertions use locator instead.
+Мы рекомендуем использовать [ElementHandle] только в редких случаях, когда вам нужно выполнить обширный обход DOM на статической странице. Для всех пользовательских действий и утверждений используйте локатор.
 :::
 
-The difference between the [Locator] and [ElementHandle] is that the latter points to a particular element, while Locator captures the logic of how to retrieve that element.
+Разница между [Locator] и [ElementHandle] заключается в том, что последний указывает на конкретный элемент, в то время как Locator захватывает логику того, как получить этот элемент.
 
-In the example below, handle points to a particular DOM element on page. If that element changes text or is used by React to render an entirely different component, handle is still pointing to that very stale DOM element. This can lead to unexpected behaviors.
+В примере ниже, ссылка указывает на конкретный DOM элемент на странице. Если этот элемент изменяет текст или используется React для рендеринга совершенно другого компонента, ссылка все равно указывает на этот устаревший DOM элемент. Это может привести к неожиданным поведениям.
 
 ```java
 ElementHandle handle = page.querySelector("text=Submit");
@@ -108,7 +108,7 @@ handle.hover();
 handle.click();
 ```
 
-With the locator, every time the locator is used, up-to-date DOM element is located in the page using the selector. So in the snippet below, underlying DOM element is going to be located twice.
+С локатором, каждый раз, когда используется локатор, актуальный DOM элемент находится на странице с использованием селектора. Таким образом, в приведенном ниже фрагменте, подлежащий DOM элемент будет найден дважды.
 
 ```java
 Locator locator = page.getByText("Submit");

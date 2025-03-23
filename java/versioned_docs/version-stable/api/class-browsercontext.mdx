@@ -6,88 +6,77 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-
 BrowserContexts provide a way to operate multiple independent browser sessions.
 
-If a page opens another page, e.g. with a `window.open` call, the popup will belong to the parent page's browser context.
+Если страница открывает другую страницу, например, с помощью вызова `window.open`, всплывающее окно будет принадлежать контексту браузера родительской страницы.
 
-Playwright allows creating isolated non-persistent browser contexts with [Browser.newContext()](/api/class-browser.mdx#browser-new-context) method. Non-persistent browser contexts don't write any browsing data to disk.
+Playwright позволяет создавать изолированные непостоянные (неперсистентные) контексты браузера с помощью метода [Browser.newContext()](/api/class-browser.mdx#browser-new-context). Такие контексты не сохраняют данные просмотра на диск.
 
 ```java
-// Create a new incognito browser context
+// Создание нового приватного (инкогнито) контекста браузера
 BrowserContext context = browser.newContext();
-// Create a new page inside context.
+// Создание новой страницы в этом контексте.
 Page page = context.newPage();
 page.navigate("https://example.com");
-// Dispose context once it is no longer needed.
+// Закрытие контекста, когда он больше не нужен.
 context.close();
 ```
 
-
 ---
 
-## Methods
+## Методы
 
 ### addCookies {#browser-context-add-cookies}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.addCookies</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.addCookies</x-search>
 
-Adds cookies into this browser context. All pages within this context will have these cookies installed. Cookies can be obtained via [BrowserContext.cookies()](/api/class-browsercontext.mdx#browser-context-cookies).
+Добавляет cookies в данный контекст браузера. Все страницы в этом контексте будут иметь указанные cookies. Cookies можно получить с помощью метода [BrowserContext.cookies()](/api/class-browsercontext.mdx#browser-context-cookies).
 
-**Usage**
+**Использование**
 
 ```java
 browserContext.addCookies(Arrays.asList(cookieObject1, cookieObject2));
 ```
 
-**Arguments**
+**Аргументы**
 - `cookies` [List]&lt;`Cookie`&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-add-cookies-option-cookies"/><a href="#browser-context-add-cookies-option-cookies" class="list-anchor">#</a>
   - `setName` [String]
-    
-    
-  - `setValue` [String]
-    
-    
-  - `setUrl` [String] *(optional)*
-    
-    Either url or domain / path are required. Optional.
-  - `setDomain` [String] *(optional)*
-    
-    For the cookie to apply to all subdomains as well, prefix domain with a dot, like this: ".example.com". Either url or domain / path are required. Optional.
-  - `setPath` [String] *(optional)*
-    
-    Either url or domain / path are required Optional.
-  - `setExpires` [double] *(optional)*
-    
-    Unix time in seconds. Optional.
-  - `setHttpOnly` [boolean] *(optional)*
-    
-    Optional.
-  - `setSecure` [boolean] *(optional)*
-    
-    Optional.
-  - `setSameSite` `enum SameSiteAttribute { STRICT, LAX, NONE }` *(optional)*
-    
-    Optional.
 
-**Returns**
+  - `setValue` [String]
+
+  - `setUrl` [String] *(опционально)*
+    Необходимо указать либо `url`, либо `domain` и `path`. Необязательный параметр.
+  - `setDomain` [String] *(опционально)*
+    Чтобы cookie применялась ко всем поддоменам, добавьте точку перед доменом, например: ".example.com". Необходимо указать либо `url`, либо `domain` и `path`. Необязательный параметр.
+  - `setPath` [String] *(опционально)*
+    Необходимо указать либо `url`, либо `domain` и `path`. Необязательный параметр.
+  - `setExpires` [double] *(опционально)*
+    Время в формате Unix (в секундах). Необязательный параметр.
+  - `setHttpOnly` [boolean] *(опционально)*
+    Необязательный параметр.
+  - `setSecure` [boolean] *(опционально)*
+    Необязательный параметр.
+  - `setSameSite` `enum SameSiteAttribute { STRICT, LAX, NONE }` *(опционально)*
+    Необязательный параметр.
+
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-add-cookies-return"/><a href="#browser-context-add-cookies-return" class="list-anchor">#</a>
 
 ---
 
 ### addInitScript {#browser-context-add-init-script}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.addInitScript</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.addInitScript</x-search>
 
-Adds a script which would be evaluated in one of the following scenarios:
-* Whenever a page is created in the browser context or is navigated.
-* Whenever a child frame is attached or navigated in any page in the browser context. In this case, the script is evaluated in the context of the newly attached frame.
+Добавляет скрипт, который будет выполняться в одном из следующих случаев:
+* Когда создаётся страница в контексте браузера или происходит навигация.
+* Когда вложенный фрейм добавляется или в нём происходит навигация на любой странице в контексте браузера. В этом случае скрипт выполняется в контексте нового фрейма.
 
-The script is evaluated after the document was created but before any of its scripts were run. This is useful to amend the JavaScript environment, e.g. to seed `Math.random`.
+Скрипт выполняется после создания документа, но до запуска любых скриптов самой страницы. Это полезно для настройки окружения JavaScript, например, для подмены `Math.random`.
 
-**Usage**
+**Использование**
 
-An example of overriding `Math.random` before the page loads:
+Пример переопределения `Math.random` до загрузки страницы:
 
 ```js
 // preload.js
@@ -95,70 +84,69 @@ Math.random = () => 42;
 ```
 
 ```java
-// In your playwright script, assuming the preload.js file is in same directory.
+// В вашем скрипте playwright, если файл preload.js находится в той же директории.
 browserContext.addInitScript(Paths.get("preload.js"));
 ```
 
 :::note
-The order of evaluation of multiple scripts installed via [BrowserContext.addInitScript()](/api/class-browsercontext.mdx#browser-context-add-init-script) and [Page.addInitScript()](/api/class-page.mdx#page-add-init-script) is not defined.
+Порядок выполнения нескольких скриптов, установленных через [BrowserContext.addInitScript()](/api/class-browsercontext.mdx#browser-context-add-init-script) и [Page.addInitScript()](/api/class-page.mdx#page-add-init-script), не определён.
 :::
 
-**Arguments**
+**Аргументы**
 - `script` [String] | [Path]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-add-init-script-option-script"/><a href="#browser-context-add-init-script-option-script" class="list-anchor">#</a>
-  
-  Script to be evaluated in all pages in the browser context.
+  Скрипт, который будет выполняться на всех страницах в данном контексте браузера.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-add-init-script-return"/><a href="#browser-context-add-init-script-return" class="list-anchor">#</a>
 
 ---
 
 ### backgroundPages {#browser-context-background-pages}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.backgroundPages</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.11</font><x-search>browserContext.backgroundPages</x-search>
 
 :::note
 
-Background pages are only supported on Chromium-based browsers.
+Фоновые страницы поддерживаются только в браузерах на базе Chromium.
 :::
 
-All existing background pages in the context.
+Все существующие фоновые страницы в данном контексте.
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.backgroundPages();
 ```
 
-**Returns**
+**Возвращает**
 - [List]&lt;[Page]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-background-pages-return"/><a href="#browser-context-background-pages-return" class="list-anchor">#</a>
 
 ---
 
 ### browser {#browser-context-browser}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.browser</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.browser</x-search>
 
-Returns the browser instance of the context. If it was launched as a persistent context null gets returned.
+Возвращает экземпляр браузера, к которому относится данный контекст. Если контекст был создан как постоянный (persistent), возвращается `null`.
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.browser();
 ```
 
-**Returns**
+**Возвращает**
 - [null] | [Browser]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-browser-return"/><a href="#browser-context-browser-return" class="list-anchor">#</a>
 
 ---
 
 ### clearCookies {#browser-context-clear-cookies}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.clearCookies</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.clearCookies</x-search>
 
-Removes cookies from context. Accepts optional filter.
+Удаляет cookies из контекста. Поддерживает необязательный фильтр.
 
-**Usage**
+**Использование**
 
 ```java
 context.clearCookies();
@@ -170,131 +158,112 @@ context.clearCookies(new BrowserContext.ClearCookiesOptions()
                          .setDomain("my-origin.com"));
 ```
 
-**Arguments**
-- `options` `BrowserContext.ClearCookiesOptions` *(optional)*
-  - `setDomain` [String] | [Pattern] *(optional)* <font size="2">Added in: v1.43</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-cookies-option-domain"/><a href="#browser-context-clear-cookies-option-domain" class="list-anchor">#</a>
-    
-    Only removes cookies with the given domain.
-  - `setName` [String] | [Pattern] *(optional)* <font size="2">Added in: v1.43</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-cookies-option-name"/><a href="#browser-context-clear-cookies-option-name" class="list-anchor">#</a>
-    
-    Only removes cookies with the given name.
-  - `setPath` [String] | [Pattern] *(optional)* <font size="2">Added in: v1.43</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-cookies-option-path"/><a href="#browser-context-clear-cookies-option-path" class="list-anchor">#</a>
-    
-    Only removes cookies with the given path.
+**Аргументы**
+- `options` `BrowserContext.ClearCookiesOptions` *(опционально)*
+  - `setDomain` [String] | [Pattern] *(опционально)* <font size="2">Добавлено в: v1.43</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-cookies-option-domain"/><a href="#browser-context-clear-cookies-option-domain" class="list-anchor">#</a>
+    Удаляет только cookies с указанным доменом.
+  - `setName` [String] | [Pattern] *(опционально)* <font size="2">Добавлено в: v1.43</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-cookies-option-name"/><a href="#browser-context-clear-cookies-option-name" class="list-anchor">#</a>
+    Удаляет только cookies с указанным именем.
+  - `setPath` [String] | [Pattern] *(опционально)* <font size="2">Добавлено в: v1.43</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-cookies-option-path"/><a href="#browser-context-clear-cookies-option-path" class="list-anchor">#</a>
+    Удаляет только cookies с указанным путём.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-cookies-return"/><a href="#browser-context-clear-cookies-return" class="list-anchor">#</a>
 
 ---
 
 ### clearPermissions {#browser-context-clear-permissions}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.clearPermissions</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.clearPermissions</x-search>
 
-Clears all permission overrides for the browser context.
+Сбрасывает все переопределения разрешений для данного контекста браузера.
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext context = browser.newContext();
 context.grantPermissions(Arrays.asList("clipboard-read"));
-// do stuff ..
+// выполнение действий...
 context.clearPermissions();
 ```
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-permissions-return"/><a href="#browser-context-clear-permissions-return" class="list-anchor">#</a>
 
 ---
 
 ### close {#browser-context-close}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.close</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.close</x-search>
 
-Closes the browser context. All the pages that belong to the browser context will be closed.
+Закрывает данный контекст браузера. Все страницы, относящиеся к этому контексту, будут закрыты.
 
 :::note
 
-The default browser context cannot be closed.
+Контекст браузера по умолчанию не может быть закрыт.
 :::
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.close();
 BrowserContext.close(options);
 ```
 
-**Arguments**
-- `options` `BrowserContext.CloseOptions` *(optional)*
-  - `setReason` [String] *(optional)* <font size="2">Added in: v1.40</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-close-option-reason"/><a href="#browser-context-close-option-reason" class="list-anchor">#</a>
-    
-    The reason to be reported to the operations interrupted by the context closure.
+**Аргументы**
+- `options` `BrowserContext.CloseOptions` *(опционально)*
+  - `setReason` [String] *(опционально)* <font size="2">Добавлено в: v1.40</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-close-option-reason"/><a href="#browser-context-close-option-reason" class="list-anchor">#</a>
+    Причина, которая будет указана для операций, прерванных из-за закрытия контекста.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-close-return"/><a href="#browser-context-close-return" class="list-anchor">#</a>
 
 ---
 
 ### cookies {#browser-context-cookies}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.cookies</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.cookies</x-search>
 
-If no URLs are specified, this method returns all cookies. If URLs are specified, only cookies that affect those URLs are returned.
+Если не указаны URL-адреса, метод возвращает все cookies. Если указаны URL, возвращаются только cookies, относящиеся к этим URL.
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.cookies();
 BrowserContext.cookies(urls);
 ```
 
-**Arguments**
-- `urls` [String] | [List]&lt;[String]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-cookies-option-urls"/><a href="#browser-context-cookies-option-urls" class="list-anchor">#</a>
-  
-  Optional list of URLs.
+**Аргументы**
+- `urls` [String] | [List]&lt;[String]&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-cookies-option-urls"/><a href="#browser-context-cookies-option-urls" class="list-anchor">#</a>
+  Необязательный список URL-адресов.
 
-**Returns**
+**Возвращает**
 - [List]&lt;`Cookie`&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-cookies-return"/><a href="#browser-context-cookies-return" class="list-anchor">#</a>
   - `name` [String]
-    
-    
   - `value` [String]
-    
-    
   - `domain` [String]
-    
-    
   - `path` [String]
-    
-    
   - `expires` [double]
-    
-    Unix time in seconds.
+    Время в формате Unix (в секундах).
   - `httpOnly` [boolean]
-    
-    
   - `secure` [boolean]
-    
-    
   - `sameSite` `enum SameSiteAttribute { STRICT, LAX, NONE }`
-    
-    
+
 ---
 
 ### exposeBinding {#browser-context-expose-binding}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.exposeBinding</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.exposeBinding</x-search>
 
-The method adds a function called [name](/api/class-browsercontext.mdx#browser-context-expose-binding-option-name) on the `window` object of every frame in every page in the context. When called, the function executes [callback](/api/class-browsercontext.mdx#browser-context-expose-binding-option-callback) and returns a [Promise] which resolves to the return value of [callback](/api/class-browsercontext.mdx#browser-context-expose-binding-option-callback). If the [callback](/api/class-browsercontext.mdx#browser-context-expose-binding-option-callback) returns a [Promise], it will be awaited.
+Метод добавляет функцию с именем [name](/api/class-browsercontext.mdx#browser-context-expose-binding-option-name) в объект `window` каждого фрейма на каждой странице в контексте. При вызове эта функция выполняет [callback](/api/class-browsercontext.mdx#browser-context-expose-binding-option-callback) и возвращает [Promise], который резолвится в результат выполнения [callback](/api/class-browsercontext.mdx#browser-context-expose-binding-option-callback). Если [callback] возвращает [Promise], он будет ожидаться.
 
-The first argument of the [callback](/api/class-browsercontext.mdx#browser-context-expose-binding-option-callback) function contains information about the caller: `{ browserContext: BrowserContext, page: Page, frame: Frame }`.
+Первый аргумент функции [callback] содержит информацию о вызывающем контексте: `{ browserContext: BrowserContext, page: Page, frame: Frame }`.
 
-See [Page.exposeBinding()](/api/class-page.mdx#page-expose-binding) for page-only version.
+Смотрите также [Page.exposeBinding()](/api/class-page.mdx#page-expose-binding) для версии, ограниченной страницей.
 
-**Usage**
+**Использование**
 
-An example of exposing page URL to all frames in all pages in the context:
+Пример: передача URL страницы во все фреймы на всех страницах контекста:
 
 ```java
 import com.microsoft.playwright.*;
@@ -320,41 +289,37 @@ public class Example {
 }
 ```
 
-**Arguments**
+**Аргументы**
 - `name` [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-binding-option-name"/><a href="#browser-context-expose-binding-option-name" class="list-anchor">#</a>
-  
-  Name of the function on the window object.
+  Имя функции в объекте window.
 - `callback` `BindingCallback`<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-binding-option-callback"/><a href="#browser-context-expose-binding-option-callback" class="list-anchor">#</a>
-  
-  Callback function that will be called in the Playwright's context.
-- `options` `BrowserContext.ExposeBindingOptions` *(optional)*
-  - `setHandle` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-binding-option-handle"/><a href="#browser-context-expose-binding-option-handle" class="list-anchor">#</a>
-    
-    :::warning[Deprecated]
-    This option will be removed in the future.
+  Callback-функция, которая будет вызываться в контексте Playwright.
+- `options` `BrowserContext.ExposeBindingOptions` *(опционально)*
+  - `setHandle` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-binding-option-handle"/><a href="#browser-context-expose-binding-option-handle" class="list-anchor">#</a>
+    :::warning[Устарело]
+    Эта опция будет удалена в будущих версиях.
     :::
-    
-    
-    Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is supported. When passing by value, multiple arguments are supported.
 
-**Returns**
+    Определяет, передавать ли аргумент как handle вместо значения. При передаче handle поддерживается только один аргумент. При передаче по значению — несколько.
+
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-binding-return"/><a href="#browser-context-expose-binding-return" class="list-anchor">#</a>
 
 ---
 
 ### exposeFunction {#browser-context-expose-function}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.exposeFunction</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.exposeFunction</x-search>
 
-The method adds a function called [name](/api/class-browsercontext.mdx#browser-context-expose-function-option-name) on the `window` object of every frame in every page in the context. When called, the function executes [callback](/api/class-browsercontext.mdx#browser-context-expose-function-option-callback) and returns a [Promise] which resolves to the return value of [callback](/api/class-browsercontext.mdx#browser-context-expose-function-option-callback).
+Метод добавляет функцию с именем [name](/api/class-browsercontext.mdx#browser-context-expose-function-option-name) в объект `window` каждого фрейма на каждой странице в контексте. При вызове эта функция выполняет [callback](/api/class-browsercontext.mdx#browser-context-expose-function-option-callback) и возвращает [Promise], который резолвится в результат выполнения callback.
 
-If the [callback](/api/class-browsercontext.mdx#browser-context-expose-function-option-callback) returns a [Promise], it will be awaited.
+Если [callback](/api/class-browsercontext.mdx#browser-context-expose-function-option-callback) возвращает [Promise], он будет ожидаем.
 
-See [Page.exposeFunction()](/api/class-page.mdx#page-expose-function) for page-only version.
+Смотрите также [Page.exposeFunction()](/api/class-page.mdx#page-expose-function) для версии, ограниченной страницей.
 
-**Usage**
+**Использование**
 
-An example of adding a `sha256` function to all pages in the context:
+Пример добавления функции `sha256` во все страницы в контексте:
 
 ```java
 import com.microsoft.playwright.*;
@@ -395,43 +360,40 @@ public class Example {
 }
 ```
 
-**Arguments**
+**Аргументы**
 - `name` [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-function-option-name"/><a href="#browser-context-expose-function-option-name" class="list-anchor">#</a>
-  
-  Name of the function on the window object.
+  Имя функции в объекте window.
 - `callback` `FunctionCallback`<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-function-option-callback"/><a href="#browser-context-expose-function-option-callback" class="list-anchor">#</a>
-  
-  Callback function that will be called in the Playwright's context.
+  Callback-функция, которая будет вызываться в контексте Playwright.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-function-return"/><a href="#browser-context-expose-function-return" class="list-anchor">#</a>
 
 ---
 
 ### grantPermissions {#browser-context-grant-permissions}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.grantPermissions</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.grantPermissions</x-search>
 
-Grants specified permissions to the browser context. Only grants corresponding permissions to the given origin if specified.
+Выдаёт указанные разрешения контексту браузера. Если указано origin, разрешения применяются только к этому источнику.
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.grantPermissions(permissions);
 BrowserContext.grantPermissions(permissions, options);
 ```
 
-**Arguments**
+**Аргументы**
 - `permissions` [List]&lt;[String]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-grant-permissions-option-permissions"/><a href="#browser-context-grant-permissions-option-permissions" class="list-anchor">#</a>
-  
-  A list of permissions to grant.
-  
+  Список разрешений, которые нужно выдать.
+
   :::danger
-  
-  Supported permissions differ between browsers, and even between different versions of the same browser. Any permission may stop working after an update.
+
+  Поддерживаемые разрешения различаются в зависимости от браузера и даже между разными версиями одного и того же браузера. Любое разрешение может перестать работать после обновления.
   :::
-  
-  Here are some permissions that may be supported by some browsers:
+
+  Некоторые из разрешений, которые могут поддерживаться:
   * `'accelerometer'`
   * `'ambient-light-sensor'`
   * `'background-sync'`
@@ -447,91 +409,90 @@ BrowserContext.grantPermissions(permissions, options);
   * `'notifications'`
   * `'payment-handler'`
   * `'storage-access'`
-- `options` `BrowserContext.GrantPermissionsOptions` *(optional)*
-  - `setOrigin` [String] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-grant-permissions-option-origin"/><a href="#browser-context-grant-permissions-option-origin" class="list-anchor">#</a>
-    
-    The [origin] to grant permissions to, e.g. "https://example.com".
 
-**Returns**
+- `options` `BrowserContext.GrantPermissionsOptions` *(опционально)*
+  - `setOrigin` [String] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-grant-permissions-option-origin"/><a href="#browser-context-grant-permissions-option-origin" class="list-anchor">#</a>
+    [Origin], которому следует выдать разрешения, например `"https://example.com"`.
+
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-grant-permissions-return"/><a href="#browser-context-grant-permissions-return" class="list-anchor">#</a>
 
 ---
 
 ### newCDPSession {#browser-context-new-cdp-session}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.newCDPSession</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.11</font><x-search>browserContext.newCDPSession</x-search>
 
 :::note
 
-CDP sessions are only supported on Chromium-based browsers.
+Сессии CDP поддерживаются только в браузерах на базе Chromium.
 :::
 
-Returns the newly created session.
+Возвращает вновь созданную сессию.
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.newCDPSession(page);
 ```
 
-**Arguments**
+**Аргументы**
 - `page` [Page] | [Frame]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-new-cdp-session-option-page"/><a href="#browser-context-new-cdp-session-option-page" class="list-anchor">#</a>
-  
-  Target to create new session for. For backwards-compatibility, this parameter is named `page`, but it can be a `Page` or `Frame` type.
+  Цель, для которой создаётся новая сессия. Для обратной совместимости параметр называется `page`, но может быть как `Page`, так и `Frame`.
 
-**Returns**
+**Возвращает**
 - [CDPSession]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-new-cdp-session-return"/><a href="#browser-context-new-cdp-session-return" class="list-anchor">#</a>
 
 ---
 
 ### newPage {#browser-context-new-page}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.newPage</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.newPage</x-search>
 
-Creates a new page in the browser context.
+Создаёт новую страницу в данном контексте браузера.
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.newPage();
 ```
 
-**Returns**
+**Возвращает**
 - [Page]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-new-page-return"/><a href="#browser-context-new-page-return" class="list-anchor">#</a>
 
 ---
 
 ### pages {#browser-context-pages}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.pages</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.pages</x-search>
 
-Returns all open pages in the context.
+Возвращает все открытые страницы в контексте.
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.pages();
 ```
 
-**Returns**
+**Возвращает**
 - [List]&lt;[Page]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-pages-return"/><a href="#browser-context-pages-return" class="list-anchor">#</a>
 
 ---
 
 ### route {#browser-context-route}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.route</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.route</x-search>
 
-Routing provides the capability to modify network requests that are made by any page in the browser context. Once route is enabled, every request matching the url pattern will stall unless it's continued, fulfilled or aborted.
+Маршрутизация предоставляет возможность изменять сетевые запросы, которые выполняются любой страницей в контексте браузера. Как только маршрут включен, каждый запрос, соответствующий шаблону URL, будет приостановлен, если он не будет продолжен, выполнен или прерван.
 
 :::note
 
-[BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting [setServiceWorkers](/api/class-browser.mdx#browser-new-context-option-service-workers) to `'block'`.
+[BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route) не будет перехватывать запросы, перехваченные Service Worker. См. [эту](https://github.com/microsoft/playwright/issues/1090) проблему. Мы рекомендуем отключать Service Workers при использовании перехвата запросов, установив [setServiceWorkers](/api/class-browser.mdx#browser-new-context-option-service-workers) в `'block'`.
 :::
 
-**Usage**
+**Использование**
 
-An example of a naive handler that aborts all image requests:
+Пример простого обработчика, который прерывает все запросы изображений:
 
 ```java
 BrowserContext context = browser.newContext();
@@ -541,7 +502,7 @@ page.navigate("https://example.com");
 browser.close();
 ```
 
-or the same snippet using a regex pattern instead:
+или тот же фрагмент кода, но с использованием регулярного выражения:
 
 ```java
 BrowserContext context = browser.newContext();
@@ -551,7 +512,7 @@ page.navigate("https://example.com");
 browser.close();
 ```
 
-It is possible to examine the request to decide the route action. For example, mocking all requests that contain some post data, and leaving all other requests as is:
+Можно исследовать запрос, чтобы решить, какое действие выполнить с маршрутом. Например, имитировать все запросы, содержащие некоторые данные POST, и оставлять все остальные запросы без изменений:
 
 ```java
 context.route("/api/**", route -> {
@@ -562,86 +523,86 @@ context.route("/api/**", route -> {
 });
 ```
 
-Page routes (set up with [Page.route()](/api/class-page.mdx#page-route)) take precedence over browser context routes when request matches both handlers.
+Маршруты страниц (настроенные с помощью [Page.route()](/api/class-page.mdx#page-route)) имеют приоритет над маршрутами контекста браузера, когда запрос соответствует обоим обработчикам.
 
-To remove a route with its handler you can use [BrowserContext.unroute()](/api/class-browsercontext.mdx#browser-context-unroute).
+Чтобы удалить маршрут с его обработчиком, вы можете использовать [BrowserContext.unroute()](/api/class-browsercontext.mdx#browser-context-unroute).
 
 :::note
 
-Enabling routing disables http cache.
+Включение маршрутизации отключает HTTP-кэш.
 :::
 
-**Arguments**
+**Аргументы**
 - `url` [String] | [Pattern] | [Predicate]&lt;[String]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-option-url"/><a href="#browser-context-route-option-url" class="list-anchor">#</a>
   
-  A glob pattern, regex pattern or predicate receiving [URL] to match while routing. When a [setBaseURL](/api/class-browser.mdx#browser-new-context-option-base-url) via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.
+  Глобальный шаблон, регулярное выражение или предикат, получающий [URL] для сопоставления при маршрутизации. Когда [setBaseURL](/api/class-browser.mdx#browser-new-context-option-base-url) через параметры контекста был предоставлен и переданный URL является путем, он объединяется через конструктор [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL).
 - `handler` [Consumer]&lt;[Route]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-option-handler"/><a href="#browser-context-route-option-handler" class="list-anchor">#</a>
   
-  handler function to route the request.
-- `options` `BrowserContext.RouteOptions` *(optional)*
-  - `setTimes` [int] *(optional)* <font size="2">Added in: v1.15</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-option-times"/><a href="#browser-context-route-option-times" class="list-anchor">#</a>
+  Функция-обработчик для маршрутизации запроса.
+- `options` `BrowserContext.RouteOptions` *(опционально)*
+  - `setTimes` [int] *(опционально)* <font size="2">Добавлено в: v1.15</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-option-times"/><a href="#browser-context-route-option-times" class="list-anchor">#</a>
     
-    How often a route should be used. By default it will be used every time.
+    Как часто маршрут должен использоваться. По умолчанию он будет использоваться каждый раз.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-return"/><a href="#browser-context-route-return" class="list-anchor">#</a>
 
 ---
 
 ### routeFromHAR {#browser-context-route-from-har}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.23</font><x-search>browserContext.routeFromHAR</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.23</font><x-search>browserContext.routeFromHAR</x-search>
 
-If specified the network requests that are made in the context will be served from the HAR file. Read more about [Replaying from HAR](../mock.mdx#replaying-from-har).
+Если указано, сетевые запросы, выполняемые в контексте, будут обслуживаться из HAR-файла. Подробнее о [Replaying from HAR](../mock.mdx#replaying-from-har).
 
-Playwright will not serve requests intercepted by Service Worker from the HAR file. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting [setServiceWorkers](/api/class-browser.mdx#browser-new-context-option-service-workers) to `'block'`.
+Playwright не будет обслуживать запросы, перехваченные Service Worker, из HAR-файла. См. [эту](https://github.com/microsoft/playwright/issues/1090) проблему. Мы рекомендуем отключать Service Workers при использовании перехвата запросов, установив [setServiceWorkers](/api/class-browser.mdx#browser-new-context-option-service-workers) в `'block'`.
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.routeFromHAR(har);
 BrowserContext.routeFromHAR(har, options);
 ```
 
-**Arguments**
+**Аргументы**
 - `har` [Path]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-har"/><a href="#browser-context-route-from-har-option-har" class="list-anchor">#</a>
   
-  Path to a [HAR](http://www.softwareishard.com/blog/har-12-spec) file with prerecorded network data. If `path` is a relative path, then it is resolved relative to the current working directory.
-- `options` `BrowserContext.RouteFromHAROptions` *(optional)*
-  - `setNotFound` `enum HarNotFound { ABORT, FALLBACK }` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-not-found"/><a href="#browser-context-route-from-har-option-not-found" class="list-anchor">#</a>
-    * If set to 'abort' any request not found in the HAR file will be aborted.
-    * If set to 'fallback' falls through to the next route handler in the handler chain.
+  Путь к [HAR](http://www.softwareishard.com/blog/har-12-spec) файлу с предварительно записанными сетевыми данными. Если `path` является относительным путем, то он разрешается относительно текущей рабочей директории.
+- `options` `BrowserContext.RouteFromHAROptions` *(опционально)*
+  - `setNotFound` `enum HarNotFound { ABORT, FALLBACK }` *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-not-found"/><a href="#browser-context-route-from-har-option-not-found" class="list-anchor">#</a>
+    * Если установлено значение 'abort', любой запрос, не найденный в HAR-файле, будет прерван.
+    * Если установлено значение 'fallback', переходит к следующему обработчику маршрута в цепочке обработчиков.
     
-    Defaults to abort.
-  - `setUpdate` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-update"/><a href="#browser-context-route-from-har-option-update" class="list-anchor">#</a>
+    По умолчанию прерывается.
+  - `setUpdate` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-update"/><a href="#browser-context-route-from-har-option-update" class="list-anchor">#</a>
     
-    If specified, updates the given HAR with the actual network information instead of serving from file. The file is written to disk when [BrowserContext.close()](/api/class-browsercontext.mdx#browser-context-close) is called.
-  - `setUpdateContent` `enum RouteFromHarUpdateContentPolicy { EMBED, ATTACH }` *(optional)* <font size="2">Added in: v1.32</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-update-content"/><a href="#browser-context-route-from-har-option-update-content" class="list-anchor">#</a>
+    Если указано, обновляет данный HAR с фактической сетевой информацией вместо обслуживания из файла. Файл записывается на диск, когда [BrowserContext.close()](/api/class-browsercontext.mdx#browser-context-close) вызывается.
+  - `setUpdateContent` `enum RouteFromHarUpdateContentPolicy { EMBED, ATTACH }` *(опционально)* <font size="2">Добавлено в: v1.32</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-update-content"/><a href="#browser-context-route-from-har-option-update-content" class="list-anchor">#</a>
     
-    Optional setting to control resource content management. If `attach` is specified, resources are persisted as separate files or entries in the ZIP archive. If `embed` is specified, content is stored inline the HAR file.
-  - `setUpdateMode` `enum HarMode { FULL, MINIMAL }` *(optional)* <font size="2">Added in: v1.32</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-update-mode"/><a href="#browser-context-route-from-har-option-update-mode" class="list-anchor">#</a>
+    Опциональная настройка для управления содержимым ресурсов. Если указано `attach`, ресурсы сохраняются как отдельные файлы или записи в ZIP-архиве. Если указано `embed`, содержимое сохраняется в HAR-файле.
+  - `setUpdateMode` `enum HarMode { FULL, MINIMAL }` *(опционально)* <font size="2">Добавлено в: v1.32</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-update-mode"/><a href="#browser-context-route-from-har-option-update-mode" class="list-anchor">#</a>
     
-    When set to `minimal`, only record information necessary for routing from HAR. This omits sizes, timing, page, cookies, security and other types of HAR information that are not used when replaying from HAR. Defaults to `minimal`.
-  - `setUrl` [String] | [Pattern] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-url"/><a href="#browser-context-route-from-har-option-url" class="list-anchor">#</a>
+    Когда установлено значение `minimal`, записывается только информация, необходимая для маршрутизации из HAR. Это исключает размеры, время, страницу, куки, безопасность и другие типы информации HAR, которые не используются при воспроизведении из HAR. По умолчанию `minimal`.
+  - `setUrl` [String] | [Pattern] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-url"/><a href="#browser-context-route-from-har-option-url" class="list-anchor">#</a>
     
-    A glob pattern, regular expression or predicate to match the request URL. Only requests with URL matching the pattern will be served from the HAR file. If not specified, all requests are served from the HAR file.
+    Глобальный шаблон, регулярное выражение или предикат для сопоставления URL запроса. Только запросы с URL, соответствующим шаблону, будут обслуживаться из HAR-файла. Если не указано, все запросы обслуживаются из HAR-файла.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-return"/><a href="#browser-context-route-from-har-return" class="list-anchor">#</a>
 
 ---
 
 ### routeWebSocket {#browser-context-route-web-socket}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>browserContext.routeWebSocket</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.48</font><x-search>browserContext.routeWebSocket</x-search>
 
-This method allows to modify websocket connections that are made by any page in the browser context.
+Этот метод позволяет изменять соединения WebSocket, которые создаются любой страницей в контексте браузера.
 
-Note that only `WebSocket`s created after this method was called will be routed. It is recommended to call this method before creating any pages.
+Обратите внимание, что только `WebSocket`, созданные после вызова этого метода, будут маршрутизированы. Рекомендуется вызывать этот метод перед созданием любых страниц.
 
-**Usage**
+**Использование**
 
-Below is an example of a simple handler that blocks some websocket messages. See [WebSocketRoute] for more details and examples.
+Ниже приведен пример простого обработчика, который блокирует некоторые сообщения WebSocket. См. [WebSocketRoute] для получения более подробной информации и примеров.
 
 ```java
 context.routeWebSocket("/ws", ws -> {
@@ -654,24 +615,24 @@ context.routeWebSocket("/ws", ws -> {
 });
 ```
 
-**Arguments**
+**Аргументы**
 - `url` [String] | [Pattern] | [Predicate]&lt;[String]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-web-socket-option-url"/><a href="#browser-context-route-web-socket-option-url" class="list-anchor">#</a>
   
-  Only WebSockets with the url matching this pattern will be routed. A string pattern can be relative to the [setBaseURL](/api/class-browser.mdx#browser-new-context-option-base-url) context option.
+  Только WebSocket с URL, соответствующим этому шаблону, будут маршрутизированы. Строковый шаблон может быть относительным к параметру контекста [setBaseURL](/api/class-browser.mdx#browser-new-context-option-base-url).
 - `handler` [Consumer]&lt;[WebSocketRoute]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-web-socket-option-handler"/><a href="#browser-context-route-web-socket-option-handler" class="list-anchor">#</a>
   
-  Handler function to route the WebSocket.
+  Функция-обработчик для маршрутизации WebSocket.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-web-socket-return"/><a href="#browser-context-route-web-socket-return" class="list-anchor">#</a>
 
 ---
 
 ### setDefaultNavigationTimeout {#browser-context-set-default-navigation-timeout}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.setDefaultNavigationTimeout</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.setDefaultNavigationTimeout</x-search>
 
-This setting will change the default maximum navigation time for the following methods and related shortcuts:
+Эта настройка изменит максимальное время навигации по умолчанию для следующих методов и связанных с ними ярлыков:
 * [Page.goBack()](/api/class-page.mdx#page-go-back)
 * [Page.goForward()](/api/class-page.mdx#page-go-forward)
 * [Page.navigate()](/api/class-page.mdx#page-goto)
@@ -681,211 +642,211 @@ This setting will change the default maximum navigation time for the following m
 
 :::note
 
-[Page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) and [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) take priority over [BrowserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout).
+[Page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) и [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) имеют приоритет над [BrowserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout).
 :::
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.setDefaultNavigationTimeout(timeout);
 ```
 
-**Arguments**
+**Аргументы**
 - `timeout` [double]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-default-navigation-timeout-option-timeout"/><a href="#browser-context-set-default-navigation-timeout-option-timeout" class="list-anchor">#</a>
   
-  Maximum navigation time in milliseconds
+  Максимальное время навигации в миллисекундах
 
 ---
 
 ### setDefaultTimeout {#browser-context-set-default-timeout}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.setDefaultTimeout</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.setDefaultTimeout</x-search>
 
-This setting will change the default maximum time for all the methods accepting [timeout](/api/class-browsercontext.mdx#browser-context-set-default-timeout-option-timeout) option.
+Эта настройка изменит максимальное время по умолчанию для всех методов, принимающих параметр [timeout](/api/class-browsercontext.mdx#browser-context-set-default-timeout-option-timeout).
 
 :::note
 
-[Page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout), [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) and [BrowserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout) take priority over [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
+[Page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout), [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) и [BrowserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout) имеют приоритет над [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
 :::
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.setDefaultTimeout(timeout);
 ```
 
-**Arguments**
+**Аргументы**
 - `timeout` [double]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-default-timeout-option-timeout"/><a href="#browser-context-set-default-timeout-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds. Pass `0` to disable timeout.
+  Максимальное время в миллисекундах. Передайте `0`, чтобы отключить тайм-аут.
 
 ---
 
 ### setExtraHTTPHeaders {#browser-context-set-extra-http-headers}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.setExtraHTTPHeaders</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.setExtraHTTPHeaders</x-search>
 
-The extra HTTP headers will be sent with every request initiated by any page in the context. These headers are merged with page-specific extra HTTP headers set with [Page.setExtraHTTPHeaders()](/api/class-page.mdx#page-set-extra-http-headers). If page overrides a particular header, page-specific header value will be used instead of the browser context header value.
+Дополнительные HTTP-заголовки будут отправляться с каждым запросом, инициированным любой страницей в контексте. Эти заголовки объединяются с дополнительными HTTP-заголовками, установленными для страницы с помощью [Page.setExtraHTTPHeaders()](/api/class-page.mdx#page-set-extra-http-headers). Если страница переопределяет определенный заголовок, будет использоваться значение заголовка, специфичное для страницы, вместо значения заголовка контекста браузера.
 
 :::note
 
-[BrowserContext.setExtraHTTPHeaders()](/api/class-browsercontext.mdx#browser-context-set-extra-http-headers) does not guarantee the order of headers in the outgoing requests.
+[BrowserContext.setExtraHTTPHeaders()](/api/class-browsercontext.mdx#browser-context-set-extra-http-headers) не гарантирует порядок заголовков в исходящих запросах.
 :::
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.setExtraHTTPHeaders(headers);
 ```
 
-**Arguments**
+**Аргументы**
 - `headers` [Map]&lt;[String], [String]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-extra-http-headers-option-headers"/><a href="#browser-context-set-extra-http-headers-option-headers" class="list-anchor">#</a>
   
-  An object containing additional HTTP headers to be sent with every request. All header values must be strings.
+  Объект, содержащий дополнительные HTTP-заголовки, которые будут отправляться с каждым запросом. Все значения заголовков должны быть строками.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-extra-http-headers-return"/><a href="#browser-context-set-extra-http-headers-return" class="list-anchor">#</a>
 
 ---
 
 ### setGeolocation {#browser-context-set-geolocation}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.setGeolocation</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.setGeolocation</x-search>
 
-Sets the context's geolocation. Passing `null` or `undefined` emulates position unavailable.
+Устанавливает геолокацию контекста. Передача `null` или `undefined` эмулирует недоступность позиции.
 
-**Usage**
+**Использование**
 
 ```java
 browserContext.setGeolocation(new Geolocation(59.95, 30.31667));
 ```
 
 :::note
-Consider using [BrowserContext.grantPermissions()](/api/class-browsercontext.mdx#browser-context-grant-permissions) to grant permissions for the browser context pages to read its geolocation.
+Рассмотрите возможность использования [BrowserContext.grantPermissions()](/api/class-browsercontext.mdx#browser-context-grant-permissions) для предоставления разрешений страницам контекста браузера на чтение его геолокации.
 :::
 
-**Arguments**
+**Аргументы**
 - `geolocation` [null] | Geolocation<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-geolocation-option-geolocation"/><a href="#browser-context-set-geolocation-option-geolocation" class="list-anchor">#</a>
   - `setLatitude` [double]
     
-    Latitude between -90 and 90.
+    Широта между -90 и 90.
   - `setLongitude` [double]
     
-    Longitude between -180 and 180.
-  - `setAccuracy` [double] *(optional)*
+    Долгота между -180 и 180.
+  - `setAccuracy` [double] *(опционально)*
     
-    Non-negative accuracy value. Defaults to `0`.
+    Неотрицательное значение точности. По умолчанию `0`.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-geolocation-return"/><a href="#browser-context-set-geolocation-return" class="list-anchor">#</a>
 
 ---
 
 ### setOffline {#browser-context-set-offline}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.setOffline</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.setOffline</x-search>
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.setOffline(offline);
 ```
 
-**Arguments**
+**Аргументы**
 - `offline` [boolean]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-offline-option-offline"/><a href="#browser-context-set-offline-option-offline" class="list-anchor">#</a>
   
-  Whether to emulate network being offline for the browser context.
+  Эмулировать ли отсутствие сети для контекста браузера.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-offline-return"/><a href="#browser-context-set-offline-return" class="list-anchor">#</a>
 
 ---
 
 ### storageState {#browser-context-storage-state}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.storageState</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.storageState</x-search>
 
-Returns storage state for this browser context, contains current cookies, local storage snapshot and IndexedDB snapshot.
+Возвращает состояние хранилища для этого контекста браузера, содержит текущие куки, снимок локального хранилища и снимок IndexedDB.
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.storageState();
 BrowserContext.storageState(options);
 ```
 
-**Arguments**
-- `options` `BrowserContext.StorageStateOptions` *(optional)*
-  - `setIndexedDB` [boolean] *(optional)* <font size="2">Added in: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-indexed-db"/><a href="#browser-context-storage-state-option-indexed-db" class="list-anchor">#</a>
+**Аргументы**
+- `options` `BrowserContext.StorageStateOptions` *(опционально)*
+  - `setIndexedDB` [boolean] *(опционально)* <font size="2">Добавлено в: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-indexed-db"/><a href="#browser-context-storage-state-option-indexed-db" class="list-anchor">#</a>
     
-    Set to `true` to include [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) in the storage state snapshot. If your application uses IndexedDB to store authentication tokens, like Firebase Authentication, enable this.
+    Установите значение `true`, чтобы включить [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) в снимок состояния хранилища. Если ваше приложение использует IndexedDB для хранения токенов аутентификации, таких как Firebase Authentication, включите это.
     
     :::note
     
-    IndexedDBs with typed arrays are currently not supported.
+    IndexedDB с типизированными массивами в настоящее время не поддерживается.
     :::
     
-  - `setPath` [Path] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-path"/><a href="#browser-context-storage-state-option-path" class="list-anchor">#</a>
+  - `setPath` [Path] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-path"/><a href="#browser-context-storage-state-option-path" class="list-anchor">#</a>
     
-    The file path to save the storage state to. If [setPath](/api/class-browsercontext.mdx#browser-context-storage-state-option-path) is a relative path, then it is resolved relative to current working directory. If no path is provided, storage state is still returned, but won't be saved to the disk.
+    Путь к файлу для сохранения состояния хранилища. Если [setPath](/api/class-browsercontext.mdx#browser-context-storage-state-option-path) является относительным путем, то он разрешается относительно текущей рабочей директории. Если путь не указан, состояние хранилища все равно возвращается, но не будет сохранено на диск.
 
-**Returns**
+**Возвращает**
 - [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-return"/><a href="#browser-context-storage-state-return" class="list-anchor">#</a>
 
 ---
 
 ### unroute {#browser-context-unroute}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.unroute</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.unroute</x-search>
 
-Removes a route created with [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route). When [handler](/api/class-browsercontext.mdx#browser-context-unroute-option-handler) is not specified, removes all routes for the [url](/api/class-browsercontext.mdx#browser-context-unroute-option-url).
+Удаляет маршрут, созданный с помощью [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route). Когда [handler](/api/class-browsercontext.mdx#browser-context-unroute-option-handler) не указан, удаляет все маршруты для [url](/api/class-browsercontext.mdx#browser-context-unroute-option-url).
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.unroute(url);
 BrowserContext.unroute(url, handler);
 ```
 
-**Arguments**
+**Аргументы**
 - `url` [String] | [Pattern] | [Predicate]&lt;[String]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-unroute-option-url"/><a href="#browser-context-unroute-option-url" class="list-anchor">#</a>
   
-  A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route).
-- `handler` [Consumer]&lt;[Route]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-unroute-option-handler"/><a href="#browser-context-unroute-option-handler" class="list-anchor">#</a>
+  Глобальный шаблон, регулярное выражение или предикат, получающий [URL], использованный для регистрации маршрутизации с [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route).
+- `handler` [Consumer]&lt;[Route]&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-unroute-option-handler"/><a href="#browser-context-unroute-option-handler" class="list-anchor">#</a>
   
-  Optional handler function used to register a routing with [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route).
+  Опциональная функция-обработчик, использованная для регистрации маршрутизации с [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route).
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-unroute-return"/><a href="#browser-context-unroute-return" class="list-anchor">#</a>
 
 ---
 
 ### unrouteAll {#browser-context-unroute-all}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.41</font><x-search>browserContext.unrouteAll</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.41</font><x-search>browserContext.unrouteAll</x-search>
 
-Removes all routes created with [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route) and [BrowserContext.routeFromHAR()](/api/class-browsercontext.mdx#browser-context-route-from-har).
+Удаляет все маршруты, созданные с помощью [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route) и [BrowserContext.routeFromHAR()](/api/class-browsercontext.mdx#browser-context-route-from-har).
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.unrouteAll();
 ```
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-unroute-all-return"/><a href="#browser-context-unroute-all-return" class="list-anchor">#</a>
 
 ---
 
 ### waitForCondition {#browser-context-wait-for-condition}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.32</font><x-search>browserContext.waitForCondition</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.32</font><x-search>browserContext.waitForCondition</x-search>
 
-The method will block until the condition returns true. All Playwright events will be dispatched while the method is waiting for the condition.
+Метод будет блокировать выполнение до тех пор, пока условие не вернет true. Все события Playwright будут обрабатываться, пока метод ожидает выполнения условия.
 
-**Usage**
+**Использование**
 
-Use the method to wait for a condition that depends on page events:
+Используйте метод для ожидания условия, зависящего от событий страницы:
 
 ```java
 List<String> failedUrls = new ArrayList<>();
@@ -899,76 +860,76 @@ page2.getByText("Submit button").click();
 context.waitForCondition(() -> failedUrls.size() > 3);
 ```
 
-**Arguments**
+**Аргументы**
 - `condition` [BooleanSupplier]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-condition-option-condition"/><a href="#browser-context-wait-for-condition-option-condition" class="list-anchor">#</a>
   
-  Condition to wait for.
-- `options` `BrowserContext.WaitForConditionOptions` *(optional)*
-  - `setTimeout` [double] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-condition-option-timeout"/><a href="#browser-context-wait-for-condition-option-timeout" class="list-anchor">#</a>
+  Условие для ожидания.
+- `options` `BrowserContext.WaitForConditionOptions` *(опционально)*
+  - `setTimeout` [double] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-condition-option-timeout"/><a href="#browser-context-wait-for-condition-option-timeout" class="list-anchor">#</a>
     
-    Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Максимальное время ожидания в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-condition-return"/><a href="#browser-context-wait-for-condition-return" class="list-anchor">#</a>
 
 ---
 
 ### waitForConsoleMessage {#browser-context-wait-for-console-message}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.34</font><x-search>browserContext.waitForConsoleMessage</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.34</font><x-search>browserContext.waitForConsoleMessage</x-search>
 
-Performs action and waits for a [ConsoleMessage] to be logged by in the pages in the context. If predicate is provided, it passes [ConsoleMessage] value into the `predicate` function and waits for `predicate(message)` to return a truthy value. Will throw an error if the page is closed before the [BrowserContext.onConsoleMessage(handler)](/api/class-browsercontext.mdx#browser-context-event-console) event is fired.
+Выполняет действие и ожидает, пока [ConsoleMessage] не будет зарегистрировано на страницах в контексте. Если предикат предоставлен, он передает значение [ConsoleMessage] в функцию `predicate` и ожидает, пока `predicate(message)` не вернет истинное значение. Выдаст ошибку, если страница будет закрыта до того, как событие [BrowserContext.onConsoleMessage(handler)](/api/class-browsercontext.mdx#browser-context-event-console) будет вызвано.
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.waitForConsoleMessage(callback);
 BrowserContext.waitForConsoleMessage(callback, options);
 ```
 
-**Arguments**
-- `options` `BrowserContext.WaitForConsoleMessageOptions` *(optional)*
-  - `setPredicate` [Predicate]&lt;[ConsoleMessage]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-predicate"/><a href="#browser-context-wait-for-console-message-option-predicate" class="list-anchor">#</a>
+**Аргументы**
+- `options` `BrowserContext.WaitForConsoleMessageOptions` *(опционально)*
+  - `setPredicate` [Predicate]&lt;[ConsoleMessage]&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-predicate"/><a href="#browser-context-wait-for-console-message-option-predicate" class="list-anchor">#</a>
     
-    Receives the [ConsoleMessage] object and resolves to truthy value when the waiting should resolve.
-  - `setTimeout` [double] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-timeout"/><a href="#browser-context-wait-for-console-message-option-timeout" class="list-anchor">#</a>
+    Получает объект [ConsoleMessage] и разрешается в истинное значение, когда ожидание должно завершиться.
+  - `setTimeout` [double] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-timeout"/><a href="#browser-context-wait-for-console-message-option-timeout" class="list-anchor">#</a>
     
-    Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
+    Максимальное время ожидания в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя метод [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
 - `callback` [Runnable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-callback"/><a href="#browser-context-wait-for-console-message-option-callback" class="list-anchor">#</a>
   
-  Callback that performs the action triggering the event.
+  Обратный вызов, выполняющий действие, вызывающее событие.
 
-**Returns**
+**Возвращает**
 - [ConsoleMessage]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-return"/><a href="#browser-context-wait-for-console-message-return" class="list-anchor">#</a>
 
 ---
 
 ### waitForPage {#browser-context-wait-for-page}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>browserContext.waitForPage</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>browserContext.waitForPage</x-search>
 
-Performs action and waits for a new [Page] to be created in the context. If predicate is provided, it passes [Page] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the context closes before new [Page] is created.
+Выполняет действие и ожидает, пока в контексте не будет создана новая [Page]. Если предикат предоставлен, он передает значение [Page] в функцию `predicate` и ожидает, пока `predicate(event)` не вернет истинное значение. Выдаст ошибку, если контекст закроется до создания новой [Page].
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.waitForPage(callback);
 BrowserContext.waitForPage(callback, options);
 ```
 
-**Arguments**
-- `options` `BrowserContext.WaitForPageOptions` *(optional)*
-  - `setPredicate` [Predicate]&lt;[Page]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-predicate"/><a href="#browser-context-wait-for-page-option-predicate" class="list-anchor">#</a>
+**Аргументы**
+- `options` `BrowserContext.WaitForPageOptions` *(опционально)*
+  - `setPredicate` [Predicate]&lt;[Page]&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-predicate"/><a href="#browser-context-wait-for-page-option-predicate" class="list-anchor">#</a>
     
-    Receives the [Page] object and resolves to truthy value when the waiting should resolve.
-  - `setTimeout` [double] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-timeout"/><a href="#browser-context-wait-for-page-option-timeout" class="list-anchor">#</a>
+    Получает объект [Page] и разрешается в истинное значение, когда ожидание должно завершиться.
+  - `setTimeout` [double] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-timeout"/><a href="#browser-context-wait-for-page-option-timeout" class="list-anchor">#</a>
     
-    Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
+    Максимальное время ожидания в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя метод [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
 - `callback` [Runnable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-callback"/><a href="#browser-context-wait-for-page-option-callback" class="list-anchor">#</a>
   
-  Callback that performs the action triggering the event.
+  Обратный вызов, выполняющий действие, вызывающее событие.
 
-**Returns**
+**Возвращает**
 - [Page]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-page-return"/><a href="#browser-context-wait-for-page-return" class="list-anchor">#</a>
 
 ---
@@ -977,49 +938,49 @@ BrowserContext.waitForPage(callback, options);
 
 ### clock() {#browser-context-clock}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>browserContext.clock()</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.45</font><x-search>browserContext.clock()</x-search>
 
-Playwright has ability to mock clock and passage of time.
+Playwright имеет возможность имитировать часы и ход времени.
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.clock()
 ```
 
-**Returns**
+**Возвращает**
 - [Clock]
 
 ---
 
 ### request() {#browser-context-request}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>browserContext.request()</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>browserContext.request()</x-search>
 
-API testing helper associated with this context. Requests made with this API will use context cookies.
+Помощник для тестирования API, связанный с этим контекстом. Запросы, сделанные с помощью этого API, будут использовать куки контекста.
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.request()
 ```
 
-**Returns**
+**Возвращает**
 - [APIRequestContext]
 
 ---
 
 ### tracing() {#browser-context-tracing}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>browserContext.tracing()</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>browserContext.tracing()</x-search>
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.tracing()
 ```
 
-**Returns**
+**Возвращает**
 - [Tracing]
 
 ---
@@ -1028,14 +989,14 @@ BrowserContext.tracing()
 
 ### onBackgroundPage(handler) {#browser-context-event-background-page}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.onBackgroundPage(handler)</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.11</font><x-search>browserContext.onBackgroundPage(handler)</x-search>
 
 :::note
 
-Only works with Chromium browser's persistent context.
+Работает только с постоянным контекстом браузера Chromium.
 :::
 
-Emitted when new background page is created in the context.
+Вызывается, когда в контексте создается новая фоновая страница.
 
 ```java
 context.onBackgroundPage(backgroundPage -> {
@@ -1043,46 +1004,46 @@ context.onBackgroundPage(backgroundPage -> {
 });
 ```
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.onBackgroundPage(handler)
 ```
 
-**Event data**
+**Данные события**
 - [Page]
 
 ---
 
 ### onClose(handler) {#browser-context-event-close}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.onClose(handler)</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.onClose(handler)</x-search>
 
-Emitted when Browser context gets closed. This might happen because of one of the following:
-* Browser context is closed.
-* Browser application is closed or crashed.
-* The [Browser.close()](/api/class-browser.mdx#browser-close) method was called.
+Вызывается, когда контекст браузера закрывается. Это может произойти по одной из следующих причин:
+* Контекст браузера закрыт.
+* Приложение браузера закрыто или произошло его аварийное завершение.
+* Был вызван метод [Browser.close()](/api/class-browser.mdx#browser-close).
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.onClose(handler)
 ```
 
-**Event data**
+**Данные события**
 - [BrowserContext]
 
 ---
 
 ### onConsoleMessage(handler) {#browser-context-event-console}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.34</font><x-search>browserContext.onConsoleMessage(handler)</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.34</font><x-search>browserContext.onConsoleMessage(handler)</x-search>
 
-Emitted when JavaScript within the page calls one of console API methods, e.g. `console.log` or `console.dir`.
+Вызывается, когда JavaScript на странице вызывает один из методов консольного API, например, `console.log` или `console.dir`.
 
-The arguments passed into `console.log` and the page are available on the [ConsoleMessage] event handler argument.
+Аргументы, переданные в `console.log` и страницу, доступны в аргументе обработчика события [ConsoleMessage].
 
-**Usage**
+**Использование**
 
 ```java
 context.onConsoleMessage(msg -> {
@@ -1092,18 +1053,18 @@ context.onConsoleMessage(msg -> {
 page.evaluate("() => console.log('hello', 5, { foo: 'bar' })");
 ```
 
-**Event data**
+**Данные события**
 - [ConsoleMessage]
 
 ---
 
 ### onDialog(handler) {#browser-context-event-dialog}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.34</font><x-search>browserContext.onDialog(handler)</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.34</font><x-search>browserContext.onDialog(handler)</x-search>
 
-Emitted when a JavaScript dialog appears, such as `alert`, `prompt`, `confirm` or `beforeunload`. Listener **must** either [Dialog.accept()](/api/class-dialog.mdx#dialog-accept) or [Dialog.dismiss()](/api/class-dialog.mdx#dialog-dismiss) the dialog - otherwise the page will [freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking) waiting for the dialog, and actions like click will never finish.
+Вызывается, когда появляется JavaScript-диалог, такой как `alert`, `prompt`, `confirm` или `beforeunload`. Обработчик **должен** либо [Dialog.accept()](/api/class-dialog.mdx#dialog-accept), либо [Dialog.dismiss()](/api/class-dialog.mdx#dialog-dismiss) диалог - в противном случае страница [заморозится](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking), ожидая диалога, и действия, такие как клик, никогда не завершатся.
 
-**Usage**
+**Использование**
 
 ```java
 context.onDialog(dialog -> {
@@ -1112,21 +1073,21 @@ context.onDialog(dialog -> {
 ```
 
 :::note
-When no [Page.onDialog(handler)](/api/class-page.mdx#page-event-dialog) or [BrowserContext.onDialog(handler)](/api/class-browsercontext.mdx#browser-context-event-dialog) listeners are present, all dialogs are automatically dismissed.
+Когда отсутствуют обработчики [Page.onDialog(handler)](/api/class-page.mdx#page-event-dialog) или [BrowserContext.onDialog(handler)](/api/class-browsercontext.mdx#browser-context-event-dialog), все диалоги автоматически отклоняются.
 :::
 
-**Event data**
+**Данные события**
 - [Dialog]
 
 ---
 
 ### onPage(handler) {#browser-context-event-page}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.onPage(handler)</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.onPage(handler)</x-search>
 
-The event is emitted when a new Page is created in the BrowserContext. The page may still be loading. The event will also fire for popup pages. See also [Page.onPopup(handler)](/api/class-page.mdx#page-event-popup) to receive events about popups relevant to a specific page.
+Событие вызывается, когда в BrowserContext создается новая страница. Страница может все еще загружаться. Событие также будет срабатывать для всплывающих страниц. См. также [Page.onPopup(handler)](/api/class-page.mdx#page-event-popup) для получения событий о всплывающих окнах, относящихся к конкретной странице.
 
-The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup. If you would like to route/listen to this network request, use [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route) and [BrowserContext.onRequest(handler)](/api/class-browsercontext.mdx#browser-context-event-request) respectively instead of similar methods on the [Page].
+Самый ранний момент, когда страница доступна, это когда она перешла на начальный URL. Например, при открытии всплывающего окна с `window.open('http://example.com')`, это событие сработает, когда сетевой запрос к "http://example.com" будет выполнен и его ответ начнет загружаться во всплывающем окне. Если вы хотите маршрутизировать/слушать этот сетевой запрос, используйте [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route) и [BrowserContext.onRequest(handler)](/api/class-browsercontext.mdx#browser-context-event-request) соответственно, вместо аналогичных методов на [Page].
 
 ```java
 Page newPage = context.waitForPage(() -> {
@@ -1136,108 +1097,108 @@ System.out.println(newPage.evaluate("location.href"));
 ```
 
 :::note
-Use [Page.waitForLoadState()](/api/class-page.mdx#page-wait-for-load-state) to wait until the page gets to a particular state (you should not need it in most cases).
+Используйте [Page.waitForLoadState()](/api/class-page.mdx#page-wait-for-load-state), чтобы дождаться, пока страница достигнет определенного состояния (в большинстве случаев это не потребуется).
 :::
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.onPage(handler)
 ```
 
-**Event data**
+**Данные события**
 - [Page]
 
 ---
 
 ### onRequest(handler) {#browser-context-event-request}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>browserContext.onRequest(handler)</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>browserContext.onRequest(handler)</x-search>
 
-Emitted when a request is issued from any pages created through this context. The [request] object is read-only. To only listen for requests from a particular page, use [Page.onRequest(handler)](/api/class-page.mdx#page-event-request).
+Вызывается, когда запрос отправляется с любой страницы, созданной через этот контекст. Объект [request] доступен только для чтения. Чтобы слушать запросы только с определенной страницы, используйте [Page.onRequest(handler)](/api/class-page.mdx#page-event-request).
 
-In order to intercept and mutate requests, see [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route) or [Page.route()](/api/class-page.mdx#page-route).
+Для перехвата и изменения запросов см. [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route) или [Page.route()](/api/class-page.mdx#page-route).
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.onRequest(handler)
 ```
 
-**Event data**
+**Данные события**
 - [Request]
 
 ---
 
 ### onRequestFailed(handler) {#browser-context-event-request-failed}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>browserContext.onRequestFailed(handler)</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>browserContext.onRequestFailed(handler)</x-search>
 
-Emitted when a request fails, for example by timing out. To only listen for failed requests from a particular page, use [Page.onRequestFailed(handler)](/api/class-page.mdx#page-event-request-failed).
+Вызывается, когда запрос не удается выполнить, например, из-за тайм-аута. Чтобы слушать только неудачные запросы с определенной страницы, используйте [Page.onRequestFailed(handler)](/api/class-page.mdx#page-event-request-failed).
 
 :::note
 
-HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [BrowserContext.onRequestFinished(handler)](/api/class-browsercontext.mdx#browser-context-event-request-finished) event and not with [BrowserContext.onRequestFailed(handler)](/api/class-browsercontext.mdx#browser-context-event-request-failed).
+HTTP-ошибки, такие как 404 или 503, все еще считаются успешными ответами с точки зрения HTTP, поэтому запрос завершится событием [BrowserContext.onRequestFinished(handler)](/api/class-browsercontext.mdx#browser-context-event-request-finished), а не [BrowserContext.onRequestFailed(handler)](/api/class-browsercontext.mdx#browser-context-event-request-failed).
 :::
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.onRequestFailed(handler)
 ```
 
-**Event data**
+**Данные события**
 - [Request]
 
 ---
 
 ### onRequestFinished(handler) {#browser-context-event-request-finished}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>browserContext.onRequestFinished(handler)</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>browserContext.onRequestFinished(handler)</x-search>
 
-Emitted when a request finishes successfully after downloading the response body. For a successful response, the sequence of events is `request`, `response` and `requestfinished`. To listen for successful requests from a particular page, use [Page.onRequestFinished(handler)](/api/class-page.mdx#page-event-request-finished).
+Вызывается, когда запрос успешно завершается после загрузки тела ответа. Для успешного ответа последовательность событий: `request`, `response` и `requestfinished`. Чтобы слушать успешные запросы с определенной страницы, используйте [Page.onRequestFinished(handler)](/api/class-page.mdx#page-event-request-finished).
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.onRequestFinished(handler)
 ```
 
-**Event data**
+**Данные события**
 - [Request]
 
 ---
 
 ### onResponse(handler) {#browser-context-event-response}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>browserContext.onResponse(handler)</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>browserContext.onResponse(handler)</x-search>
 
-Emitted when [response] status and headers are received for a request. For a successful response, the sequence of events is `request`, `response` and `requestfinished`. To listen for response events from a particular page, use [Page.onResponse(handler)](/api/class-page.mdx#page-event-response).
+Вызывается, когда статус и заголовки [response] получены для запроса. Для успешного ответа последовательность событий: `request`, `response` и `requestfinished`. Чтобы слушать события ответа с определенной страницы, используйте [Page.onResponse(handler)](/api/class-page.mdx#page-event-response).
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.onResponse(handler)
 ```
 
-**Event data**
+**Данные события**
 - [Response]
 
 ---
 
 ### onWebError(handler) {#browser-context-event-web-error}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.38</font><x-search>browserContext.onWebError(handler)</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.38</font><x-search>browserContext.onWebError(handler)</x-search>
 
-Emitted when exception is unhandled in any of the pages in this context. To listen for errors from a particular page, use [Page.onPageError(handler)](/api/class-page.mdx#page-event-page-error) instead.
+Вызывается, когда исключение не обработано на любой из страниц в этом контексте. Чтобы слушать ошибки с определенной страницы, используйте [Page.onPageError(handler)](/api/class-page.mdx#page-event-page-error) вместо этого.
 
-**Usage**
+**Использование**
 
 ```java
 BrowserContext.onWebError(handler)
 ```
 
-**Event data**
+**Данные события**
 - [WebError]
 
 

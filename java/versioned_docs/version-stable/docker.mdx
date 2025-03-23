@@ -6,46 +6,46 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-[Dockerfile.noble] can be used to run Playwright scripts in Docker environment. This image includes the [Playwright browsers](./browsers.mdx#install-browsers) and [browser system dependencies](./browsers.mdx#install-system-dependencies). The Playwright package/dependency is not included in the image and should be installed separately.
+[Dockerfile.noble] может быть использован для запуска скриптов Playwright в среде Docker. Этот образ включает [браузеры Playwright](./browsers.mdx#install-browsers) и [системные зависимости браузера](./browsers.mdx#install-system-dependencies). Пакет/зависимость Playwright не включены в образ и должны быть установлены отдельно.
 
-## Usage
+## Использование
 
-This Docker image is published to [Microsoft Artifact Registry].
+Этот Docker-образ опубликован в [Microsoft Artifact Registry].
 
 :::info
 
-This Docker image is intended to be used for testing and development purposes only. It is not recommended to use this Docker image to visit untrusted websites.
+Этот Docker-образ предназначен только для тестирования и разработки. Не рекомендуется использовать этот Docker-образ для посещения ненадежных веб-сайтов.
 :::
 
-### Pull the image
+### Загрузка образа
 
 ```bash
 docker pull mcr.microsoft.com/playwright/java:v1.50.0-noble
 ```
 
-### Run the image
+### Запуск образа
 
-By default, the Docker image will use the `root` user to run the browsers. This will disable the Chromium sandbox which is not available with root. If you run trusted code (e.g. End-to-end tests) and want to avoid the hassle of managing separate user then the root user may be fine. For web scraping or crawling, we recommend to create a separate user inside the Docker container and use the seccomp profile.
+По умолчанию Docker-образ будет использовать пользователя `root` для запуска браузеров. Это отключит песочницу Chromium, которая недоступна с root. Если вы запускаете доверенный код (например, сквозные тесты) и хотите избежать хлопот с управлением отдельным пользователем, то пользователь root может быть подходящим. Для веб-скрейпинга или обхода сайтов мы рекомендуем создать отдельного пользователя внутри контейнера Docker и использовать профиль seccomp.
 
-#### End-to-end tests
+#### Сквозные тесты
 
-On trusted websites, you can avoid creating a separate user and use root for it since you trust the code which will run on the browsers.
+На доверенных веб-сайтах вы можете избежать создания отдельного пользователя и использовать root, так как вы доверяете коду, который будет выполняться в браузерах.
 
 ```bash
 docker run -it --rm --ipc=host mcr.microsoft.com/playwright/java:v1.50.0-noble /bin/bash
 ```
 
-#### Crawling and scraping
+#### Обход и скрейпинг
 
-On untrusted websites, it's recommended to use a separate user for launching the browsers in combination with the seccomp profile. Inside the container or if you are using the Docker image as a base image you have to use `adduser` for it.
+На ненадежных веб-сайтах рекомендуется использовать отдельного пользователя для запуска браузеров в сочетании с профилем seccomp. Внутри контейнера или если вы используете Docker-образ как базовый образ, вам нужно использовать `adduser` для этого.
 
 ```bash
 docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_profile.json mcr.microsoft.com/playwright/java:v1.50.0-noble /bin/bash
 ```
 
-[`seccomp_profile.json`](https://github.com/microsoft/playwright/blob/main/utils/docker/seccomp_profile.json) is needed to run Chromium with sandbox. This is a [default Docker seccomp profile](https://github.com/docker/engine/blob/d0d99b04cf6e00ed3fc27e81fc3d94e7eda70af3/profiles/seccomp/default.json) with extra user namespace cloning permissions:
+[`seccomp_profile.json`](https://github.com/microsoft/playwright/blob/main/utils/docker/seccomp_profile.json) необходим для запуска Chromium с песочницей. Это [профиль seccomp по умолчанию для Docker](https://github.com/docker/engine/blob/d0d99b04cf6e00ed3fc27e81fc3d94e7eda70af3/profiles/seccomp/default.json) с дополнительными разрешениями на клонирование пространства имен пользователя:
 
 ```json
 {
@@ -63,26 +63,26 @@ docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_prof
 ```
 
 :::note
-Using `--ipc=host` is recommended when using Chrome ([Docker docs](https://docs.docker.com/engine/reference/run/#ipc-settings---ipc)). Chrome can run out of memory without this flag.
+Использование `--ipc=host` рекомендуется при использовании Chrome ([документация Docker](https://docs.docker.com/engine/reference/run/#ipc-settings---ipc)). Chrome может исчерпать память без этого флага.
 :::
 
-### Using on CI
+### Использование на CI
 
-See our [Continuous Integration guides](./ci.mdx) for sample configs.
+Смотрите наши [руководства по непрерывной интеграции](./ci.mdx) для примеров конфигураций.
 
-### Remote Connection
+### Удаленное подключение
 
-You can run Playwright Server in Docker while keeping your tests running on the host system or another machine. This is useful for running tests on unsupported Linux distributions or remote execution scenarios.
+Вы можете запустить Playwright Server в Docker, оставив ваши тесты работающими на хост-системе или другой машине. Это полезно для запуска тестов на неподдерживаемых дистрибутивах Linux или в сценариях удаленного выполнения.
 
-#### Running the Playwright Server
+#### Запуск Playwright Server
 
-Start the Playwright Server in Docker:
+Запустите Playwright Server в Docker:
 
 ```bash
 docker run -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.50.0-noble /bin/sh -c "npx -y playwright@1.50.0 run-server --port 3000 --host 0.0.0.0"
 ```
 
-#### Connecting to the Server
+#### Подключение к серверу
 
 ```java
 package org.example;
@@ -99,44 +99,44 @@ public class App {
 }
 ```
 
-#### Network Configuration
+#### Конфигурация сети
 
-If you need to access local servers from within the Docker container:
+Если вам нужно получить доступ к локальным серверам из контейнера Docker:
 
 ```bash
 docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.50.0-noble /bin/sh -c "npx -y playwright@1.50.0 run-server --port 3000 --host 0.0.0.0"
 ```
 
-This makes `hostmachine` point to the host's localhost. Your tests should use `hostmachine` instead of `localhost` when accessing local servers.
+Это делает `hostmachine` указывающим на localhost хоста. Ваши тесты должны использовать `hostmachine` вместо `localhost` при доступе к локальным серверам.
 
 :::note
 
-When running tests remotely, ensure the Playwright version in your tests matches the version running in the Docker container.
+При запуске тестов удаленно убедитесь, что версия Playwright в ваших тестах соответствует версии, работающей в контейнере Docker.
 :::
 
-## Image tags
+## Теги образов
 
-See [all available image tags].
+Смотрите [все доступные теги образов].
 
-We currently publish images with the following tags:
-- `:v1.50.0` - Playwright v1.50.0 release docker image based on Ubuntu 24.04 LTS (Noble Numbat).
-- `:v1.50.0-noble` - Playwright v1.50.0 release docker image based on Ubuntu 24.04 LTS (Noble Numbat).
-- `:v1.50.0-jammy` - Playwright v1.50.0 release docker image based on Ubuntu 22.04 LTS (Jammy Jellyfish).
+В настоящее время мы публикуем образы со следующими тегами:
+- `:v1.50.0` - Docker-образ релиза Playwright v1.50.0 на основе Ubuntu 24.04 LTS (Noble Numbat).
+- `:v1.50.0-noble` - Docker-образ релиза Playwright v1.50.0 на основе Ubuntu 24.04 LTS (Noble Numbat).
+- `:v1.50.0-jammy` - Docker-образ релиза Playwright v1.50.0 на основе Ubuntu 22.04 LTS (Jammy Jellyfish).
 
 :::note
 
-It is recommended to always pin your Docker image to a specific version if possible. If the Playwright version in your Docker image does not match the version in your project/tests, Playwright will be unable to locate browser executables.
+Рекомендуется всегда закреплять ваш Docker-образ на определенной версии, если это возможно. Если версия Playwright в вашем Docker-образе не совпадает с версией в вашем проекте/тестах, Playwright не сможет найти исполняемые файлы браузера.
 :::
 
-### Base images
+### Базовые образы
 
-We currently publish images based on the following [Ubuntu](https://hub.docker.com/_/ubuntu) versions:
-- **Ubuntu 24.04 LTS** (Noble Numbat), image tags include `noble`
-- **Ubuntu 22.04 LTS** (Jammy Jellyfish), image tags include `jammy`
+В настоящее время мы публикуем образы на основе следующих версий [Ubuntu](https://hub.docker.com/_/ubuntu):
+- **Ubuntu 24.04 LTS** (Noble Numbat), теги образов включают `noble`
+- **Ubuntu 22.04 LTS** (Jammy Jellyfish), теги образов включают `jammy`
 
 #### Alpine
 
-Browser builds for Firefox and WebKit are built for the [glibc](https://en.wikipedia.org/wiki/Glibc) library. Alpine Linux and other distributions that are based on the [musl](https://en.wikipedia.org/wiki/Musl) standard library are not supported.
+Сборки браузеров для Firefox и WebKit создаются для библиотеки [glibc](https://en.wikipedia.org/wiki/Glibc). Alpine Linux и другие дистрибутивы, основанные на стандартной библиотеке [musl](https://en.wikipedia.org/wiki/Musl), не поддерживаются.
 
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

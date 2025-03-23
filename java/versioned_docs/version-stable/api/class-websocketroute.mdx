@@ -6,12 +6,11 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+Когда маршрут [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) настроен с помощью [Page.routeWebSocket()](/api/class-page.mdx#page-route-web-socket) или [BrowserContext.routeWebSocket()](/api/class-browsercontext.mdx#browser-context-route-web-socket), объект `WebSocketRoute` позволяет обрабатывать WebSocket, как это делает реальный сервер.
 
-Whenever a [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) route is set up with [Page.routeWebSocket()](/api/class-page.mdx#page-route-web-socket) or [BrowserContext.routeWebSocket()](/api/class-browsercontext.mdx#browser-context-route-web-socket), the `WebSocketRoute` object allows to handle the WebSocket, like an actual server would do.
+**Мокирование**
 
-**Mocking**
-
-By default, the routed WebSocket will not connect to the server. This way, you can mock entire communcation over the WebSocket. Here is an example that responds to a `"request"` with a `"response"`.
+По умолчанию маршрутизированный WebSocket не подключается к серверу. Таким образом, вы можете имитировать всю коммуникацию через WebSocket. Вот пример, который отвечает на `"request"` с `"response"`.
 
 ```java
 page.routeWebSocket("wss://example.com/ws", ws -> {
@@ -22,9 +21,9 @@ page.routeWebSocket("wss://example.com/ws", ws -> {
 });
 ```
 
-Since we do not call [WebSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server) inside the WebSocket route handler, Playwright assumes that WebSocket will be mocked, and opens the WebSocket inside the page automatically.
+Поскольку мы не вызываем [WebSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server) внутри обработчика маршрута WebSocket, Playwright предполагает, что WebSocket будет имитирован, и автоматически открывает WebSocket внутри страницы.
 
-Here is another example that handles JSON messages:
+Вот еще один пример, который обрабатывает JSON-сообщения:
 
 ```java
 page.routeWebSocket("wss://example.com/ws", ws -> {
@@ -39,11 +38,11 @@ page.routeWebSocket("wss://example.com/ws", ws -> {
 });
 ```
 
-**Intercepting**
+**Перехват**
 
-Alternatively, you may want to connect to the actual server, but intercept messages in-between and modify or block them. Calling [WebSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server) returns a server-side `WebSocketRoute` instance that you can send messages to, or handle incoming messages.
+В качестве альтернативы, вы можете подключиться к реальному серверу, но перехватывать сообщения между ними и изменять или блокировать их. Вызов [WebSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server) возвращает серверный экземпляр `WebSocketRoute`, к которому вы можете отправлять сообщения или обрабатывать входящие сообщения.
 
-Below is an example that modifies some messages sent by the page to the server. Messages sent from the server to the page are left intact, relying on the default forwarding.
+Ниже приведен пример, который изменяет некоторые сообщения, отправляемые страницей на сервер. Сообщения, отправляемые с сервера на страницу, остаются нетронутыми, полагаясь на стандартную пересылку.
 
 ```java
 page.routeWebSocket("/ws", ws -> {
@@ -57,13 +56,13 @@ page.routeWebSocket("/ws", ws -> {
 });
 ```
 
-After connecting to the server, all **messages are forwarded** between the page and the server by default.
+После подключения к серверу все **сообщения пересылаются** между страницей и сервером по умолчанию.
 
-However, if you call [WebSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) on the original route, messages from the page to the server **will not be forwarded** anymore, but should instead be handled by the [handler](/api/class-websocketroute.mdx#web-socket-route-on-message-option-handler).
+Однако, если вы вызываете [WebSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) на оригинальном маршруте, сообщения от страницы к серверу **больше не будут пересылаться**, но должны обрабатываться [обработчиком](/api/class-websocketroute.mdx#web-socket-route-on-message-option-handler).
 
-Similarly, calling [WebSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) on the server-side WebSocket will **stop forwarding messages** from the server to the page, and [handler](/api/class-websocketroute.mdx#web-socket-route-on-message-option-handler) should take care of them.
+Аналогично, вызов [WebSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) на серверном WebSocket **прекратит пересылку сообщений** с сервера на страницу, и [обработчик](/api/class-websocketroute.mdx#web-socket-route-on-message-option-handler) должен позаботиться о них.
 
-The following example blocks some messages in both directions. Since it calls [WebSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) in both directions, there is no automatic forwarding at all.
+Следующий пример блокирует некоторые сообщения в обоих направлениях. Поскольку он вызывает [WebSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) в обоих направлениях, автоматической пересылки вообще нет.
 
 ```java
 page.routeWebSocket("/ws", ws -> {
@@ -79,34 +78,33 @@ page.routeWebSocket("/ws", ws -> {
 });
 ```
 
-
 ---
 
-## Methods
+## Методы
 
 ### close {#web-socket-route-close}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.close</x-search>
 
-Closes one side of the WebSocket connection.
+Закрывает одну сторону WebSocket соединения.
 
-**Usage**
+**Использование**
 
 ```java
 WebSocketRoute.close();
 WebSocketRoute.close(options);
 ```
 
-**Arguments**
-- `options` `WebSocketRoute.CloseOptions` *(optional)*
-  - `setCode` [int] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-option-code"/><a href="#web-socket-route-close-option-code" class="list-anchor">#</a>
+**Аргументы**
+- `options` `WebSocketRoute.CloseOptions` *(опционально)*
+  - `setCode` [int] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-option-code"/><a href="#web-socket-route-close-option-code" class="list-anchor">#</a>
     
-    Optional [close code](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#code).
-  - `setReason` [String] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-option-reason"/><a href="#web-socket-route-close-option-reason" class="list-anchor">#</a>
+    Опциональный [код закрытия](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#code).
+  - `setReason` [String] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-option-reason"/><a href="#web-socket-route-close-option-reason" class="list-anchor">#</a>
     
-    Optional [close reason](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason).
+    Опциональная [причина закрытия](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason).
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-return"/><a href="#web-socket-route-close-return" class="list-anchor">#</a>
 
 ---
@@ -115,21 +113,21 @@ WebSocketRoute.close(options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.connectToServer</x-search>
 
-By default, routed WebSocket does not connect to the server, so you can mock entire WebSocket communication. This method connects to the actual WebSocket server, and returns the server-side [WebSocketRoute] instance, giving the ability to send and receive messages from the server.
+По умолчанию маршрутизированный WebSocket не подключается к серверу, поэтому вы можете имитировать всю коммуникацию через WebSocket. Этот метод подключается к реальному WebSocket серверу и возвращает серверный экземпляр [WebSocketRoute], предоставляя возможность отправлять и получать сообщения с сервера.
 
-Once connected to the server:
-* Messages received from the server will be **automatically forwarded** to the WebSocket in the page, unless [WebSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) is called on the server-side `WebSocketRoute`.
-* Messages sent by the [`WebSocket.send()`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send) call in the page will be **automatically forwarded** to the server, unless [WebSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) is called on the original `WebSocketRoute`.
+После подключения к серверу:
+* Сообщения, полученные с сервера, будут **автоматически пересылаться** в WebSocket на странице, если только [WebSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) не вызван на серверной стороне `WebSocketRoute`.
+* Сообщения, отправленные вызовом [`WebSocket.send()`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send) на странице, будут **автоматически пересылаться** на сервер, если только [WebSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) не вызван на оригинальном `WebSocketRoute`.
 
-See examples at the top for more details.
+Смотрите примеры в начале для более подробной информации.
 
-**Usage**
+**Использование**
 
 ```java
 WebSocketRoute.connectToServer();
 ```
 
-**Returns**
+**Возвращает**
 - [WebSocketRoute]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-connect-to-server-return"/><a href="#web-socket-route-connect-to-server-return" class="list-anchor">#</a>
 
 ---
@@ -138,20 +136,20 @@ WebSocketRoute.connectToServer();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.onClose</x-search>
 
-Allows to handle [`WebSocket.close`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close).
+Позволяет обрабатывать [`WebSocket.close`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close).
 
-By default, closing one side of the connection, either in the page or on the server, will close the other side. However, when [WebSocketRoute.onClose()](/api/class-websocketroute.mdx#web-socket-route-on-close) handler is set up, the default forwarding of closure is disabled, and handler should take care of it.
+По умолчанию закрытие одной стороны соединения, либо на странице, либо на сервере, закроет другую сторону. Однако, когда обработчик [WebSocketRoute.onClose()](/api/class-websocketroute.mdx#web-socket-route-on-close) настроен, стандартная пересылка закрытия отключается, и обработчик должен позаботиться об этом.
 
-**Usage**
+**Использование**
 
 ```java
 WebSocketRoute.onClose(handler);
 ```
 
-**Arguments**
+**Аргументы**
 - `handler` [Consumer]&lt;[null] | [int]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-close-option-handler"/><a href="#web-socket-route-on-close-option-handler" class="list-anchor">#</a>
   
-  Function that will handle WebSocket closure. Received an optional [close code](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#code) and an optional [close reason](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason).
+  Функция, которая будет обрабатывать закрытие WebSocket. Получает опциональный [код закрытия](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#code) и опциональную [причину закрытия](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason).
 
 ---
 
@@ -159,24 +157,24 @@ WebSocketRoute.onClose(handler);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.onMessage</x-search>
 
-This method allows to handle messages that are sent by the WebSocket, either from the page or from the server.
+Этот метод позволяет обрабатывать сообщения, которые отправляются через WebSocket, либо со страницы, либо с сервера.
 
-When called on the original WebSocket route, this method handles messages sent from the page. You can handle this messages by responding to them with [WebSocketRoute.send()](/api/class-websocketroute.mdx#web-socket-route-send), forwarding them to the server-side connection returned by [WebSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server) or do something else.
+Когда вызывается на оригинальном маршруте WebSocket, этот метод обрабатывает сообщения, отправленные со страницы. Вы можете обрабатывать эти сообщения, отвечая на них с помощью [WebSocketRoute.send()](/api/class-websocketroute.mdx#web-socket-route-send), пересылая их на серверное соединение, возвращенное [WebSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server), или делая что-то еще.
 
-Once this method is called, messages are not automatically forwarded to the server or to the page - you should do that manually by calling [WebSocketRoute.send()](/api/class-websocketroute.mdx#web-socket-route-send). See examples at the top for more details.
+После вызова этого метода сообщения не пересылаются автоматически на сервер или на страницу - вы должны сделать это вручную, вызывая [WebSocketRoute.send()](/api/class-websocketroute.mdx#web-socket-route-send). Смотрите примеры в начале для более подробной информации.
 
-Calling this method again will override the handler with a new one.
+Повторный вызов этого метода заменит обработчик на новый.
 
-**Usage**
+**Использование**
 
 ```java
 WebSocketRoute.onMessage(handler);
 ```
 
-**Arguments**
+**Аргументы**
 - `handler` [Consumer]&lt;[WebSocketFrame]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-message-option-handler"/><a href="#web-socket-route-on-message-option-handler" class="list-anchor">#</a>
   
-  Function that will handle messages.
+  Функция, которая будет обрабатывать сообщения.
 
 ---
 
@@ -184,18 +182,18 @@ WebSocketRoute.onMessage(handler);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.send</x-search>
 
-Sends a message to the WebSocket. When called on the original WebSocket, sends the message to the page. When called on the result of [WebSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server), sends the message to the server. See examples at the top for more details.
+Отправляет сообщение в WebSocket. Когда вызывается на оригинальном WebSocket, отправляет сообщение на страницу. Когда вызывается на результате [WebSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server), отправляет сообщение на сервер. Смотрите примеры в начале для более подробной информации.
 
-**Usage**
+**Использование**
 
 ```java
 WebSocketRoute.send(message);
 ```
 
-**Arguments**
+**Аргументы**
 - `message` [String] | [byte&#91;&#93;]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-send-option-message"/><a href="#web-socket-route-send-option-message" class="list-anchor">#</a>
   
-  Message to send.
+  Сообщение для отправки.
 
 ---
 
@@ -203,15 +201,15 @@ WebSocketRoute.send(message);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.url</x-search>
 
-URL of the WebSocket created in the page.
+URL WebSocket, созданного на странице.
 
-**Usage**
+**Использование**
 
 ```java
 WebSocketRoute.url();
 ```
 
-**Returns**
+**Возвращает**
 - [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-url-return"/><a href="#web-socket-route-url-return" class="list-anchor">#</a>
 
 

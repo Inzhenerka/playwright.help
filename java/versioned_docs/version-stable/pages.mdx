@@ -1,95 +1,94 @@
 ---
 id: pages
-title: "Pages"
+title: "Страницы"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Pages
+## Страницы
 
-Each [BrowserContext] can have multiple pages. A [Page] refers to a single tab or a popup window within a browser context. It should be used to navigate to URLs and interact with the page content.
+Каждый [BrowserContext] может содержать несколько страниц. [Page] относится к одной вкладке или всплывающему окну в контексте браузера. Он должен использоваться для навигации по URL-адресам и взаимодействия с содержимым страницы.
 
 ```java
-// Create a page.
+// Создать страницу.
 Page page = context.newPage();
 
-// Navigate explicitly, similar to entering a URL in the browser.
+// Явная навигация, аналогичная вводу URL в браузере.
 page.navigate("http://example.com");
-// Fill an input.
+// Заполнить поле ввода.
 page.locator("#search").fill("query");
 
-// Navigate implicitly by clicking a link.
+// Неявная навигация путем нажатия на ссылку.
 page.locator("#submit").click();
-// Expect a new url.
+// Ожидание нового URL.
 System.out.println(page.url());
 ```
 
-## Multiple pages
+## Несколько страниц
 
-Each browser context can host multiple pages (tabs).
-* Each page behaves like a focused, active page. Bringing the page to front is not required.
-* Pages inside a context respect context-level emulation, like viewport sizes, custom network routes or browser locale.
+Каждый контекст браузера может содержать несколько страниц (вкладок).
+* Каждая страница ведет себя как сфокусированная, активная страница. Выводить страницу на передний план не требуется.
+* Страницы в контексте учитывают эмуляцию на уровне контекста, такую как размеры окна просмотра, пользовательские сетевые маршруты или локаль браузера.
 
 ```java
-// Create two pages
+// Создать две страницы
 Page pageOne = context.newPage();
 Page pageTwo = context.newPage();
 
-// Get pages of a browser context
+// Получить страницы контекста браузера
 List<Page> allPages = context.pages();
 ```
 
-## Handling new pages
+## Обработка новых страниц
 
-The `page` event on browser contexts can be used to get new pages that are created in the context. This can be used to handle new pages opened by `target="_blank"` links.
+Событие `page` в контекстах браузера может использоваться для получения новых страниц, созданных в контексте. Это может быть использовано для обработки новых страниц, открытых ссылками с `target="_blank"`.
 
 ```java
-// Get page after a specific action (e.g. clicking a link)
+// Получить страницу после определенного действия (например, нажатия на ссылку)
 Page newPage = context.waitForPage(() -> {
-  page.getByText("open new tab").click(); // Opens a new tab
+  page.getByText("open new tab").click(); // Открывает новую вкладку
 });
-// Interact with the new page normally
+// Взаимодействовать с новой страницей как обычно
 newPage.getByRole(AriaRole.BUTTON).click();
 System.out.println(newPage.title());
 ```
 
-If the action that triggers the new page is unknown, the following pattern can be used.
+Если действие, которое вызывает новую страницу, неизвестно, можно использовать следующий шаблон.
 
 ```java
-// Get all new pages (including popups) in the context
+// Получить все новые страницы (включая всплывающие окна) в контексте
 context.onPage(page -> {
   page.waitForLoadState();
   System.out.println(page.title());
 });
 ```
 
-## Handling popups
+## Обработка всплывающих окон
 
-If the page opens a pop-up (e.g. pages opened by `target="_blank"` links), you can get a reference to it by listening to the `popup` event on the page.
+Если страница открывает всплывающее окно (например, страницы, открытые ссылками с `target="_blank"`), вы можете получить ссылку на него, прослушивая событие `popup` на странице.
 
-This event is emitted in addition to the `browserContext.on('page')` event, but only for popups relevant to this page.
+Это событие генерируется в дополнение к событию `browserContext.on('page')`, но только для всплывающих окон, относящихся к этой странице.
 
 ```java
-// Get popup after a specific action (e.g., click)
+// Получить всплывающее окно после определенного действия (например, нажатия)
 Page popup = page.waitForPopup(() -> {
   page.getByText("open the popup").click();
 });
-// Interact with the popup normally
+// Взаимодействовать с всплывающим окном как обычно
 popup.getByRole(AriaRole.BUTTON).click();
 System.out.println(popup.title());
 ```
 
-If the action that triggers the popup is unknown, the following pattern can be used.
+Если действие, которое вызывает всплывающее окно, неизвестно, можно использовать следующий шаблон.
 
 ```java
-// Get all popups when they open
+// Получить все всплывающие окна при их открытии
 page.onPopup(popup -> {
   popup.waitForLoadState();
   System.out.println(popup.title());
 });
 ```
-
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"

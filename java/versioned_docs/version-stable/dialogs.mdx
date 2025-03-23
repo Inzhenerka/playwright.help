@@ -1,18 +1,18 @@
 ---
 id: dialogs
-title: "Dialogs"
+title: "Диалоги"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright can interact with the web page dialogs such as [`alert`](https://developer.mozilla.org/en-US/docs/Web/API/Window/alert), [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm), [`prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt) as well as [`beforeunload`](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event) confirmation. For print dialogs, see [Print](#print-dialogs).
+Playwright может взаимодействовать с диалогами веб-страниц, такими как [`alert`](https://developer.mozilla.org/en-US/docs/Web/API/Window/alert), [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm), [`prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt), а также с подтверждением [`beforeunload`](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event). Для диалогов печати см. [Печать](#print-dialogs).
 
-## alert(), confirm(), prompt() dialogs
+## Диалоги alert(), confirm(), prompt()
 
-By default, dialogs are auto-dismissed by Playwright, so you don't have to handle them. However, you can register a dialog handler before the action that triggers the dialog to either [Dialog.accept()](/api/class-dialog.mdx#dialog-accept) or [Dialog.dismiss()](/api/class-dialog.mdx#dialog-dismiss) it.
+По умолчанию диалоги автоматически отклоняются Playwright, поэтому вам не нужно их обрабатывать. Однако вы можете зарегистрировать обработчик диалогов перед действием, которое вызывает диалог, чтобы либо [Dialog.accept()](/api/class-dialog.mdx#dialog-accept), либо [Dialog.dismiss()](/api/class-dialog.mdx#dialog-dismiss) его.
 
 ```java
 page.onDialog(dialog -> dialog.accept());
@@ -20,30 +20,30 @@ page.getByRole(AriaRole.BUTTON).click();
 ```
 
 :::note
-[Page.onDialog(handler)](/api/class-page.mdx#page-event-dialog) listener **must handle** the dialog. Otherwise your action will stall, be it [Locator.click()](/api/class-locator.mdx#locator-click) or something else. That's because dialogs in Web are modals and therefore block further page execution until they are handled.
+Слушатель [Page.onDialog(handler)](/api/class-page.mdx#page-event-dialog) **должен обработать** диалог. В противном случае ваше действие будет приостановлено, будь то [Locator.click()](/api/class-locator.mdx#locator-click) или что-то еще. Это потому, что диалоги в вебе являются модальными и, следовательно, блокируют дальнейшее выполнение страницы, пока они не будут обработаны.
 :::
 
-As a result, the following snippet will never resolve:
+В результате следующий фрагмент никогда не разрешится:
 
 :::warning
 
-WRONG!
+НЕПРАВИЛЬНО!
 :::
 
 ```java
 page.onDialog(dialog -> System.out.println(dialog.message()));
-page.getByRole(AriaRole.BUTTON).click(); // Will hang here
+page.getByRole(AriaRole.BUTTON).click(); // Здесь произойдет зависание
 ```
 
 :::note
-If there is no listener for [Page.onDialog(handler)](/api/class-page.mdx#page-event-dialog), all dialogs are automatically dismissed.
+Если нет слушателя для [Page.onDialog(handler)](/api/class-page.mdx#page-event-dialog), все диалоги автоматически отклоняются.
 :::
 
-## beforeunload dialog
+## Диалог beforeunload
 
-When [Page.close()](/api/class-page.mdx#page-close) is invoked with the truthy [setRunBeforeUnload](/api/class-page.mdx#page-close-option-run-before-unload) value, the page runs its unload handlers. This is the only case when [Page.close()](/api/class-page.mdx#page-close) does not wait for the page to actually close, because it might be that the page stays open in the end of the operation.
+Когда [Page.close()](/api/class-page.mdx#page-close) вызывается с истинным значением [setRunBeforeUnload](/api/class-page.mdx#page-close-option-run-before-unload), страница запускает свои обработчики выгрузки. Это единственный случай, когда [Page.close()](/api/class-page.mdx#page-close) не ждет фактического закрытия страницы, потому что может случиться так, что страница останется открытой в конце операции.
 
-You can register a dialog handler to handle the `beforeunload` dialog yourself:
+Вы можете зарегистрировать обработчик диалогов, чтобы самостоятельно обработать диалог `beforeunload`:
 
 ```java
 page.onDialog(dialog -> {
@@ -53,9 +53,9 @@ page.onDialog(dialog -> {
 page.close(new Page.CloseOptions().setRunBeforeUnload(true));
 ```
 
-## Print dialogs
+## Диалоги печати
 
-In order to assert that a print dialog via [`window.print`](https://developer.mozilla.org/en-US/docs/Web/API/Window/print) was triggered, you can use the following snippet:
+Чтобы убедиться, что диалог печати через [`window.print`](https://developer.mozilla.org/en-US/docs/Web/API/Window/print) был вызван, вы можете использовать следующий фрагмент:
 
 ```java
 page.navigate("<url>");
@@ -66,7 +66,7 @@ page.getByText("Print it!").click();
 page.waitForFunction("window.waitForPrintDialog");
 ```
 
-This will wait for the print dialog to be opened after the button is clicked. Make sure to evaluate the script before clicking the button / after the page is loaded.
+Это будет ожидать открытия диалога печати после нажатия кнопки. Убедитесь, что вы оценили скрипт перед нажатием кнопки / после загрузки страницы.
 
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

@@ -1,81 +1,80 @@
 ---
 id: navigations
-title: "Navigations"
+title: "Навигации"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright can navigate to URLs and handle navigations caused by the page interactions.
+Playwright может переходить по URL-адресам и обрабатывать навигации, вызванные взаимодействиями с страницей.
 
-## Basic navigation
+## Основная навигация
 
-Simplest form of a navigation is opening a URL:
+Самая простая форма навигации - это открытие URL:
 
 ```java
-// Navigate the page
+// Переход на страницу
 page.navigate("https://example.com");
 ```
 
-The code above loads the page and waits for the web page to fire the [load](https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event) event. The load event is fired when the whole page has loaded, including all dependent resources such as stylesheets, scripts, iframes, and images.
+Код выше загружает страницу и ожидает, пока веб-страница не вызовет событие [load](https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event). Событие load вызывается, когда вся страница загружена, включая все зависимые ресурсы, такие как таблицы стилей, скрипты, iframes и изображения.
 
 :::note
 
-If the page does a client-side redirect before `load`, [Page.navigate()](/api/class-page.mdx#page-goto) will wait for the redirected page to fire the `load` event.
+Если страница выполняет перенаправление на стороне клиента до `load`, [Page.navigate()](/api/class-page.mdx#page-goto) будет ждать, пока перенаправленная страница не вызовет событие `load`.
 :::
 
-## When is the page loaded?
+## Когда страница загружена?
 
-Modern pages perform numerous activities after the `load` event was fired. They fetch data lazily, populate UI, load expensive resources, scripts and styles after the `load` event was fired. There is no way to tell that the page is `loaded`, it depends on the page, framework, etc. So when can you start interacting with it?
+Современные страницы выполняют множество действий после того, как событие `load` было вызвано. Они лениво загружают данные, заполняют пользовательский интерфейс, загружают дорогие ресурсы, скрипты и стили после того, как событие `load` было вызвано. Нет способа определить, что страница `загружена`, это зависит от страницы, фреймворка и т.д. Так когда же можно начинать взаимодействовать с ней?
 
-In Playwright you can interact with the page at any moment. It will automatically wait for the target elements to become [actionable](./actionability.mdx).
+В Playwright вы можете взаимодействовать со страницей в любой момент. Он автоматически будет ждать, пока целевые элементы не станут [доступными для действий](./actionability.mdx).
 
 ```java
-// Navigate and click element
-// Click will auto-wait for the element
+// Переход и клик по элементу
+// Клик будет автоматически ждать элемент
 page.navigate("https://example.com");
 page.getByText("Example Domain").click();
 ```
 
-For the scenario above, Playwright will wait for the text to become visible, will wait for the rest of the actionability checks to pass for that element, and will click it.
+Для приведенного выше сценария Playwright будет ждать, пока текст не станет видимым, будет ждать, пока остальные проверки доступности для действий не пройдут для этого элемента, и кликнет по нему.
 
-Playwright operates as a very fast user - the moment it sees the button, it clicks it. In the general case, you don't need to worry about whether all the resources loaded, etc.
+Playwright работает как очень быстрый пользователь - в тот момент, когда он видит кнопку, он кликает по ней. В общем случае вам не нужно беспокоиться о том, загружены ли все ресурсы и т.д.
 
-## Hydration
+## Гидратация
 
-At some point in time, you'll stumble upon a use case where Playwright performs an action, but nothing seemingly happens. Or you enter some text into the input field and it will disappear. The most probable reason behind that is a poor page [hydration](https://en.wikipedia.org/wiki/Hydration_(web_development)).
+В какой-то момент вы столкнетесь с случаем, когда Playwright выполняет действие, но ничего, казалось бы, не происходит. Или вы вводите текст в поле ввода, и он исчезает. Наиболее вероятная причина этого - плохая [гидратация](https://en.wikipedia.org/wiki/Hydration_(web_development)) страницы.
 
-When page is hydrated, first, a static version of the page is sent to the browser. Then the dynamic part is sent and the page becomes "live". As a very fast user, Playwright will start interacting with the page the moment it sees it. And if the button on a page is enabled, but the listeners have not yet been added, Playwright will do its job, but the click won't have any effect.
+Когда страница гидратируется, сначала статическая версия страницы отправляется в браузер. Затем отправляется динамическая часть, и страница становится "живой". Как очень быстрый пользователь, Playwright начнет взаимодействовать со страницей в тот момент, когда он ее увидит. И если кнопка на странице включена, но слушатели еще не добавлены, Playwright выполнит свою работу, но клик не будет иметь никакого эффекта.
 
-A simple way to verify if your page suffers from a poor hydration is to open Chrome DevTools, pick "Slow 3G" network emulation in the Network panel and reload the page. Once you see the element of interest, interact with it. You'll see that the button clicks will be ignored and the entered text will be reset by the subsequent page load code. The right fix for this issue is to make sure that all the interactive controls are disabled until after the hydration, when the page is fully functional.
+Простой способ проверить, страдает ли ваша страница от плохой гидратации, - это открыть Chrome DevTools, выбрать эмуляцию сети "Slow 3G" в панели Network и перезагрузить страницу. Как только вы увидите интересующий вас элемент, взаимодействуйте с ним. Вы увидите, что клики по кнопке будут игнорироваться, а введенный текст будет сброшен последующим кодом загрузки страницы. Правильное решение этой проблемы - убедиться, что все интерактивные элементы управления отключены до завершения гидратации, когда страница полностью функциональна.
 
-## Waiting for navigation
+## Ожидание навигации
 
-Clicking an element could trigger multiple navigations. In these cases, it is recommended to explicitly [Page.waitForURL()](/api/class-page.mdx#page-wait-for-url) to a specific url.
+Клик по элементу может вызвать несколько навигаций. В таких случаях рекомендуется явно использовать [Page.waitForURL()](/api/class-page.mdx#page-wait-for-url) для конкретного URL.
 
 ```java
 page.getByText("Click me").click();
 page.waitForURL("**/login");
 ```
 
-## Navigation events
+## События навигации
 
-Playwright splits the process of showing a new document in a page into **navigation** and **loading**.
+Playwright разделяет процесс отображения нового документа на странице на **навигацию** и **загрузку**.
 
-**Navigation starts** by changing the page URL or by interacting with the page (e.g., clicking a link). The navigation intent may be canceled, for example, on hitting an unresolved DNS address or transformed into a file download.
+**Навигация начинается** с изменения URL страницы или взаимодействия со страницей (например, клик по ссылке). Намерение навигации может быть отменено, например, при попадании на неразрешенный DNS-адрес или преобразовано в загрузку файла.
 
-**Navigation is committed** when the response headers have been parsed and session history is updated. Only after the navigation succeeds (is committed), the page starts **loading** the document.
+**Навигация завершается** при разборе заголовков ответа и обновлении истории сеанса. Только после успешного завершения навигации (ее завершения) страница начинает **загружать** документ.
 
-**Loading** covers getting the remaining response body over the network, parsing, executing the scripts and firing load events:
-- [Page.url()](/api/class-page.mdx#page-url) is set to the new url
-- document content is loaded over network and parsed
-- [Page.onDOMContentLoaded(handler)](/api/class-page.mdx#page-event-dom-content-loaded) event is fired
-- page executes some scripts and loads resources like stylesheets and images
-- [Page.onLoad(handler)](/api/class-page.mdx#page-event-load) event is fired
-- page executes dynamically loaded scripts
-
+**Загрузка** охватывает получение оставшегося тела ответа по сети, разбор, выполнение скриптов и вызов событий загрузки:
+- [Page.url()](/api/class-page.mdx#page-url) устанавливается на новый URL
+- содержимое документа загружается по сети и разбирается
+- событие [Page.onDOMContentLoaded(handler)](/api/class-page.mdx#page-event-dom-content-loaded) вызывается
+- страница выполняет некоторые скрипты и загружает ресурсы, такие как таблицы стилей и изображения
+- событие [Page.onLoad(handler)](/api/class-page.mdx#page-event-load) вызывается
+- страница выполняет динамически загруженные скрипты
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"

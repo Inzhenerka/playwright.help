@@ -1,22 +1,22 @@
 ---
 id: evaluating
-title: "Evaluating JavaScript"
+title: "Выполнение JavaScript"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright scripts run in your Playwright environment. Your page scripts run in the browser page environment. Those environments don't intersect, they are running in different virtual machines in different processes and even potentially on different computers.
+Скрипты Playwright выполняются в вашей среде Playwright. Скрипты вашей страницы выполняются в среде страницы браузера. Эти среды не пересекаются, они работают в разных виртуальных машинах в разных процессах и даже потенциально на разных компьютерах.
 
-The [Page.evaluate()](/api/class-page.mdx#page-evaluate) API can run a JavaScript function in the context of the web page and bring results back to the Playwright environment. Browser globals like `window` and `document` can be used in `evaluate`.
+API [Page.evaluate()](/api/class-page.mdx#page-evaluate) может выполнять JavaScript-функцию в контексте веб-страницы и возвращать результаты в среду Playwright. Глобальные объекты браузера, такие как `window` и `document`, могут использоваться в `evaluate`.
 
 ```java
 String href = (String) page.evaluate("document.location.href");
 ```
 
-If the result is a Promise or if the function is asynchronous evaluate will automatically wait until it's resolved:
+Если результат является Promise или если функция асинхронная, evaluate автоматически дождется ее разрешения:
 
 ```java
 int status = (int) page.evaluate("async () => {\n" +
@@ -25,54 +25,54 @@ int status = (int) page.evaluate("async () => {\n" +
   "}");
 ```
 
-## Different environments
+## Разные среды
 
-Evaluated scripts run in the browser environment, while your test runs in a testing environments. This means you cannot use variables from your test in the page and vice versa. Instead, you should pass them explicitly as an argument.
+Оцениваемые скрипты выполняются в среде браузера, в то время как ваш тест выполняется в тестовой среде. Это означает, что вы не можете использовать переменные из вашего теста на странице и наоборот. Вместо этого вы должны передавать их явно в качестве аргумента.
 
-The following snippet is **WRONG** because it uses the variable directly:
+Следующий фрагмент **НЕПРАВИЛЬНЫЙ**, потому что он использует переменную напрямую:
 
 ```java
 String data = "some data";
 Object result = page.evaluate("() => {\n" +
-  "  // WRONG: there is no 'data' in the web page.\n" +
+  "  // НЕПРАВИЛЬНО: на веб-странице нет 'data'.\n" +
   "  window.myApp.use(data);\n" +
   "}");
 ```
 
-The following snippet is **CORRECT** because it passes the value explicitly as an argument:
+Следующий фрагмент **ПРАВИЛЬНЫЙ**, потому что он передает значение явно в качестве аргумента:
 
 ```java
 String data = "some data";
-// Pass |data| as a parameter.
+// Передаем |data| в качестве параметра.
 Object result = page.evaluate("data => {\n" +
   "  window.myApp.use(data);\n" +
   "}", data);
 ```
 
-## Evaluation Argument
+## Аргумент оценки
 
-Playwright evaluation methods like [Page.evaluate()](/api/class-page.mdx#page-evaluate) take a single optional argument. This argument can be a mix of [Serializable] values and [JSHandle] instances. Handles are automatically converted to the value they represent.
+Методы оценки Playwright, такие как [Page.evaluate()](/api/class-page.mdx#page-evaluate), принимают один необязательный аргумент. Этот аргумент может быть смесью значений [Serializable] и экземпляров [JSHandle]. Обработчики автоматически преобразуются в представляемое ими значение.
 
 ```java
-// A primitive value.
+// Примитивное значение.
 page.evaluate("num => num", 42);
 
-// An array.
+// Массив.
 page.evaluate("array => array.length", Arrays.asList(1, 2, 3));
 
-// An object.
+// Объект.
 Map<String, Object> obj = new HashMap<>();
 obj.put("foo", "bar");
 page.evaluate("object => object.foo", obj);
 
-// A single handle.
+// Один обработчик.
 ElementHandle button = page.evaluateHandle("window.button");
 page.evaluate("button => button.textContent", button);
 
-// Alternative notation using JSHandle.evaluate.
+// Альтернативная нотация с использованием JSHandle.evaluate.
 button.evaluate("(button, from) => button.textContent.substring(from)", 5);
 
-// Object with multiple handles.
+// Объект с несколькими обработчиками.
 ElementHandle button1 = page.evaluateHandle("window.button1");
 ElementHandle button2 = page.evaluateHandle("window.button2");
 Map<String, ElementHandle> arg = new HashMap<>();
@@ -80,21 +80,21 @@ arg.put("button1", button1);
 arg.put("button2", button2);
 page.evaluate("o => o.button1.textContent + o.button2.textContent", arg);
 
-// Object destructuring works. Note that property names must match
-// between the destructured object and the argument.
-// Also note the required parenthesis.
+// Деструктуризация объекта работает. Обратите внимание, что имена свойств должны совпадать
+// между деструктурированным объектом и аргументом.
+// Также обратите внимание на обязательные скобки.
 Map<String, ElementHandle> arg = new HashMap<>();
 arg.put("button1", button1);
 arg.put("button2", button2);
 page.evaluate("({ button1, button2 }) => button1.textContent + button2.textContent", arg);
 
-// Array works as well. Arbitrary names can be used for destructuring.
-// Note the required parenthesis.
+// Массив также работает. Для деструктуризации можно использовать произвольные имена.
+// Обратите внимание на обязательные скобки.
 page.evaluate(
   "([b1, b2]) => b1.textContent + b2.textContent",
   Arrays.asList(button1, button2));
 
-// Any mix of serializables and handles works.
+// Любая смесь сериализуемых и обработчиков работает.
 Map<String, Object> arg = new HashMap<>();
 arg.put("button1", button1);
 arg.put("list", Arrays.asList(button2));
@@ -104,23 +104,23 @@ page.evaluate(
   arg);
 ```
 
-## Init scripts
+## Скрипты инициализации
 
-Sometimes it is convenient to evaluate something in the page before it starts loading. For example, you might want to setup some mocks or test data.
+Иногда удобно выполнить что-то на странице до того, как она начнет загружаться. Например, вы можете захотеть настроить некоторые моки или тестовые данные.
 
-In this case, use [Page.addInitScript()](/api/class-page.mdx#page-add-init-script) or [BrowserContext.addInitScript()](/api/class-browsercontext.mdx#browser-context-add-init-script). In the example below, we will replace `Math.random()` with a constant value.
+В этом случае используйте [Page.addInitScript()](/api/class-page.mdx#page-add-init-script) или [BrowserContext.addInitScript()](/api/class-browsercontext.mdx#browser-context-add-init-script). В примере ниже мы заменим `Math.random()` на постоянное значение.
 
-First, create a `preload.js` file that contains the mock.
+Сначала создайте файл `preload.js`, содержащий мок.
 
 ```js
 // preload.js
 Math.random = () => 42;
 ```
 
-Next, add init script to the page.
+Затем добавьте скрипт инициализации на страницу.
 
 ```java
-// In your test, assuming the "preload.js" file is in the "mocks" directory.
+// В вашем тесте, предполагая, что файл "preload.js" находится в каталоге "mocks".
 page.addInitScript(Paths.get("mocks/preload.js"));
 ```
 

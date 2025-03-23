@@ -1,25 +1,25 @@
 ---
 id: network
-title: "Network"
+title: "Сеть"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright provides APIs to **monitor** and **modify** browser network traffic, both HTTP and HTTPS. Any requests that a page does, including [XHRs](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) requests, can be tracked, modified and handled.
+Playwright предоставляет API для **мониторинга** и **модификации** сетевого трафика браузера, как HTTP, так и HTTPS. Любые запросы, которые делает страница, включая [XHR](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) и [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) запросы, могут быть отслежены, изменены и обработаны.
 
-## Mock APIs
+## Мокирование API
 
-Check out our [API mocking guide](./mock.mdx) to learn more on how to
-- mock API requests and never hit the API
-- perform the API request and modify the response
-- use HAR files to mock network requests.
+Ознакомьтесь с нашим [руководством по мокированию API](./mock.mdx), чтобы узнать больше о том, как
+- мокировать API-запросы и никогда не обращаться к API
+- выполнять API-запрос и изменять ответ
+- использовать HAR-файлы для мокирования сетевых запросов.
 
-## HTTP Authentication
+## HTTP-аутентификация
 
-Perform HTTP Authentication.
+Выполнение HTTP-аутентификации.
 
 ```java
 BrowserContext context = browser.newContext(new Browser.NewContextOptions()
@@ -28,13 +28,13 @@ Page page = context.newPage();
 page.navigate("https://example.com");
 ```
 
-## HTTP Proxy
+## HTTP-прокси
 
-You can configure pages to load over the HTTP(S) proxy or SOCKSv5. Proxy can be either set globally for the entire browser, or for each browser context individually.
+Вы можете настроить страницы для загрузки через HTTP(S) прокси или SOCKSv5. Прокси может быть установлен глобально для всего браузера или для каждого контекста браузера отдельно.
 
-You can optionally specify username and password for HTTP(S) proxy, you can also specify hosts to bypass the [setProxy](/api/class-browser.mdx#browser-new-context-option-proxy) for.
+Вы можете дополнительно указать имя пользователя и пароль для HTTP(S) прокси, а также указать хосты, которые нужно обойти [setProxy](/api/class-browser.mdx#browser-new-context-option-proxy).
 
-Here is an example of a global proxy:
+Вот пример глобального прокси:
 
 ```java
 Browser browser = chromium.launch(new BrowserType.LaunchOptions()
@@ -43,7 +43,7 @@ Browser browser = chromium.launch(new BrowserType.LaunchOptions()
   .setPassword("pwd")));
 ```
 
-Its also possible to specify it per context:
+Также возможно указать его для каждого контекста:
 
 ```java
 Browser browser = chromium.launch();
@@ -51,9 +51,9 @@ BrowserContext context = browser.newContext(new Browser.NewContextOptions()
   .setProxy(new Proxy("http://myproxy.com:3128")));
 ```
 
-## Network events
+## Сетевые события
 
-You can monitor all the [Request]s and [Response]s:
+Вы можете отслеживать все [Request] и [Response]:
 
 ```java
 import com.microsoft.playwright.*;
@@ -73,32 +73,32 @@ public class Example {
 }
 ```
 
-Or wait for a network response after the button click with [Page.waitForResponse()](/api/class-page.mdx#page-wait-for-response):
+Или дождаться сетевого ответа после нажатия кнопки с помощью [Page.waitForResponse()](/api/class-page.mdx#page-wait-for-response):
 
 ```java
-// Use a glob URL pattern
+// Используйте шаблон URL с глобом
 Response response = page.waitForResponse("**/api/fetch_data", () -> {
   page.getByText("Update").click();
 });
 ```
 
-#### Variations
+#### Вариации
 
-Wait for [Response]s with [Page.waitForResponse()](/api/class-page.mdx#page-wait-for-response)
+Ожидание [Response] с [Page.waitForResponse()](/api/class-page.mdx#page-wait-for-response)
 
 ```java
-// Use a RegExp
+// Используйте RegExp
 Response response = page.waitForResponse(Pattern.compile("\\.jpeg$"), () -> {
   page.getByText("Update").click();
 });
 
-// Use a predicate taking a Response object
+// Используйте предикат, принимающий объект Response
 Response response = page.waitForResponse(r -> r.url().contains(token), () -> {
   page.getByText("Update").click();
 });
 ```
 
-## Handle requests
+## Обработка запросов
 
 ```java
 page.route("**/api/fetch_data", route -> route.fulfill(new Route.FulfillOptions()
@@ -107,11 +107,11 @@ page.route("**/api/fetch_data", route -> route.fulfill(new Route.FulfillOptions(
 page.navigate("https://example.com");
 ```
 
-You can mock API endpoints via handling the network requests in your Playwright script.
+Вы можете мокировать API-эндпоинты, обрабатывая сетевые запросы в вашем скрипте Playwright.
 
-#### Variations
+#### Вариации
 
-Set up route on the entire browser context with [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route) or page with [Page.route()](/api/class-page.mdx#page-route). It will apply to popup windows and opened links.
+Настройте маршрут для всего контекста браузера с помощью [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route) или страницы с помощью [Page.route()](/api/class-page.mdx#page-route). Это будет применяться к всплывающим окнам и открытым ссылкам.
 
 ```java
 browserContext.route("**/api/login", route -> route.fulfill(new Route.FulfillOptions()
@@ -120,30 +120,30 @@ browserContext.route("**/api/login", route -> route.fulfill(new Route.FulfillOpt
 page.navigate("https://example.com");
 ```
 
-## Modify requests
+## Изменение запросов
 
 ```java
-// Delete header
+// Удаление заголовка
 page.route("**/*", route -> {
   Map<String, String> headers = new HashMap<>(route.request().headers());
   headers.remove("X-Secret");
     route.resume(new Route.ResumeOptions().setHeaders(headers));
 });
 
-// Continue requests as POST.
+// Продолжение запросов как POST.
 page.route("**/*", route -> route.resume(new Route.ResumeOptions().setMethod("POST")));
 ```
 
-You can continue requests with modifications. Example above removes an HTTP header from the outgoing requests.
+Вы можете продолжать запросы с изменениями. Пример выше удаляет HTTP-заголовок из исходящих запросов.
 
-## Abort requests
+## Прерывание запросов
 
-You can abort requests using [Page.route()](/api/class-page.mdx#page-route) and [Route.abort()](/api/class-route.mdx#route-abort).
+Вы можете прерывать запросы, используя [Page.route()](/api/class-page.mdx#page-route) и [Route.abort()](/api/class-route.mdx#route-abort).
 
 ```java
 page.route("**/*.{png,jpg,jpeg}", route -> route.abort());
 
-// Abort based on the request type
+// Прерывание на основе типа запроса
 page.route("**/*", route -> {
   if ("image".equals(route.request().resourceType()))
     route.abort();
@@ -152,57 +152,57 @@ page.route("**/*", route -> {
 });
 ```
 
-## Modify responses
+## Изменение ответов
 
-To modify a response use [APIRequestContext] to get the original response and then pass the response to [Route.fulfill()](/api/class-route.mdx#route-fulfill). You can override individual fields on the response via options:
+Чтобы изменить ответ, используйте [APIRequestContext] для получения оригинального ответа, а затем передайте ответ в [Route.fulfill()](/api/class-route.mdx#route-fulfill). Вы можете переопределить отдельные поля в ответе через опции:
 
 ```java
 page.route("**/title.html", route -> {
-  // Fetch original response.
+  // Получение оригинального ответа.
   APIResponse response = route.fetch();
-  // Add a prefix to the title.
+  // Добавление префикса к заголовку.
   String body = response.text();
   body = body.replace("<title>", "<title>My prefix:");
   Map<String, String> headers = response.headers();
   headers.put("content-type", "text/html");
   route.fulfill(new Route.FulfillOptions()
-    // Pass all fields from the response.
+    // Передача всех полей из ответа.
     .setResponse(response)
-    // Override response body.
+    // Переопределение тела ответа.
     .setBody(body)
-    // Force content type to be html.
+    // Принудительное указание типа контента как html.
     .setHeaders(headers));
 });
 ```
 
-## Glob URL patterns
+## Шаблоны URL с глобами
 
-Playwright uses simplified glob patterns for URL matching in network interception methods like [Page.route()](/api/class-page.mdx#page-route) or [Page.waitForResponse()](/api/class-page.mdx#page-wait-for-response). These patterns support basic wildcards:
-1. Asterisks:
-   - A single `*` matches any characters except `/`
-   - A double `**` matches any characters including `/`
-1. Question mark `?` matches any single character except `/`
-1. Curly braces `{}` can be used to match a list of options separated by commas `,`
-1. Square brackets `[]` can be used to match a set of characters
-1. Backslash `\` can be used to escape any of special characters (note to escape backslash itself as `\\`)
+Playwright использует упрощенные шаблоны с глобами для сопоставления URL в методах перехвата сети, таких как [Page.route()](/api/class-page.mdx#page-route) или [Page.waitForResponse()](/api/class-page.mdx#page-wait-for-response). Эти шаблоны поддерживают основные подстановочные знаки:
+1. Звездочки:
+   - Одиночная `*` соответствует любым символам, кроме `/`
+   - Двойная `**` соответствует любым символам, включая `/`
+1. Вопросительный знак `?` соответствует любому одиночному символу, кроме `/`
+1. Фигурные скобки `{}` могут использоваться для сопоставления списка опций, разделенных запятыми `,`
+1. Квадратные скобки `[]` могут использоваться для сопоставления набора символов
+1. Обратная косая черта `\` может использоваться для экранирования любых специальных символов (обратите внимание, что для экранирования самой обратной косой черты используйте `\\`)
 
-Examples:
-- `https://example.com/*.js` matches `https://example.com/file.js` but not `https://example.com/path/file.js`
-- `https://example.com/\\?page=1` matches `https://example.com/?page=1` but not `https://example.com`
-- `**/v[0-9]*` matches `https://example.com/v1/` but not `https://example.com/vote/`
-- `**/*.js` matches both `https://example.com/file.js` and `https://example.com/path/file.js`
-- `**/*.{png,jpg,jpeg}` matches all image requests
+Примеры:
+- `https://example.com/*.js` соответствует `https://example.com/file.js`, но не `https://example.com/path/file.js`
+- `https://example.com/\\?page=1` соответствует `https://example.com/?page=1`, но не `https://example.com`
+- `**/v[0-9]*` соответствует `https://example.com/v1/`, но не `https://example.com/vote/`
+- `**/*.js` соответствует как `https://example.com/file.js`, так и `https://example.com/path/file.js`
+- `**/*.{png,jpg,jpeg}` соответствует всем запросам изображений
 
-Important notes:
-- The glob pattern must match the entire URL, not just a part of it.
-- When using globs for URL matching, consider the full URL structure, including the protocol and path separators.
-- For more complex matching requirements, consider using [RegExp] instead of glob patterns.
+Важные замечания:
+- Шаблон с глобом должен соответствовать всему URL, а не только его части.
+- При использовании глобов для сопоставления URL учитывайте полную структуру URL, включая протокол и разделители пути.
+- Для более сложных требований к сопоставлению рассмотрите возможность использования [RegExp] вместо шаблонов с глобами.
 
 ## WebSockets
 
-Playwright supports [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) inspection, mocking and modifying out of the box. See our [API mocking guide](./mock.mdx#mock-websockets) to learn how to mock WebSockets.
+Playwright поддерживает инспекцию, мокирование и модификацию [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) из коробки. Ознакомьтесь с нашим [руководством по мокированию API](./mock.mdx#mock-websockets), чтобы узнать, как мокировать WebSockets.
 
-Every time a WebSocket is created, the [Page.onWebSocket(handler)](/api/class-page.mdx#page-event-web-socket) event is fired. This event contains the [WebSocket] instance for further web socket frames inspection:
+Каждый раз, когда создается WebSocket, срабатывает событие [Page.onWebSocket(handler)](/api/class-page.mdx#page-event-web-socket). Это событие содержит экземпляр [WebSocket] для дальнейшей инспекции фреймов веб-сокета:
 
 ```java
 page.onWebSocket(ws -> {
@@ -213,12 +213,12 @@ page.onWebSocket(ws -> {
 });
 ```
 
-## Missing Network Events and Service Workers
+## Отсутствующие сетевые события и Service Workers
 
-Playwright's built-in [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route) and [Page.route()](/api/class-page.mdx#page-route) allow your tests to natively route requests and perform mocking and interception.
-1. If you're using Playwright's native [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route) and [Page.route()](/api/class-page.mdx#page-route), and it appears network events are missing, disable Service Workers by setting [setServiceWorkers](/api/class-browser.mdx#browser-new-context-option-service-workers) to `'block'`.
-1. It might be that you are using a mock tool such as Mock Service Worker (MSW). While this tool works out of the box for mocking responses, it adds its own Service Worker that takes over the network requests, hence making them invisible to [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route) and [Page.route()](/api/class-page.mdx#page-route). If you are interested in both network testing and mocking, consider using built-in [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route) and [Page.route()](/api/class-page.mdx#page-route) for [response mocking](#handle-requests).
-1. If you're interested in not solely using Service Workers for testing and network mocking, but in routing and listening for requests made by Service Workers themselves, please see [this experimental feature](https://github.com/microsoft/playwright/issues/15684).
+Встроенные функции [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route) и [Page.route()](/api/class-page.mdx#page-route) Playwright позволяют вашим тестам нативно маршрутизировать запросы и выполнять мокирование и перехват.
+1. Если вы используете нативные функции [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route) и [Page.route()](/api/class-page.mdx#page-route) Playwright, и кажется, что сетевые события отсутствуют, отключите Service Workers, установив [setServiceWorkers](/api/class-browser.mdx#browser-new-context-option-service-workers) в `'block'`.
+1. Возможно, вы используете инструмент мокирования, такой как Mock Service Worker (MSW). Хотя этот инструмент работает из коробки для мокирования ответов, он добавляет свой собственный Service Worker, который берет на себя сетевые запросы, делая их невидимыми для [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route) и [Page.route()](/api/class-page.mdx#page-route). Если вас интересует как тестирование сети, так и мокирование, рассмотрите возможность использования встроенных функций [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route) и [Page.route()](/api/class-page.mdx#page-route) для [мокирования ответов](#handle-requests).
+1. Если вас интересует не только использование Service Workers для тестирования и мокирования сети, но и маршрутизация и прослушивание запросов, сделанных самими Service Workers, пожалуйста, ознакомьтесь с [этой экспериментальной функцией](https://github.com/microsoft/playwright/issues/15684).
 
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

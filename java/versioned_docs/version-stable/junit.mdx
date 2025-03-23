@@ -1,16 +1,16 @@
 ---
 id: junit
-title: "JUnit (experimental)"
+title: "JUnit (экспериментально)"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-With a few lines of code, you can hook up Playwright to your favorite Java test runner.
+С помощью нескольких строк кода вы можете подключить Playwright к вашему любимому тестовому фреймворку для Java.
 
-In [JUnit](https://junit.org/junit5/), you can use Playwright [fixtures](./junit.mdx#fixtures) to automatically initialize [Playwright], [Browser], [BrowserContext] or [Page]. In the example below, all three test methods use the same [Browser]. Each test uses its own [BrowserContext] and [Page].
+В [JUnit](https://junit.org/junit5/) вы можете использовать [fixtures](./junit.mdx#fixtures) Playwright для автоматической инициализации [Playwright], [Browser], [BrowserContext] или [Page]. В примере ниже все три тестовых метода используют один и тот же [Browser]. Каждый тест использует свой собственный [BrowserContext] и [Page].
 
 ```java
 package org.example;
@@ -51,7 +51,7 @@ public class TestExample {
 
 ## Fixtures
 
-Simply add JUnit annotation `@UsePlaywright` to your test classes to enable Playwright fixtures. Test fixtures are used to establish environment for each test, giving the test everything it needs and nothing else.
+Просто добавьте аннотацию JUnit `@UsePlaywright` к вашим тестовым классам, чтобы включить fixtures Playwright. Тестовые fixtures используются для создания окружения для каждого теста, предоставляя тесту все необходимое и ничего лишнего.
 
 ```java
 @UsePlaywright
@@ -66,23 +66,23 @@ public class TestExample {
 }
 ```
 
-The `Page page` argument tells JUnit to setup the `page` fixture and provide it to your test method.
+Аргумент `Page page` указывает JUnit настроить fixture `page` и предоставить его вашему тестовому методу.
 
-Here is a list of the pre-defined fixtures:
+Вот список предопределенных fixtures:
 
 |Fixture       |Type               |Description                      |
 |:-------------|:------------------|:--------------------------------|
-|page          |[Page]             |Isolated page for this test run.|
-|browserContext|[BrowserContext]   |Isolated context for this test run. The `page` fixture belongs to this context as well.|
-|browser       |[Browser]          |Browsers are shared across tests to optimize resources.|
-|playwright    |[Playwright]       |Playwright instance is shared between tests running on the same thread.|
-|request       |[APIRequestContext]|Isolated APIRequestContext for this test run. Learn how to do [API testing](./api-testing).|
+|page          |[Page]             |Изолированная страница для этого теста.|
+|browserContext|[BrowserContext]   |Изолированный контекст для этого теста. Fixture `page` также принадлежит этому контексту.|
+|browser       |[Browser]          |Браузеры разделяются между тестами для оптимизации ресурсов.|
+|playwright    |[Playwright]       |Экземпляр Playwright разделяется между тестами, выполняющимися в одном потоке.|
+|request       |[APIRequestContext]|Изолированный APIRequestContext для этого теста. Узнайте, как выполнять [API тестирование](./api-testing).|
 
-## Customizing options
+## Настройка параметров
 
-To customize fixture options, you should implement an `OptionsFactory` and specify the class in the `@UsePlaywright()` annotation.
+Чтобы настроить параметры fixtures, вы должны реализовать `OptionsFactory` и указать класс в аннотации `@UsePlaywright()`.
 
-You can easily override launch options for [BrowserType.launch()](/api/class-browsertype.mdx#browser-type-launch), or context options for [Browser.newContext()](/api/class-browser.mdx#browser-new-context) and [APIRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context). See the following example:
+Вы можете легко переопределить параметры запуска для [BrowserType.launch()](/api/class-browsertype.mdx#browser-type-launch) или параметры контекста для [Browser.newContext()](/api/class-browser.mdx#browser-new-context) и [APIRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context). См. следующий пример:
 
 ```java
 import com.microsoft.playwright.junit.Options;
@@ -115,9 +115,9 @@ public class MyTest {
 }
 ```
 
-## Running Tests in Parallel
+## Запуск тестов параллельно
 
-By default JUnit will run all tests sequentially on a single thread. Since JUnit 5.3 you can change this behavior to run tests in parallel to speed up execution (see [this page](https://junit.org/junit5/docs/snapshot/user-guide/index.html#writing-tests-parallel-execution)). Since it is not safe to use same Playwright objects from multiple threads without extra synchronization we recommend you create Playwright instance per thread and use it on that thread exclusively. Here is an example how to run multiple test classes in parallel.
+По умолчанию JUnit будет выполнять все тесты последовательно в одном потоке. Начиная с JUnit 5.3, вы можете изменить это поведение, чтобы запускать тесты параллельно для ускорения выполнения (см. [эту страницу](https://junit.org/junit5/docs/snapshot/user-guide/index.html#writing-tests-parallel-execution)). Поскольку небезопасно использовать одни и те же объекты Playwright из нескольких потоков без дополнительной синхронизации, мы рекомендуем создавать экземпляр Playwright на поток и использовать его исключительно в этом потоке. Вот пример, как запускать несколько тестовых классов параллельно.
 
 ```java
 @UsePlaywright
@@ -164,7 +164,7 @@ class Test2 {
 }
 ```
 
-Configure JUnit to run tests in each class sequentially and run multiple classes on parallel threads (with max number of thread equal to 1/2 of the number of CPU cores):
+Настройте JUnit для выполнения тестов в каждом классе последовательно и запуска нескольких классов в параллельных потоках (с максимальным количеством потоков, равным 1/2 от числа ядер процессора):
 
 ```bash
 junit.jupiter.execution.parallel.enabled = true

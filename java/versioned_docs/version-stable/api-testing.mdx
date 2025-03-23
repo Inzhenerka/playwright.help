@@ -1,34 +1,34 @@
 ---
 id: api-testing
-title: "API testing"
+title: "Тестирование API"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright can be used to get access to the [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) API of your application.
+Playwright может быть использован для доступа к [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) API вашего приложения.
 
-Sometimes you may want to send requests to the server directly from Java without loading a page and running js code in it. A few examples where it may come in handy:
-- Test your server API.
-- Prepare server side state before visiting the web application in a test.
-- Validate server side post-conditions after running some actions in the browser.
+Иногда может возникнуть необходимость отправить запросы на сервер напрямую из Java, не загружая страницу и не выполняя в ней JavaScript-код. Несколько примеров, когда это может быть полезно:
+- Тестирование API вашего сервера.
+- Подготовка состояния на стороне сервера перед посещением веб-приложения в тесте.
+- Проверка постусловий на стороне сервера после выполнения некоторых действий в браузере.
 
-All of that could be achieved via [APIRequestContext] methods.
+Все это можно достичь с помощью методов [APIRequestContext].
 
-## Writing API Test
+## Написание теста API
 
-[APIRequestContext] can send all kinds of HTTP(S) requests over network.
+[APIRequestContext] может отправлять все виды HTTP(S) запросов по сети.
 
-The following example demonstrates how to use Playwright to test issues creation via [GitHub API](https://docs.github.com/en/rest). The test suite will do the following:
-- Create a new repository before running tests.
-- Create a few issues and validate server state.
-- Delete the repository after running tests.
+Следующий пример демонстрирует, как использовать Playwright для тестирования создания задач через [GitHub API](https://docs.github.com/en/rest). Набор тестов будет выполнять следующие действия:
+- Создавать новый репозиторий перед запуском тестов.
+- Создавать несколько задач и проверять состояние сервера.
+- Удалять репозиторий после выполнения тестов.
 
-### Configure
+### Настройка
 
-GitHub API requires authorization, so we'll configure the token once for all tests. While at it, we'll also set the `baseURL` to simplify the tests.
+GitHub API требует авторизации, поэтому мы настроим токен один раз для всех тестов. Заодно мы также установим `baseURL`, чтобы упростить тесты.
 
 ```java
 package org.example;
@@ -56,14 +56,14 @@ public class TestGitHubAPI {
 
   void createAPIRequestContext() {
     Map<String, String> headers = new HashMap<>();
-    // We set this header per GitHub guidelines.
+    // Устанавливаем этот заголовок согласно рекомендациям GitHub.
     headers.put("Accept", "application/vnd.github.v3+json");
-    // Add authorization token to all requests.
-    // Assuming personal access token available in the environment.
+    // Добавляем токен авторизации ко всем запросам.
+    // Предполагается, что личный токен доступа доступен в окружении.
     headers.put("Authorization", "token " + API_TOKEN);
 
     request = playwright.request().newContext(new APIRequest.NewContextOptions()
-      // All requests we send go to this API endpoint.
+      // Все запросы, которые мы отправляем, идут на этот API-эндпоинт.
       .setBaseURL("https://api.github.com")
       .setExtraHTTPHeaders(headers));
   }
@@ -96,9 +96,9 @@ public class TestGitHubAPI {
 }
 ```
 
-### Write tests
+### Написание тестов
 
-Now that we initialized request object we can add a few tests that will create new issues in the repository.
+Теперь, когда мы инициализировали объект запроса, мы можем добавить несколько тестов, которые будут создавать новые задачи в репозитории.
 
 ```java
 package org.example;
@@ -191,9 +191,9 @@ public class TestGitHubAPI {
 
 ```
 
-### Setup and teardown
+### Настройка и завершение
 
-These tests assume that repository exists. You probably want to create a new one before running tests and delete it afterwards. Use `@BeforeAll` and `@AfterAll` hooks for that.
+Эти тесты предполагают, что репозиторий существует. Вероятно, вы захотите создать новый перед запуском тестов и удалить его после. Используйте хуки `@BeforeAll` и `@AfterAll` для этого.
 
 ```java
 public class TestGitHubAPI {
@@ -229,9 +229,9 @@ public class TestGitHubAPI {
 }
 ```
 
-### Complete test example
+### Полный пример теста
 
-Here is the complete example of an API test:
+Вот полный пример теста API:
 
 ```java
 package org.example;
@@ -268,14 +268,14 @@ public class TestGitHubAPI {
 
   void createAPIRequestContext() {
     Map<String, String> headers = new HashMap<>();
-    // We set this header per GitHub guidelines.
+    // Устанавливаем этот заголовок согласно рекомендациям GitHub.
     headers.put("Accept", "application/vnd.github.v3+json");
-    // Add authorization token to all requests.
-    // Assuming personal access token available in the environment.
+    // Добавляем токен авторизации ко всем запросам.
+    // Предполагается, что личный токен доступа доступен в окружении.
     headers.put("Authorization", "token " + API_TOKEN);
 
     request = playwright.request().newContext(new APIRequest.NewContextOptions()
-      // All requests we send go to this API endpoint.
+      // Все запросы, которые мы отправляем, идут на этот API-эндпоинт.
       .setBaseURL("https://api.github.com")
       .setExtraHTTPHeaders(headers));
   }
@@ -377,11 +377,11 @@ public class TestGitHubAPI {
 }
 ```
 
-See experimental [JUnit integration](./junit.mdx) to automatically initialize Playwright objects and more.
+Смотрите экспериментальную [интеграцию с JUnit](./junit.mdx) для автоматической инициализации объектов Playwright и других возможностей.
 
-## Prepare server state via API calls
+## Подготовка состояния сервера через API вызовы
 
-The following test creates a new issue via API and then navigates to the list of all issues in the project to check that it appears at the top of the list. The check is performed using [LocatorAssertions].
+Следующий тест создает новую задачу через API, а затем переходит к списку всех задач в проекте, чтобы проверить, что она появляется в начале списка. Проверка выполняется с использованием [LocatorAssertions].
 
 ```java
 public class TestGitHubAPI {
@@ -401,9 +401,9 @@ public class TestGitHubAPI {
 }
 ```
 
-## Check the server state after running user actions
+## Проверка состояния сервера после выполнения действий пользователя
 
-The following test creates a new issue via user interface in the browser and then checks via API if it was created:
+Следующий тест создает новую задачу через пользовательский интерфейс в браузере, а затем проверяет через API, была ли она создана:
 
 ```java
 public class TestGitHubAPI {
@@ -423,20 +423,20 @@ public class TestGitHubAPI {
 }
 ```
 
-## Reuse authentication state
+## Повторное использование состояния аутентификации
 
-Web apps use cookie-based or token-based authentication, where authenticated state is stored as [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies). Playwright provides [APIRequestContext.storageState()](/api/class-apirequestcontext.mdx#api-request-context-storage-state) method that can be used to retrieve storage state from an authenticated context and then create new contexts with that state.
+Веб-приложения используют аутентификацию на основе куки или токенов, где аутентифицированное состояние хранится в виде [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies). Playwright предоставляет метод [APIRequestContext.storageState()](/api/class-apirequestcontext.mdx#api-request-context-storage-state), который может быть использован для получения состояния хранилища из аутентифицированного контекста, а затем создания новых контекстов с этим состоянием.
 
-Storage state is interchangeable between [BrowserContext] and [APIRequestContext]. You can use it to log in via API calls and then create a new context with cookies already there. The following code snippet retrieves state from an authenticated [APIRequestContext] and creates a new [BrowserContext] with that state.
+Состояние хранилища взаимозаменяемо между [BrowserContext] и [APIRequestContext]. Вы можете использовать его для входа через API вызовы, а затем создать новый контекст с уже установленными куки. Следующий код извлекает состояние из аутентифицированного [APIRequestContext] и создает новый [BrowserContext] с этим состоянием.
 
 ```java
 APIRequestContext requestContext = playwright.request().newContext(
   new APIRequest.NewContextOptions().setHttpCredentials("user", "passwd"));
 requestContext.get("https://api.example.com/login");
-// Save storage state into a variable.
+// Сохраните состояние хранилища в переменную.
 String state = requestContext.storageState();
 
-// Create a new context with the saved storage state.
+// Создайте новый контекст с сохраненным состоянием хранилища.
 BrowserContext context = browser.newContext(new Browser.NewContextOptions().setStorageState(state));
 ```
 

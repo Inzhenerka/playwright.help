@@ -1,20 +1,20 @@
 ---
 id: test-runners
-title: "Test Runners"
+title: "Тестовые фреймворки"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-With a few lines of code, you can hook up Playwright to your favorite Java test runner.
+С помощью нескольких строк кода вы можете подключить Playwright к вашему любимому Java тестовому фреймворку.
 
-Playwright and Browser instances can be reused between tests for better performance. We recommend running each test case in a new BrowserContext, this way browser state will be isolated between the tests.
+Экземпляры Playwright и Browser могут быть повторно использованы между тестами для повышения производительности. Мы рекомендуем запускать каждый тестовый случай в новом BrowserContext, таким образом состояние браузера будет изолировано между тестами.
 
 ## JUnit
 
-In [JUnit](https://junit.org/junit5/) you can initialize [Playwright] and [Browser] in [@BeforeAll](https://junit.org/junit5/docs/current/api/org.junit.jupiter.api/org/junit/jupiter/api/BeforeAll.html) method and destroy them in [@AfterAll](https://junit.org/junit5/docs/current/api/org.junit.jupiter.api/org/junit/jupiter/api/AfterAll.html). In the example below all three test methods use the same [Browser]. Each test uses its own [BrowserContext] and [Page].
+В [JUnit](https://junit.org/junit5/) вы можете инициализировать [Playwright] и [Browser] в методе [@BeforeAll](https://junit.org/junit5/docs/current/api/org.junit.jupiter.api/org/junit/jupiter/api/BeforeAll.html) и уничтожать их в методе [@AfterAll](https://junit.org/junit5/docs/current/api/org.junit.jupiter.api/org/junit/jupiter/api/AfterAll.html). В примере ниже все три тестовых метода используют один и тот же [Browser]. Каждый тест использует свой собственный [BrowserContext] и [Page].
 
 ```java
 package org.example;
@@ -29,11 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestExample {
-  // Shared between all tests in this class.
+  // Общий для всех тестов в этом классе.
   static Playwright playwright;
   static Browser browser;
 
-  // New instance for each test method.
+  // Новый экземпляр для каждого тестового метода.
   BrowserContext context;
   Page page;
 
@@ -84,19 +84,19 @@ public class TestExample {
 }
 ```
 
-See experimental [JUnit integration](./junit.mdx) to automatically initialize Playwright objects and more.
+Смотрите экспериментальную [интеграцию JUnit](./junit.mdx) для автоматической инициализации объектов Playwright и других возможностей.
 
-### Running Tests in Parallel
+### Запуск тестов параллельно
 
-By default JUnit will run all tests sequentially on a single thread. Since JUnit 5.3 you can change this behavior to run tests in parallel to speed up execution (see [this page](https://junit.org/junit5/docs/snapshot/user-guide/index.html#writing-tests-parallel-execution)). Since it is not safe to use same Playwright objects from multiple threads without extra synchronization we recommend you create Playwright instance per thread and use it on that thread exclusively. Here is an example how to run multiple test classes in parallel.
+По умолчанию JUnit будет запускать все тесты последовательно в одном потоке. Начиная с JUnit 5.3 вы можете изменить это поведение, чтобы запускать тесты параллельно для ускорения выполнения (см. [эту страницу](https://junit.org/junit5/docs/snapshot/user-guide/index.html#writing-tests-parallel-execution)). Поскольку небезопасно использовать одни и те же объекты Playwright из нескольких потоков без дополнительной синхронизации, мы рекомендуем создавать экземпляр Playwright для каждого потока и использовать его исключительно в этом потоке. Вот пример, как запускать несколько тестовых классов параллельно.
 
-Use [`@TestInstance(TestInstance.Lifecycle.PER_CLASS)`](https://junit.org/junit5/docs/current/api/org.junit.jupiter.api/org/junit/jupiter/api/TestInstance.html) annotation to make JUnit create one instance of a class for all test methods within that class (by default each JUnit will create a new instance of the class for each test method). Store [Playwright] and [Browser] objects in instance fields. They will be shared between tests. Each instance of the class will use its own copy of Playwright.
+Используйте аннотацию [`@TestInstance(TestInstance.Lifecycle.PER_CLASS)`](https://junit.org/junit5/docs/current/api/org.junit.jupiter.api/org/junit/jupiter/api/TestInstance.html), чтобы JUnit создавал один экземпляр класса для всех тестовых методов в этом классе (по умолчанию JUnit создаст новый экземпляр класса для каждого тестового метода). Храните объекты [Playwright] и [Browser] в полях экземпляра. Они будут общими для всех тестов. Каждый экземпляр класса будет использовать свою собственную копию Playwright.
 
 ```java
-// Subclasses will inherit PER_CLASS behavior.
+// Подклассы унаследуют поведение PER_CLASS.
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TestFixtures {
-  // Shared between all tests in the class.
+  // Общий для всех тестов в классе.
   Playwright playwright;
   Browser browser;
 
@@ -111,7 +111,7 @@ class TestFixtures {
     playwright.close();
   }
 
-  // New instance for each test method.
+  // Новый экземпляр для каждого тестового метода.
   BrowserContext context;
   Page page;
 
@@ -169,7 +169,7 @@ class Test2 extends TestFixtures {
 }
 ```
 
-Configure JUnit to run tests in each class sequentially and run multiple classes on parallel threads (with max number of thread equal to 1/2 of the number of CPU cores):
+Настройте JUnit для выполнения тестов в каждом классе последовательно и запуска нескольких классов в параллельных потоках (с максимальным числом потоков, равным 1/2 от числа ядер процессора):
 
 ```bash
 junit.jupiter.execution.parallel.enabled = true
@@ -179,9 +179,9 @@ junit.jupiter.execution.parallel.config.strategy=dynamic
 junit.jupiter.execution.parallel.config.dynamic.factor=0.5
 ```
 
-### Using Gradle
+### Использование Gradle
 
-You can use a Gradle build configuration script, written in Groovy or Kotlin.
+Вы можете использовать скрипт конфигурации сборки Gradle, написанный на Groovy или Kotlin.
 
 <Tabs defaultValue="gradle" values={[ {label: 'build.gradle', value: 'gradle'}, {label: 'build.gradle.kts', value: 'gradle-kotlin'} ] }>
 
@@ -205,7 +205,7 @@ application {
   mainClass = 'org.example.App'
 }
 
-// Usage: ./gradlew playwright --args="help"
+// Использование: ./gradlew playwright --args="help"
 task playwright(type: JavaExec) {
   classpath sourceSets.test.runtimeClasspath
   mainClass = 'com.microsoft.playwright.CLI'
@@ -238,7 +238,7 @@ application {
   mainClass.set("org.example.App")
 }
 
-// Usage: ./gradlew playwright --args="help"
+// Использование: ./gradlew playwright --args="help"
 tasks.register<JavaExec>("playwright") {
   classpath(sourceSets["test"].runtimeClasspath)
   mainClass.set("com.microsoft.playwright.CLI")
@@ -256,13 +256,13 @@ tasks.test {
 
 </Tabs>
 
-Tests can then be launched as follows:
+Тесты затем могут быть запущены следующим образом:
 
 ```bash
 ./gradlew run
 ```
 
-Also, Playwright command line tools can be run with :
+Также, инструменты командной строки Playwright могут быть запущены с помощью:
 
 ```bash
 ./gradlew playwright --args="help"
@@ -270,7 +270,7 @@ Also, Playwright command line tools can be run with :
 
 ## TestNG
 
-In [TestNG](https://testng.org/) you can initialize [Playwright] and [Browser] in [@BeforeClass](https://javadoc.io/doc/org.testng/testng/latest/org/testng/annotations/BeforeClass.html) method and destroy them in [@AfterClass](https://javadoc.io/doc/org.testng/testng/latest/org/testng/annotations/AfterClass.html). In the example below all three test methods use the same [Browser]. Each test uses its own [BrowserContext] and [Page].
+В [TestNG](https://testng.org/) вы можете инициализировать [Playwright] и [Browser] в методе [@BeforeClass](https://javadoc.io/doc/org.testng/testng/latest/org/testng/annotations/BeforeClass.html) и уничтожать их в методе [@AfterClass](https://javadoc.io/doc/org.testng/testng/latest/org/testng/annotations/AfterClass.html). В примере ниже все три тестовых метода используют один и тот же [Browser]. Каждый тест использует свой собственный [BrowserContext] и [Page].
 
 ```java
 package org.example;
@@ -285,11 +285,11 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 public class TestExample {
-  // Shared between all tests in this class.
+  // Общий для всех тестов в этом классе.
   Playwright playwright;
   Browser browser;
 
-  // New instance for each test method.
+  // Новый экземпляр для каждого тестового метода.
   BrowserContext context;
   Page page;
 
@@ -339,7 +339,6 @@ public class TestExample {
   }
 }
 ```
-
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"

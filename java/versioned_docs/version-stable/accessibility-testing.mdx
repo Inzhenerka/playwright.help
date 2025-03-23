@@ -1,42 +1,42 @@
 ---
 id: accessibility-testing
-title: "Accessibility testing"
+title: "Тестирование доступности"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright can be used to test your application for many types of accessibility issues.
+Playwright может использоваться для тестирования вашего приложения на наличие различных проблем с доступностью.
 
-A few examples of problems this can catch include:
-- Text that would be hard to read for users with vision impairments due to poor color contrast with the background behind it
-- UI controls and form elements without labels that a screen reader could identify
-- Interactive elements with duplicate IDs which can confuse assistive technologies
+Некоторые примеры проблем, которые можно выявить:
+- Текст, который будет трудно читать пользователям с нарушениями зрения из-за плохого контраста с фоном
+- Элементы управления интерфейсом и формы без меток, которые может идентифицировать экранный диктор
+- Интерактивные элементы с дублирующимися ID, которые могут запутать вспомогательные технологии
 
-The following examples rely on the [`com.deque.html.axe-core/playwright`](https://mvnrepository.com/artifact/com.deque.html.axe-core/playwright) Maven package which adds support for running the [axe accessibility testing engine](https://www.deque.com/axe/) as part of your Playwright tests.
+Следующие примеры полагаются на пакет Maven [`com.deque.html.axe-core/playwright`](https://mvnrepository.com/artifact/com.deque.html.axe-core/playwright), который добавляет поддержку запуска [движка тестирования доступности axe](https://www.deque.com/axe/) в рамках ваших тестов Playwright.
 
-## Disclaimer
+## Отказ от ответственности
 
-Automated accessibility tests can detect some common accessibility problems such as missing or invalid properties. But many accessibility problems can only be discovered through manual testing. We recommend using a combination of automated testing, manual accessibility assessments, and inclusive user testing.
+Автоматизированные тесты доступности могут обнаружить некоторые распространенные проблемы с доступностью, такие как отсутствующие или недействительные свойства. Но многие проблемы с доступностью можно обнаружить только с помощью ручного тестирования. Мы рекомендуем использовать комбинацию автоматизированного тестирования, ручных оценок доступности и инклюзивного тестирования пользователей.
 
-For manual assessments, we recommend [Accessibility Insights for Web](https://accessibilityinsights.io/docs/web/overview/?referrer=playwright-accessibility-testing-java), a free and open source dev tool that walks you through assessing a website for [WCAG 2.1 AA](https://www.w3.org/WAI/WCAG21/quickref/?currentsidebar=%23col_customize&levels=aaa) coverage.
+Для ручных оценок мы рекомендуем [Accessibility Insights for Web](https://accessibilityinsights.io/docs/web/overview/?referrer=playwright-accessibility-testing-java), бесплатный и открытый инструмент для разработчиков, который поможет вам оценить веб-сайт на соответствие [WCAG 2.1 AA](https://www.w3.org/WAI/WCAG21/quickref/?currentsidebar=%23col_customize&levels=aaa).
 
-## Example accessibility tests
+## Примеры тестов доступности
 
-Accessibility tests work just like any other Playwright test. You can either create separate test cases for them, or integrate accessibility scans and assertions into your existing test cases.
+Тесты доступности работают так же, как и любой другой тест Playwright. Вы можете либо создать для них отдельные тестовые случаи, либо интегрировать сканирование доступности и утверждения в ваши существующие тестовые случаи.
 
-The following examples demonstrate a few basic accessibility testing scenarios.
+Следующие примеры демонстрируют несколько базовых сценариев тестирования доступности.
 
-### Example 1: Scanning an entire page
+### Пример 1: Сканирование всей страницы
 
-This example demonstrates how to test an entire page for automatically detectable accessibility violations. The test:
-1. Imports the [`com.deque.html.axe-core/playwright`](https://mvnrepository.com/artifact/com.deque.html.axe-core/playwright) package
-1. Uses normal JUnit 5 `@Test` syntax to define a test case
-1. Uses normal Playwright syntax to open a browser and navigate to the page under test
-1. Invokes `AxeBuilder.analyze()` to run the accessibility scan against the page
-1. Uses normal JUnit 5 test assertions to verify that there are no violations in the returned scan results
+Этот пример демонстрирует, как протестировать всю страницу на наличие автоматически обнаруживаемых нарушений доступности. Тест:
+1. Импортирует пакет [`com.deque.html.axe-core/playwright`](https://mvnrepository.com/artifact/com.deque.html.axe-core/playwright)
+1. Использует обычный синтаксис JUnit 5 `@Test` для определения тестового случая
+1. Использует обычный синтаксис Playwright для открытия браузера и перехода на тестируемую страницу
+1. Вызывает `AxeBuilder.analyze()`, чтобы запустить сканирование доступности страницы
+1. Использует обычные утверждения тестов JUnit 5, чтобы убедиться, что в возвращенных результатах сканирования нет нарушений
 
 ```java
 import com.deque.html.axecore.playwright.*; // 1
@@ -64,13 +64,13 @@ public class HomepageTests {
 }
 ```
 
-### Example 2: Configuring axe to scan a specific part of a page
+### Пример 2: Настройка axe для сканирования конкретной части страницы
 
-`com.deque.html.axe-core/playwright` supports many configuration options for axe. You can specify these options by using a Builder pattern with the `AxeBuilder` class.
+`com.deque.html.axe-core/playwright` поддерживает множество параметров конфигурации для axe. Вы можете указать эти параметры, используя шаблон Builder с классом `AxeBuilder`.
 
-For example, you can use [`AxeBuilder.include()`](https://github.com/dequelabs/axe-core-maven-html/blob/develop/playwright/README.md#axebuilderincludeliststring-selector) to constrain an accessibility scan to only run against one specific part of a page.
+Например, вы можете использовать [`AxeBuilder.include()`](https://github.com/dequelabs/axe-core-maven-html/blob/develop/playwright/README.md#axebuilderincludeliststring-selector), чтобы ограничить сканирование доступности только одной конкретной частью страницы.
 
-`AxeBuilder.analyze()` will scan the page *in its current state* when you call it. To scan parts of a page that are revealed based on UI interactions, use [Locators](./locators.mdx) to interact with the page before invoking `analyze()`:
+`AxeBuilder.analyze()` будет сканировать страницу *в ее текущем состоянии* на момент вызова. Чтобы сканировать части страницы, которые отображаются в результате взаимодействия с интерфейсом, используйте [Локаторы](./locators.mdx) для взаимодействия со страницей перед вызовом `analyze()`:
 
 ```java
 public class HomepageTests {
@@ -80,9 +80,9 @@ public class HomepageTests {
 
     page.locator("button[aria-label=\"Navigation Menu\"]").click();
 
-    // It is important to waitFor() the page to be in the desired
-    // state *before* running analyze(). Otherwise, axe might not
-    // find all the elements your test expects it to scan.
+    // Важно дождаться, чтобы страница была в нужном состоянии
+    // *перед* запуском analyze(). В противном случае axe может не
+    // найти все элементы, которые ваш тест ожидает сканировать.
     page.locator("#navigation-menu-flyout").waitFor();
 
     AxeResults accessibilityScanResults = new AxeBuilder(page)
@@ -94,13 +94,13 @@ public class HomepageTests {
 }
 ```
 
-### Example 3: Scanning for WCAG violations
+### Пример 3: Сканирование на наличие нарушений WCAG
 
-By default, axe checks against a wide variety of accessibility rules. Some of these rules correspond to specific success criteria from the [Web Content Accessibility Guidelines (WCAG)](https://www.w3.org/TR/WCAG21/), and others are "best practice" rules that are not specifically required by any WCAG criterion.
+По умолчанию axe проверяет широкий спектр правил доступности. Некоторые из этих правил соответствуют конкретным критериям успеха из [Руководства по доступности веб-контента (WCAG)](https://www.w3.org/TR/WCAG21/), а другие являются правилами "лучшей практики", которые не требуются ни одним критерием WCAG.
 
-You can constrain an accessibility scan to only run those rules which are "tagged" as corresponding to specific WCAG success criteria by using [`AxeBuilder.withTags()`](https://github.com/dequelabs/axe-core-maven-html/blob/develop/playwright/README.md#axebuilderwithtagsliststring-rules). For example, [Accessibility Insights for Web's Automated Checks](https://accessibilityinsights.io/docs/web/getstarted/fastpass/?referrer=playwright-accessibility-testing-java) only include axe rules that test for violations of WCAG A and AA success criteria; to match that behavior, you would use the tags `wcag2a`, `wcag2aa`, `wcag21a`, and `wcag21aa`.
+Вы можете ограничить сканирование доступности только теми правилами, которые "помечены" как соответствующие конкретным критериям успеха WCAG, используя [`AxeBuilder.withTags()`](https://github.com/dequelabs/axe-core-maven-html/blob/develop/playwright/README.md#axebuilderwithtagsliststring-rules). Например, [Автоматические проверки Accessibility Insights for Web](https://accessibilityinsights.io/docs/web/getstarted/fastpass/?referrer=playwright-accessibility-testing-java) включают только правила axe, которые проверяют нарушения критериев успеха WCAG A и AA; чтобы соответствовать этому поведению, вы бы использовали теги `wcag2a`, `wcag2aa`, `wcag21a` и `wcag21aa`.
 
-Note that [automated testing cannot detect all types of WCAG violations](#disclaimer).
+Обратите внимание, что [автоматизированное тестирование не может обнаружить все типы нарушений WCAG](#disclaimer).
 
 ```java
 AxeResults accessibilityScanResults = new AxeBuilder(page)
@@ -110,21 +110,21 @@ AxeResults accessibilityScanResults = new AxeBuilder(page)
 assertEquals(Collections.emptyList(), accessibilityScanResults.getViolations());
 ```
 
-You can find a complete listing of the rule tags axe-core supports in [the "Axe-core Tags" section of the axe API documentation](https://www.deque.com/axe/core-documentation/api-documentation/#axe-core-tags).
+Вы можете найти полный список поддерживаемых axe-core тегов правил в [разделе "Axe-core Tags" документации по API axe](https://www.deque.com/axe/core-documentation/api-documentation/#axe-core-tags).
 
-## Handling known issues
+## Обработка известных проблем
 
-A common question when adding accessibility tests to an application is "how do I suppress known violations?" The following examples demonstrate a few techniques you can use.
+Один из распространенных вопросов при добавлении тестов доступности в приложение: "как подавить известные нарушения?" Следующие примеры демонстрируют несколько техник, которые вы можете использовать.
 
-### Excluding individual elements from a scan
+### Исключение отдельных элементов из сканирования
 
-If your application contains a few specific elements with known issues, you can use [`AxeBuilder.exclude()`](https://github.com/dequelabs/axe-core-maven-html/blob/develop/playwright/README.md#axebuilderexcludeliststring-selector) to exclude them from being scanned until you're able to fix the issues.
+Если ваше приложение содержит несколько конкретных элементов с известными проблемами, вы можете использовать [`AxeBuilder.exclude()`](https://github.com/dequelabs/axe-core-maven-html/blob/develop/playwright/README.md#axebuilderexcludeliststring-selector), чтобы исключить их из сканирования, пока вы не сможете исправить проблемы.
 
-This is usually the simplest option, but it has some important downsides:
-* `exclude()` will exclude the specified elements *and all of their descendants*. Avoid using it with components that contain many children.
-* `exclude()` will prevent *all* rules from running against the specified elements, not just the rules corresponding to known issues.
+Это обычно самый простой вариант, но у него есть некоторые важные недостатки:
+* `exclude()` исключит указанные элементы *и всех их потомков*. Избегайте использования его с компонентами, содержащими много дочерних элементов.
+* `exclude()` предотвратит выполнение *всех* правил для указанных элементов, а не только правил, соответствующих известным проблемам.
 
-Here is an example of excluding one element from being scanned in one specific test:
+Вот пример исключения одного элемента из сканирования в одном конкретном тесте:
 
 ```java
 AxeResults accessibilityScanResults = new AxeBuilder(page)
@@ -134,13 +134,13 @@ AxeResults accessibilityScanResults = new AxeBuilder(page)
 assertEquals(Collections.emptyList(), accessibilityScanResults.getViolations());
 ```
 
-If the element in question is used repeatedly in many pages, consider [using a test fixture](#using-a-test-fixture-for-common-axe-configuration) to reuse the same `AxeBuilder` configuration across multiple tests.
+Если рассматриваемый элемент используется многократно на многих страницах, рассмотрите возможность [использования тестового фикстура](#using-a-test-fixture-for-common-axe-configuration) для повторного использования той же конфигурации `AxeBuilder` в нескольких тестах.
 
-### Disabling individual scan rules
+### Отключение отдельных правил сканирования
 
-If your application contains many different preexisting violations of a specific rule, you can use [`AxeBuilder.disableRules()`](https://github.com/dequelabs/axe-core-maven-html/blob/develop/playwright/README.md#axebuilderdisablerulesliststring-rules) to temporarily disable individual rules until you're able to fix the issues.
+Если ваше приложение содержит множество различных существующих нарушений конкретного правила, вы можете использовать [`AxeBuilder.disableRules()`](https://github.com/dequelabs/axe-core-maven-html/blob/develop/playwright/README.md#axebuilderdisablerulesliststring-rules), чтобы временно отключить отдельные правила, пока вы не сможете исправить проблемы.
 
-You can find the rule IDs to pass to `disableRules()` in the `id` property of the violations you want to suppress. A [complete list of axe's rules](https://github.com/dequelabs/axe-core/blob/master/doc/rule-descriptions.md) can be found in `axe-core`'s documentation.
+Вы можете найти идентификаторы правил, которые нужно передать в `disableRules()`, в свойстве `id` нарушений, которые вы хотите подавить. [Полный список правил axe](https://github.com/dequelabs/axe-core/blob/master/doc/rule-descriptions.md) можно найти в документации `axe-core`.
 
 ```java
 AxeResults accessibilityScanResults = new AxeBuilder(page)
@@ -150,16 +150,16 @@ AxeResults accessibilityScanResults = new AxeBuilder(page)
 assertEquals(Collections.emptyList(), accessibilityScanResults.getViolations());
 ```
 
-### Using violation fingerprints to specific known issues
+### Использование отпечатков нарушений для конкретных известных проблем
 
-If you would like to allow for a more granular set of known issues, you can use the following pattern:
-1. Perform an accessibility scan which is expected to find some known violations
-1. Convert the violations into "violation fingerprint" objects
-1. Assert that the set of fingerprints is equivalent to the expected ones
+Если вы хотите разрешить более детализированный набор известных проблем, вы можете использовать следующий шаблон:
+1. Выполните сканирование доступности, которое, как ожидается, обнаружит некоторые известные нарушения
+1. Преобразуйте нарушения в объекты "отпечатков нарушений"
+1. Утвердите, что набор отпечатков эквивалентен ожидаемым
 
-This approach avoids the downsides of using `AxeBuilder.exclude()` at the cost of slightly more complexity and fragility.
+Этот подход избегает недостатков использования `AxeBuilder.exclude()` за счет небольшой дополнительной сложности и хрупкости.
 
-Here is an example of using fingerprints based on only rule IDs and "target" selectors pointing to each violation:
+Вот пример использования отпечатков, основанных только на идентификаторах правил и селекторах "целей", указывающих на каждое нарушение:
 
 ```java
 public class HomepageTests {
@@ -178,20 +178,20 @@ public class HomepageTests {
     ), violationFingerprints);
   }
 
-  // You can make your "fingerprint" as specific as you like. This one considers a violation to be
-  // "the same" if it corresponds the same Axe rule on the same element.
+  // Вы можете сделать ваш "отпечаток" настолько специфичным, насколько хотите. Этот считает нарушение
+  // "тем же самым", если оно соответствует тому же правилу Axe на том же элементе.
   //
-  // Using a record type makes it easy to compare fingerprints with assertEquals
+  // Использование типа записи упрощает сравнение отпечатков с помощью assertEquals
   public record ViolationFingerprint(String ruleId, String target) { }
 
   public List<ViolationFingerprint> fingerprintsFromScanResults(AxeResults results) {
     return results.getViolations().stream()
-      // Each violation refers to one rule and multiple "nodes" which violate it
+      // Каждое нарушение относится к одному правилу и нескольким "узлам", которые его нарушают
       .flatMap(violation -> violation.getNodes().stream()
         .map(node -> new ViolationFingerprint(
           violation.getId(),
-          // Each node contains a "target", which is a CSS selector that uniquely identifies it
-          // If the page involves iframes or shadow DOMs, it may be a chain of CSS selectors
+          // Каждый узел содержит "цель", которая является CSS-селектором, уникально идентифицирующим его
+          // Если страница включает iframes или теневые DOM, это может быть цепочка CSS-селекторов
           node.getTarget().toString()
         )))
       .collect(Collectors.toList());
@@ -199,18 +199,18 @@ public class HomepageTests {
 }
 ```
 
-## Using a test fixture for common axe configuration
+## Использование тестового фикстура для общей конфигурации axe
 
-A [`TestFixtures` class](./test-runners#running-tests-in-parallel) is a good way to share common `AxeBuilder` configuration across many tests. Some scenarios where this might be useful include:
-* Using a common set of rules among all of your tests
-* Suppressing a known violation in a common element which appears in many different pages
-* Attaching standalone accessibility reports consistently for many scans
+Класс [`TestFixtures`](./test-runners#running-tests-in-parallel) является хорошим способом поделиться общей конфигурацией `AxeBuilder` между многими тестами. Некоторые сценарии, где это может быть полезно, включают:
+* Использование общего набора правил среди всех ваших тестов
+* Подавление известного нарушения в общем элементе, который появляется на многих разных страницах
+* Последовательное прикрепление автономных отчетов о доступности для многих сканирований
 
-The following example demonstrates extending the `TestFixtures` class from the [Test Runners example](./test-runners#running-tests-in-parallel) with a new fixture that contains some common `AxeBuilder` configuration.
+Следующий пример демонстрирует расширение класса `TestFixtures` из примера [Тестовые раннеры](./test-runners#running-tests-in-parallel) с новым фикстуром, содержащим некоторую общую конфигурацию `AxeBuilder`.
 
-### Creating a fixture
+### Создание фикстура
 
-This example fixture creates an `AxeBuilder` object which is pre-configured with shared `withTags()` and `exclude()` configuration.
+Этот пример фикстура создает объект `AxeBuilder`, который предварительно настроен с общей конфигурацией `withTags()` и `exclude()`.
 
 ```java
 class AxeTestFixtures extends TestFixtures {
@@ -222,9 +222,9 @@ class AxeTestFixtures extends TestFixtures {
 }
 ```
 
-### Using a fixture
+### Использование фикстура
 
-To use the fixture, replace the earlier examples' `new AxeBuilder(page)` with the newly defined `makeAxeBuilder` fixture:
+Чтобы использовать фикстур, замените `new AxeBuilder(page)` из предыдущих примеров на вновь определенный фикстур `makeAxeBuilder`:
 
 ```java
 public class HomepageTests extends AxeTestFixtures {
@@ -233,8 +233,8 @@ public class HomepageTests extends AxeTestFixtures {
     page.navigate("https://your-site.com/");
 
     AxeResults accessibilityScanResults = makeAxeBuilder()
-      // Automatically uses the shared AxeBuilder configuration,
-      // but supports additional test-specific configuration too
+      // Автоматически использует общую конфигурацию AxeBuilder,
+      // но также поддерживает дополнительную конфигурацию, специфичную для теста
       .include("#specific-element-under-test")
       .analyze();
 
@@ -243,7 +243,8 @@ public class HomepageTests extends AxeTestFixtures {
 }
 ```
 
-See experimental [JUnit integration](./junit.mdx) to automatically initialize Playwright objects and more.
+Смотрите экспериментальную [интеграцию JUnit](./junit.mdx) для автоматической инициализации объектов Playwright и многого другого.
+
 
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
