@@ -1,25 +1,25 @@
 ---
 id: locators
-title: "Locators"
+title: "Локаторы"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-[Locator]s are the central piece of Playwright's auto-waiting and retry-ability. In a nutshell, locators represent a way to find element(s) on the page at any moment.
+[Локаторы] являются центральной частью автоматического ожидания и возможности повторных попыток в Playwright. Вкратце, локаторы представляют собой способ найти элемент(ы) на странице в любой момент времени.
 
-### Quick Guide
+### Быстрый гид
 
-These are the recommended built-in locators.
-- [Page.GetByRole()](#locate-by-role) to locate by explicit and implicit accessibility attributes.
-- [Page.GetByText()](#locate-by-text) to locate by text content.
-- [Page.GetByLabel()](#locate-by-label) to locate a form control by associated label's text.
-- [Page.GetByPlaceholder()](#locate-by-placeholder) to locate an input by placeholder.
-- [Page.GetByAltText()](#locate-by-alt-text) to locate an element, usually image, by its text alternative.
-- [Page.GetByTitle()](#locate-by-title) to locate an element by its title attribute.
-- [Page.GetByTestId()](#locate-by-test-id) to locate an element based on its `data-testid` attribute (other attributes can be configured).
+Это рекомендуемые встроенные локаторы.
+- [Page.GetByRole()](#locate-by-role) для поиска по явным и неявным атрибутам доступности.
+- [Page.GetByText()](#locate-by-text) для поиска по текстовому содержимому.
+- [Page.GetByLabel()](#locate-by-label) для поиска элемента управления формой по тексту связанной метки.
+- [Page.GetByPlaceholder()](#locate-by-placeholder) для поиска ввода по заполнителю.
+- [Page.GetByAltText()](#locate-by-alt-text) для поиска элемента, обычно изображения, по его текстовой альтернативе.
+- [Page.GetByTitle()](#locate-by-title) для поиска элемента по его атрибуту title.
+- [Page.GetByTestId()](#locate-by-test-id) для поиска элемента на основе его атрибута `data-testid` (другие атрибуты могут быть настроены).
 
 ```csharp
 await Page.GetByLabel("User Name").FillAsync("John");
@@ -31,11 +31,11 @@ await Page.GetByRole(AriaRole.Button, new() { Name = "Sign in" }).ClickAsync();
 await Expect(Page.GetByText("Welcome, John!")).ToBeVisibleAsync();
 ```
 
-## Locating elements
+## Поиск элементов
 
-Playwright comes with multiple built-in locators. To make tests resilient, we recommend prioritizing user-facing attributes and explicit contracts such as [Page.GetByRole()](/api/class-page.mdx#page-get-by-role).
+Playwright предоставляет несколько встроенных локаторов. Чтобы сделать тесты устойчивыми, мы рекомендуем отдавать приоритет атрибутам, ориентированным на пользователя, и явным контрактам, таким как [Page.GetByRole()](/api/class-page.mdx#page-get-by-role).
 
-For example, consider the following DOM structure.
+Например, рассмотрим следующую структуру DOM.
 
 <HTMLCard>
 <div>
@@ -47,17 +47,17 @@ For example, consider the following DOM structure.
 ```
 </HTMLCard>
 
-Locate the element by its role of `button` with name "Sign in".
+Найдите элемент по его роли `button` с именем "Sign in".
 
 ```csharp
 await Page.GetByRole(AriaRole.Button, new() { Name = "Sign in" }).ClickAsync();
 ```
 
 :::note
-Use the [code generator](./codegen.mdx) to generate a locator, and then edit it as you'd like.
+Используйте [генератор кода](./codegen.mdx) для создания локатора, а затем редактируйте его по своему усмотрению.
 :::
 
-Every time a locator is used for an action, an up-to-date DOM element is located in the page. In the snippet below, the underlying DOM element will be located twice, once prior to every action. This means that if the DOM changes in between the calls due to re-render, the new element corresponding to the locator will be used.
+Каждый раз, когда локатор используется для действия, актуальный элемент DOM находится на странице. В приведенном ниже фрагменте кода базовый элемент DOM будет найден дважды, один раз перед каждым действием. Это означает, что если DOM изменится между вызовами из-за повторного рендеринга, будет использован новый элемент, соответствующий локатору.
 
 ```csharp
 var locator = Page.GetByRole(AriaRole.Button, new() { Name = "Sign in" });
@@ -66,7 +66,7 @@ await locator.HoverAsync();
 await locator.ClickAsync();
 ```
 
-Note that all methods that create a locator, such as [Page.GetByLabel()](/api/class-page.mdx#page-get-by-label), are also available on the [Locator] and [FrameLocator] classes, so you can chain them and iteratively narrow down your locator.
+Обратите внимание, что все методы, создающие локатор, такие как [Page.GetByLabel()](/api/class-page.mdx#page-get-by-label), также доступны в классах [Locator] и [FrameLocator], поэтому вы можете их объединять и итеративно сужать ваш локатор.
 
 ```csharp
 var locator = Page
@@ -76,11 +76,11 @@ var locator = Page
 await locator.ClickAsync();
 ```
 
-### Locate by role
+### Поиск по роли
 
-The [Page.GetByRole()](/api/class-page.mdx#page-get-by-role) locator reflects how users and assistive technology perceive the page, for example whether some element is a button or a checkbox. When locating by role, you should usually pass the accessible name as well, so that the locator pinpoints the exact element.
+Локатор [Page.GetByRole()](/api/class-page.mdx#page-get-by-role) отражает, как пользователи и вспомогательные технологии воспринимают страницу, например, является ли какой-то элемент кнопкой или флажком. При поиске по роли обычно следует также передавать доступное имя, чтобы локатор точно указывал на нужный элемент.
 
-For example, consider the following DOM structure.
+Например, рассмотрим следующую структуру DOM.
 
 <HTMLCard>
 <div>
@@ -102,7 +102,7 @@ For example, consider the following DOM structure.
 ```
 </HTMLCard>
 
-You can locate each element by its implicit role:
+Вы можете найти каждый элемент по его неявной роли:
 
 ```csharp
 await Expect(Page
@@ -120,20 +120,20 @@ await Page
     .ClickAsync();
 ```
 
-Role locators include [buttons, checkboxes, headings, links, lists, tables, and many more](https://www.w3.org/TR/html-aria/#docconformance) and follow W3C specifications for [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name). Note that many html elements like `<button>` have an [implicitly defined role](https://w3c.github.io/html-aam/#html-element-role-mappings) that is recognized by the role locator.
+Локаторы ролей включают [кнопки, флажки, заголовки, ссылки, списки, таблицы и многие другие](https://www.w3.org/TR/html-aria/#docconformance) и следуют спецификациям W3C для [роли ARIA](https://www.w3.org/TR/wai-aria-1.2/#roles), [атрибутов ARIA](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) и [доступного имени](https://w3c.github.io/accname/#dfn-accessible-name). Обратите внимание, что многие HTML-элементы, такие как `<button>`, имеют [неявно определенную роль](https://w3c.github.io/html-aam/#html-element-role-mappings), которая распознается локатором роли.
 
-Note that role locators **do not replace** accessibility audits and conformance tests, but rather give early feedback about the ARIA guidelines.
+Обратите внимание, что локаторы ролей **не заменяют** аудиты доступности и тесты на соответствие, но дают раннюю обратную связь о руководствах ARIA.
 
-:::note[When to use role locators]
+:::note[Когда использовать локаторы ролей]
 
-We recommend prioritizing role locators to locate elements, as it is the closest way to how users and assistive technology perceive the page.
+Мы рекомендуем отдавать приоритет локаторам ролей для поиска элементов, так как это наиболее близкий способ к тому, как пользователи и вспомогательные технологии воспринимают страницу.
 :::
 
-### Locate by label
+### Поиск по метке
 
-Most form controls usually have dedicated labels that could be conveniently used to interact with the form. In this case, you can locate the control by its associated label using [Page.GetByLabel()](/api/class-page.mdx#page-get-by-label).
+Большинство элементов управления формами обычно имеют выделенные метки, которые можно удобно использовать для взаимодействия с формой. В этом случае вы можете найти элемент управления по его связанной метке, используя [Page.GetByLabel()](/api/class-page.mdx#page-get-by-label).
 
-For example, consider the following DOM structure.
+Например, рассмотрим следующую структуру DOM.
 
 <HTMLCard>
 <div>
@@ -147,21 +147,21 @@ For example, consider the following DOM structure.
 ```
 </HTMLCard>
 
-You can fill the input after locating it by the label text:
+Вы можете заполнить ввод после его нахождения по тексту метки:
 
 ```csharp
 await Page.GetByLabel("Password").FillAsync("secret");
 ```
 
-:::note[When to use label locators]
-Use this locator when locating form fields.
+:::note[Когда использовать локаторы меток]
+Используйте этот локатор при поиске полей формы.
 :::
 
-### Locate by placeholder
+### Поиск по заполнителю
 
-Inputs may have a placeholder attribute to hint to the user what value should be entered. You can locate such an input using [Page.GetByPlaceholder()](/api/class-page.mdx#page-get-by-placeholder).
+Поля ввода могут иметь атрибут заполнителя, чтобы подсказать пользователю, какое значение следует ввести. Вы можете найти такое поле ввода, используя [Page.GetByPlaceholder()](/api/class-page.mdx#page-get-by-placeholder).
 
-For example, consider the following DOM structure.
+Например, рассмотрим следующую структуру DOM.
 
 <HTMLCard>
 <div>
@@ -173,7 +173,7 @@ For example, consider the following DOM structure.
 ```
 </HTMLCard>
 
-You can fill the input after locating it by the placeholder text:
+Вы можете заполнить ввод после его нахождения по тексту заполнителя:
 
 ```csharp
 await Page
@@ -181,15 +181,15 @@ await Page
     .FillAsync("playwright@microsoft.com");
 ```
 
-:::note[When to use placeholder locators]
-Use this locator when locating form elements that do not have labels but do have placeholder texts.
+:::note[Когда использовать локаторы заполнителей]
+Используйте этот локатор при поиске элементов формы, у которых нет меток, но есть текст заполнителя.
 :::
 
-### Locate by text
+### Поиск по тексту
 
-Find an element by the text it contains. You can match by a substring, exact string, or a regular expression when using [Page.GetByText()](/api/class-page.mdx#page-get-by-text).
+Найдите элемент по тексту, который он содержит. Вы можете сопоставить по подстроке, точной строке или регулярному выражению, используя [Page.GetByText()](/api/class-page.mdx#page-get-by-text).
 
-For example, consider the following DOM structure.
+Например, рассмотрим следующую структуру DOM.
 
 <HTMLCard>
 <div>
@@ -201,13 +201,13 @@ For example, consider the following DOM structure.
 ```
 </HTMLCard>
 
-You can locate the element by the text it contains:
+Вы можете найти элемент по тексту, который он содержит:
 
 ```csharp
 await Expect(Page.GetByText("Welcome, John")).ToBeVisibleAsync();
 ```
 
-Set an exact match:
+Установите точное совпадение:
 
 ```csharp
 await Expect(Page
@@ -215,7 +215,7 @@ await Expect(Page
     .ToBeVisibleAsync();
 ```
 
-Match with a regular expression:
+Совпадение с регулярным выражением:
 
 ```csharp
 await Expect(Page
@@ -224,20 +224,20 @@ await Expect(Page
 ```
 
 :::note
-Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
+Сопоставление по тексту всегда нормализует пробелы, даже при точном совпадении. Например, оно превращает несколько пробелов в один, превращает разрывы строк в пробелы и игнорирует начальные и конечные пробелы.
 :::
 
-:::note[When to use text locators]
-We recommend using text locators to find non interactive elements like `div`, `span`, `p`, etc. For interactive elements like `button`, `a`, `input`, etc. use [role locators](#locate-by-role).
+:::note[Когда использовать локаторы текста]
+Мы рекомендуем использовать локаторы текста для поиска неинтерактивных элементов, таких как `div`, `span`, `p` и т. д. Для интерактивных элементов, таких как `button`, `a`, `input` и т. д., используйте [локаторы ролей](#locate-by-role).
 :::
 
-You can also [filter by text](#filter-by-text) which can be useful when trying to find a particular item in a list.
+Вы также можете [фильтровать по тексту](#filter-by-text), что может быть полезно при попытке найти конкретный элемент в списке.
 
-### Locate by alt text
+### Поиск по альтернативному тексту
 
-All images should have an `alt` attribute that describes the image. You can locate an image based on the text alternative using [Page.GetByAltText()](/api/class-page.mdx#page-get-by-alt-text).
+Все изображения должны иметь атрибут `alt`, который описывает изображение. Вы можете найти изображение на основе текстовой альтернативы, используя [Page.GetByAltText()](/api/class-page.mdx#page-get-by-alt-text).
 
-For example, consider the following DOM structure.
+Например, рассмотрим следующую структуру DOM.
 
 <HTMLCard>
 <div>
@@ -249,21 +249,21 @@ For example, consider the following DOM structure.
 ```
 </HTMLCard>
 
-You can click on the image after locating it by the text alternative:
+Вы можете щелкнуть по изображению после его нахождения по текстовой альтернативе:
 
 ```csharp
 await Page.GetByAltText("playwright logo").ClickAsync();
 ```
 
-:::note[When to use alt locators]
-Use this locator when your element supports alt text such as `img` and `area` elements.
+:::note[Когда использовать локаторы alt]
+Используйте этот локатор, когда ваш элемент поддерживает альтернативный текст, например, элементы `img` и `area`.
 :::
 
-### Locate by title
+### Поиск по заголовку
 
-Locate an element with a matching title attribute using [Page.GetByTitle()](/api/class-page.mdx#page-get-by-title).
+Найдите элемент с совпадающим атрибутом title, используя [Page.GetByTitle()](/api/class-page.mdx#page-get-by-title).
 
-For example, consider the following DOM structure.
+Например, рассмотрим следующую структуру DOM.
 
 <HTMLCard>
 <div>
@@ -275,21 +275,21 @@ For example, consider the following DOM structure.
 ```
 </HTMLCard>
 
-You can check the issues count after locating it by the title text:
+Вы можете проверить количество проблем после его нахождения по тексту заголовка:
 
 ```csharp
 await Expect(Page.GetByTitle("Issues count")).toHaveText("25 issues");
 ```
 
-:::note[When to use title locators]
-Use this locator when your element has the `title` attribute.
+:::note[Когда использовать локаторы заголовков]
+Используйте этот локатор, когда ваш элемент имеет атрибут `title`.
 :::
 
-### Locate by test id
+### Поиск по тестовому идентификатору
 
-Testing by test ids is the most resilient way of testing as even if your text or role of the attribute changes, the test will still pass. QA's and developers should define explicit test ids and query them with [Page.GetByTestId()](/api/class-page.mdx#page-get-by-test-id). However testing by test ids is not user facing. If the role or text value is important to you then consider using user facing locators such as [role](#locate-by-role) and [text locators](#locate-by-text).
+Тестирование по тестовым идентификаторам является наиболее устойчивым способом тестирования, так как даже если ваш текст или роль атрибута изменится, тест все равно пройдет. QA и разработчики должны определять явные тестовые идентификаторы и запрашивать их с помощью [Page.GetByTestId()](/api/class-page.mdx#page-get-by-test-id). Однако тестирование по тестовым идентификаторам не ориентировано на пользователя. Если роль или текстовое значение важны для вас, рассмотрите возможность использования локаторов, ориентированных на пользователя, таких как [локаторы ролей](#locate-by-role) и [локаторы текста](#locate-by-text).
 
-For example, consider the following DOM structure.
+Например, рассмотрим следующую структуру DOM.
 
 <HTMLCard>
 <div>
@@ -301,27 +301,27 @@ For example, consider the following DOM structure.
 ```
 </HTMLCard>
 
-You can locate the element by its test id:
+Вы можете найти элемент по его тестовому идентификатору:
 
 ```csharp
 await Page.GetByTestId("directions").ClickAsync();
 ```
 
-:::note[When to use testid locators]
-You can also use test ids when you choose to use the test id methodology or when you can't locate by [role](#locate-by-role) or [text](#locate-by-text).
+:::note[Когда использовать локаторы testid]
+Вы также можете использовать тестовые идентификаторы, когда выбираете методологию тестовых идентификаторов или когда не можете найти по [роли](#locate-by-role) или [тексту](#locate-by-text).
 :::
 
-#### Set a custom test id attribute
+#### Установите пользовательский атрибут тестового идентификатора
 
-By default, [Page.GetByTestId()](/api/class-page.mdx#page-get-by-test-id) will locate elements based on the `data-testid` attribute, but you can configure it in your test config or by calling [Selectors.SetTestIdAttribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute).
+По умолчанию [Page.GetByTestId()](/api/class-page.mdx#page-get-by-test-id) будет находить элементы на основе атрибута `data-testid`, но вы можете настроить его в конфигурации теста или вызвав [Selectors.SetTestIdAttribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute).
 
-Set the test id to use a custom data attribute for your tests.
+Установите тестовый идентификатор для использования пользовательского атрибута данных в ваших тестах.
 
 ```csharp
 playwright.Selectors.SetTestIdAttribute("data-pw");
 ```
 
-In your html you can now use `data-pw` as your test id instead of the default `data-testid`.
+В вашем HTML вы теперь можете использовать `data-pw` в качестве вашего тестового идентификатора вместо стандартного `data-testid`.
 
 <HTMLCard>
 <div>
@@ -333,15 +333,15 @@ In your html you can now use `data-pw` as your test id instead of the default `d
 ```
 </HTMLCard>
 
-And then locate the element as you would normally do:
+А затем найдите элемент, как вы обычно это делаете:
 
 ```csharp
 await Page.GetByTestId("directions").ClickAsync();
 ```
 
-### Locate by CSS or XPath
+### Поиск по CSS или XPath
 
-If you absolutely must use CSS or XPath locators, you can use [Page.Locator()](/api/class-page.mdx#page-locator) to create a locator that takes a selector describing how to find an element in the page. Playwright supports CSS and XPath selectors, and auto-detects them if you omit `css=` or `xpath=` prefix.
+Если вам абсолютно необходимо использовать локаторы CSS или XPath, вы можете использовать [Page.Locator()](/api/class-page.mdx#page-locator) для создания локатора, который принимает селектор, описывающий, как найти элемент на странице. Playwright поддерживает селекторы CSS и XPath и автоматически определяет их, если вы опустите префикс `css=` или `xpath=`.
 
 ```csharp
 await Page.Locator("css=button").ClickAsync();
@@ -351,7 +351,7 @@ await Page.Locator("button").ClickAsync();
 await Page.Locator("//button").ClickAsync();
 ```
 
-XPath and CSS selectors can be tied to the DOM structure or implementation. These selectors can break when the DOM structure changes. Long CSS or XPath chains below are an example of a **bad practice** that leads to unstable tests:
+Селекторы XPath и CSS могут быть связаны со структурой DOM или реализацией. Эти селекторы могут сломаться, когда структура DOM изменится. Длинные цепочки CSS или XPath ниже являются примером **плохой практики**, которая приводит к нестабильным тестам:
 
 ```csharp
 await Page.Locator("#tsf > div:nth-child(2) > div.A8SBwf > div.RNNXgb > div > div.a4bIc > input").ClickAsync();
@@ -359,17 +359,17 @@ await Page.Locator("#tsf > div:nth-child(2) > div.A8SBwf > div.RNNXgb > div > di
 await Page.Locator("//*[@id='tsf']/div[2]/div[1]/div[1]/div/div[2]/input").ClickAsync();
 ```
 
-:::note[When to use this]
-CSS and XPath are not recommended as the DOM can often change leading to non resilient tests. Instead, try to come up with a locator that is close to how the user perceives the page such as [role locators](#locate-by-role) or [define an explicit testing contract](#locate-by-test-id) using test ids.
+:::note[Когда использовать это]
+CSS и XPath не рекомендуются, так как DOM может часто изменяться, что приводит к неустойчивым тестам. Вместо этого постарайтесь придумать локатор, который близок к тому, как пользователь воспринимает страницу, например, [локаторы ролей](#locate-by-role) или [определите явный тестовый контракт](#locate-by-test-id) с использованием тестовых идентификаторов.
 :::
 
-## Locate in Shadow DOM
+## Поиск в Shadow DOM
 
-All locators in Playwright **by default** work with elements in Shadow DOM. The exceptions are:
-- Locating by XPath does not pierce shadow roots.
-- [Closed-mode shadow roots](https://developer.mozilla.org/en-US/docs/Web/API/Element/attachShadow#parameters) are not supported.
+Все локаторы в Playwright **по умолчанию** работают с элементами в Shadow DOM. Исключения составляют:
+- Поиск по XPath не проникает в shadow roots.
+- [Закрытые shadow roots](https://developer.mozilla.org/en-US/docs/Web/API/Element/attachShadow#parameters) не поддерживаются.
 
-Consider the following example with a custom web component:
+Рассмотрим следующий пример с пользовательским веб-компонентом:
 
 ```html
 <x-details role=button aria-expanded=true aria-controls=inner-details>
@@ -379,9 +379,9 @@ Consider the following example with a custom web component:
 </x-details>
 ```
 
-You can locate in the same way as if the shadow root was not present at all.
+Вы можете найти элемент так же, как если бы shadow root вообще не присутствовал.
 
-To click `<div>Details</div>`:
+Чтобы щелкнуть `<div>Details</div>`:
 
 ```csharp
 await page.GetByText("Details").ClickAsync();
@@ -395,7 +395,7 @@ await page.GetByText("Details").ClickAsync();
 </x-details>
 ```
 
-To click `<x-details>`:
+Чтобы щелкнуть `<x-details>`:
 
 ```csharp
 await page
@@ -411,15 +411,15 @@ await page
 </x-details>
 ```
 
-To ensure that `<x-details>` contains the text "Details":
+Чтобы убедиться, что `<x-details>` содержит текст "Details":
 
 ```csharp
 await Expect(Page.Locator("x-details")).ToContainTextAsync("Details");
 ```
 
-## Filtering Locators
+## Фильтрация локаторов
 
-Consider the following DOM structure where we want to click on the buy button of the second product card. We have a few options in order to filter the locators to get the right one.
+Рассмотрим следующую структуру DOM, где мы хотим нажать на кнопку покупки второй карточки продукта. У нас есть несколько вариантов, чтобы отфильтровать локаторы и получить нужный.
 
 <HTMLCard>
 <div>
@@ -449,9 +449,9 @@ Consider the following DOM structure where we want to click on the buy button of
 ```
 </HTMLCard>
 
-### Filter by text
+### Фильтрация по тексту
 
-Locators can be filtered by text with the [Locator.Filter()](/api/class-locator.mdx#locator-filter) method. It will search for a particular string somewhere inside the element, possibly in a descendant element, case-insensitively. You can also pass a regular expression.
+Локаторы могут быть отфильтрованы по тексту с помощью метода [Locator.Filter()](/api/class-locator.mdx#locator-filter). Он будет искать определенную строку где-то внутри элемента, возможно, в дочернем элементе, без учета регистра. Вы также можете передать регулярное выражение.
 
 ```csharp
 await page
@@ -461,7 +461,7 @@ await page
     .ClickAsync();
 ```
 
-Use a regular expression:
+Используйте регулярное выражение:
 
 ```csharp
 await page
@@ -471,19 +471,19 @@ await page
     .ClickAsync();
 ```
 
-### Filter by not having text
+### Фильтрация по отсутствию текста
 
-Alternatively, filter by **not having** text:
+В качестве альтернативы, фильтрация по **отсутствию** текста:
 
 ```csharp
-// 5 in-stock items
+// 5 товаров в наличии
 await Expect(Page.getByRole(AriaRole.Listitem).Filter(new() { HasNotText = "Out of stock" }))
     .ToHaveCountAsync(5);
 ```
 
-### Filter by child/descendant
+### Фильтрация по дочернему/потомку
 
-Locators support an option to only select elements that have or have not a descendant matching another locator. You can therefore filter by any other locator such as a [Locator.GetByRole()](/api/class-locator.mdx#locator-get-by-role), [Locator.GetByTestId()](/api/class-locator.mdx#locator-get-by-test-id), [Locator.GetByText()](/api/class-locator.mdx#locator-get-by-text) etc.
+Локаторы поддерживают опцию выбора только тех элементов, которые имеют или не имеют потомка, соответствующего другому локатору. Таким образом, вы можете фильтровать по любому другому локатору, такому как [Locator.GetByRole()](/api/class-locator.mdx#locator-get-by-role), [Locator.GetByTestId()](/api/class-locator.mdx#locator-get-by-test-id), [Locator.GetByText()](/api/class-locator.mdx#locator-get-by-text) и т. д.
 
 <HTMLCard>
 <div>
@@ -525,7 +525,7 @@ await page
     .ClickAsync();
 ```
 
-We can also assert the product card to make sure there is only one:
+Мы также можем проверить карточку продукта, чтобы убедиться, что она только одна:
 
 ```csharp
 await Expect(Page
@@ -536,10 +536,10 @@ await Expect(Page
     .ToHaveCountAsync(1);
 ```
 
-The filtering locator **must be relative** to the original locator and is queried starting with the original locator match, not the document root. Therefore, the following will not work, because the filtering locator starts matching from the `<ul>` list element that is outside of the `<li>` list item matched by the original locator:
+Фильтрующий локатор **должен быть относительным** к исходному локатору и запрашивается, начиная с совпадения исходного локатора, а не с корня документа. Поэтому следующее не сработает, потому что фильтрующий локатор начинает совпадать с элементом списка `<ul>`, который находится за пределами элемента списка `<li>`, совпадающего с исходным локатором:
 
 ```csharp
-// ✖ WRONG
+// ✖ НЕПРАВИЛЬНО
 await Expect(Page
     .GetByRole(AriaRole.Listitem)
     .Filter(new() {
@@ -548,9 +548,9 @@ await Expect(Page
     .ToHaveCountAsync(1);
 ```
 
-### Filter by not having child/descendant
+### Фильтрация по отсутствию дочернего/потомка
 
-We can also filter by **not having** a matching element inside.
+Мы также можем фильтровать по **отсутствию** совпадающего элемента внутри.
 
 ```csharp
 await Expect(Page
@@ -561,15 +561,15 @@ await Expect(Page
     .ToHaveCountAsync(1);
 ```
 
-Note that the inner locator is matched starting from the outer one, not from the document root.
+Обратите внимание, что внутренний локатор сопоставляется, начиная с внешнего, а не с корня документа.
 
-## Locator operators
+## Операторы локаторов
 
-### Matching inside a locator
+### Сопоставление внутри локатора
 
-You can chain methods that create a locator, like [Page.GetByText()](/api/class-page.mdx#page-get-by-text) or [Locator.GetByRole()](/api/class-locator.mdx#locator-get-by-role), to narrow down the search to a particular part of the page.
+Вы можете объединять методы, создающие локатор, такие как [Page.GetByText()](/api/class-page.mdx#page-get-by-text) или [Locator.GetByRole()](/api/class-locator.mdx#locator-get-by-role), чтобы сузить поиск до определенной части страницы.
 
-In this example we first create a locator called product by locating its role of `listitem`. We then filter by text. We can use the product locator again to get by role of button and click it and then use an assertion to make sure there is only one product with the text "Product 2".
+В этом примере мы сначала создаем локатор под названием product, находя его по роли `listitem`. Затем мы фильтруем по тексту. Мы можем снова использовать локатор product, чтобы получить элемент по роли кнопки и нажать на него, а затем использовать утверждение, чтобы убедиться, что есть только один продукт с текстом "Product 2".
 
 ```csharp
 var product = page
@@ -581,7 +581,7 @@ await product
     .ClickAsync();
 ```
 
-You can also chain two locators together, for example to find a "Save" button inside a particular dialog:
+Вы также можете объединить два локатора, например, чтобы найти кнопку "Сохранить" внутри определенного диалога:
 
 ```csharp
 var saveButton = page.GetByRole(AriaRole.Button, new() { Name = "Save" });
@@ -590,23 +590,23 @@ var dialog = page.GetByTestId("settings-dialog");
 await dialog.Locator(saveButton).ClickAsync();
 ```
 
-### Matching two locators simultaneously
+### Сопоставление двух локаторов одновременно
 
-Method [Locator.And()](/api/class-locator.mdx#locator-and) narrows down an existing locator by matching an additional locator. For example, you can combine [Page.GetByRole()](/api/class-page.mdx#page-get-by-role) and [Page.GetByTitle()](/api/class-page.mdx#page-get-by-title) to match by both role and title.
+Метод [Locator.And()](/api/class-locator.mdx#locator-and) сужает существующий локатор, сопоставляя дополнительный локатор. Например, вы можете объединить [Page.GetByRole()](/api/class-page.mdx#page-get-by-role) и [Page.GetByTitle()](/api/class-page.mdx#page-get-by-title), чтобы сопоставить по роли и заголовку.
 
 ```csharp
 var button = page.GetByRole(AriaRole.Button).And(page.GetByTitle("Subscribe"));
 ```
 
-### Matching one of the two alternative locators
+### Сопоставление одного из двух альтернативных локаторов
 
-If you'd like to target one of the two or more elements, and you don't know which one it will be, use [Locator.Or()](/api/class-locator.mdx#locator-or) to create a locator that matches any one or both of the alternatives.
+Если вы хотите нацелиться на один из двух или более элементов, и вы не знаете, какой из них это будет, используйте [Locator.Or()](/api/class-locator.mdx#locator-or), чтобы создать локатор, который соответствует любому из альтернатив.
 
-For example, consider a scenario where you'd like to click on a "New email" button, but sometimes a security settings dialog shows up instead. In this case, you can wait for either a "New email" button, or a dialog and act accordingly.
+Например, рассмотрим сценарий, когда вы хотите нажать на кнопку "Новое письмо", но иногда вместо этого появляется диалог настроек безопасности. В этом случае вы можете ожидать либо кнопку "Новое письмо", либо диалог и действовать соответственно.
 
 :::note
 
-If both "New email" button and security dialog appear on screen, the "or" locator will match both of them, possibly throwing the ["strict mode violation" error](#strictness). In this case, you can use [Locator.First](/api/class-locator.mdx#locator-first) to only match one of them.
+Если на экране появляются и кнопка "Новое письмо", и диалог безопасности, локатор "или" будет соответствовать обоим из них, возможно, вызывая ошибку ["нарушение строгого режима"](#strictness). В этом случае вы можете использовать [Locator.First](/api/class-locator.mdx#locator-first), чтобы соответствовать только одному из них.
 :::
 
 ```csharp
@@ -618,39 +618,39 @@ if (await dialog.IsVisibleAsync())
 await newEmail.ClickAsync();
 ```
 
-### Matching only visible elements
+### Сопоставление только видимых элементов
 
 :::note
 
-It's usually better to find a [more reliable way](./locators.mdx#quick-guide) to uniquely identify the element instead of checking the visibility.
+Обычно лучше найти [более надежный способ](./locators.mdx#quick-guide) уникально идентифицировать элемент, чем проверять видимость.
 :::
 
-Consider a page with two buttons, the first invisible and the second [visible](./actionability.mdx#visible).
+Рассмотрим страницу с двумя кнопками, первая из которых невидима, а вторая [видима](./actionability.mdx#visible).
 
 ```html
 <button style='display: none'>Invisible</button>
 <button>Visible</button>
 ```
 
-* This will find both buttons and throw a [strictness](./locators.mdx#strictness) violation error:
+* Это найдет обе кнопки и вызовет ошибку [строгости](./locators.mdx#strictness):
   
   ```csharp
   await page.Locator("button").ClickAsync();
   ```
   
-* This will only find a second button, because it is visible, and then click it.
+* Это найдет только вторую кнопку, потому что она видима, и затем нажмет на нее.
   
   ```csharp
   await page.Locator("button").Filter(new() { Visible = true }).ClickAsync();
   ```
   
-## Lists
+## Списки
 
-### Count items in a list
+### Подсчет элементов в списке
 
-You can assert locators in order to count the items in a list.
+Вы можете утверждать локаторы, чтобы подсчитать элементы в списке.
 
-For example, consider the following DOM structure:
+Например, рассмотрим следующую структуру DOM:
 
 <HTMLCard>
 <div>
@@ -670,17 +670,17 @@ For example, consider the following DOM structure:
 ```
 </HTMLCard>
 
-Use the count assertion to ensure that the list has 3 items.
+Используйте утверждение count, чтобы убедиться, что в списке 3 элемента.
 
 ```csharp
 await Expect(Page.GetByRole(AriaRole.Listitem)).ToHaveCountAsync(3);
 ```
 
-### Assert all text in a list
+### Утверждение всего текста в списке
 
-You can assert locators in order to find all the text in a list.
+Вы можете утверждать локаторы, чтобы найти весь текст в списке.
 
-For example, consider the following DOM structure:
+Например, рассмотрим следующую структуру DOM:
 
 <HTMLCard>
 <div>
@@ -700,7 +700,7 @@ For example, consider the following DOM structure:
 ```
 </HTMLCard>
 
-Use [Expect(Locator).ToHaveTextAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text) to ensure that the list has the text "apple", "banana" and "orange".
+Используйте [Expect(Locator).ToHaveTextAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text), чтобы убедиться, что в списке есть текст "apple", "banana" и "orange".
 
 ```csharp
 await Expect(Page
@@ -708,15 +708,15 @@ await Expect(Page
     .ToHaveTextAsync(new string[] {"apple", "banana", "orange"});
 ```
 
-### Get a specific item
+### Получение конкретного элемента
 
-There are many ways to get a specific item in a list.
+Существует множество способов получить конкретный элемент в списке.
 
-#### Get by text
+#### Получение по тексту
 
-Use the [Page.GetByText()](/api/class-page.mdx#page-get-by-text) method to locate an element in a list by its text content and then click on it.
+Используйте метод [Page.GetByText()](/api/class-page.mdx#page-get-by-text), чтобы найти элемент в списке по его текстовому содержимому и затем нажать на него.
 
-For example, consider the following DOM structure:
+Например, рассмотрим следующую структуру DOM:
 
 <HTMLCard>
 <div>
@@ -736,17 +736,17 @@ For example, consider the following DOM structure:
 ```
 </HTMLCard>
 
-Locate an item by its text content and click it.
+Найдите элемент по его текстовому содержимому и нажмите на него.
 
 ```csharp
 await page.GetByText("orange").ClickAsync();
 ```
 
-#### Filter by text
+#### Фильтрация по тексту
 
-Use the [Locator.Filter()](/api/class-locator.mdx#locator-filter) to locate a specific item in a list.
+Используйте [Locator.Filter()](/api/class-locator.mdx#locator-filter), чтобы найти конкретный элемент в списке.
 
-For example, consider the following DOM structure:
+Например, рассмотрим следующую структуру DOM:
 
 <HTMLCard>
 <div>
@@ -766,7 +766,7 @@ For example, consider the following DOM structure:
 ```
 </HTMLCard>
 
-Locate an item by the role of "listitem" and then filter by the text of "orange" and then click it.
+Найдите элемент по роли "listitem", затем отфильтруйте по тексту "orange" и нажмите на него.
 
 ```csharp
 await page
@@ -775,11 +775,11 @@ await page
     .ClickAsync();
 ```
 
-#### Get by test id
+#### Получение по тестовому идентификатору
 
-Use the [Page.GetByTestId()](/api/class-page.mdx#page-get-by-test-id) method to locate an element in a list. You may need to modify the html and add a test id if you don't already have a test id.
+Используйте метод [Page.GetByTestId()](/api/class-page.mdx#page-get-by-test-id), чтобы найти элемент в списке. Возможно, вам потребуется изменить HTML и добавить тестовый идентификатор, если у вас его еще нет.
 
-For example, consider the following DOM structure:
+Например, рассмотрим следующую структуру DOM:
 
 <HTMLCard>
 <div>
@@ -799,27 +799,27 @@ For example, consider the following DOM structure:
 ```
 </HTMLCard>
 
-Locate an item by its test id of "orange" and then click it.
+Найдите элемент по его тестовому идентификатору "orange" и нажмите на него.
 
 ```csharp
 await page.GetByTestId("orange").ClickAsync();
 ```
 
-#### Get by nth item
+#### Получение по порядковому номеру
 
-If you have a list of identical elements, and the only way to distinguish between them is the order, you can choose a specific element from a list with [Locator.First](/api/class-locator.mdx#locator-first), [Locator.Last](/api/class-locator.mdx#locator-last) or [Locator.Nth()](/api/class-locator.mdx#locator-nth).
+Если у вас есть список идентичных элементов, и единственный способ отличить их — это порядок, вы можете выбрать конкретный элемент из списка с помощью [Locator.First](/api/class-locator.mdx#locator-first), [Locator.Last](/api/class-locator.mdx#locator-last) или [Locator.Nth()](/api/class-locator.mdx#locator-nth).
 
 ```csharp
 var banana = await page.GetByRole(AriaRole.Listitem).Nth(1);
 ```
 
-However, use this method with caution. Often times, the page might change, and the locator will point to a completely different element from the one you expected. Instead, try to come up with a unique locator that will pass the [strictness criteria](#strictness).
+Однако используйте этот метод с осторожностью. Часто страница может измениться, и локатор будет указывать на совершенно другой элемент, чем вы ожидали. Вместо этого постарайтесь придумать уникальный локатор, который пройдет [критерии строгости](#strictness).
 
-### Chaining filters
+### Объединение фильтров
 
-When you have elements with various similarities, you can use the [Locator.Filter()](/api/class-locator.mdx#locator-filter) method to select the right one. You can also chain multiple filters to narrow down the selection.
+Когда у вас есть элементы с различными сходствами, вы можете использовать метод [Locator.Filter()](/api/class-locator.mdx#locator-filter), чтобы выбрать нужный. Вы также можете объединить несколько фильтров, чтобы сузить выбор.
 
-For example, consider the following DOM structure:
+Например, рассмотрим следующую структуру DOM:
 
 <HTMLCard>
 <div>
@@ -865,7 +865,7 @@ For example, consider the following DOM structure:
 ```
 </HTMLCard>
 
-To take a screenshot of the row with "Mary" and "Say goodbye":
+Чтобы сделать скриншот строки с "Mary" и "Say goodbye":
 
 ```csharp
 var rowLocator = page.GetByRole(AriaRole.Listitem);
@@ -878,20 +878,20 @@ await rowLocator
     .ScreenshotAsync(new() { Path = "screenshot.png" });
 ```
 
-You should now have a "screenshot.png" file in your project's root directory.
+Теперь у вас должен быть файл "screenshot.png" в корневом каталоге вашего проекта.
 
-### Rare use cases
+### Редкие случаи использования
 
-#### Do something with each element in the list
+#### Выполнение действия с каждым элементом в списке
 
-Iterate elements:
+Итерация по элементам:
 
 ```csharp
 foreach (var row in await page.GetByRole(AriaRole.Listitem).AllAsync())
   Console.WriteLine(await row.TextContentAsync());
 ```
 
-Iterate using regular for loop:
+Итерация с использованием обычного цикла for:
 
 ```csharp
 var rows = page.GetByRole(AriaRole.Listitem);
@@ -900,9 +900,9 @@ for (int i = 0; i < count; ++i)
   Console.WriteLine(await rows.Nth(i).TextContentAsync());
 ```
 
-#### Evaluate in the page
+#### Оценка на странице
 
-The code inside [Locator.EvaluateAllAsync()](/api/class-locator.mdx#locator-evaluate-all) runs in the page, you can call any DOM apis there.
+Код внутри [Locator.EvaluateAllAsync()](/api/class-locator.mdx#locator-evaluate-all) выполняется на странице, вы можете вызывать любые DOM API там.
 
 ```csharp
 var rows = page.GetByRole(AriaRole.Listitem);
@@ -910,29 +910,29 @@ var texts = await rows.EvaluateAllAsync(
     "list => list.map(element => element.textContent)");
 ```
 
-## Strictness
+## Строгость
 
-Locators are strict. This means that all operations on locators that imply some target DOM element will throw an exception if more than one element matches. For example, the following call throws if there are several buttons in the DOM:
+Локаторы являются строгими. Это означает, что все операции с локаторами, которые подразумевают некоторый целевой элемент DOM, вызовут исключение, если будет найдено более одного элемента. Например, следующий вызов вызовет ошибку, если в DOM несколько кнопок:
 
-#### Throws an error if more than one
+#### Вызывает ошибку, если более одного
 
 ```csharp
 await page.GetByRole(AriaRole.Button).ClickAsync();
 ```
 
-On the other hand, Playwright understands when you perform a multiple-element operation, so the following call works perfectly fine when the locator resolves to multiple elements.
+С другой стороны, Playwright понимает, когда вы выполняете операцию с несколькими элементами, поэтому следующий вызов работает отлично, когда локатор разрешается в несколько элементов.
 
-#### Works fine with multiple elements
+#### Работает отлично с несколькими элементами
 
 ```csharp
 await page.GetByRole(AriaRole.Button).CountAsync();
 ```
 
-You can explicitly opt-out from strictness check by telling Playwright which element to use when multiple elements match, through [Locator.First](/api/class-locator.mdx#locator-first), [Locator.Last](/api/class-locator.mdx#locator-last), and [Locator.Nth()](/api/class-locator.mdx#locator-nth). These methods are **not recommended** because when your page changes, Playwright may click on an element you did not intend. Instead, follow best practices above to create a locator that uniquely identifies the target element.
+Вы можете явно отказаться от проверки строгости, указав Playwright, какой элемент использовать, когда совпадают несколько элементов, с помощью [Locator.First](/api/class-locator.mdx#locator-first), [Locator.Last](/api/class-locator.mdx#locator-last) и [Locator.Nth()](/api/class-locator.mdx#locator-nth). Эти методы **не рекомендуются**, потому что, когда ваша страница изменяется, Playwright может нажать на элемент, который вы не намеревались. Вместо этого следуйте лучшим практикам выше, чтобы создать локатор, который уникально идентифицирует целевой элемент.
 
-## More Locators
+## Дополнительные локаторы
 
-For less commonly used locators, look at the [other locators](./other-locators.mdx) guide.
+Для менее часто используемых локаторов, посмотрите руководство по [другим локаторам](./other-locators.mdx).
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"

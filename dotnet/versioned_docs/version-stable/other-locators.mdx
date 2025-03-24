@@ -1,166 +1,166 @@
 ---
 id: other-locators
-title: "Other locators"
+title: "Другие локаторы"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
 :::note
 
-Check out the main [locators guide](./locators) for most common and recommended locators.
+Ознакомьтесь с основным [руководством по локаторам](./locators) для наиболее распространенных и рекомендуемых локаторов.
 :::
 
-In addition to recommended locators like [Page.GetByRole()](/api/class-page.mdx#page-get-by-role) and [Page.GetByText()](/api/class-page.mdx#page-get-by-text), Playwright supports a variety of other locators described in this guide.
+В дополнение к рекомендуемым локаторам, таким как [Page.GetByRole()](/api/class-page.mdx#page-get-by-role) и [Page.GetByText()](/api/class-page.mdx#page-get-by-text), Playwright поддерживает множество других локаторов, описанных в этом руководстве.
 
-## CSS locator
+## CSS локатор
 
 :::note
 
-We recommend prioritizing [user-visible locators](./locators.mdx#quick-guide) like text or accessible role instead of using CSS that is tied to the implementation and could break when the page changes.
+Мы рекомендуем отдавать предпочтение [локаторам, видимым пользователю](./locators.mdx#quick-guide), таким как текст или доступная роль, вместо использования CSS, который привязан к реализации и может сломаться при изменении страницы.
 :::
 
-Playwright can locate an element by CSS selector.
+Playwright может находить элемент по CSS селектору.
 
 ```csharp
 await page.Locator("css=button").ClickAsync();
 ```
 
-Playwright augments standard CSS selectors in two ways:
-* CSS selectors pierce open shadow DOM.
-* Playwright adds custom pseudo-classes like `:visible`, `:has-text()`, `:has()`, `:is()`, `:nth-match()` and more.
+Playwright расширяет стандартные CSS селекторы двумя способами:
+* CSS селекторы проникают в открытый теневой DOM.
+* Playwright добавляет пользовательские псевдоклассы, такие как `:visible`, `:has-text()`, `:has()`, `:is()`, `:nth-match()` и другие.
 
-### CSS: matching by text
+### CSS: соответствие по тексту
 
-Playwright include a number of CSS pseudo-classes to match elements by their text content.
-- `article:has-text("Playwright")` - the `:has-text()` matches any element containing specified text somewhere inside, possibly in a child or a descendant element. Matching is case-insensitive, trims whitespace and searches for a substring.
+Playwright включает ряд CSS псевдоклассов для соответствия элементам по их текстовому содержимому.
+- `article:has-text("Playwright")` - `:has-text()` соответствует любому элементу, содержащему указанный текст где-то внутри, возможно, в дочернем или потомке. Соответствие нечувствительно к регистру, обрезает пробелы и ищет подстроку.
   
-  For example, `article:has-text("Playwright")` matches `<article><div>Playwright</div></article>`.
+  Например, `article:has-text("Playwright")` соответствует `<article><div>Playwright</div></article>`.
   
-  Note that `:has-text()` should be used together with other CSS specifiers, otherwise it will match all the elements containing specified text, including the `<body>`.
+  Обратите внимание, что `:has-text()` следует использовать вместе с другими CSS спецификаторами, иначе он будет соответствовать всем элементам, содержащим указанный текст, включая `<body>`.
   
   ```csharp
-  // Wrong, will match many elements including <body>
+  // Неправильно, будет соответствовать многим элементам, включая <body>
   await page.Locator(":has-text(\"Playwright\")").ClickAsync();
-  // Correct, only matches the <article> element
+  // Правильно, соответствует только элементу <article>
   await page.Locator("article:has-text(\"Playwright\")").ClickAsync();
   ```
   
-- `#nav-bar :text("Home")` - the `:text()` pseudo-class matches the smallest element containing specified text. Matching is case-insensitive, trims whitespace and searches for a substring.
+- `#nav-bar :text("Home")` - псевдокласс `:text()` соответствует наименьшему элементу, содержащему указанный текст. Соответствие нечувствительно к регистру, обрезает пробелы и ищет подстроку.
   
-  For example, this will find an element with text "Home" somewhere inside the `#nav-bar` element:
+  Например, это найдет элемент с текстом "Home" где-то внутри элемента `#nav-bar`:
   
   ```csharp
   await page.Locator("#nav-bar :text('Home')").ClickAsync();
   ```
   
-- `#nav-bar :text-is("Home")` - the `:text-is()` pseudo-class matches the smallest element with exact text. Exact matching is case-sensitive, trims whitespace and searches for the full string.
+- `#nav-bar :text-is("Home")` - псевдокласс `:text-is()` соответствует наименьшему элементу с точным текстом. Точное соответствие чувствительно к регистру, обрезает пробелы и ищет полную строку.
   
-  For example, `:text-is("Log")` does not match `<button>Log in</button>` because `<button>` contains a single text node `"Log in"` that is not equal to `"Log"`. However, `:text-is("Log")` matches `<button> Log <span>in</span></button>`, because `<button>` contains a text node `" Log "`.
+  Например, `:text-is("Log")` не соответствует `<button>Log in</button>`, потому что `<button>` содержит один текстовый узел `"Log in"`, который не равен `"Log"`. Однако, `:text-is("Log")` соответствует `<button> Log <span>in</span></button>`, потому что `<button>` содержит текстовый узел `" Log "`.
   
-  Similarly, `:text-is("Download")` will not match `<button>download</button>` because it is case-sensitive.
-* `#nav-bar :text-matches("reg?ex", "i")` - the `:text-matches()` pseudo-class matches the smallest element with text content matching the [JavaScript-like regex](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
+  Аналогично, `:text-is("Download")` не будет соответствовать `<button>download</button>`, потому что это чувствительно к регистру.
+* `#nav-bar :text-matches("reg?ex", "i")` - псевдокласс `:text-matches()` соответствует наименьшему элементу с текстовым содержимым, соответствующим [регулярному выражению, подобному JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
   
-  For example, `:text-matches("Log\s*in", "i")` matches `<button>Login</button>` and `<button>log IN</button>`.
+  Например, `:text-matches("Log\s*in", "i")` соответствует `<button>Login</button>` и `<button>log IN</button>`.
 
 :::note
 
-Text matching always normalizes whitespace. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
+Соответствие тексту всегда нормализует пробелы. Например, оно превращает несколько пробелов в один, превращает разрывы строк в пробелы и игнорирует начальные и конечные пробелы.
 :::
 
 :::note
-Input elements of the type `button` and `submit` are matched by their `value` instead of text content. For example, `:text("Log in")` matches `<input type=button value="Log in">`.
+Элементы ввода типа `button` и `submit` соответствуют по их `value`, а не по текстовому содержимому. Например, `:text("Log in")` соответствует `<input type=button value="Log in">`.
 :::
 
-### CSS: matching only visible elements
+### CSS: соответствие только видимым элементам
 
-Playwright supports the `:visible` pseudo class in CSS selectors. For example, `css=button` matches all the buttons on the page, while `css=button:visible` only matches visible buttons. This is useful to distinguish elements that are very similar but differ in visibility.
+Playwright поддерживает псевдокласс `:visible` в CSS селекторах. Например, `css=button` соответствует всем кнопкам на странице, в то время как `css=button:visible` соответствует только видимым кнопкам. Это полезно для различения элементов, которые очень похожи, но отличаются видимостью.
 
-Consider a page with two buttons, first invisible and second visible.
+Рассмотрим страницу с двумя кнопками, первая из которых невидима, а вторая видима.
 
 ```html
 <button style='display: none'>Invisible</button>
 <button>Visible</button>
 ```
 
-* This will find both buttons and throw a [strictness](./locators.mdx#strictness) violation error:
+* Это найдет обе кнопки и вызовет ошибку [строгости](./locators.mdx#strictness):
   
   ```csharp
   await page.Locator("button").ClickAsync();
   ```
   
-* This will only find a second button, because it is visible, and then click it.
+* Это найдет только вторую кнопку, потому что она видима, и затем нажмет на нее.
   
   ```csharp
   await page.Locator("button:visible").ClickAsync();
   ```
   
-### CSS: elements that contain other elements
+### CSS: элементы, содержащие другие элементы
 
-The `:has()` pseudo-class is an [experimental CSS pseudo-class](https://developer.mozilla.org/en-US/docs/Web/CSS/:has). It returns an element if any of the selectors passed as parameters relative to the `:scope` of the given element match at least one element.
+Псевдокласс `:has()` является [экспериментальным CSS псевдоклассом](https://developer.mozilla.org/en-US/docs/Web/CSS/:has). Он возвращает элемент, если любой из селекторов, переданных в качестве параметров относительно `:scope` данного элемента, соответствует хотя бы одному элементу.
 
-Following snippet returns text content of an `<article>` element that has a `<div class=promo>` inside.
+Следующий фрагмент возвращает текстовое содержимое элемента `<article>`, который содержит элемент `<div class=promo>` внутри.
 
 ```csharp
 await page.Locator("article:has(div.promo)").TextContentAsync();
 ```
 
-### CSS: elements matching one of the conditions
+### CSS: элементы, соответствующие одному из условий
 
-Comma-separated list of CSS selectors will match all elements that can be selected by one of the selectors in that list.
+Список CSS селекторов, разделенных запятыми, будет соответствовать всем элементам, которые могут быть выбраны одним из селекторов в этом списке.
 
 ```csharp
-// Clicks a <button> that has either a "Log in" or "Sign in" text.
+// Нажимает на <button>, который имеет текст "Log in" или "Sign in".
 await page.Locator("button:has-text(\"Log in\"), button:has-text(\"Sign in\")").ClickAsync();
 ```
 
-The `:is()` pseudo-class is an [experimental CSS pseudo-class](https://developer.mozilla.org/en-US/docs/Web/CSS/:is) that may be useful for specifying a list of extra conditions on an element.
+Псевдокласс `:is()` является [экспериментальным CSS псевдоклассом](https://developer.mozilla.org/en-US/docs/Web/CSS/:is), который может быть полезен для указания списка дополнительных условий на элемент.
 
-### CSS: matching elements based on layout
+### CSS: соответствие элементов на основе расположения
 
 :::note
 
-Matching based on layout may produce unexpected results. For example, a different element could be matched when layout changes by one pixel.
+Соответствие на основе расположения может давать неожиданные результаты. Например, другой элемент может быть выбран, когда расположение изменяется на один пиксель.
 :::
 
-Sometimes, it is hard to come up with a good selector to the target element when it lacks distinctive features. In this case, using Playwright layout CSS pseudo-classes could help. These can be combined with regular CSS to pinpoint one of the multiple choices.
+Иногда сложно придумать хороший селектор для целевого элемента, если у него нет отличительных черт. В этом случае использование CSS псевдоклассов расположения Playwright может помочь. Их можно комбинировать с обычным CSS, чтобы точно указать один из нескольких вариантов.
 
-For example, `input:right-of(:text("Password"))` matches an input field that is to the right of text "Password" - useful when the page has multiple inputs that are hard to distinguish between each other.
+Например, `input:right-of(:text("Password"))` соответствует полю ввода, которое находится справа от текста "Password" - полезно, когда на странице есть несколько полей ввода, которые трудно различить.
 
-Note that layout pseudo-classes are useful in addition to something else, like `input`. If you use a layout pseudo-class alone, like `:right-of(:text("Password"))`, most likely you'll get not the input you are looking for, but some empty element in between the text and the target input.
+Обратите внимание, что псевдоклассы расположения полезны в дополнение к чему-то еще, например, `input`. Если вы используете псевдокласс расположения отдельно, например, `:right-of(:text("Password"))`, скорее всего, вы получите не то поле ввода, которое ищете, а какой-то пустой элемент между текстом и целевым полем ввода.
 
-Layout pseudo-classes use [bounding client rect](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect) to compute distance and relative position of the elements.
-* `:right-of(div > button)` - Matches elements that are to the right of any element matching the inner selector, at any vertical position.
-* `:left-of(div > button)` - Matches elements that are to the left of any element matching the inner selector, at any vertical position.
-* `:above(div > button)` - Matches elements that are above any of the elements matching the inner selector, at any horizontal position.
-* `:below(div > button)` - Matches elements that are below any of the elements matching the inner selector, at any horizontal position.
-* `:near(div > button)` - Matches elements that are near (within 50 CSS pixels) any of the elements matching the inner selector.
+Псевдоклассы расположения используют [bounding client rect](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect) для вычисления расстояния и относительного положения элементов.
+* `:right-of(div > button)` - Соответствует элементам, которые находятся справа от любого элемента, соответствующего внутреннему селектору, на любой вертикальной позиции.
+* `:left-of(div > button)` - Соответствует элементам, которые находятся слева от любого элемента, соответствующего внутреннему селектору, на любой вертикальной позиции.
+* `:above(div > button)` - Соответствует элементам, которые находятся выше любого из элементов, соответствующих внутреннему селектору, на любой горизонтальной позиции.
+* `:below(div > button)` - Соответствует элементам, которые находятся ниже любого из элементов, соответствующих внутреннему селектору, на любой горизонтальной позиции.
+* `:near(div > button)` - Соответствует элементам, которые находятся рядом (в пределах 50 CSS пикселей) с любым из элементов, соответствующих внутреннему селектору.
 
-Note that resulting matches are sorted by their distance to the anchor element, so you can use [Locator.First](/api/class-locator.mdx#locator-first) to pick the closest one. This is only useful if you have something like a list of similar elements, where the closest is obviously the right one. However, using [Locator.First](/api/class-locator.mdx#locator-first) in other cases most likely won't work as expected - it will not target the element you are searching for, but some other element that happens to be the closest like a random empty `<div>`, or an element that is scrolled out and is not currently visible.
+Обратите внимание, что полученные совпадения сортируются по их расстоянию до якорного элемента, поэтому вы можете использовать [Locator.First](/api/class-locator.mdx#locator-first), чтобы выбрать ближайший. Это полезно только в том случае, если у вас есть что-то вроде списка похожих элементов, где ближайший очевидно является правильным. Однако использование [Locator.First](/api/class-locator.mdx#locator-first) в других случаях, скорее всего, не сработает так, как ожидалось - он не будет нацеливаться на элемент, который вы ищете, а на какой-то другой элемент, который случайно оказался ближайшим, например, случайный пустой `<div>`, или элемент, который прокручен и в данный момент не виден.
 
 ```csharp
-// Fill an input to the right of "Username".
+// Заполните поле ввода справа от "Username".
 await page.Locator("input:right-of(:text(\"Username\"))").FillAsync("value");
 
-// Click a button near the promo card.
+// Нажмите на кнопку рядом с промо-картой.
 await page.Locator("button:near(.promo-card)").ClickAsync();
 
-// Click the radio input in the list closest to the "Label 3".
+// Нажмите на радио-кнопку в списке, ближайшую к "Label 3".
 await page.Locator("[type=radio]:left-of(:text(\"Label 3\"))").First.ClickAsync();
 ```
 
-All layout pseudo-classes support optional maximum pixel distance as the last argument. For example `button:near(:text("Username"), 120)` matches a button that is at most 120 CSS pixels away from the element with the text "Username".
+Все псевдоклассы расположения поддерживают необязательное максимальное расстояние в пикселях в качестве последнего аргумента. Например, `button:near(:text("Username"), 120)` соответствует кнопке, которая находится на расстоянии не более 120 CSS пикселей от элемента с текстом "Username".
 
-### CSS: pick n-th match from the query result
+### CSS: выбор n-го совпадения из результата запроса
 
 :::note
 
-It is usually possible to distinguish elements by some attribute or text content, which is more resilient to page changes.
+Обычно можно различить элементы по какому-либо атрибуту или текстовому содержимому, что более устойчиво к изменениям страницы.
 :::
 
-Sometimes page contains a number of similar elements, and it is hard to select a particular one. For example:
+Иногда на странице содержится несколько похожих элементов, и сложно выбрать конкретный. Например:
 
 ```html
 <section> <button>Buy</button> </section>
@@ -168,227 +168,227 @@ Sometimes page contains a number of similar elements, and it is hard to select a
 <div><div> <button>Buy</button> </div></div>
 ```
 
-In this case, `:nth-match(:text("Buy"), 3)` will select the third button from the snippet above. Note that index is one-based.
+В этом случае `:nth-match(:text("Buy"), 3)` выберет третью кнопку из приведенного выше фрагмента. Обратите внимание, что индекс начинается с единицы.
 
 ```csharp
-// Click the third "Buy" button
+// Нажмите на третью кнопку "Buy"
 await page.Locator(":nth-match(:text('Buy'), 3)").ClickAsync();
 ```
 
-`:nth-match()` is also useful to wait until a specified number of elements appear, using [Locator.WaitForAsync()](/api/class-locator.mdx#locator-wait-for).
+`:nth-match()` также полезен для ожидания, пока не появится указанное количество элементов, используя [Locator.WaitForAsync()](/api/class-locator.mdx#locator-wait-for).
 
 ```csharp
-// Wait until all three buttons are visible
+// Ожидание, пока все три кнопки не станут видимыми
 await page.Locator(":nth-match(:text('Buy'), 3)").WaitForAsync();
 ```
 
 :::note
-Unlike [`:nth-child()`](https://developer.mozilla.org/en-US/docs/Web/CSS/:nth-child), elements do not have to be siblings, they could be anywhere on the page. In the snippet above, all three buttons match `:text("Buy")` selector, and `:nth-match()` selects the third button.
+В отличие от [`:nth-child()`](https://developer.mozilla.org/en-US/docs/Web/CSS/:nth-child), элементы не обязательно должны быть соседними, они могут находиться в любом месте на странице. В приведенном выше фрагменте все три кнопки соответствуют селектору `:text("Buy")`, и `:nth-match()` выбирает третью кнопку.
 :::
 
-## N-th element locator
+## Локатор n-го элемента
 
-You can narrow down query to the n-th match using the `nth=` locator passing a zero-based index.
+Вы можете сузить запрос до n-го совпадения, используя локатор `nth=`, передавая индекс, начиная с нуля.
 
 ```csharp
-// Click first button
+// Нажмите на первую кнопку
 await page.Locator("button").Locator("nth=0").ClickAsync();
 
-// Click last button
+// Нажмите на последнюю кнопку
 await page.Locator("button").Locator("nth=-1").ClickAsync();
 ```
 
-## Parent element locator
+## Локатор родительского элемента
 
-When you need to target a parent element of some other element, most of the time you should [Locator.Filter()](/api/class-locator.mdx#locator-filter) by the child locator. For example, consider the following DOM structure:
+Когда вам нужно нацелиться на родительский элемент какого-либо другого элемента, чаще всего следует использовать [Locator.Filter()](/api/class-locator.mdx#locator-filter) по локатору дочернего элемента. Например, рассмотрим следующую структуру DOM:
 
 ```html
 <li><label>Hello</label></li>
 <li><label>World</label></li>
 ```
 
-If you'd like to target the parent `<li>` of a label with text `"Hello"`, using [Locator.Filter()](/api/class-locator.mdx#locator-filter) works best:
+Если вы хотите нацелиться на родительский `<li>` элемента label с текстом `"Hello"`, использование [Locator.Filter()](/api/class-locator.mdx#locator-filter) будет лучшим вариантом:
 
 ```csharp
 var child = page.GetByText("Hello");
 var parent = page.GetByRole(AriaRole.Listitem).Filter(new () { Has = child });
 ```
 
-Alternatively, if you cannot find a suitable locator for the parent element, use `xpath=..`. Note that this method is not as reliable, because any changes to the DOM structure will break your tests. Prefer [Locator.Filter()](/api/class-locator.mdx#locator-filter) when possible.
+В качестве альтернативы, если вы не можете найти подходящий локатор для родительского элемента, используйте `xpath=..`. Обратите внимание, что этот метод не так надежен, потому что любые изменения в структуре DOM сломают ваши тесты. Предпочитайте [Locator.Filter()](/api/class-locator.mdx#locator-filter), когда это возможно.
 
 ```csharp
 var parent = page.GetByText("Hello").Locator("xpath=..");
 ```
 
-## React locator
+## React локатор
 
 :::note
 
-React locator is experimental and prefixed with `_`. The functionality might change in future.
+React локатор является экспериментальным и имеет префикс `_`. Функциональность может измениться в будущем.
 :::
 
-React locator allows finding elements by their component name and property values. The syntax is very similar to [CSS attribute selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) and supports all CSS attribute selector operators.
+React локатор позволяет находить элементы по имени их компонента и значениям свойств. Синтаксис очень похож на [CSS селекторы атрибутов](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) и поддерживает все операторы селекторов атрибутов CSS.
 
-In React locator, component names are transcribed with **CamelCase**.
+В React локаторе имена компонентов записываются в **CamelCase**.
 
 ```csharp
 await page.Locator("_react=BookItem").ClickAsync();
 ```
 
-More examples:
-- match by **component**: `_react=BookItem`
-- match by component and **exact property value**, case-sensitive: `_react=BookItem[author = "Steven King"]`
-- match by property value only, **case-insensitive**: `_react=[author = "steven king" i]`
-- match by component and **truthy property value**: `_react=MyButton[enabled]`
-- match by component and **boolean value**: `_react=MyButton[enabled = false]`
-- match by property **value substring**: `_react=[author *= "King"]`
-- match by component and **multiple properties**: `_react=BookItem[author *= "king" i][year = 1990]`
-- match by **nested** property value: `_react=[some.nested.value = 12]`
-- match by component and property value **prefix**: `_react=BookItem[author ^= "Steven"]`
-- match by component and property value **suffix**: `_react=BookItem[author $= "Steven"]`
-- match by component and **key**: `_react=BookItem[key = '2']`
-- match by property value **regex**: `_react=[author = /Steven(\\s+King)?/i]`
+Больше примеров:
+- соответствие по **компоненту**: `_react=BookItem`
+- соответствие по компоненту и **точному значению свойства**, чувствительно к регистру: `_react=BookItem[author = "Steven King"]`
+- соответствие только по значению свойства, **нечувствительно к регистру**: `_react=[author = "steven king" i]`
+- соответствие по компоненту и **истинному значению свойства**: `_react=MyButton[enabled]`
+- соответствие по компоненту и **логическому значению**: `_react=MyButton[enabled = false]`
+- соответствие по **подстроке значения свойства**: `_react=[author *= "King"]`
+- соответствие по компоненту и **нескольким свойствам**: `_react=BookItem[author *= "king" i][year = 1990]`
+- соответствие по **вложенному** значению свойства: `_react=[some.nested.value = 12]`
+- соответствие по компоненту и **префиксу значения свойства**: `_react=BookItem[author ^= "Steven"]`
+- соответствие по компоненту и **суффиксу значения свойства**: `_react=BookItem[author $= "Steven"]`
+- соответствие по компоненту и **ключу**: `_react=BookItem[key = '2']`
+- соответствие по **регулярному выражению значения свойства**: `_react=[author = /Steven(\\s+King)?/i]`
 
-To find React element names in a tree use [React DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi).
-
-:::note
-
-React locator supports React 15 and above.
-:::
-
-:::note
-React locator, as well as [React DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi), only work against **unminified** application builds.
-:::
-
-## Vue locator
+Чтобы найти имена React элементов в дереве, используйте [React DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi).
 
 :::note
 
-Vue locator is experimental and prefixed with `_`. The functionality might change in future.
+React локатор поддерживает React 15 и выше.
 :::
 
-Vue locator allows finding elements by their component name and property values. The syntax is very similar to [CSS attribute selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) and supports all CSS attribute selector operators.
+:::note
+React локатор, как и [React DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi), работает только с **неминифицированными** сборками приложений.
+:::
 
-In Vue locator, component names are transcribed with **kebab-case**.
+## Vue локатор
+
+:::note
+
+Vue локатор является экспериментальным и имеет префикс `_`. Функциональность может измениться в будущем.
+:::
+
+Vue локатор позволяет находить элементы по имени их компонента и значениям свойств. Синтаксис очень похож на [CSS селекторы атрибутов](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) и поддерживает все операторы селекторов атрибутов CSS.
+
+В Vue локаторе имена компонентов записываются в **kebab-case**.
 
 ```csharp
 await page.Locator("_vue=book-item").ClickAsync();
 ```
 
-More examples:
-- match by **component**: `_vue=book-item`
-- match by component and **exact property value**, case-sensitive: `_vue=book-item[author = "Steven King"]`
-- match by property value only, **case-insensitive**: `_vue=[author = "steven king" i]`
-- match by component and **truthy property value**: `_vue=my-button[enabled]`
-- match by component and **boolean value**: `_vue=my-button[enabled = false]`
-- match by property **value substring**: `_vue=[author *= "King"]`
-- match by component and **multiple properties**: `_vue=book-item[author *= "king" i][year = 1990]`
-- match by **nested** property value: `_vue=[some.nested.value = 12]`
-- match by component and property value **prefix**: `_vue=book-item[author ^= "Steven"]`
-- match by component and property value **suffix**: `_vue=book-item[author $= "Steven"]`
-- match by property value **regex**: `_vue=[author = /Steven(\\s+King)?/i]`
+Больше примеров:
+- соответствие по **компоненту**: `_vue=book-item`
+- соответствие по компоненту и **точному значению свойства**, чувствительно к регистру: `_vue=book-item[author = "Steven King"]`
+- соответствие только по значению свойства, **нечувствительно к регистру**: `_vue=[author = "steven king" i]`
+- соответствие по компоненту и **истинному значению свойства**: `_vue=my-button[enabled]`
+- соответствие по компоненту и **логическому значению**: `_vue=my-button[enabled = false]`
+- соответствие по **подстроке значения свойства**: `_vue=[author *= "King"]`
+- соответствие по компоненту и **нескольким свойствам**: `_vue=book-item[author *= "king" i][year = 1990]`
+- соответствие по **вложенному** значению свойства: `_vue=[some.nested.value = 12]`
+- соответствие по компоненту и **префиксу значения свойства**: `_vue=book-item[author ^= "Steven"]`
+- соответствие по компоненту и **суффиксу значения свойства**: `_vue=book-item[author $= "Steven"]`
+- соответствие по **регулярному выражению значения свойства**: `_vue=[author = /Steven(\\s+King)?/i]`
 
-To find Vue element names in a tree use [Vue DevTools](https://chrome.google.com/webstore/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd?hl=en).
+Чтобы найти имена Vue элементов в дереве, используйте [Vue DevTools](https://chrome.google.com/webstore/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd?hl=en).
 
 :::note
 
-Vue locator supports Vue2 and above.
+Vue локатор поддерживает Vue2 и выше.
 :::
 
 :::note
-Vue locator, as well as [Vue DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi), only work against **unminified** application builds.
+Vue локатор, как и [Vue DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi), работает только с **неминифицированными** сборками приложений.
 :::
 
-## XPath locator
+## XPath локатор
 
 :::warning
 
-We recommend prioritizing [user-visible locators](./locators.mdx#quick-guide) like text or accessible role instead of using XPath that is tied to the implementation and easily break when the page changes.
+Мы рекомендуем отдавать предпочтение [локаторам, видимым пользователю](./locators.mdx#quick-guide), таким как текст или доступная роль, вместо использования XPath, который привязан к реализации и легко ломается при изменении страницы.
 :::
 
-XPath locators are equivalent to calling [`Document.evaluate`](https://developer.mozilla.org/en/docs/Web/API/Document/evaluate).
+XPath локаторы эквивалентны вызову [`Document.evaluate`](https://developer.mozilla.org/en/docs/Web/API/Document/evaluate).
 
 ```csharp
 await page.Locator("xpath=//button").ClickAsync();
 ```
 
 :::note
-Any selector string starting with `//` or `..` are assumed to be an xpath selector. For example, Playwright converts `'//html/body'` to `'xpath=//html/body'`.
+Любая строка селектора, начинающаяся с `//` или `..`, считается XPath селектором. Например, Playwright преобразует `'//html/body'` в `'xpath=//html/body'`.
 :::
 
 :::note
-XPath does not pierce shadow roots.
+XPath не проникает в теневые корни.
 :::
 
-### XPath union
+### XPath объединение
 
-Pipe operator (`|`) can be used to specify multiple selectors in XPath. It will match all elements that can be selected by one of the selectors in that list.
+Оператор pipe (`|`) может использоваться для указания нескольких селекторов в XPath. Он будет соответствовать всем элементам, которые могут быть выбраны одним из селекторов в этом списке.
 
 ```csharp
-// Waits for either confirmation dialog or load spinner.
+// Ожидание либо диалогового окна подтверждения, либо индикатора загрузки.
 await page.Locator("//span[contains(@class, 'spinner__loading')]|//div[@id='confirmation']").WaitForAsync();
 ```
 
-## Label to form control retargeting
+## Перенаправление метки на элемент управления формой
 
 :::warning
 
-We recommend [locating by label text](./locators.mdx#locate-by-label) instead of relying to label-to-control retargeting.
+Мы рекомендуем [находить по тексту метки](./locators.mdx#locate-by-label) вместо использования перенаправления метки на элемент управления.
 :::
 
-Targeted input actions in Playwright automatically distinguish between labels and controls, so you can target the label to perform an action on the associated control.
+Целевые действия ввода в Playwright автоматически различают метки и элементы управления, поэтому вы можете нацелиться на метку, чтобы выполнить действие на связанном элементе управления.
 
-For example, consider the following DOM structure: `<label for="password">Password:</label><input id="password" type="password">`. You can target the label by its "Password" text using [Page.GetByText()](/api/class-page.mdx#page-get-by-text). However, the following actions will be performed on the input instead of the label:
-- [Locator.ClickAsync()](/api/class-locator.mdx#locator-click) will click the label and automatically focus the input field;
-- [Locator.FillAsync()](/api/class-locator.mdx#locator-fill) will fill the input field;
-- [Locator.InputValueAsync()](/api/class-locator.mdx#locator-input-value) will return the value of the input field;
-- [Locator.SelectTextAsync()](/api/class-locator.mdx#locator-select-text) will select text in the input field;
-- [Locator.SetInputFilesAsync()](/api/class-locator.mdx#locator-set-input-files) will set files for the input field with `type=file`;
-- [Locator.SelectOptionAsync()](/api/class-locator.mdx#locator-select-option) will select an option from the select box.
+Например, рассмотрим следующую структуру DOM: `<label for="password">Password:</label><input id="password" type="password">`. Вы можете нацелиться на метку по ее тексту "Password", используя [Page.GetByText()](/api/class-page.mdx#page-get-by-text). Однако следующие действия будут выполнены на поле ввода, а не на метке:
+- [Locator.ClickAsync()](/api/class-locator.mdx#locator-click) нажмет на метку и автоматически сфокусирует поле ввода;
+- [Locator.FillAsync()](/api/class-locator.mdx#locator-fill) заполнит поле ввода;
+- [Locator.InputValueAsync()](/api/class-locator.mdx#locator-input-value) вернет значение поля ввода;
+- [Locator.SelectTextAsync()](/api/class-locator.mdx#locator-select-text) выделит текст в поле ввода;
+- [Locator.SetInputFilesAsync()](/api/class-locator.mdx#locator-set-input-files) установит файлы для поля ввода с `type=file`;
+- [Locator.SelectOptionAsync()](/api/class-locator.mdx#locator-select-option) выберет опцию из выпадающего списка.
 
 ```csharp
-// Fill the input by targeting the label.
+// Заполните поле ввода, нацелившись на метку.
 await page.GetByText("Password").FillAsync("secret");
 ```
 
-However, other methods will target the label itself, for example [Expect(Locator).ToHaveTextAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text) will assert the text content of the label, not the input field.
+Однако другие методы будут нацелены на саму метку, например, [Expect(Locator).ToHaveTextAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text) будет проверять текстовое содержимое метки, а не поля ввода.
 
 ```csharp
-// Fill the input by targeting the label.
+// Заполните поле ввода, нацелившись на метку.
 await Expect(Page.Locator("label")).ToHaveTextAsync("Password");
 ```
 
-## Legacy text locator
+## Устаревший текстовый локатор
 
 :::warning
 
-We recommend the modern [text locator](./locators.mdx#get-by-text) instead.
+Мы рекомендуем использовать современный [текстовый локатор](./locators.mdx#get-by-text) вместо этого.
 :::
 
-Legacy text locator matches elements that contain passed text.
+Устаревший текстовый локатор соответствует элементам, содержащим переданный текст.
 
 ```csharp
 await page.Locator("text=Log in").ClickAsync();
 ```
 
-Legacy text locator has a few variations:
-- `text=Log in` - default matching is case-insensitive, trims whitespace and searches for a substring. For example, `text=Log` matches `<button>Log in</button>`.
+Устаревший текстовый локатор имеет несколько вариаций:
+- `text=Log in` - соответствие по умолчанию нечувствительно к регистру, обрезает пробелы и ищет подстроку. Например, `text=Log` соответствует `<button>Log in</button>`.
   
   ```csharp
   await page.Locator("text=Log in").ClickAsync();
   ```
   
-- `text="Log in"` - text body can be escaped with single or double quotes to search for a text node with exact content after trimming whitespace.
+- `text="Log in"` - текстовое содержимое может быть экранировано одинарными или двойными кавычками для поиска текстового узла с точным содержимым после обрезки пробелов.
   
-  For example, `text="Log"` does not match `<button>Log in</button>` because `<button>` contains a single text node `"Log in"` that is not equal to `"Log"`. However, `text="Log"` matches `<button> Log <span>in</span></button>`, because `<button>` contains a text node `" Log "`. This exact mode implies case-sensitive matching, so `text="Download"` will not match `<button>download</button>`.
+  Например, `text="Log"` не соответствует `<button>Log in</button>`, потому что `<button>` содержит один текстовый узел `"Log in"`, который не равен `"Log"`. Однако, `text="Log"` соответствует `<button> Log <span>in</span></button>`, потому что `<button>` содержит текстовый узел `" Log "`. Этот точный режим подразумевает чувствительное к регистру соответствие, поэтому `text="Download"` не будет соответствовать `<button>download</button>`.
   
-  Quoted body follows the usual escaping rules, e.g. use `\"` to escape double quote in a double-quoted string: `text="foo\"bar"`.
+  Заключенное в кавычки содержимое следует обычным правилам экранирования, например, используйте `\"` для экранирования двойной кавычки в строке с двойными кавычками: `text="foo\"bar"`.
   
   ```csharp
   await page.Locator("text='Log in'").ClickAsync();
   ```
   
-- `/Log\s*in/i` - body can be a [JavaScript-like regex](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) wrapped in `/` symbols. For example, `text=/Log\s*in/i` matches `<button>Login</button>` and `<button>log IN</button>`.
+- `/Log\s*in/i` - содержимое может быть [регулярным выражением, подобным JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp), заключенным в символы `/`. Например, `text=/Log\s*in/i` соответствует `<button>Login</button>` и `<button>log IN</button>`.
   
   ```csharp
   await page.Locator("text=/Log\\s*in/i").ClickAsync();
@@ -396,58 +396,58 @@ Legacy text locator has a few variations:
   
 :::note
 
-String selectors starting and ending with a quote (either `"` or `'`) are assumed to be a legacy text locators. For example, `"Log in"` is converted to `text="Log in"` internally.
+Строковые селекторы, начинающиеся и заканчивающиеся кавычкой (либо `"` либо `'`), считаются устаревшими текстовыми локаторами. Например, `"Log in"` внутренне преобразуется в `text="Log in"`.
 :::
 
 :::note
-Matching always normalizes whitespace. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
+Соответствие всегда нормализует пробелы. Например, оно превращает несколько пробелов в один, превращает разрывы строк в пробелы и игнорирует начальные и конечные пробелы.
 :::
 
 :::note
-Input elements of the type `button` and `submit` are matched by their `value` instead of text content. For example, `text=Log in` matches `<input type=button value="Log in">`.
+Элементы ввода типа `button` и `submit` соответствуют по их `value`, а не по текстовому содержимому. Например, `text=Log in` соответствует `<input type=button value="Log in">`.
 :::
 
-## id, data-testid, data-test-id, data-test selectors
+## id, data-testid, data-test-id, data-test селекторы
 
 :::warning
 
-We recommend [locating by test id](./locators.mdx#locate-by-test-id) instead.
+Мы рекомендуем [находить по тестовому идентификатору](./locators.mdx#locate-by-test-id) вместо этого.
 :::
 
-Playwright supports shorthand for selecting elements using certain attributes. Currently, only the following attributes are supported:
+Playwright поддерживает сокращения для выбора элементов с использованием определенных атрибутов. В настоящее время поддерживаются только следующие атрибуты:
 - `id`
 - `data-testid`
 - `data-test-id`
 - `data-test`
 
 ```csharp
-// Fill an input with the id "username"
+// Заполните поле ввода с id "username"
 await page.Locator("id=username").FillAsync("value");
 
-// Click an element with data-test-id "submit"
+// Нажмите на элемент с data-test-id "submit"
 await page.Locator("data-test-id=submit").ClickAsync();
 ```
 
 :::note
-Attribute selectors are not CSS selectors, so anything CSS-specific like `:enabled` is not supported. For more features, use a proper [css](#css-locator) selector, e.g. `css=[data-test="login"]:enabled`.
+Атрибутные селекторы не являются CSS селекторами, поэтому все, что специфично для CSS, например, `:enabled`, не поддерживается. Для получения дополнительных возможностей используйте правильный [css](#css-locator) селектор, например, `css=[data-test="login"]:enabled`.
 :::
 
-## Chaining selectors
+## Цепочка селекторов
 
 :::warning
 
-We recommend [chaining locators](./locators.mdx#matching-inside-a-locator) instead.
+Мы рекомендуем [цепочку локаторов](./locators.mdx#matching-inside-a-locator) вместо этого.
 :::
 
-Selectors defined as `engine=body` or in short-form can be combined with the `>>` token, e.g. `selector1 >> selector2 >> selectors3`. When selectors are chained, the next one is queried relative to the previous one's result.
+Селекторы, определенные как `engine=body` или в краткой форме, могут быть объединены с помощью токена `>>`, например, `selector1 >> selector2 >> selectors3`. Когда селекторы объединены в цепочку, следующий селектор запрашивается относительно результата предыдущего.
 
-For example,
+Например,
 
 ```txt
 css=article >> css=.bar > .baz >> css=span[attr=value]
 ```
 
-is equivalent to
+эквивалентно
 
 ```js
 document
@@ -456,18 +456,18 @@ document
     .querySelector('span[attr=value]');
 ```
 
-If a selector needs to include `>>` in the body, it should be escaped inside a string to not be confused with chaining separator, e.g. `text="some >> text"`.
+Если селектору необходимо включить `>>` в тело, его следует экранировать внутри строки, чтобы не путать с разделителем цепочки, например, `text="some >> text"`.
 
-### Intermediate matches
+### Промежуточные совпадения
 
 :::warning
 
-We recommend [filtering by another locator](./locators.mdx#filter-by-childdescendant) to locate elements that contain other elements.
+Мы рекомендуем [фильтрацию по другому локатору](./locators.mdx#filter-by-childdescendant) для нахождения элементов, содержащих другие элементы.
 :::
 
-By default, chained selectors resolve to an element queried by the last selector. A selector can be prefixed with `*` to capture elements that are queried by an intermediate selector.
+По умолчанию, цепочные селекторы разрешаются в элемент, запрашиваемый последним селектором. Селектор может быть префиксирован `*`, чтобы захватить элементы, запрашиваемые промежуточным селектором.
 
-For example, `css=article >> text=Hello` captures the element with the text `Hello`, and `*css=article >> text=Hello` (note the `*`) captures the `article` element that contains some element with the text `Hello`.
+Например, `css=article >> text=Hello` захватывает элемент с текстом `Hello`, а `*css=article >> text=Hello` (обратите внимание на `*`) захватывает элемент `article`, который содержит какой-то элемент с текстом `Hello`.
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"

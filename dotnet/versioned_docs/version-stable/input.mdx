@@ -1,156 +1,156 @@
 ---
 id: input
-title: "Actions"
+title: "Действия"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright can interact with HTML Input elements such as text inputs, checkboxes, radio buttons, select options, mouse clicks, type characters, keys and shortcuts as well as upload files and focus elements.
+Playwright может взаимодействовать с HTML-элементами ввода, такими как текстовые поля, флажки, радиокнопки, опции выбора, клики мыши, ввод символов, клавиш и сочетаний клавиш, а также загружать файлы и фокусировать элементы.
 
-## Text input
+## Текстовый ввод
 
-Using [Locator.FillAsync()](/api/class-locator.mdx#locator-fill) is the easiest way to fill out the form fields. It focuses the element and triggers an `input` event with the entered text. It works for `<input>`, `<textarea>` and `[contenteditable]` elements.
+Использование [Locator.FillAsync()](/api/class-locator.mdx#locator-fill) — это самый простой способ заполнить поля формы. Он фокусирует элемент и вызывает событие `input` с введенным текстом. Это работает для элементов `<input>`, `<textarea>` и `[contenteditable]`.
 
 ```csharp
-// Text input
-await page.GetByRole(AriaRole.Textbox).FillAsync("Peter");
+// Текстовый ввод
+await page.GetByRole(AriaRole.Textbox).FillAsync("Петр");
 
-// Date input
-await page.GetByLabel("Birth date").FillAsync("2020-02-02");
+// Ввод даты
+await page.GetByLabel("Дата рождения").FillAsync("2020-02-02");
 
-// Time input
-await page.GetByLabel("Appointment time").FillAsync("13-15");
+// Ввод времени
+await page.GetByLabel("Время встречи").FillAsync("13-15");
 
-// Local datetime input
-await page.GetByLabel("Local time").FillAsync("2020-03-02T05:15");
+// Ввод локальной даты и времени
+await page.GetByLabel("Местное время").FillAsync("2020-03-02T05:15");
 ```
 
-## Checkboxes and radio buttons
+## Флажки и радиокнопки
 
-Using [Locator.SetCheckedAsync()](/api/class-locator.mdx#locator-set-checked) is the easiest way to check and uncheck a checkbox or a radio button. This method can be used with `input[type=checkbox]`, `input[type=radio]` and `[role=checkbox]` elements.
+Использование [Locator.SetCheckedAsync()](/api/class-locator.mdx#locator-set-checked) — это самый простой способ установить или снять флажок или радиокнопку. Этот метод можно использовать с элементами `input[type=checkbox]`, `input[type=radio]` и `[role=checkbox]`.
 
 ```csharp
-// Check the checkbox
-await page.GetByLabel("I agree to the terms above").CheckAsync();
+// Установить флажок
+await page.GetByLabel("Я согласен с условиями выше").CheckAsync();
 
-// Assert the checked state
-await Expect(page.GetByLabel("Subscribe to newsletter")).ToBeCheckedAsync();
+// Проверить состояние флажка
+await Expect(page.GetByLabel("Подписаться на рассылку")).ToBeCheckedAsync();
 
-// Select the radio button
+// Выбрать радиокнопку
 await page.GetByLabel("XL").CheckAsync();
 ```
 
-## Select options
+## Выбор опций
 
-Selects one or multiple options in the `<select>` element with [Locator.SelectOptionAsync()](/api/class-locator.mdx#locator-select-option). You can specify option `value`, or `label` to select. Multiple options can be selected.
+Выбирает одну или несколько опций в элементе `<select>` с помощью [Locator.SelectOptionAsync()](/api/class-locator.mdx#locator-select-option). Вы можете указать `value` или `label` для выбора. Можно выбрать несколько опций.
 
 ```csharp
-// Single selection matching the value or label
-await page.GetByLabel("Choose a color").SelectOptionAsync("blue");
+// Одиночный выбор по значению или метке
+await page.GetByLabel("Выберите цвет").SelectOptionAsync("blue");
 
-// Single selection matching the label
-await page.GetByLabel("Choose a color").SelectOptionAsync(new SelectOptionValue { Label = "blue" });
+// Одиночный выбор по метке
+await page.GetByLabel("Выберите цвет").SelectOptionAsync(new SelectOptionValue { Label = "blue" });
 
-// Multiple selected items
-await page.GetByLabel("Choose multiple colors").SelectOptionAsync(new[] { "blue", "green", "red" });
+// Несколько выбранных элементов
+await page.GetByLabel("Выберите несколько цветов").SelectOptionAsync(new[] { "blue", "green", "red" });
 ```
 
-## Mouse click
+## Клик мышью
 
-Performs a simple human click.
+Выполняет простой человеческий клик.
 
 ```csharp
-// Generic click
+// Общий клик
 await page.GetByRole(AriaRole.Button).ClickAsync();
 
-// Double click
-await page.GetByText("Item").DblClickAsync();
+// Двойной клик
+await page.GetByText("Элемент").DblClickAsync();
 
-// Right click
-await page.GetByText("Item").ClickAsync(new() { Button = MouseButton.Right });
+// Правый клик
+await page.GetByText("Элемент").ClickAsync(new() { Button = MouseButton.Right });
 
-// Shift + click
-await page.GetByText("Item").ClickAsync(new() { Modifiers = new[] { KeyboardModifier.Shift } });
+// Shift + клик
+await page.GetByText("Элемент").ClickAsync(new() { Modifiers = new[] { KeyboardModifier.Shift } });
 
-// Ctrl + click on Windows and Linux
-// Meta + click on macOS
-await page.GetByText("Item").ClickAsync(new() { Modifiers = new[] { KeyboardModifier.ControlOrMeta } });
+// Ctrl + клик на Windows и Linux
+// Meta + клик на macOS
+await page.GetByText("Элемент").ClickAsync(new() { Modifiers = new[] { KeyboardModifier.ControlOrMeta } });
 
-// Hover over element
-await page.GetByText("Item").HoverAsync();
+// Наведение на элемент
+await page.GetByText("Элемент").HoverAsync();
 
-// Click the top left corner
-await page.GetByText("Item").ClickAsync(new() { position = new Position { X = 0, Y = 0 } });
+// Клик в верхний левый угол
+await page.GetByText("Элемент").ClickAsync(new() { position = new Position { X = 0, Y = 0 } });
 ```
 
-Under the hood, this and other pointer-related methods:
-- wait for element with given selector to be in DOM
-- wait for it to become displayed, i.e. not empty, no `display:none`, no `visibility:hidden`
-- wait for it to stop moving, for example, until css transition finishes
-- scroll the element into view
-- wait for it to receive pointer events at the action point, for example, waits until element becomes non-obscured by other elements
-- retry if the element is detached during any of the above checks
+Под капотом, этот и другие методы, связанные с указателем:
+- ждут, пока элемент с данным селектором появится в DOM
+- ждут, пока он станет видимым, т.е. не пустым, без `display:none`, без `visibility:hidden`
+- ждут, пока он перестанет двигаться, например, пока не завершится css-переход
+- прокручивают элемент в видимую область
+- ждут, пока он начнет получать события указателя в точке действия, например, ждут, пока элемент не станет не закрытым другими элементами
+- повторяют попытку, если элемент отсоединяется во время любой из вышеуказанных проверок
 
-#### Forcing the click
+#### Принудительный клик
 
-Sometimes, apps use non-trivial logic where hovering the element overlays it with another element that intercepts the click. This behavior is indistinguishable from a bug where element gets covered and the click is dispatched elsewhere. If you know this is taking place, you can bypass the [actionability](./actionability.mdx) checks and force the click:
+Иногда приложения используют нетривиальную логику, когда при наведении на элемент он перекрывается другим элементом, который перехватывает клик. Это поведение неотличимо от ошибки, когда элемент закрывается, и клик отправляется в другое место. Если вы знаете, что это происходит, вы можете обойти проверки [действительности](./actionability.mdx) и принудительно выполнить клик:
 
 ```csharp
 await page.GetByRole(AriaRole.Button).ClickAsync(new() { Force = true });
 ```
 
-#### Programmatic click
+#### Программный клик
 
-If you are not interested in testing your app under the real conditions and want to simulate the click by any means possible, you can trigger the [`HTMLElement.click()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click) behavior via simply dispatching a click event on the element with [Locator.DispatchEventAsync()](/api/class-locator.mdx#locator-dispatch-event):
+Если вас не интересует тестирование вашего приложения в реальных условиях и вы хотите симулировать клик любыми возможными средствами, вы можете вызвать поведение [`HTMLElement.click()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click) просто отправив событие клика на элемент с помощью [Locator.DispatchEventAsync()](/api/class-locator.mdx#locator-dispatch-event):
 
 ```csharp
 await page.GetByRole(AriaRole.Button).DispatchEventAsync("click");
 ```
 
-## Type characters
+## Ввод символов
 
 :::caution
 
-Most of the time, you should input text with [Locator.FillAsync()](/api/class-locator.mdx#locator-fill). See the [Text input](#text-input) section above. You only need to type characters if there is special keyboard handling on the page.
+Большую часть времени вы должны вводить текст с помощью [Locator.FillAsync()](/api/class-locator.mdx#locator-fill). См. раздел [Текстовый ввод](#text-input) выше. Вам нужно вводить символы только в том случае, если на странице есть специальная обработка клавиатуры.
 :::
 
-Type into the field character by character, as if it was a user with a real keyboard with [Locator.PressSequentiallyAsync()](/api/class-locator.mdx#locator-press-sequentially).
+Вводите в поле символ за символом, как если бы это был пользователь с настоящей клавиатурой, с помощью [Locator.PressSequentiallyAsync()](/api/class-locator.mdx#locator-press-sequentially).
 
 ```csharp
-// Press keys one by one
+// Нажимайте клавиши одну за другой
 await Page.Locator("#area").PressSequentiallyAsync("Hello World!");
 ```
 
-This method will emit all the necessary keyboard events, with all the `keydown`, `keyup`, `keypress` events in place. You can even specify the optional `delay` between the key presses to simulate real user behavior.
+Этот метод будет генерировать все необходимые события клавиатуры, с учетом всех событий `keydown`, `keyup`, `keypress`. Вы даже можете указать необязательную `delay` между нажатиями клавиш, чтобы симулировать поведение реального пользователя.
 
-## Keys and shortcuts
+## Клавиши и сочетания клавиш
 
 ```csharp
-// Hit Enter
-await page.GetByText("Submit").PressAsync("Enter");
+// Нажать Enter
+await page.GetByText("Отправить").PressAsync("Enter");
 
-// Dispatch Control+Right
+// Отправить Control+Right
 await page.GetByRole(AriaRole.Textbox).PressAsync("Control+ArrowRight");
 
-// Press $ sign on keyboard
+// Нажать знак $ на клавиатуре
 await page.GetByRole(AriaRole.Textbox).PressAsync("$");
 ```
 
-The [Locator.PressAsync()](/api/class-locator.mdx#locator-press) method focuses the selected element and produces a single keystroke. It accepts the logical key names that are emitted in the [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) property of the keyboard events:
+Метод [Locator.PressAsync()](/api/class-locator.mdx#locator-press) фокусирует выбранный элемент и производит одно нажатие клавиши. Он принимает логические имена клавиш, которые генерируются в свойстве [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) событий клавиатуры:
 
 ```txt
 Backquote, Minus, Equal, Backslash, Backspace, Tab, Delete, Escape,
 ArrowDown, End, Enter, Home, Insert, PageDown, PageUp, ArrowRight,
-ArrowUp, F1 - F12, Digit0 - Digit9, KeyA - KeyZ, etc.
+ArrowUp, F1 - F12, Digit0 - Digit9, KeyA - KeyZ и т.д.
 ```
 
-- You can alternatively specify a single character you'd like to produce such as `"a"` or `"#"`.
-- Following modification shortcuts are also supported: `Shift, Control, Alt, Meta`.
+- Вы также можете указать один символ, который хотите сгенерировать, например `"a"` или `"#"`.
+- Также поддерживаются следующие модификационные сочетания: `Shift, Control, Alt, Meta`.
 
-Simple version produces a single character. This character is case-sensitive, so `"a"` and `"A"` will produce different results.
+Простая версия генерирует один символ. Этот символ чувствителен к регистру, поэтому `"a"` и `"A"` дадут разные результаты.
 
 ```csharp
 // <input id=name>
@@ -160,29 +160,29 @@ await page.Locator("#name").PressAsync("Shift+A");
 await page.Locator("#name").PressAsync("Shift+ArrowLeft");
 ```
 
-Shortcuts such as `"Control+o"` or `"Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
+Также поддерживаются сочетания клавиш, такие как `"Control+o"` или `"Control+Shift+T"`. При указании с модификатором, модификатор нажимается и удерживается, пока не будет нажата последующая клавиша.
 
-Note that you still need to specify the capital `A` in `Shift-A` to produce the capital character. `Shift-a` produces a lower-case one as if you had the `CapsLock` toggled.
+Обратите внимание, что вам все равно нужно указать заглавную `A` в `Shift-A`, чтобы получить заглавный символ. `Shift-a` дает строчную букву, как если бы у вас был включен `CapsLock`.
 
-## Upload files
+## Загрузка файлов
 
-You can select input files for upload using the [Locator.SetInputFilesAsync()](/api/class-locator.mdx#locator-set-input-files) method. It expects first argument to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input) with the type `"file"`. Multiple files can be passed in the array. If some of the file paths are relative, they are resolved relative to the current working directory. Empty array clears the selected files.
+Вы можете выбрать файлы для загрузки с помощью метода [Locator.SetInputFilesAsync()](/api/class-locator.mdx#locator-set-input-files). Он ожидает, что первый аргумент указывает на [элемент ввода](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input) с типом `"file"`. Несколько файлов могут быть переданы в массиве. Если некоторые из путей к файлам являются относительными, они разрешаются относительно текущей рабочей директории. Пустой массив очищает выбранные файлы.
 
 ```csharp
-// Select one file
-await page.GetByLabel("Upload file").SetInputFilesAsync("myfile.pdf");
+// Выбрать один файл
+await page.GetByLabel("Загрузить файл").SetInputFilesAsync("myfile.pdf");
 
-// Select multiple files
-await page.GetByLabel("Upload files").SetInputFilesAsync(new[] { "file1.txt", "file12.txt" });
+// Выбрать несколько файлов
+await page.GetByLabel("Загрузить файлы").SetInputFilesAsync(new[] { "file1.txt", "file12.txt" });
 
-// Select a directory
-await page.GetByLabel("Upload directory").SetInputFilesAsync("mydir");
+// Выбрать директорию
+await page.GetByLabel("Загрузить директорию").SetInputFilesAsync("mydir");
 
-// Remove all the selected files
-await page.GetByLabel("Upload file").SetInputFilesAsync(new[] {});
+// Удалить все выбранные файлы
+await page.GetByLabel("Загрузить файл").SetInputFilesAsync(new[] {});
 
-// Upload buffer from memory
-await page.GetByLabel("Upload file").SetInputFilesAsync(new FilePayload
+// Загрузить буфер из памяти
+await page.GetByLabel("Загрузить файл").SetInputFilesAsync(new FilePayload
 {
     Name = "file.txt",
     MimeType = "text/plain",
@@ -190,39 +190,39 @@ await page.GetByLabel("Upload file").SetInputFilesAsync(new FilePayload
 });
 ```
 
-If you don't have input element in hand (it is created dynamically), you can handle the [Page.FileChooser](/api/class-page.mdx#page-event-file-chooser) event or use a corresponding waiting method upon your action:
+Если у вас нет элемента ввода под рукой (он создается динамически), вы можете обработать событие [Page.FileChooser](/api/class-page.mdx#page-event-file-chooser) или использовать соответствующий метод ожидания после вашего действия:
 
 ```csharp
 var fileChooser = page.RunAndWaitForFileChooserAsync(async () =>
 {
-    await page.GetByLabel("Upload file").ClickAsync();
+    await page.GetByLabel("Загрузить файл").ClickAsync();
 });
 await fileChooser.SetFilesAsync("myfile.pdf");
 ```
 
-## Focus element
+## Фокусировка элемента
 
-For the dynamic pages that handle focus events, you can focus the given element with [Locator.FocusAsync()](/api/class-locator.mdx#locator-focus).
+Для динамических страниц, которые обрабатывают события фокуса, вы можете сфокусировать данный элемент с помощью [Locator.FocusAsync()](/api/class-locator.mdx#locator-focus).
 
 ```csharp
-await page.GetByLabel("Password").FocusAsync();
+await page.GetByLabel("Пароль").FocusAsync();
 ```
 
-## Drag and Drop
+## Перетаскивание
 
-You can perform drag&drop operation with [Locator.DragToAsync()](/api/class-locator.mdx#locator-drag-to). This method will:
-- Hover the element that will be dragged.
-- Press left mouse button.
-- Move mouse to the element that will receive the drop.
-- Release left mouse button.
+Вы можете выполнить операцию перетаскивания с помощью [Locator.DragToAsync()](/api/class-locator.mdx#locator-drag-to). Этот метод выполнит:
+- Наведение на элемент, который будет перетаскиваться.
+- Нажатие левой кнопки мыши.
+- Перемещение мыши к элементу, который будет принимать перетаскивание.
+- Отпускание левой кнопки мыши.
 
 ```csharp
 await page.Locator("#item-to-be-dragged").DragToAsync(page.Locator("#item-to-drop-at"));
 ```
 
-### Dragging manually
+### Ручное перетаскивание
 
-If you want precise control over the drag operation, use lower-level methods like [Locator.HoverAsync()](/api/class-locator.mdx#locator-hover), [Mouse.DownAsync()](/api/class-mouse.mdx#mouse-down), [Mouse.MoveAsync()](/api/class-mouse.mdx#mouse-move) and [Mouse.UpAsync()](/api/class-mouse.mdx#mouse-up).
+Если вы хотите точно контролировать операцию перетаскивания, используйте методы более низкого уровня, такие как [Locator.HoverAsync()](/api/class-locator.mdx#locator-hover), [Mouse.DownAsync()](/api/class-mouse.mdx#mouse-down), [Mouse.MoveAsync()](/api/class-mouse.mdx#mouse-move) и [Mouse.UpAsync()](/api/class-mouse.mdx#mouse-up).
 
 ```csharp
 await page.Locator("#item-to-be-dragged").HoverAsync();
@@ -232,36 +232,35 @@ await page.Mouse.UpAsync();
 ```
 
 :::note
-If your page relies on the `dragover` event being dispatched, you need at least two mouse moves to trigger it in all browsers. To reliably issue the second mouse move, repeat your [Mouse.MoveAsync()](/api/class-mouse.mdx#mouse-move) or [Locator.HoverAsync()](/api/class-locator.mdx#locator-hover) twice. The sequence of operations would be: hover the drag element, mouse down, hover the drop element, hover the drop element second time, mouse up.
+Если ваша страница полагается на событие `dragover`, вам нужно как минимум два перемещения мыши, чтобы вызвать его во всех браузерах. Чтобы надежно выполнить второе перемещение мыши, повторите ваш [Mouse.MoveAsync()](/api/class-mouse.mdx#mouse-move) или [Locator.HoverAsync()](/api/class-locator.mdx#locator-hover) дважды. Последовательность операций будет следующей: наведите на элемент для перетаскивания, нажмите мышь, наведите на элемент для сброса, наведите на элемент для сброса второй раз, отпустите мышь.
 :::
 
-## Scrolling
+## Прокрутка
 
-Most of the time, Playwright will automatically scroll for you before doing any actions. Therefore, you do not need to scroll explicitly.
+Большую часть времени Playwright автоматически прокручивает за вас перед выполнением любых действий. Поэтому вам не нужно прокручивать явно.
 
 ```csharp
-// Scrolls automatically so that button is visible
+// Прокручивает автоматически, чтобы кнопка была видна
 await page.GetByRole(AriaRole.Button).ClickAsync();
 ```
 
-However, in rare cases you might need to manually scroll. For example, you might want to force an "infinite list" to load more elements, or position the page for a specific screenshot. In such a case, the most reliable way is to find an element that you want to make visible at the bottom, and scroll it into view.
+Однако в редких случаях вам может понадобиться прокрутить вручную. Например, вы можете захотеть заставить "бесконечный список" загрузить больше элементов или расположить страницу для определенного скриншота. В таком случае наиболее надежный способ — найти элемент, который вы хотите сделать видимым внизу, и прокрутить его в видимую область.
 
 ```csharp
-// Scroll the footer into view, forcing an "infinite list" to load more content
-await page.GetByText("Footer text").ScrollIntoViewIfNeededAsync();
+// Прокрутите нижний колонтитул в видимую область, заставляя "бесконечный список" загрузить больше контента
+await page.GetByText("Текст нижнего колонтитула").ScrollIntoViewIfNeededAsync();
 ```
 
-If you would like to control the scrolling more precisely, use [Mouse.WheelAsync()](/api/class-mouse.mdx#mouse-wheel) or [Locator.EvaluateAsync()](/api/class-locator.mdx#locator-evaluate):
+Если вы хотите более точно контролировать прокрутку, используйте [Mouse.WheelAsync()](/api/class-mouse.mdx#mouse-wheel) или [Locator.EvaluateAsync()](/api/class-locator.mdx#locator-evaluate):
 
 ```csharp
-// Position the mouse and scroll with the mouse wheel
+// Разместите мышь и прокрутите колесиком мыши
 await page.GetByTestId("scrolling-container").HoverAsync();
 await page.Mouse.WheelAsync(0, 10);
 
-// Alternatively, programmatically scroll a specific element
+// Или программно прокрутите конкретный элемент
 await page.GetByTestId("scrolling-container").EvaluateAsync("e => e.scrollTop += 100");
 ```
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

@@ -1,51 +1,50 @@
 ---
 id: extensibility
-title: "Extensibility"
+title: "Расширяемость"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Custom selector engines
+## Пользовательские механизмы селекторов
 
-Playwright supports custom selector engines, registered with [Selectors.RegisterAsync()](/api/class-selectors.mdx#selectors-register).
+Playwright поддерживает пользовательские механизмы селекторов, регистрируемые с помощью [Selectors.RegisterAsync()](/api/class-selectors.mdx#selectors-register).
 
-Selector engine should have the following properties:
-- `query` function to query first element matching `selector` relative to the `root`.
-- `queryAll` function to query all elements matching `selector` relative to the `root`.
+Механизм селекторов должен иметь следующие свойства:
+- Функция `query` для поиска первого элемента, соответствующего `selector`, относительно `root`.
+- Функция `queryAll` для поиска всех элементов, соответствующих `selector`, относительно `root`.
 
-By default the engine is run directly in the frame's JavaScript context and, for example, can call an application-defined function. To isolate the engine from any JavaScript in the frame, but leave access to the DOM, register the engine with `{contentScript: true}` option. Content script engine is safer because it is protected from any tampering with the global objects, for example altering `Node.prototype` methods. All built-in selector engines run as content scripts. Note that running as a content script is not guaranteed when the engine is used together with other custom engines.
+По умолчанию механизм выполняется непосредственно в контексте JavaScript фрейма и, например, может вызывать функцию, определенную в приложении. Чтобы изолировать механизм от любого JavaScript в фрейме, но оставить доступ к DOM, зарегистрируйте механизм с опцией `{contentScript: true}`. Механизм контент-скрипта более безопасен, так как он защищен от любых изменений глобальных объектов, например, изменения методов `Node.prototype`. Все встроенные механизмы селекторов выполняются как контент-скрипты. Обратите внимание, что выполнение в качестве контент-скрипта не гарантируется, если механизм используется вместе с другими пользовательскими механизмами.
 
-Selectors must be registered before creating the page.
+Селекторы должны быть зарегистрированы до создания страницы.
 
-An example of registering selector engine that queries elements based on a tag name:
+Пример регистрации механизма селекторов, который ищет элементы на основе имени тега:
 
 ```csharp
-// Register the engine. Selectors will be prefixed with "tag=".
-// The script is evaluated in the page context.
+// Зарегистрируйте механизм. Селекторы будут иметь префикс "tag=".
+// Скрипт выполняется в контексте страницы.
 await playwright.Selectors.Register("tag", new() {
   Script = @"
-  // Must evaluate to a selector engine instance.
+  // Должен оцениваться как экземпляр механизма селекторов.
   {
-    // Returns the first element matching given selector in the root's subtree.
+    // Возвращает первый элемент, соответствующий данному селектору в поддереве root.
     query(root, selector) {
       return root.querySelector(selector);
     },
 
-    // Returns all elements matching given selector in the root's subtree.
+    // Возвращает все элементы, соответствующие данному селектору в поддереве root.
     queryAll(root, selector) {
       return Array.from(root.querySelectorAll(selector));
     }
   }"
 });
 
-// Now we can use "tag=" selectors.
+// Теперь мы можем использовать селекторы "tag=".
 await page.Locator("tag=button").ClickAsync();
 
-// We can combine it with built-in locators.
+// Мы можем комбинировать его с встроенными локаторами.
 await page.Locator("tag=div").GetByText("Click me").ClickAsync();
 ```
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

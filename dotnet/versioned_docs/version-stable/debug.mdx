@@ -1,6 +1,6 @@
 ---
 id: debug
-title: "Debugging Tests"
+title: "Отладка тестов"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -8,15 +8,15 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Playwright Inspector
 
-The Playwright Inspector is a GUI tool to help you debug your Playwright tests. It allows you to step through your tests, live edit locators, pick locators and see actionability logs.
+Playwright Inspector — это графический инструмент, который помогает отлаживать ваши тесты Playwright. Он позволяет пошагово проходить тесты, в реальном времени редактировать локаторы, выбирать локаторы и просматривать логи доступности.
 
 <img width="864" alt="Playwright Inspector" src="https://user-images.githubusercontent.com/13063165/212924587-4b84e5f6-b147-40e9-8c75-d7b9ab6b7ca1.png" />
 
-### Run in debug mode
+### Запуск в режиме отладки
 
-Set the `PWDEBUG` environment variable to run your Playwright tests in debug mode. This configures Playwright for debugging and opens the inspector. Additional useful defaults are configured when `PWDEBUG=1` is set:
-- Browsers launch in headed mode
-- Default timeout is set to 0 (= no timeout)
+Установите переменную окружения `PWDEBUG`, чтобы запустить ваши тесты Playwright в режиме отладки. Это настраивает Playwright для отладки и открывает инспектор. Дополнительные полезные настройки по умолчанию конфигурируются при установке `PWDEBUG=1`:
+- Браузеры запускаются в режиме с графическим интерфейсом
+- Тайм-аут по умолчанию устанавливается в 0 (= без тайм-аута)
 
 <Tabs
   groupId="bash-flavor"
@@ -52,74 +52,74 @@ dotnet test
 </TabItem>
 </Tabs>
 
-### Stepping through your tests
+### Пошаговое выполнение тестов
 
-You can play, pause or step through each action of your test using the toolbar at the top of the Inspector. You can see the current action highlighted in the test code, and matching elements highlighted in the browser window.
+Вы можете воспроизводить, приостанавливать или пошагово выполнять каждое действие вашего теста, используя панель инструментов в верхней части Inspector. Вы можете видеть текущее действие, выделенное в коде теста, и соответствующие элементы, выделенные в окне браузера.
 
 <img width="1340" alt="Playwright Inspector and browser" src="https://user-images.githubusercontent.com/13063165/212936618-84b87acc-bc2e-46ed-994b-32b2ef742e60.png" />
 
-### Run a test from a specific breakpoint
+### Запуск теста с определенной точки останова
 
-To speed up the debugging process you can add a [Page.PauseAsync()](/api/class-page.mdx#page-pause) method to your test. This way you won't have to step through each action of your test to get to the point where you want to debug.
+Чтобы ускорить процесс отладки, вы можете добавить метод [Page.PauseAsync()](/api/class-page.mdx#page-pause) в ваш тест. Таким образом, вам не придется пошагово проходить каждое действие вашего теста, чтобы добраться до точки, где вы хотите отладить.
 
 ```csharp
 await page.PauseAsync();
 ```
 
-Once you add a `page.pause()` call, run your tests in debug mode. Clicking the "Resume" button in the Inspector will run the test and only stop on the `page.pause()`.
+После добавления вызова `page.pause()`, запустите ваши тесты в режиме отладки. Нажатие кнопки "Resume" в Inspector выполнит тест и остановится только на `page.pause()`.
 
 <img width="1350" alt="test with page.pause" src="https://user-images.githubusercontent.com/13063165/219473050-122be4c2-31d0-4cbd-aa8b-8588e8b781a6.png" />
 
-### Live editing locators
+### Редактирование локаторов в реальном времени
 
-While running in debug mode you can live edit the locators. Next to the 'Pick Locator' button there is a field showing the [locator](./locators.mdx) that the test is paused on. You can edit this locator directly in the **Pick Locator** field, and matching elements will be highlighted in the browser window.
+Во время работы в режиме отладки вы можете редактировать локаторы в реальном времени. Рядом с кнопкой 'Pick Locator' есть поле, показывающее [локатор](./locators.mdx), на котором тест приостановлен. Вы можете редактировать этот локатор прямо в поле **Pick Locator**, и соответствующие элементы будут выделены в окне браузера.
 
 <img width="1348" alt="live editing locators" src="https://user-images.githubusercontent.com/13063165/212980815-1cf6ef7b-e69a-496c-898a-ec603a3bc562.png" />
 
-### Picking locators
+### Выбор локаторов
 
-While debugging, you might need to choose a more resilient locator. You can do this by clicking on the **Pick Locator** button and hovering over any element in the browser window. While hovering over an element you will see the code needed to locate this element highlighted below. Clicking an element in the browser will add the locator into the field where you can then either tweak it or copy it into your code.
+Во время отладки вам может понадобиться выбрать более устойчивый локатор. Вы можете сделать это, нажав на кнопку **Pick Locator** и наведя курсор на любой элемент в окне браузера. При наведении на элемент вы увидите код, необходимый для нахождения этого элемента, выделенный ниже. Щелчок по элементу в браузере добавит локатор в поле, где вы затем сможете его настроить или скопировать в ваш код.
 
 <img width="1392" alt="Picking locators" src="https://user-images.githubusercontent.com/13063165/212968640-ce82a027-9277-4bdf-b0a9-6282fb2becb7.png" />
 
-Playwright will look at your page and figure out the best locator, prioritizing [role, text and test id locators](./locators.mdx). If Playwright finds multiple elements matching the locator, it will improve the locator to make it resilient and uniquely identify the target element, so you don't have to worry about failing tests due to locators.
+Playwright проанализирует вашу страницу и определит лучший локатор, отдавая приоритет [ролям, тексту и тестовым идентификаторам локаторов](./locators.mdx). Если Playwright найдет несколько элементов, соответствующих локатору, он улучшит локатор, чтобы сделать его устойчивым и уникально идентифицировать целевой элемент, так что вам не придется беспокоиться о сбоях тестов из-за локаторов.
 
-### Actionability logs
+### Логи доступности
 
-By the time Playwright has paused on a click action, it has already performed [actionability checks](./actionability.mdx) that can be found in the log. This can help you understand what happened during your test and what Playwright did or tried to do. The log tells you if the element was visible, enabled and stable, if the locator resolved to an element, scrolled into view, and so much more. If actionability can't be reached, it will show the action as pending.
+К моменту, когда Playwright приостанавливается на действии клика, он уже выполнил [проверки доступности](./actionability.mdx), которые можно найти в логе. Это может помочь вам понять, что произошло во время вашего теста и что Playwright сделал или пытался сделать. Лог сообщает вам, был ли элемент видимым, включенным и стабильным, разрешился ли локатор в элемент, прокручен ли он в видимую область и многое другое. Если доступность не может быть достигнута, действие будет показано как ожидающее.
 
 <img width="883" alt="Actionability Logs" src="https://user-images.githubusercontent.com/13063165/212968907-5dede739-e0e3-482a-91cd-726a0f5b0b6d.png" />
 
 ## Trace Viewer
 
-Playwright [Trace Viewer](/trace-viewer.mdx) is a GUI tool that lets you explore recorded Playwright traces of your tests. You can go back and forward through each action on the left side, and visually see what was happening during the action. In the middle of the screen, you can see a DOM snapshot for the action. On the right side you can see action details, such as time, parameters, return value and log. You can also explore console messages, network requests and the source code.
+[Trace Viewer](/trace-viewer.mdx) Playwright — это графический инструмент, который позволяет вам исследовать записанные трассы Playwright ваших тестов. Вы можете перемещаться вперед и назад через каждое действие на левой стороне и визуально видеть, что происходило во время действия. В центре экрана вы можете видеть снимок DOM для действия. На правой стороне вы можете видеть детали действия, такие как время, параметры, возвращаемое значение и лог. Вы также можете исследовать сообщения консоли, сетевые запросы и исходный код.
 
 <video width="100%" height="100%" controls muted>
 
-<source src="https://user-images.githubusercontent.com/13063165/219132713-17b9d75b-71e3-42c4-a43f-3f9e2e15f834.mp4" type="video/mp4" /> Your browser does not support the video tag.
+<source src="https://user-images.githubusercontent.com/13063165/219132713-17b9d75b-71e3-42c4-a43f-3f9e2e15f834.mp4" type="video/mp4" /> Ваш браузер не поддерживает тег видео.
 
 </video>
 
-To learn more about how to record traces and use the Trace Viewer, check out the [Trace Viewer](/trace-viewer.mdx) guide.
+Чтобы узнать больше о том, как записывать трассы и использовать Trace Viewer, ознакомьтесь с руководством [Trace Viewer](/trace-viewer.mdx).
 
-## Browser Developer Tools
+## Инструменты разработчика браузера
 
-When running in Debug Mode with `PWDEBUG=console`, a `playwright` object is available in the Developer tools console. Developer tools can help you to:
-- Inspect the DOM tree and **find element selectors**
-- **See console logs** during execution (or learn how to [read logs via API](./api/class-page.mdx#page-event-console))
-- Check **network activity** and other developer tools features
+При запуске в режиме отладки с `PWDEBUG=console`, объект `playwright` доступен в консоли инструментов разработчика. Инструменты разработчика могут помочь вам:
+- Исследовать дерево DOM и **находить селекторы элементов**
+- **Просматривать логи консоли** во время выполнения (или узнать, как [читать логи через API](./api/class-page.mdx#page-event-console))
+- Проверять **сетевую активность** и другие функции инструментов разработчика
 
-This will also set the default timeouts of Playwright to 0 (= no timeout).
+Это также установит тайм-ауты по умолчанию Playwright в 0 (= без тайм-аута).
 
 <img width="1399" alt="Browser Developer Tools with Playwright object" src="https://user-images.githubusercontent.com/13063165/219128002-898f604d-9697-4b7f-95b5-a6a8260b7282.png" />
 
-To debug your tests using the browser developer tools, start by setting a breakpoint in your test to pause the execution using the [Page.PauseAsync()](/api/class-page.mdx#page-pause) method.
+Чтобы отладить ваши тесты с использованием инструментов разработчика браузера, начните с установки точки останова в вашем тесте, чтобы приостановить выполнение, используя метод [Page.PauseAsync()](/api/class-page.mdx#page-pause).
 
 ```csharp
 await page.PauseAsync();
 ```
 
-Once you have set a breakpoint in your test, you can then run your test with `PWDEBUG=console`.
+После установки точки останова в вашем тесте вы можете запустить ваш тест с `PWDEBUG=console`.
 
 <Tabs
   groupId="bash-flavor"
@@ -155,11 +155,11 @@ dotnet test
 </TabItem>
 </Tabs>
 
-Once Playwright launches the browser window, you can open the developer tools. The `playwright` object will be available in the console panel.
+Как только Playwright запустит окно браузера, вы можете открыть инструменты разработчика. Объект `playwright` будет доступен в панели консоли.
 
 #### playwright.$(selector)
 
-Query the Playwright selector, using the actual Playwright query engine, for example:
+Запрос селектора Playwright, используя фактический движок запросов Playwright, например:
 
 ```bash
 playwright.$('.auth-form >> text=Log in');
@@ -169,7 +169,7 @@ playwright.$('.auth-form >> text=Log in');
 
 #### playwright.$$(selector)
 
-Same as `playwright.$`, but returns all matching elements.
+То же, что и `playwright.$`, но возвращает все соответствующие элементы.
 
 ```bash
 playwright.$$('li >> text=John')
@@ -179,7 +179,7 @@ playwright.$$('li >> text=John')
 
 #### playwright.inspect(selector)
 
-Reveal element in the Elements panel.
+Показать элемент в панели Elements.
 
 ```bash
 playwright.inspect('text=Log in')
@@ -187,7 +187,7 @@ playwright.inspect('text=Log in')
 
 #### playwright.locator(selector)
 
-Create a locator and query matching elements, for example:
+Создать локатор и запросить соответствующие элементы, например:
 
 ```bash
 playwright.locator('.auth-form', { hasText: 'Log in' });
@@ -199,7 +199,7 @@ Locator ()
 
 #### playwright.selector(element)
 
-Generates selector for the given element. For example, select an element in the Elements panel and pass `$0`:
+Генерирует селектор для данного элемента. Например, выберите элемент в панели Elements и передайте `$0`:
 
 ```bash
 playwright.selector($0)
@@ -207,9 +207,9 @@ playwright.selector($0)
 "div[id="glow-ingress-block"] >> text=/.*Hello.*/"
 ```
 
-## Verbose API logs
+## Подробные логи API
 
-Playwright supports verbose logging with the `DEBUG` environment variable.
+Playwright поддерживает подробное логирование с помощью переменной окружения `DEBUG`.
 
 <Tabs
   groupId="bash-flavor"
@@ -247,17 +247,17 @@ dotnet run
 
 :::note
 
-**For WebKit**: launching WebKit Inspector during the execution will prevent the Playwright script from executing any further and will reset pre-configured user agent and device emulation.
+**Для WebKit**: запуск WebKit Inspector во время выполнения предотвратит дальнейшее выполнение скрипта Playwright и сбросит предварительно настроенный пользовательский агент и эмуляцию устройства.
 :::
 
-## Headed mode
+## Режим с графическим интерфейсом
 
-Playwright runs browsers in headless mode by default. To change this behavior, use `headless: false` as a launch option.
+По умолчанию Playwright запускает браузеры в безголовом режиме. Чтобы изменить это поведение, используйте `headless: false` в качестве опции запуска.
 
-You can also use the [SlowMo](/api/class-browsertype.mdx#browser-type-launch-option-slow-mo) option to slow down execution (by N milliseconds per operation) and follow along while debugging.
+Вы также можете использовать опцию [SlowMo](/api/class-browsertype.mdx#browser-type-launch-option-slow-mo), чтобы замедлить выполнение (на N миллисекунд на операцию) и следить за процессом отладки.
 
 ```csharp
-// Chromium, Firefox, or WebKit
+// Chromium, Firefox или WebKit
 await using var browser = await playwright.Chromium.LaunchAsync(new()
 {
     Headless = false,

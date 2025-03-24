@@ -6,126 +6,124 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-
-JSHandle represents an in-page JavaScript object. JSHandles can be created with the [Page.EvaluateHandleAsync()](/api/class-page.mdx#page-evaluate-handle) method.
+JSHandle представляет собой объект JavaScript на странице. JSHandle можно создать с помощью метода [Page.EvaluateHandleAsync()](/api/class-page.mdx#page-evaluate-handle).
 
 ```csharp
 var windowHandle = await page.EvaluateHandleAsync("() => window");
 ```
 
-JSHandle prevents the referenced JavaScript object being garbage collected unless the handle is exposed with [JsHandle.DisposeAsync()](/api/class-jshandle.mdx#js-handle-dispose). JSHandles are auto-disposed when their origin frame gets navigated or the parent context gets destroyed.
+JSHandle предотвращает сборку мусора для ссылочного объекта JavaScript, если только этот объект не освобожден с помощью [JsHandle.DisposeAsync()](/api/class-jshandle.mdx#js-handle-dispose). JSHandle автоматически освобождаются, когда их исходный фрейм переходит на другую страницу или родительский контекст уничтожается.
 
-JSHandle instances can be used as an argument in [Page.EvalOnSelectorAsync()](/api/class-page.mdx#page-eval-on-selector), [Page.EvaluateAsync()](/api/class-page.mdx#page-evaluate) and [Page.EvaluateHandleAsync()](/api/class-page.mdx#page-evaluate-handle) methods.
-
+Экземпляры JSHandle могут использоваться в качестве аргумента в методах [Page.EvalOnSelectorAsync()](/api/class-page.mdx#page-eval-on-selector), [Page.EvaluateAsync()](/api/class-page.mdx#page-evaluate) и [Page.EvaluateHandleAsync()](/api/class-page.mdx#page-evaluate-handle).
 
 ---
 
-## Methods
+## Методы
 
 ### AsElement {#js-handle-as-element}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>jsHandle.AsElement</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до версии v1.9</font><x-search>jsHandle.AsElement</x-search>
 
-Returns either `null` or the object handle itself, if the object handle is an instance of [ElementHandle].
+Возвращает либо `null`, либо сам объект, если объект является экземпляром [ElementHandle].
 
-**Usage**
+**Использование**
 
 ```csharp
 JsHandle.AsElement();
 ```
 
-**Returns**
+**Возвращает**
 - [ElementHandle]?<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="js-handle-as-element-return"/><a href="#js-handle-as-element-return" class="list-anchor">#</a>
 
 ---
 
 ### DisposeAsync {#js-handle-dispose}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>jsHandle.DisposeAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до версии v1.9</font><x-search>jsHandle.DisposeAsync</x-search>
 
-The `jsHandle.dispose` method stops referencing the element handle.
+Метод `jsHandle.dispose` прекращает ссылку на элемент.
 
-**Usage**
+**Использование**
 
 ```csharp
 await JsHandle.DisposeAsync();
 ```
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="js-handle-dispose-return"/><a href="#js-handle-dispose-return" class="list-anchor">#</a>
 
 ---
 
 ### EvaluateAsync {#js-handle-evaluate}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>jsHandle.EvaluateAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до версии v1.9</font><x-search>jsHandle.EvaluateAsync</x-search>
 
-Returns the return value of [expression](/api/class-jshandle.mdx#js-handle-evaluate-option-expression).
+Возвращает значение, возвращаемое [выражением](/api/class-jshandle.mdx#js-handle-evaluate-option-expression).
 
-This method passes this handle as the first argument to [expression](/api/class-jshandle.mdx#js-handle-evaluate-option-expression).
+Этот метод передает этот объект в качестве первого аргумента [выражению](/api/class-jshandle.mdx#js-handle-evaluate-option-expression).
 
-If [expression](/api/class-jshandle.mdx#js-handle-evaluate-option-expression) returns a [Promise], then `handle.evaluate` would wait for the promise to resolve and return its value.
+Если [выражение](/api/class-jshandle.mdx#js-handle-evaluate-option-expression) возвращает [Promise], то `handle.evaluate` будет ожидать разрешения промиса и вернет его значение.
 
-**Usage**
+**Использование**
 
 ```csharp
 var tweetHandle = await page.QuerySelectorAsync(".tweet .retweets");
 Assert.AreEqual("10 retweets", await tweetHandle.EvaluateAsync("node => node.innerText"));
 ```
 
-**Arguments**
+**Аргументы**
 - `expression` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="js-handle-evaluate-option-expression"/><a href="#js-handle-evaluate-option-expression" class="list-anchor">#</a>
   
-  JavaScript expression to be evaluated in the browser context. If the expression evaluates to a function, the function is automatically invoked.
-- `arg` [EvaluationArgument]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="js-handle-evaluate-option-arg"/><a href="#js-handle-evaluate-option-arg" class="list-anchor">#</a>
+  JavaScript-выражение для выполнения в контексте браузера. Если выражение оценивается как функция, функция автоматически вызывается.
+- `arg` [EvaluationArgument]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="js-handle-evaluate-option-arg"/><a href="#js-handle-evaluate-option-arg" class="list-anchor">#</a>
   
-  Optional argument to pass to [expression](/api/class-jshandle.mdx#js-handle-evaluate-option-expression).
+  Необязательный аргумент для передачи в [выражение](/api/class-jshandle.mdx#js-handle-evaluate-option-expression).
 
-**Returns**
+**Возвращает**
 - [object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="js-handle-evaluate-return"/><a href="#js-handle-evaluate-return" class="list-anchor">#</a>
 
 ---
 
 ### EvaluateHandleAsync {#js-handle-evaluate-handle}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>jsHandle.EvaluateHandleAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до версии v1.9</font><x-search>jsHandle.EvaluateHandleAsync</x-search>
 
-Returns the return value of [expression](/api/class-jshandle.mdx#js-handle-evaluate-handle-option-expression) as a [JSHandle].
+Возвращает значение, возвращаемое [выражением](/api/class-jshandle.mdx#js-handle-evaluate-handle-option-expression) в виде [JSHandle].
 
-This method passes this handle as the first argument to [expression](/api/class-jshandle.mdx#js-handle-evaluate-handle-option-expression).
+Этот метод передает этот объект в качестве первого аргумента [выражению](/api/class-jshandle.mdx#js-handle-evaluate-handle-option-expression).
 
-The only difference between `jsHandle.evaluate` and `jsHandle.evaluateHandle` is that `jsHandle.evaluateHandle` returns [JSHandle].
+Единственное отличие между `jsHandle.evaluate` и `jsHandle.evaluateHandle` заключается в том, что `jsHandle.evaluateHandle` возвращает [JSHandle].
 
-If the function passed to the `jsHandle.evaluateHandle` returns a [Promise], then `jsHandle.evaluateHandle` would wait for the promise to resolve and return its value.
+Если функция, переданная в `jsHandle.evaluateHandle`, возвращает [Promise], то `jsHandle.evaluateHandle` будет ожидать разрешения промиса и вернет его значение.
 
-See [Page.EvaluateHandleAsync()](/api/class-page.mdx#page-evaluate-handle) for more details.
+Смотрите [Page.EvaluateHandleAsync()](/api/class-page.mdx#page-evaluate-handle) для получения более подробной информации.
 
-**Usage**
+**Использование**
 
 ```csharp
 await JsHandle.EvaluateHandleAsync(expression, arg);
 ```
 
-**Arguments**
+**Аргументы**
 - `expression` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="js-handle-evaluate-handle-option-expression"/><a href="#js-handle-evaluate-handle-option-expression" class="list-anchor">#</a>
   
-  JavaScript expression to be evaluated in the browser context. If the expression evaluates to a function, the function is automatically invoked.
-- `arg` [EvaluationArgument]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="js-handle-evaluate-handle-option-arg"/><a href="#js-handle-evaluate-handle-option-arg" class="list-anchor">#</a>
+  JavaScript-выражение для выполнения в контексте браузера. Если выражение оценивается как функция, функция автоматически вызывается.
+- `arg` [EvaluationArgument]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="js-handle-evaluate-handle-option-arg"/><a href="#js-handle-evaluate-handle-option-arg" class="list-anchor">#</a>
   
-  Optional argument to pass to [expression](/api/class-jshandle.mdx#js-handle-evaluate-handle-option-expression).
+  Необязательный аргумент для передачи в [выражение](/api/class-jshandle.mdx#js-handle-evaluate-handle-option-expression).
 
-**Returns**
+**Возвращает**
 - [JSHandle]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="js-handle-evaluate-handle-return"/><a href="#js-handle-evaluate-handle-return" class="list-anchor">#</a>
 
 ---
 
 ### GetPropertiesAsync {#js-handle-get-properties}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>jsHandle.GetPropertiesAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до версии v1.9</font><x-search>jsHandle.GetPropertiesAsync</x-search>
 
-The method returns a map with **own property names** as keys and JSHandle instances for the property values.
+Метод возвращает карту с **именами собственных свойств** в качестве ключей и экземплярами JSHandle для значений свойств.
 
-**Usage**
+**Использование**
 
 ```csharp
 var handle = await page.EvaluateHandleAsync("() => ({ window, document }");
@@ -135,51 +133,51 @@ var documentHandle = properties["document"];
 await handle.DisposeAsync();
 ```
 
-**Returns**
+**Возвращает**
 - [Map]&lt;[string], [JSHandle]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="js-handle-get-properties-return"/><a href="#js-handle-get-properties-return" class="list-anchor">#</a>
 
 ---
 
 ### GetPropertyAsync {#js-handle-get-property}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>jsHandle.GetPropertyAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до версии v1.9</font><x-search>jsHandle.GetPropertyAsync</x-search>
 
-Fetches a single property from the referenced object.
+Извлекает одно свойство из ссылочного объекта.
 
-**Usage**
+**Использование**
 
 ```csharp
 await JsHandle.GetPropertyAsync(propertyName);
 ```
 
-**Arguments**
+**Аргументы**
 - `propertyName` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="js-handle-get-property-option-property-name"/><a href="#js-handle-get-property-option-property-name" class="list-anchor">#</a>
   
-  property to get
+  свойство для получения
 
-**Returns**
+**Возвращает**
 - [JSHandle]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="js-handle-get-property-return"/><a href="#js-handle-get-property-return" class="list-anchor">#</a>
 
 ---
 
 ### JsonValueAsync {#js-handle-json-value}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>jsHandle.JsonValueAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до версии v1.9</font><x-search>jsHandle.JsonValueAsync</x-search>
 
-Returns a JSON representation of the object. If the object has a `toJSON` function, it **will not be called**.
+Возвращает JSON-представление объекта. Если у объекта есть функция `toJSON`, она **не будет вызвана**.
 
 :::note
 
-The method will return an empty JSON object if the referenced object is not stringifiable. It will throw an error if the object has circular references.
+Метод вернет пустой JSON-объект, если ссылочный объект не может быть преобразован в строку. Он вызовет ошибку, если объект содержит циклические ссылки.
 :::
 
-**Usage**
+**Использование**
 
 ```csharp
 await JsHandle.JsonValueAsync();
 ```
 
-**Returns**
+**Возвращает**
 - [object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="js-handle-json-value-return"/><a href="#js-handle-json-value-return" class="list-anchor">#</a>
 
 

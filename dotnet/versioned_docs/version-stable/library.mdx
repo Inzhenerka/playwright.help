@@ -1,36 +1,36 @@
 ---
 id: library
-title: "Getting started - Library"
+title: "Начало работы - Библиотека"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright can either be used with the [MSTest, NUnit, or xUnit base classes](./test-runners.mdx) or as a Playwright Library (this guide). If you are working on an application that utilizes Playwright capabilities or you are using Playwright with another test runner, read on.
+Playwright может использоваться либо с [базовыми классами MSTest, NUnit или xUnit](./test-runners.mdx), либо как библиотека Playwright (это руководство). Если вы работаете над приложением, которое использует возможности Playwright, или используете Playwright с другим тестовым фреймворком, читайте дальше.
 
-## Usage
+## Использование
 
-Create a console project and add the Playwright dependency.
+Создайте консольный проект и добавьте зависимость Playwright.
 
 ```bash
-# Create project
+# Создать проект
 dotnet new console -n PlaywrightDemo
 cd PlaywrightDemo
 
-# Add project dependency
+# Добавить зависимость проекта
 dotnet add package Microsoft.Playwright
-# Build the project
+# Собрать проект
 dotnet build
-# Install required browsers - replace netX with actual output folder name, e.g. net8.0.
+# Установить необходимые браузеры - замените netX на фактическое имя выходной папки, например, net8.0.
 pwsh bin/Debug/netX/playwright.ps1 install
 
-# If the pwsh command does not work (throws TypeNotFound), make sure to use an up-to-date version of PowerShell.
+# Если команда pwsh не работает (выдает TypeNotFound), убедитесь, что используете актуальную версию PowerShell.
 dotnet tool update --global PowerShell
 ```
 
-Create a `Program.cs` that will navigate to `https://playwright.dev/dotnet` and take a screenshot in Chromium.
+Создайте `Program.cs`, который будет переходить на `https://playwright.dev/dotnet` и делать скриншот в Chromium.
 
 ```csharp
 using Microsoft.Playwright;
@@ -45,13 +45,13 @@ await page.ScreenshotAsync(new()
 });
 ```
 
-Now run it.
+Теперь запустите его.
 
 ```bash
 dotnet run
 ```
 
-By default, Playwright runs the browsers in headless mode. To see the browser UI, set [Headless](/api/class-browsertype.mdx#browser-type-launch-option-headless) option to `false`. You can also use [SlowMo](/api/class-browsertype.mdx#browser-type-launch-option-slow-mo) to slow down execution. Learn more in the debugging tools [section](./debug.mdx).
+По умолчанию Playwright запускает браузеры в безголовом режиме. Чтобы увидеть интерфейс браузера, установите опцию [Headless](/api/class-browsertype.mdx#browser-type-launch-option-headless) в `false`. Вы также можете использовать [SlowMo](/api/class-browsertype.mdx#browser-type-launch-option-slow-mo) для замедления выполнения. Узнайте больше в разделе инструментов отладки [section](./debug.mdx).
 
 ```csharp
 await using var browser = await playwright.Firefox.LaunchAsync(new()
@@ -61,15 +61,15 @@ await using var browser = await playwright.Firefox.LaunchAsync(new()
 });
 ```
 
-## Using Assertions
+## Использование утверждений
 
-You can do the following to leverage Playwright's web-first assertions when you are using your own test framework. These will automatically retry until the condition is met, e.g. an element has a certain text or the timeout is reached:
+Вы можете сделать следующее, чтобы использовать веб-первичные утверждения Playwright, когда вы используете свой собственный тестовый фреймворк. Они будут автоматически повторяться, пока условие не будет выполнено, например, элемент имеет определенный текст или истекло время ожидания:
 
 ```csharp
 using Microsoft.Playwright;
 using static Microsoft.Playwright.Assertions;
 
-// Change the default 5 seconds timeout if you'd like.
+// Измените стандартное время ожидания в 5 секунд, если хотите.
 SetDefaultExpectTimeout(10_000);
 
 using var playwright = await Playwright.CreateAsync();
@@ -79,9 +79,9 @@ await page.GotoAsync("https://playwright.dev/dotnet");
 await Expect(page.GetByRole(AriaRole.Link, new() { Name = "Get started" })).ToBeVisibleAsync();
 ```
 
-## Bundle drivers for different platforms
+## Пакетирование драйверов для разных платформ
 
-Playwright by default does bundle only the driver for the .NET publish target runtime. If you want to bundle for additional platforms, you can override this behavior by using either `all`, `none` or `linux`, `win`, `osx` in your project file.
+По умолчанию Playwright пакует только драйвер для целевой среды выполнения публикации .NET. Если вы хотите упаковать для дополнительных платформ, вы можете переопределить это поведение, используя `all`, `none` или `linux`, `win`, `osx` в вашем файле проекта.
 
 ```xml
 <PropertyGroup>
@@ -89,14 +89,13 @@ Playwright by default does bundle only the driver for the .NET publish target ru
 </PropertyGroup>
 ```
 
-or:
+или:
 
 ```xml
 <PropertyGroup>
   <PlaywrightPlatform>osx;linux</PlaywrightPlatform>
 </PropertyGroup>
 ```
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
@@ -169,6 +168,6 @@ or:
 [IReadOnlyDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2 "IReadOnlyDictionary"
 [JsonElement]: https://docs.microsoft.com/en-us/dotnet/api/system.text.json.jsonelement "JsonElement"
 
-[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/dotnet/about "all available image tags"
-[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/dotnet/about "Microsoft Artifact Registry"
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/dotnet/about "все доступные теги изображений"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/dotnet/about "Реестр артефактов Microsoft"
 [Dockerfile.noble]: https://github.com/microsoft/playwright-dotnet/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

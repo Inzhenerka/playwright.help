@@ -6,13 +6,13 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-The following will explain how to use Playwright with [Microsoft Edge WebView2](https://docs.microsoft.com/en-us/microsoft-edge/webview2/). WebView2 is a WinForms control, which will use Microsoft Edge under the hood to render web content. It is a part of the Microsoft Edge browser and is available on Windows 10 and Windows 11. Playwright can be used to automate WebView2 applications and can be used to test web content in WebView2. For connecting to WebView2, Playwright uses [BrowserType.ConnectOverCDPAsync()](/api/class-browsertype.mdx#browser-type-connect-over-cdp) which connects to it via the Chrome DevTools Protocol (CDP).
+В этом разделе объясняется, как использовать Playwright с [Microsoft Edge WebView2](https://docs.microsoft.com/en-us/microsoft-edge/webview2/). WebView2 — это элемент управления WinForms, который использует Microsoft Edge для отображения веб-контента. Он является частью браузера Microsoft Edge и доступен на Windows 10 и Windows 11. Playwright может использоваться для автоматизации приложений WebView2 и тестирования веб-контента в WebView2. Для подключения к WebView2 Playwright использует [BrowserType.ConnectOverCDPAsync()](/api/class-browsertype.mdx#browser-type-connect-over-cdp), который подключается к нему через протокол Chrome DevTools Protocol (CDP).
 
-## Overview
+## Обзор
 
-A WebView2 control can be instructed to listen to incoming CDP connections by setting either the `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS` environment variable with `--remote-debugging-port=9222` or calling [EnsureCoreWebView2Async](https://docs.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.wpf.webview2.ensurecorewebview2async?view=webview2-dotnet-1.0.1343.22) with the `--remote-debugging-port=9222` argument. This will start the WebView2 process with the Chrome DevTools Protocol enabled which allows the automation by Playwright. 9222 is an example port in this case, but any other unused port can be used as well.
+Элемент управления WebView2 может быть настроен на прослушивание входящих CDP-соединений путем установки переменной окружения `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS` с `--remote-debugging-port=9222` или вызова [EnsureCoreWebView2Async](https://docs.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.wpf.webview2.ensurecorewebview2async?view=webview2-dotnet-1.0.1343.22) с аргументом `--remote-debugging-port=9222`. Это запустит процесс WebView2 с включенным протоколом Chrome DevTools, что позволит автоматизировать его с помощью Playwright. В данном случае 9222 — это пример порта, но можно использовать любой другой неиспользуемый порт.
 
 ```csharp
 await this.webView.EnsureCoreWebView2Async(await CoreWebView2Environment.CreateAsync(null, null, new CoreWebView2EnvironmentOptions()
@@ -21,7 +21,7 @@ await this.webView.EnsureCoreWebView2Async(await CoreWebView2Environment.CreateA
 })).ConfigureAwait(false);
 ```
 
-Once your application with the WebView2 control is running, you can connect to it via Playwright:
+После того как ваше приложение с элементом управления WebView2 запущено, вы можете подключиться к нему через Playwright:
 
 ```csharp
 var browser = await playwright.Chromium.ConnectOverCDPAsync("http://localhost:9222");
@@ -29,25 +29,25 @@ var context = browser.Contexts[0];
 var page = context.Pages[0];
 ```
 
-To ensure that the WebView2 control is ready, you can wait for the [`CoreWebView2InitializationCompleted`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.wpf.webview2.corewebview2initializationcompleted?view=webview2-dotnet-1.0.1343.22) event:
+Чтобы убедиться, что элемент управления WebView2 готов, вы можете дождаться события [`CoreWebView2InitializationCompleted`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.wpf.webview2.corewebview2initializationcompleted?view=webview2-dotnet-1.0.1343.22):
 
 ```csharp
 this.webView.CoreWebView2InitializationCompleted += (_, e) =>
 {
     if (e.IsSuccess)
     {
-        Console.WriteLine("WebView2 initialized");
+        Console.WriteLine("WebView2 инициализирован");
     }
 };
 ```
 
-## Writing and running tests
+## Написание и выполнение тестов
 
-By default, the WebView2 control will use the same user data directory for all instances. This means that if you run multiple tests in parallel, they will interfere with each other. To avoid this, you should set the `WEBVIEW2_USER_DATA_FOLDER` environment variable (or use [WebView2.EnsureCoreWebView2Async Method](https://docs.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.wpf.webview2.ensurecorewebview2async?view=webview2-dotnet-1.0.1343.22)) to a different folder for each test. This will make sure that each test runs in its own user data directory.
+По умолчанию элемент управления WebView2 будет использовать один и тот же каталог пользовательских данных для всех экземпляров. Это означает, что если вы запускаете несколько тестов параллельно, они будут мешать друг другу. Чтобы этого избежать, вы должны установить переменную окружения `WEBVIEW2_USER_DATA_FOLDER` (или использовать [WebView2.EnsureCoreWebView2Async Method](https://docs.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.wpf.webview2.ensurecorewebview2async?view=webview2-dotnet-1.0.1343.22)) в разные папки для каждого теста. Это обеспечит выполнение каждого теста в собственном каталоге пользовательских данных.
 
-Using the following, Playwright will run your WebView2 application as a sub-process, assign a unique user data directory to it and provide the [Page] instance to your test:
+Используя следующее, Playwright запустит ваше приложение WebView2 как подпроцесс, назначит ему уникальный каталог пользовательских данных и предоставит экземпляр [Page] вашему тесту:
 
-<!-- source code is available here to verify that the examples are working https://github.com/mxschmitt/playwright-webview2-demo -->
+<!-- исходный код доступен здесь для проверки работоспособности примеров https://github.com/mxschmitt/playwright-webview2-demo -->
 
 ```csharp
 // WebView2Test.cs
@@ -71,9 +71,9 @@ public class ExampleTest : PlaywrightTest
     public async Task BrowserTestInitialize()
     {
         var cdpPort = 10000 + WorkerIndex;
-        Assert.IsTrue(File.Exists(_executablePath), "Make sure that the executable exists");
+        Assert.IsTrue(File.Exists(_executablePath), "Убедитесь, что исполняемый файл существует");
         _userDataDir = Path.Join(Path.GetTempPath(), $"playwright-webview2-tests/user-data-dir-{WorkerIndex}");
-        // WebView2 does some lazy cleanups on shutdown so we can't clean it up after each test
+        // WebView2 выполняет некоторые ленивые очистки при завершении работы, поэтому мы не можем очищать его после каждого теста
         if (Directory.Exists(_userDataDir))
         {
             Directory.Delete(_userDataDir, true);
@@ -92,9 +92,9 @@ public class ExampleTest : PlaywrightTest
             var output = await _webView2Process!.StandardOutput.ReadLineAsync();
             if (_webView2Process!.HasExited)
             {
-                throw new Exception("WebView2 process exited unexpectedly");
+                throw new Exception("Процесс WebView2 завершился неожиданно");
             }
-            if (output != null && output.Contains("WebView2 initialized"))
+            if (output != null && output.Contains("WebView2 инициализирован"))
             {
                 break;
             }
@@ -134,11 +134,11 @@ public class ExampleTest : WebView2Test
 }
 ```
 
-## Debugging
+## Отладка
 
-Inside your webview2 control, you can just right-click to open the context menu and select "Inspect" to open the DevTools or press <kbd>F12</kbd>. You can also use the [WebView2.CoreWebView2.OpenDevToolsWindow](https://learn.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.core.corewebview2.opendevtoolswindow?view=webview2-dotnet-1.0.1462.37) method to open the DevTools programmatically.
+Внутри вашего элемента управления webview2 вы можете просто щелкнуть правой кнопкой мыши, чтобы открыть контекстное меню, и выбрать "Inspect", чтобы открыть DevTools, или нажать <kbd>F12</kbd>. Вы также можете использовать метод [WebView2.CoreWebView2.OpenDevToolsWindow](https://learn.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.core.corewebview2.opendevtoolswindow?view=webview2-dotnet-1.0.1462.37) для программного открытия DevTools.
 
-For debugging tests, see the Playwright [Debugging guide](./debug).
+Для отладки тестов смотрите руководство Playwright по [отладке](./debug).
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"

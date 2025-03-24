@@ -6,52 +6,50 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+Когда страница отправляет запрос на сетевой ресурс, происходит следующая последовательность событий, генерируемых [Page]:
+* [Page.Request](/api/class-page.mdx#page-event-request) генерируется, когда запрос отправляется страницей.
+* [Page.Response](/api/class-page.mdx#page-event-response) генерируется, когда/если получены статус и заголовки ответа на запрос.
+* [Page.RequestFinished](/api/class-page.mdx#page-event-request-finished) генерируется, когда тело ответа загружено и запрос завершен.
 
-Whenever the page sends a request for a network resource the following sequence of events are emitted by [Page]:
-* [Page.Request](/api/class-page.mdx#page-event-request) emitted when the request is issued by the page.
-* [Page.Response](/api/class-page.mdx#page-event-response) emitted when/if the response status and headers are received for the request.
-* [Page.RequestFinished](/api/class-page.mdx#page-event-request-finished) emitted when the response body is downloaded and the request is complete.
-
-If request fails at some point, then instead of `'requestfinished'` event (and possibly instead of 'response' event), the  [Page.RequestFailed](/api/class-page.mdx#page-event-request-failed) event is emitted.
+Если запрос не удается на каком-то этапе, то вместо события `'requestfinished'` (а возможно и вместо события 'response') генерируется событие [Page.RequestFailed](/api/class-page.mdx#page-event-request-failed).
 
 :::note
 
-HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with `'requestfinished'` event.
+Ответы с HTTP ошибками, такие как 404 или 503, все равно считаются успешными с точки зрения HTTP, поэтому запрос завершится событием `'requestfinished'`.
 :::
 
-If request gets a 'redirect' response, the request is successfully finished with the `requestfinished` event, and a new request is  issued to a redirected url.
-
+Если запрос получает ответ 'redirect', запрос успешно завершается событием `requestfinished`, и новый запрос отправляется на перенаправленный URL.
 
 ---
 
-## Methods
+## Методы
 
 ### AllHeadersAsync {#request-all-headers}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>request.AllHeadersAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.15</font><x-search>request.AllHeadersAsync</x-search>
 
-An object with all the request HTTP headers associated with this request. The header names are lower-cased.
+Объект со всеми HTTP заголовками запроса, связанными с этим запросом. Имена заголовков приведены к нижнему регистру.
 
-**Usage**
+**Использование**
 
 ```csharp
 await Request.AllHeadersAsync();
 ```
 
-**Returns**
+**Возвращает**
 - [IDictionary]&lt;[string], [string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-all-headers-return"/><a href="#request-all-headers-return" class="list-anchor">#</a>
 
 ---
 
 ### Failure {#request-failure}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.Failure</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.Failure</x-search>
 
-The method returns `null` unless this request has failed, as reported by `requestfailed` event.
+Метод возвращает `null`, если только этот запрос не завершился неудачей, как сообщается событием `requestfailed`.
 
-**Usage**
+**Использование**
 
-Example of logging of all the failed requests:
+Пример логирования всех неудачных запросов:
 
 ```csharp
 page.RequestFailed += (_, request) =>
@@ -60,305 +58,305 @@ page.RequestFailed += (_, request) =>
 };
 ```
 
-**Returns**
+**Возвращает**
 - [string]?<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-failure-return"/><a href="#request-failure-return" class="list-anchor">#</a>
 
 ---
 
 ### Frame {#request-frame}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.Frame</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.Frame</x-search>
 
-Returns the [Frame] that initiated this request.
+Возвращает [Frame], который инициировал этот запрос.
 
-**Usage**
+**Использование**
 
 ```csharp
 var frameUrl = request.Frame.Url;
 ```
 
-**Returns**
+**Возвращает**
 - [Frame]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-frame-return"/><a href="#request-frame-return" class="list-anchor">#</a>
 
-**Details**
+**Детали**
 
-Note that in some cases the frame is not available, and this method will throw.
-* When request originates in the Service Worker. You can use `request.serviceWorker()` to check that.
-* When navigation request is issued before the corresponding frame is created. You can use [Request.IsNavigationRequest](/api/class-request.mdx#request-is-navigation-request) to check that.
+Обратите внимание, что в некоторых случаях фрейм недоступен, и этот метод вызовет исключение.
+* Когда запрос исходит из Service Worker. Вы можете использовать `request.serviceWorker()`, чтобы это проверить.
+* Когда запрос навигации отправляется до создания соответствующего фрейма. Вы можете использовать [Request.IsNavigationRequest](/api/class-request.mdx#request-is-navigation-request), чтобы это проверить.
 
-Here is an example that handles all the cases:
+Вот пример, который обрабатывает все случаи:
 
 ---
 
 ### HeaderValueAsync {#request-header-value}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>request.HeaderValueAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.15</font><x-search>request.HeaderValueAsync</x-search>
 
-Returns the value of the header matching the name. The name is case-insensitive.
+Возвращает значение заголовка, соответствующего имени. Имя не чувствительно к регистру.
 
-**Usage**
+**Использование**
 
 ```csharp
 await Request.HeaderValueAsync(name);
 ```
 
-**Arguments**
+**Аргументы**
 - `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-header-value-option-name"/><a href="#request-header-value-option-name" class="list-anchor">#</a>
   
-  Name of the header.
+  Имя заголовка.
 
-**Returns**
+**Возвращает**
 - [string]?<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-header-value-return"/><a href="#request-header-value-return" class="list-anchor">#</a>
 
 ---
 
 ### Headers {#request-headers}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.Headers</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.Headers</x-search>
 
-An object with the request HTTP headers. The header names are lower-cased. Note that this method does not return security-related headers, including cookie-related ones. You can use [Request.AllHeadersAsync()](/api/class-request.mdx#request-all-headers) for complete list of headers that include `cookie` information.
+Объект с HTTP заголовками запроса. Имена заголовков приведены к нижнему регистру. Обратите внимание, что этот метод не возвращает заголовки, связанные с безопасностью, включая заголовки, связанные с cookie. Вы можете использовать [Request.AllHeadersAsync()](/api/class-request.mdx#request-all-headers) для полного списка заголовков, включая информацию о `cookie`.
 
-**Usage**
+**Использование**
 
 ```csharp
 Request.Headers
 ```
 
-**Returns**
+**Возвращает**
 - [IDictionary]&lt;[string], [string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-headers-return"/><a href="#request-headers-return" class="list-anchor">#</a>
 
 ---
 
 ### HeadersArrayAsync {#request-headers-array}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>request.HeadersArrayAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.15</font><x-search>request.HeadersArrayAsync</x-search>
 
-An array with all the request HTTP headers associated with this request. Unlike [Request.AllHeadersAsync()](/api/class-request.mdx#request-all-headers), header names are NOT lower-cased. Headers with multiple entries, such as `Set-Cookie`, appear in the array multiple times.
+Массив со всеми HTTP заголовками запроса, связанными с этим запросом. В отличие от [Request.AllHeadersAsync()](/api/class-request.mdx#request-all-headers), имена заголовков НЕ приведены к нижнему регистру. Заголовки с несколькими записями, такие как `Set-Cookie`, появляются в массиве несколько раз.
 
-**Usage**
+**Использование**
 
 ```csharp
 await Request.HeadersArrayAsync();
 ```
 
-**Returns**
+**Возвращает**
 - [IEnumerable]&lt;`HttpHeader`&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-headers-array-return"/><a href="#request-headers-array-return" class="list-anchor">#</a>
   - `name` [string]
     
-    Name of the header.
+    Имя заголовка.
   - `value` [string]
     
-    Value of the header.
+    Значение заголовка.
 
 ---
 
 ### IsNavigationRequest {#request-is-navigation-request}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.IsNavigationRequest</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.IsNavigationRequest</x-search>
 
-Whether this request is driving frame's navigation.
+Является ли этот запрос управляющим навигацией фрейма.
 
-Some navigation requests are issued before the corresponding frame is created, and therefore do not have [Request.Frame](/api/class-request.mdx#request-frame) available.
+Некоторые запросы навигации отправляются до создания соответствующего фрейма, и поэтому [Request.Frame](/api/class-request.mdx#request-frame) недоступен.
 
-**Usage**
+**Использование**
 
 ```csharp
 Request.IsNavigationRequest
 ```
 
-**Returns**
+**Возвращает**
 - [bool]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-is-navigation-request-return"/><a href="#request-is-navigation-request-return" class="list-anchor">#</a>
 
 ---
 
 ### Method {#request-method}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.Method</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.Method</x-search>
 
-Request's method (GET, POST, etc.)
+Метод запроса (GET, POST и т.д.)
 
-**Usage**
+**Использование**
 
 ```csharp
 Request.Method
 ```
 
-**Returns**
+**Возвращает**
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-method-return"/><a href="#request-method-return" class="list-anchor">#</a>
 
 ---
 
 ### PostData {#request-post-data}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.PostData</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.PostData</x-search>
 
-Request's post body, if any.
+Тело запроса, если оно есть.
 
-**Usage**
+**Использование**
 
 ```csharp
 Request.PostData
 ```
 
-**Returns**
+**Возвращает**
 - [string]?<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-post-data-return"/><a href="#request-post-data-return" class="list-anchor">#</a>
 
 ---
 
 ### PostDataBuffer {#request-post-data-buffer}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.PostDataBuffer</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.PostDataBuffer</x-search>
 
-Request's post body in a binary form, if any.
+Тело запроса в бинарной форме, если оно есть.
 
-**Usage**
+**Использование**
 
 ```csharp
 Request.PostDataBuffer
 ```
 
-**Returns**
+**Возвращает**
 - [byte]&#91;&#93;?<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-post-data-buffer-return"/><a href="#request-post-data-buffer-return" class="list-anchor">#</a>
 
 ---
 
 ### PostDataJSON {#request-post-data-json}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>request.PostDataJSON</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>request.PostDataJSON</x-search>
 
-Returns parsed request's body for `form-urlencoded` and JSON as a fallback if any.
+Возвращает разобранное тело запроса для `form-urlencoded` и JSON в качестве резервного варианта, если оно есть.
 
-When the response is `application/x-www-form-urlencoded` then a key/value object of the values will be returned. Otherwise it will be parsed as JSON.
+Когда ответ `application/x-www-form-urlencoded`, возвращается объект ключ/значение значений. В противном случае он будет разобран как JSON.
 
-**Usage**
+**Использование**
 
 ```csharp
 Request.PostDataJSON
 ```
 
-**Returns**
+**Возвращает**
 - [JsonElement]?<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-post-data-json-return"/><a href="#request-post-data-json-return" class="list-anchor">#</a>
 
 ---
 
 ### RedirectedFrom {#request-redirected-from}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.RedirectedFrom</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.RedirectedFrom</x-search>
 
-Request that was redirected by the server to this one, if any.
+Запрос, который был перенаправлен сервером на этот, если таковой имеется.
 
-When the server responds with a redirect, Playwright creates a new [Request] object. The two requests are connected by `redirectedFrom()` and `redirectedTo()` methods. When multiple server redirects has happened, it is possible to construct the whole redirect chain by repeatedly calling `redirectedFrom()`.
+Когда сервер отвечает перенаправлением, Playwright создает новый объект [Request]. Два запроса связаны методами `redirectedFrom()` и `redirectedTo()`. Когда произошло несколько перенаправлений сервера, можно построить всю цепочку перенаправлений, многократно вызывая `redirectedFrom()`.
 
-**Usage**
+**Использование**
 
-For example, if the website `http://example.com` redirects to `https://example.com`:
+Например, если веб-сайт `http://example.com` перенаправляет на `https://example.com`:
 
 ```csharp
 var response = await page.GotoAsync("http://www.microsoft.com");
 Console.WriteLine(response.Request.RedirectedFrom?.Url); // http://www.microsoft.com
 ```
 
-If the website `https://google.com` has no redirects:
+Если веб-сайт `https://google.com` не имеет перенаправлений:
 
 ```csharp
 var response = await page.GotoAsync("https://www.google.com");
 Console.WriteLine(response.Request.RedirectedFrom?.Url); // null
 ```
 
-**Returns**
+**Возвращает**
 - [Request]?<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-redirected-from-return"/><a href="#request-redirected-from-return" class="list-anchor">#</a>
 
 ---
 
 ### RedirectedTo {#request-redirected-to}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.RedirectedTo</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.RedirectedTo</x-search>
 
-New request issued by the browser if the server responded with redirect.
+Новый запрос, отправленный браузером, если сервер ответил перенаправлением.
 
-**Usage**
+**Использование**
 
-This method is the opposite of [Request.RedirectedFrom](/api/class-request.mdx#request-redirected-from):
+Этот метод является противоположностью [Request.RedirectedFrom](/api/class-request.mdx#request-redirected-from):
 
 ```csharp
 Console.WriteLine(request.RedirectedFrom?.RedirectedTo == request); // True
 ```
 
-**Returns**
+**Возвращает**
 - [Request]?<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-redirected-to-return"/><a href="#request-redirected-to-return" class="list-anchor">#</a>
 
 ---
 
 ### ResourceType {#request-resource-type}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.ResourceType</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.ResourceType</x-search>
 
-Contains the request's resource type as it was perceived by the rendering engine. ResourceType will be one of the following: `document`, `stylesheet`, `image`, `media`, `font`, `script`, `texttrack`, `xhr`, `fetch`, `eventsource`, `websocket`, `manifest`, `other`.
+Содержит тип ресурса запроса, как он был воспринят движком рендеринга. ResourceType будет одним из следующих: `document`, `stylesheet`, `image`, `media`, `font`, `script`, `texttrack`, `xhr`, `fetch`, `eventsource`, `websocket`, `manifest`, `other`.
 
-**Usage**
+**Использование**
 
 ```csharp
 Request.ResourceType
 ```
 
-**Returns**
+**Возвращает**
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-resource-type-return"/><a href="#request-resource-type-return" class="list-anchor">#</a>
 
 ---
 
 ### ResponseAsync {#request-response}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.ResponseAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.ResponseAsync</x-search>
 
-Returns the matching [Response] object, or `null` if the response was not received due to error.
+Возвращает соответствующий объект [Response], или `null`, если ответ не был получен из-за ошибки.
 
-**Usage**
+**Использование**
 
 ```csharp
 await Request.ResponseAsync();
 ```
 
-**Returns**
+**Возвращает**
 - [Response]?<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-response-return"/><a href="#request-response-return" class="list-anchor">#</a>
 
 ---
 
 ### SizesAsync {#request-sizes}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>request.SizesAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.15</font><x-search>request.SizesAsync</x-search>
 
-Returns resource size information for given request.
+Возвращает информацию о размере ресурса для данного запроса.
 
-**Usage**
+**Использование**
 
 ```csharp
 await Request.SizesAsync();
 ```
 
-**Returns**
+**Возвращает**
 - Sizes<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-sizes-return"/><a href="#request-sizes-return" class="list-anchor">#</a>
   - `requestBodySize` [int]
     
-    Size of the request body (POST data payload) in bytes. Set to 0 if there was no body.
+    Размер тела запроса (POST данных) в байтах. Установлено в 0, если тела не было.
   - `requestHeadersSize` [int]
     
-    Total number of bytes from the start of the HTTP request message until (and including) the double CRLF before the body.
+    Общее количество байтов от начала HTTP сообщения запроса до (и включая) двойной CRLF перед телом.
   - `responseBodySize` [int]
     
-    Size of the received response body (encoded) in bytes.
+    Размер полученного тела ответа (закодированного) в байтах.
   - `responseHeadersSize` [int]
     
-    Total number of bytes from the start of the HTTP response message until (and including) the double CRLF before the body.
+    Общее количество байтов от начала HTTP сообщения ответа до (и включая) двойной CRLF перед телом.
 
 ---
 
 ### Timing {#request-timing}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.Timing</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.Timing</x-search>
 
-Returns resource timing information for given request. Most of the timing values become available upon the response, `responseEnd` becomes available when request finishes. Find more information at [Resource Timing API](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming).
+Возвращает информацию о времени ресурса для данного запроса. Большинство значений времени становятся доступны при получении ответа, `responseEnd` становится доступным, когда запрос завершается. Подробнее см. [Resource Timing API](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming).
 
-**Usage**
+**Использование**
 
 ```csharp
 var request = await page.RunAndWaitForRequestFinishedAsync(async () =>
@@ -368,53 +366,52 @@ var request = await page.RunAndWaitForRequestFinishedAsync(async () =>
 Console.WriteLine(request.Timing.ResponseEnd);
 ```
 
-**Returns**
+**Возвращает**
 - Timing<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-timing-return"/><a href="#request-timing-return" class="list-anchor">#</a>
   - `startTime` [float]
     
-    Request start time in milliseconds elapsed since January 1, 1970 00:00:00 UTC
+    Время начала запроса в миллисекундах, прошедших с 1 января 1970 года 00:00:00 UTC
   - `domainLookupStart` [float]
     
-    Time immediately before the browser starts the domain name lookup for the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+    Время непосредственно перед тем, как браузер начинает поиск доменного имени для ресурса. Значение указано в миллисекундах относительно `startTime`, -1, если недоступно.
   - `domainLookupEnd` [float]
     
-    Time immediately after the browser starts the domain name lookup for the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+    Время непосредственно после того, как браузер начинает поиск доменного имени для ресурса. Значение указано в миллисекундах относительно `startTime`, -1, если недоступно.
   - `connectStart` [float]
     
-    Time immediately before the user agent starts establishing the connection to the server to retrieve the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+    Время непосредственно перед тем, как пользовательский агент начинает устанавливать соединение с сервером для получения ресурса. Значение указано в миллисекундах относительно `startTime`, -1, если недоступно.
   - `secureConnectionStart` [float]
     
-    Time immediately before the browser starts the handshake process to secure the current connection. The value is given in milliseconds relative to `startTime`, -1 if not available.
+    Время непосредственно перед тем, как браузер начинает процесс рукопожатия для защиты текущего соединения. Значение указано в миллисекундах относительно `startTime`, -1, если недоступно.
   - `connectEnd` [float]
     
-    Time immediately before the user agent starts establishing the connection to the server to retrieve the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+    Время непосредственно перед тем, как пользовательский агент начинает устанавливать соединение с сервером для получения ресурса. Значение указано в миллисекундах относительно `startTime`, -1, если недоступно.
   - `requestStart` [float]
     
-    Time immediately before the browser starts requesting the resource from the server, cache, or local resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+    Время непосредственно перед тем, как браузер начинает запрашивать ресурс с сервера, из кэша или локального ресурса. Значение указано в миллисекундах относительно `startTime`, -1, если недоступно.
   - `responseStart` [float]
     
-    Time immediately after the browser receives the first byte of the response from the server, cache, or local resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+    Время непосредственно после того, как браузер получает первый байт ответа от сервера, из кэша или локального ресурса. Значение указано в миллисекундах относительно `startTime`, -1, если недоступно.
   - `responseEnd` [float]
     
-    Time immediately after the browser receives the last byte of the resource or immediately before the transport connection is closed, whichever comes first. The value is given in milliseconds relative to `startTime`, -1 if not available.
+    Время непосредственно после того, как браузер получает последний байт ресурса или непосредственно перед закрытием транспортного соединения, в зависимости от того, что произойдет раньше. Значение указано в миллисекундах относительно `startTime`, -1, если недоступно.
 
 ---
 
 ### Url {#request-url}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>request.Url</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>request.Url</x-search>
 
-URL of the request.
+URL запроса.
 
-**Usage**
+**Использование**
 
 ```csharp
 Request.Url
 ```
 
-**Returns**
+**Возвращает**
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-url-return"/><a href="#request-url-return" class="list-anchor">#</a>
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

@@ -1,22 +1,22 @@
 ---
 id: evaluating
-title: "Evaluating JavaScript"
+title: "Выполнение JavaScript"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright scripts run in your Playwright environment. Your page scripts run in the browser page environment. Those environments don't intersect, they are running in different virtual machines in different processes and even potentially on different computers.
+Скрипты Playwright выполняются в вашей среде Playwright. Скрипты страницы выполняются в среде браузерной страницы. Эти среды не пересекаются, они работают в разных виртуальных машинах в разных процессах и даже потенциально на разных компьютерах.
 
-The [Page.EvaluateAsync()](/api/class-page.mdx#page-evaluate) API can run a JavaScript function in the context of the web page and bring results back to the Playwright environment. Browser globals like `window` and `document` can be used in `evaluate`.
+API [Page.EvaluateAsync()](/api/class-page.mdx#page-evaluate) может выполнять JavaScript-функцию в контексте веб-страницы и возвращать результаты в среду Playwright. Глобальные объекты браузера, такие как `window` и `document`, могут использоваться в `evaluate`.
 
 ```csharp
 var href = await page.EvaluateAsync<string>("document.location.href");
 ```
 
-If the result is a Promise or if the function is asynchronous evaluate will automatically wait until it's resolved:
+Если результат является Promise или если функция асинхронная, evaluate автоматически дождется ее разрешения:
 
 ```csharp
 int status = await page.EvaluateAsync<int>(@"async () => {
@@ -25,87 +25,86 @@ int status = await page.EvaluateAsync<int>(@"async () => {
 }");
 ```
 
-## Different environments
+## Разные среды
 
-Evaluated scripts run in the browser environment, while your test runs in a testing environments. This means you cannot use variables from your test in the page and vice versa. Instead, you should pass them explicitly as an argument.
+Выполняемые скрипты работают в среде браузера, в то время как ваш тест выполняется в тестовой среде. Это означает, что вы не можете использовать переменные из вашего теста на странице и наоборот. Вместо этого вы должны передавать их явно в качестве аргумента.
 
-The following snippet is **WRONG** because it uses the variable directly:
+Следующий фрагмент **НЕПРАВИЛЬНЫЙ**, потому что он использует переменную напрямую:
 
 ```csharp
 var data = "some data";
 var result = await page.EvaluateAsync(@"() => {
-  // WRONG: there is no 'data' in the web page.
+  // НЕПРАВИЛЬНО: на веб-странице нет 'data'.
   window.myApp.use(data);
 }");
 ```
 
-The following snippet is **CORRECT** because it passes the value explicitly as an argument:
+Следующий фрагмент **ПРАВИЛЬНЫЙ**, потому что он передает значение явно в качестве аргумента:
 
 ```csharp
 var data = "some data";
-// Pass |data| as a parameter.
+// Передаем |data| как параметр.
 var result = await page.EvaluateAsync("data => { window.myApp.use(data); }", data);
 ```
 
-## Evaluation Argument
+## Аргумент для выполнения
 
-Playwright evaluation methods like [Page.EvaluateAsync()](/api/class-page.mdx#page-evaluate) take a single optional argument. This argument can be a mix of [Serializable] values and [JSHandle] instances. Handles are automatically converted to the value they represent.
+Методы выполнения Playwright, такие как [Page.EvaluateAsync()](/api/class-page.mdx#page-evaluate), принимают один необязательный аргумент. Этот аргумент может быть смесью значений [Serializable] и экземпляров [JSHandle]. Обработчики автоматически преобразуются в представляемое ими значение.
 
 ```csharp
-// A primitive value.
+// Примитивное значение.
 await page.EvaluateAsync<int>("num => num", 42);
 
-// An array.
+// Массив.
 await page.EvaluateAsync<int[]>("array => array.length", new[] { 1, 2, 3 });
 
-// An object.
+// Объект.
 await page.EvaluateAsync<object>("object => object.foo", new { foo = "bar" });
 
-// A single handle.
+// Один обработчик.
 var button = await page.EvaluateHandleAsync("window.button");
 await page.EvaluateAsync<IJSHandle>("button => button.textContent", button);
 
-// Alternative notation using JSHandle.EvaluateAsync.
+// Альтернативная нотация с использованием JSHandle.EvaluateAsync.
 await button.EvaluateAsync<string>("(button, from) => button.textContent.substring(from)", 5);
 
-// Object with multiple handles.
+// Объект с несколькими обработчиками.
 var button1 = await page.EvaluateHandleAsync("window.button1");
 var button2 = await page.EvaluateHandleAsync("window.button2");
 await page.EvaluateAsync("o => o.button1.textContent + o.button2.textContent", new { button1, button2 });
 
-// Object destructuring works. Note that property names must match
-// between the destructured object and the argument.
-// Also note the required parenthesis.
+// Деструктуризация объекта работает. Обратите внимание, что имена свойств должны совпадать
+// между деструктурированным объектом и аргументом.
+// Также обратите внимание на обязательные скобки.
 await page.EvaluateAsync("({ button1, button2 }) => button1.textContent + button2.textContent", new { button1, button2 });
 
-// Array works as well. Arbitrary names can be used for destructuring.
-// Note the required parenthesis.
+// Массив также работает. Можно использовать произвольные имена для деструктуризации.
+// Обратите внимание на обязательные скобки.
 await page.EvaluateAsync("([b1, b2]) => b1.textContent + b2.textContent", new[] { button1, button2 });
 
-// Any mix of serializables and handles works.
+// Любая смесь сериализуемых и обработчиков работает.
 await page.EvaluateAsync("x => x.button1.textContent + x.list[0].textContent + String(x.foo)", new { button1, list = new[] { button2 }, foo = null as object });
 ```
 
-## Init scripts
+## Скрипты инициализации
 
-Sometimes it is convenient to evaluate something in the page before it starts loading. For example, you might want to setup some mocks or test data.
+Иногда удобно выполнить что-то на странице до того, как она начнет загружаться. Например, вы можете захотеть настроить некоторые моки или тестовые данные.
 
-In this case, use [Page.AddInitScriptAsync()](/api/class-page.mdx#page-add-init-script) or [BrowserContext.AddInitScriptAsync()](/api/class-browsercontext.mdx#browser-context-add-init-script). In the example below, we will replace `Math.random()` with a constant value.
+В этом случае используйте [Page.AddInitScriptAsync()](/api/class-page.mdx#page-add-init-script) или [BrowserContext.AddInitScriptAsync()](/api/class-browsercontext.mdx#browser-context-add-init-script). В примере ниже мы заменим `Math.random()` на постоянное значение.
 
-First, create a `preload.js` file that contains the mock.
+Сначала создайте файл `preload.js`, содержащий мок.
 
 ```js
 // preload.js
 Math.random = () => 42;
 ```
 
-Next, add init script to the page.
+Затем добавьте скрипт инициализации на страницу.
 
 ```csharp
-// In your test, assuming the "preload.js" file is in the "mocks" directory.
+// В вашем тесте, предполагая, что файл "preload.js" находится в директории "mocks".
 await Page.AddInitScriptAsync(scriptPath: "mocks/preload.js");
 ```
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

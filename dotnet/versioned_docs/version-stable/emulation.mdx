@@ -1,18 +1,18 @@
 ---
 id: emulation
-title: "Emulation"
+title: "Эмуляция"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-With Playwright you can test your app on any browser as well as emulate a real device such as a mobile phone or tablet. Simply configure the devices you would like to emulate and Playwright will simulate the browser behavior such as `"userAgent"`, `"screenSize"`, `"viewport"` and if it `"hasTouch"` enabled. You can also emulate the `"geolocation"`, `"locale"` and `"timezone"` for all tests or for a specific test as well as set the `"permissions"` to show notifications or change the `"colorScheme"`.
+С помощью Playwright вы можете тестировать ваше приложение в любом браузере, а также эмулировать реальное устройство, такое как мобильный телефон или планшет. Просто настройте устройства, которые вы хотите эмулировать, и Playwright будет симулировать поведение браузера, такое как `"userAgent"`, `"screenSize"`, `"viewport"` и наличие `"hasTouch"`. Вы также можете эмулировать `"geolocation"`, `"locale"` и `"timezone"` для всех тестов или для конкретного теста, а также установить `"permissions"` для показа уведомлений или изменить `"colorScheme"`.
 
-## Devices
+## Устройства
 
-Playwright comes with a [registry of device parameters](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json) using [Playwright.Devices](/api/class-playwright.mdx#playwright-devices) for selected desktop, tablet and mobile devices. It can be used to simulate browser behavior for a specific device such as user agent, screen size, viewport and if it has touch enabled. All tests will run with the specified device parameters.
+Playwright поставляется с [реестром параметров устройств](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json), используя [Playwright.Devices](/api/class-playwright.mdx#playwright-devices) для выбранных настольных, планшетных и мобильных устройств. Это можно использовать для симуляции поведения браузера для конкретного устройства, такого как user agent, размер экрана, viewport и наличие сенсорного ввода. Все тесты будут выполняться с указанными параметрами устройства.
 
 ```csharp
 using Microsoft.Playwright;
@@ -31,23 +31,23 @@ await using var context = await browser.NewContextAsync(iphone13);
 
 ## Viewport
 
-The viewport is included in the device but you can override it for some tests with [Page.SetViewportSizeAsync()](/api/class-page.mdx#page-set-viewport-size).
+Viewport включен в устройство, но вы можете переопределить его для некоторых тестов с помощью [Page.SetViewportSizeAsync()](/api/class-page.mdx#page-set-viewport-size).
 
-Test file:
+Файл теста:
 
-The same works inside a test file.
+То же самое работает внутри файла теста.
 
 ```csharp
-// Create context with given viewport
+// Создать контекст с заданным viewport
 await using var context = await browser.NewContextAsync(new()
 {
     ViewportSize = new ViewportSize() { Width = 1280, Height = 1024 }
 });
 
-// Resize viewport for individual page
+// Изменить размер viewport для отдельной страницы
 await page.SetViewportSizeAsync(1600, 1200);
 
-// Emulate high-DPI
+// Эмулировать высокое разрешение DPI
 await using var context = await browser.NewContextAsync(new()
 {
     ViewportSize = new ViewportSize() { Width = 2560, Height = 1440 },
@@ -57,7 +57,7 @@ await using var context = await browser.NewContextAsync(new()
 
 ## isMobile
 
-Whether the meta viewport tag is taken into account and touch events are enabled.
+Учитывается ли мета-тег viewport и включены ли сенсорные события.
 
 ```csharp
 await using var context = await browser.NewContextAsync(new()
@@ -66,9 +66,9 @@ await using var context = await browser.NewContextAsync(new()
 });
 ```
 
-## Locale & Timezone
+## Локаль и Часовой пояс
 
-Emulate the user Locale and Timezone which can be set globally for all tests in the config and then overridden for particular tests.
+Эмулируйте локаль и часовой пояс пользователя, которые могут быть установлены глобально для всех тестов в конфигурации и затем переопределены для конкретных тестов.
 
 ```csharp
 await using var context = await browser.NewContextAsync(new()
@@ -80,25 +80,25 @@ await using var context = await browser.NewContextAsync(new()
 
 <img width="1394" alt="Bing in german lang and timezone" src="https://user-images.githubusercontent.com/13063165/220416571-ccc96ab1-44bb-4579-8430-64502fc24a15.png" />
 
-## Permissions
+## Разрешения
 
-Allow app to show system notifications.
+Разрешите приложению показывать системные уведомления.
 
-Allow notifications for a specific domain.
+Разрешите уведомления для конкретного домена.
 
 ```csharp
 await context.GrantPermissionsAsync(new[] { "notifications" }, origin: "https://skype.com");
 ```
 
-Revoke all permissions with [BrowserContext.ClearPermissionsAsync()](/api/class-browsercontext.mdx#browser-context-clear-permissions).
+Отмените все разрешения с помощью [BrowserContext.ClearPermissionsAsync()](/api/class-browsercontext.mdx#browser-context-clear-permissions).
 
 ```csharp
 await context.ClearPermissionsAsync();
 ```
 
-## Geolocation
+## Геолокация
 
-Grant `"geolocation"` permissions and set geolocation to a specific area.
+Предоставьте разрешения `"geolocation"` и установите геолокацию для конкретной области.
 
 ```csharp
 await using var context = await browser.NewContextAsync(new()
@@ -110,38 +110,38 @@ await using var context = await browser.NewContextAsync(new()
 
 <img width="1394" alt="geolocation for italy on bing maps" src="https://user-images.githubusercontent.com/13063165/220417670-bb22d815-f5cd-47c4-8562-0b88165eac27.png" />
 
-Change the location later:
+Измените местоположение позже:
 
 ```csharp
 await context.SetGeolocationAsync(new Geolocation() { Longitude = 48.858455, Latitude = 2.294474 });
 ```
 
-**Note** you can only change geolocation for all pages in the context.
+**Примечание**: вы можете изменить геолокацию только для всех страниц в контексте.
 
-## Color Scheme and Media
+## Цветовая схема и Медиа
 
-Emulate the users `"colorScheme"`. Supported values are 'light' and 'dark'. You can also emulate the media type with [Page.EmulateMediaAsync()](/api/class-page.mdx#page-emulate-media).
+Эмулируйте `"colorScheme"` пользователя. Поддерживаемые значения: 'light' и 'dark'. Вы также можете эмулировать тип медиа с помощью [Page.EmulateMediaAsync()](/api/class-page.mdx#page-emulate-media).
 
 ```csharp
-// Create context with dark mode
+// Создать контекст с темным режимом
 await using var context = await browser.NewContextAsync(new()
 {
     ColorScheme = ColorScheme.Dark
 });
 
-// Create page with dark mode
+// Создать страницу с темным режимом
 var page = await browser.NewPageAsync(new()
 {
     ColorScheme = ColorScheme.Dark
 });
 
-// Change color scheme for the page
+// Изменить цветовую схему для страницы
 await page.EmulateMediaAsync(new()
 {
     ColorScheme = ColorScheme.Dark
 });
 
-// Change media for page
+// Изменить медиа для страницы
 await page.EmulateMediaAsync(new()
 {
     Media = Media.Print
@@ -152,28 +152,27 @@ await page.EmulateMediaAsync(new()
 
 ## User Agent
 
-The User Agent is included in the device and therefore you  will rarely need to change it however if you do need to test a different user agent you can override it with the `userAgent` property.
+User Agent включен в устройство, и поэтому вам редко потребуется его изменять, однако, если вам нужно протестировать другой user agent, вы можете переопределить его с помощью свойства `userAgent`.
 
 ```csharp
 var context = await browser.NewContextAsync(new() { UserAgent = "My User Agent" });
 ```
 
-## Offline
+## Офлайн
 
-Emulate the network being offline.
+Эмулируйте отключение сети.
 
 ```csharp
 var context = await browser.NewContextAsync(new() { Offline = true });
 ```
 
-## JavaScript Enabled
+## Включение JavaScript
 
-Emulate a user scenario where JavaScript is disabled.
+Эмулируйте сценарий пользователя, где JavaScript отключен.
 
 ```csharp
 var context = await browser.NewContextAsync(new() { JavaScriptEnabled = false });
 ```
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

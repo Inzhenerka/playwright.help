@@ -1,39 +1,39 @@
 ---
 id: ci
-title: "Continuous Integration"
+title: "Непрерывная интеграция"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright tests can be executed in CI environments. We have created sample configurations for common CI providers.
+Тесты Playwright могут выполняться в средах CI. Мы создали примеры конфигураций для распространенных провайдеров CI.
 
-3 steps to get your tests running on CI:
-1. **Ensure CI agent can run browsers**: Use [our Docker image](./docker.mdx) in Linux agents or install your dependencies using the [CLI](./browsers#install-system-dependencies).
-1. **Install Playwright**:
+3 шага для запуска ваших тестов на CI:
+1. **Убедитесь, что агент CI может запускать браузеры**: Используйте [наш Docker-образ](./docker.mdx) в Linux-агентах или установите ваши зависимости с помощью [CLI](./browsers#install-system-dependencies).
+1. **Установите Playwright**:
    
    ```bash
    dotnet build
    pwsh bin/Debug/netX/playwright.ps1 install --with-deps
    ```
    
-1. **Run your tests**:
+1. **Запустите ваши тесты**:
    
    ```bash
    dotnet test
    ```
    
-## CI configurations
+## Конфигурации CI
 
-The [Command line tools](./browsers#install-system-dependencies) can be used to install all operating system dependencies in CI.
+[Командные инструменты](./browsers#install-system-dependencies) могут быть использованы для установки всех зависимостей операционной системы в CI.
 
 ### GitHub Actions
 
-#### On push/pull_request
+#### При push/pull_request
 
-Tests will run on push or pull request on branches main/master. The [workflow](https://docs.github.com/en/actions/using-workflows/about-workflows) will install all dependencies, install Playwright and then run the tests.
+Тесты будут запускаться при push или pull request в ветках main/master. [Рабочий процесс](https://docs.github.com/en/actions/using-workflows/about-workflows) установит все зависимости, установит Playwright и затем запустит тесты.
 
 ```yml title=".github/workflows/playwright.yml"
 name: Playwright Tests
@@ -60,9 +60,9 @@ jobs:
       run: dotnet test
 ```
 
-#### Via Containers
+#### Через контейнеры
 
-GitHub Actions support [running jobs in a container](https://docs.github.com/en/actions/using-jobs/running-jobs-in-a-container) by using the [`jobs.<job_id>.container`](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idcontainer) option. This is useful to not pollute the host environment with dependencies and to have a consistent environment for e.g. screenshots/visual regression testing across different operating systems.
+GitHub Actions поддерживает [запуск задач в контейнере](https://docs.github.com/en/actions/using-jobs/running-jobs-in-a-container) с помощью опции [`jobs.<job_id>.container`](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idcontainer). Это полезно, чтобы не загрязнять среду хоста зависимостями и иметь консистентную среду, например, для тестирования скриншотов/визуальной регрессии на разных операционных системах.
 
 ```yml title=".github/workflows/playwright.yml"
 name: Playwright Tests
@@ -89,9 +89,9 @@ jobs:
         run: dotnet test
 ```
 
-#### On deployment
+#### При развертывании
 
-This will start the tests after a [GitHub Deployment](https://developer.github.com/v3/repos/deployments/) went into the `success` state. Services like Vercel use this pattern so you can run your end-to-end tests on their deployed environment.
+Это запустит тесты после того, как [развертывание GitHub](https://developer.github.com/v3/repos/deployments/) перейдет в состояние `success`. Сервисы, такие как Vercel, используют этот шаблон, чтобы вы могли запускать ваши end-to-end тесты в их развернутой среде.
 
 ```yml title=".github/workflows/playwright.yml"
 name: Playwright Tests
@@ -114,26 +114,26 @@ jobs:
     - name: Run tests
       run: dotnet test
       env:
-        # This might depend on your test-runner
+        # Это может зависеть от вашего тестового раннера
         PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
 ```
 
 ### Docker
 
-We have a [pre-built Docker image](./docker.mdx) which can either be used directly or as a reference to update your existing Docker definitions.
+У нас есть [предварительно собранный Docker-образ](./docker.mdx), который можно использовать напрямую или в качестве примера для обновления ваших существующих Docker-определений.
 
-Suggested configuration
-1. Using `--ipc=host` is also recommended when using Chromium. Without it Chromium can run out of memory and crash. Learn more about this option in [Docker docs](https://docs.docker.com/reference/cli/docker/container/run/#ipc).
-1. Seeing other weird errors when launching Chromium? Try running your container with `docker run --cap-add=SYS_ADMIN` when developing locally.
-1. Using `--init` Docker flag or [dumb-init](https://github.com/Yelp/dumb-init) is recommended to avoid special treatment for processes with PID=1. This is a common reason for zombie processes.
+Рекомендуемая конфигурация:
+1. Использование `--ipc=host` также рекомендуется при использовании Chromium. Без этого Chromium может исчерпать память и завершиться с ошибкой. Узнайте больше об этой опции в [документации Docker](https://docs.docker.com/reference/cli/docker/container/run/#ipc).
+1. Видите другие странные ошибки при запуске Chromium? Попробуйте запустить ваш контейнер с `docker run --cap-add=SYS_ADMIN` при локальной разработке.
+1. Использование флага Docker `--init` или [dumb-init](https://github.com/Yelp/dumb-init) рекомендуется, чтобы избежать специального обращения с процессами с PID=1. Это частая причина появления зомби-процессов.
 
 ### Azure Pipelines
 
-For Windows or macOS agents, no additional configuration is required, just install Playwright and run your tests.
+Для агентов Windows или macOS не требуется дополнительной конфигурации, просто установите Playwright и запустите ваши тесты.
 
-For Linux agents, you can use [our Docker container](./docker.mdx) with Azure Pipelines support [running containerized jobs](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/container-phases?view=azure-devops). Alternatively, you can use [Command line tools](./browsers#install-system-dependencies) to install all necessary dependencies.
+Для агентов Linux вы можете использовать [наш Docker-контейнер](./docker.mdx) с поддержкой Azure Pipelines [запуска контейнеризованных задач](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/container-phases?view=azure-devops). В качестве альтернативы вы можете использовать [командные инструменты](./browsers#install-system-dependencies) для установки всех необходимых зависимостей.
 
-For running the Playwright tests use this pipeline task:
+Для запуска тестов Playwright используйте эту задачу в конвейере:
 
 ```yml
 trigger:
@@ -156,7 +156,7 @@ steps:
   displayName: 'Run tests'
 ```
 
-#### Azure Pipelines (containerized)
+#### Azure Pipelines (контейнеризированный)
 
 ```yml
 trigger:
@@ -181,7 +181,7 @@ steps:
 
 ### CircleCI
 
-Running Playwright on CircleCI is very similar to running on GitHub Actions. In order to specify the pre-built Playwright [Docker image](./docker.mdx), simply modify the agent definition with `docker:` in your config like so:
+Запуск Playwright на CircleCI очень похож на запуск на GitHub Actions. Чтобы указать предварительно собранный Playwright [Docker-образ](./docker.mdx), просто измените определение агента с помощью `docker:` в вашей конфигурации следующим образом:
 
 ```yml
 executors:
@@ -190,11 +190,11 @@ executors:
       - image: mcr.microsoft.com/playwright/dotnet:v1.50.0-noble
 ```
 
-Note: When using the docker agent definition, you are specifying the resource class of where playwright runs to the 'medium' tier [here](https://circleci.com/docs/configuration-reference?#docker-execution-environment). The default behavior of Playwright is to set the number of workers to the detected core count (2 in the case of the medium tier). Overriding the number of workers to greater than this number will cause unnecessary timeouts and failures.
+Примечание: При использовании определения агента docker вы указываете класс ресурсов, где Playwright запускается на уровне 'medium' [здесь](https://circleci.com/docs/configuration-reference?#docker-execution-environment). Поведение Playwright по умолчанию - устанавливать количество рабочих процессов в соответствии с обнаруженным количеством ядер (2 в случае уровня medium). Переопределение количества рабочих процессов на большее значение приведет к ненужным тайм-аутам и сбоям.
 
 ### Jenkins
 
-Jenkins supports Docker agents for pipelines. Use the [Playwright Docker image](./docker.mdx) to run tests on Jenkins.
+Jenkins поддерживает Docker-агенты для конвейеров. Используйте [Docker-образ Playwright](./docker.mdx) для запуска тестов на Jenkins.
 
 ```groovy
 pipeline {
@@ -212,7 +212,7 @@ pipeline {
 
 ### Bitbucket Pipelines
 
-Bitbucket Pipelines can use public [Docker images as build environments](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). To run Playwright tests on Bitbucket, use our public Docker image ([see Dockerfile](./docker.mdx)).
+Bitbucket Pipelines может использовать публичные [Docker-образы как среды сборки](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). Чтобы запустить тесты Playwright на Bitbucket, используйте наш публичный Docker-образ ([см. Dockerfile](./docker.mdx)).
 
 ```yml
 image: mcr.microsoft.com/playwright/dotnet:v1.50.0-noble
@@ -220,27 +220,27 @@ image: mcr.microsoft.com/playwright/dotnet:v1.50.0-noble
 
 ### GitLab CI
 
-To run Playwright tests on GitLab, use our public Docker image ([see Dockerfile](./docker.mdx)).
+Чтобы запустить тесты Playwright на GitLab, используйте наш публичный Docker-образ ([см. Dockerfile](./docker.mdx)).
 
-## Caching browsers
+## Кэширование браузеров
 
-Caching browser binaries is not recommended, since the amount of time it takes to restore the cache is comparable to the time it takes to download the binaries. Especially under Linux, [operating system dependencies](./browsers.mdx#install-system-dependencies) need to be installed, which are not cacheable.
+Кэширование бинарных файлов браузеров не рекомендуется, так как время, необходимое для восстановления кэша, сопоставимо с временем, необходимым для загрузки бинарных файлов. Особенно в Linux, [зависимости операционной системы](./browsers.mdx#install-system-dependencies) должны быть установлены, которые не подлежат кэшированию.
 
-If you still want to cache the browser binaries between CI runs, cache [these directories](./browsers.mdx#managing-browser-binaries) in your CI configuration, against a hash of the Playwright version.
+Если вы все же хотите кэшировать бинарные файлы браузеров между запусками CI, кэшируйте [эти директории](./browsers.mdx#managing-browser-binaries) в вашей конфигурации CI, используя хэш версии Playwright.
 
-## Debugging browser launches
+## Отладка запусков браузера
 
-Playwright supports the `DEBUG` environment variable to output debug logs during execution. Setting it to `pw:browser` is helpful while debugging `Error: Failed to launch browser` errors.
+Playwright поддерживает переменную окружения `DEBUG` для вывода отладочных логов во время выполнения. Установка ее в `pw:browser` полезна при отладке ошибок `Error: Failed to launch browser`.
 
 ```bash
 DEBUG=pw:browser dotnet test
 ```
 
-## Running headed
+## Запуск с интерфейсом
 
-By default, Playwright launches browsers in headless mode. See in our [Running tests](./running-tests.mdx#run-tests-in-headed-mode) guide how to run tests in headed mode.
+По умолчанию Playwright запускает браузеры в безголовом режиме. Смотрите в нашем руководстве [Запуск тестов](./running-tests.mdx#run-tests-in-headed-mode), как запускать тесты с интерфейсом.
 
-On Linux agents, headed execution requires [Xvfb](https://en.wikipedia.org/wiki/Xvfb) to be installed. Our [Docker image](./docker.mdx) and GitHub Action have Xvfb pre-installed. To run browsers in headed mode with Xvfb, add `xvfb-run` before the actual command.
+На Linux-агентах выполнение с интерфейсом требует установки [Xvfb](https://en.wikipedia.org/wiki/Xvfb). Наш [Docker-образ](./docker.mdx) и GitHub Action имеют предустановленный Xvfb. Чтобы запустить браузеры в режиме с интерфейсом с Xvfb, добавьте `xvfb-run` перед фактической командой.
 
 ```bash
 xvfb-run dotnet test

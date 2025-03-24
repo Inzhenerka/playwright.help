@@ -6,43 +6,41 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+BrowserContexts предоставляют способ работы с несколькими независимыми сессиями браузера.
 
-BrowserContexts provide a way to operate multiple independent browser sessions.
+Если страница открывает другую страницу, например, с помощью вызова `window.open`, всплывающее окно будет принадлежать контексту браузера родительской страницы.
 
-If a page opens another page, e.g. with a `window.open` call, the popup will belong to the parent page's browser context.
-
-Playwright allows creating isolated non-persistent browser contexts with [Browser.NewContextAsync()](/api/class-browser.mdx#browser-new-context) method. Non-persistent browser contexts don't write any browsing data to disk.
+Playwright позволяет создавать изолированные непостоянные контексты браузера с помощью метода [Browser.NewContextAsync()](/api/class-browser.mdx#browser-new-context). Непостоянные контексты браузера не записывают данные о просмотре на диск.
 
 ```csharp
 using var playwright = await Playwright.CreateAsync();
 var browser = await playwright.Firefox.LaunchAsync(new() { Headless = false });
-// Create a new incognito browser context
+// Создать новый инкогнито-контекст браузера
 var context = await browser.NewContextAsync();
-// Create a new page inside context.
+// Создать новую страницу внутри контекста.
 var page = await context.NewPageAsync();
 await page.GotoAsync("https://bing.com");
-// Dispose context once it is no longer needed.
+// Закрыть контекст, когда он больше не нужен.
 await context.CloseAsync();
 ```
 
-
 ---
 
-## Methods
+## Методы
 
 ### AddCookiesAsync {#browser-context-add-cookies}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.AddCookiesAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.AddCookiesAsync</x-search>
 
-Adds cookies into this browser context. All pages within this context will have these cookies installed. Cookies can be obtained via [BrowserContext.CookiesAsync()](/api/class-browsercontext.mdx#browser-context-cookies).
+Добавляет куки в этот контекст браузера. Все страницы в этом контексте будут иметь установленные куки. Куки можно получить с помощью [BrowserContext.CookiesAsync()](/api/class-browsercontext.mdx#browser-context-cookies).
 
-**Usage**
+**Использование**
 
 ```csharp
 await context.AddCookiesAsync(new[] { cookie1, cookie2 });
 ```
 
-**Arguments**
+**Аргументы**
 - `cookies` [IEnumerable]&lt;`Cookie`&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-add-cookies-option-cookies"/><a href="#browser-context-add-cookies-option-cookies" class="list-anchor">#</a>
   - `Name` [string]
     
@@ -50,46 +48,46 @@ await context.AddCookiesAsync(new[] { cookie1, cookie2 });
   - `Value` [string]
     
     
-  - `Url` [string]? *(optional)*
+  - `Url` [string]? *(опционально)*
     
-    Either url or domain / path are required. Optional.
-  - `Domain` [string]? *(optional)*
+    Либо url, либо домен/путь обязательны. Опционально.
+  - `Domain` [string]? *(опционально)*
     
-    For the cookie to apply to all subdomains as well, prefix domain with a dot, like this: ".example.com". Either url or domain / path are required. Optional.
-  - `Path` [string]? *(optional)*
+    Чтобы куки применялись ко всем поддоменам, добавьте точку перед доменом, например: ".example.com". Либо url, либо домен/путь обязательны. Опционально.
+  - `Path` [string]? *(опционально)*
     
-    Either url or domain / path are required Optional.
-  - `Expires` [float]? *(optional)*
+    Либо url, либо домен/путь обязательны. Опционально.
+  - `Expires` [float]? *(опционально)*
     
-    Unix time in seconds. Optional.
-  - `HttpOnly` [bool]? *(optional)*
+    Время Unix в секундах. Опционально.
+  - `HttpOnly` [bool]? *(опционально)*
     
-    Optional.
-  - `Secure` [bool]? *(optional)*
+    Опционально.
+  - `Secure` [bool]? *(опционально)*
     
-    Optional.
-  - `SameSite` `enum SameSiteAttribute { Strict, Lax, None }?` *(optional)*
+    Опционально.
+  - `SameSite` `enum SameSiteAttribute { Strict, Lax, None }?` *(опционально)*
     
-    Optional.
+    Опционально.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-add-cookies-return"/><a href="#browser-context-add-cookies-return" class="list-anchor">#</a>
 
 ---
 
 ### AddInitScriptAsync {#browser-context-add-init-script}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.AddInitScriptAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.AddInitScriptAsync</x-search>
 
-Adds a script which would be evaluated in one of the following scenarios:
-* Whenever a page is created in the browser context or is navigated.
-* Whenever a child frame is attached or navigated in any page in the browser context. In this case, the script is evaluated in the context of the newly attached frame.
+Добавляет скрипт, который будет выполнен в одном из следующих сценариев:
+* Всякий раз, когда страница создается в контексте браузера или происходит навигация.
+* Всякий раз, когда дочерний фрейм прикрепляется или происходит навигация в любом фрейме в контексте браузера. В этом случае скрипт выполняется в контексте вновь прикрепленного фрейма.
 
-The script is evaluated after the document was created but before any of its scripts were run. This is useful to amend the JavaScript environment, e.g. to seed `Math.random`.
+Скрипт выполняется после создания документа, но до выполнения любых его скриптов. Это полезно для изменения среды JavaScript, например, для задания начального значения `Math.random`.
 
-**Usage**
+**Использование**
 
-An example of overriding `Math.random` before the page loads:
+Пример переопределения `Math.random` перед загрузкой страницы:
 
 ```js
 // preload.js
@@ -101,65 +99,65 @@ await Context.AddInitScriptAsync(scriptPath: "preload.js");
 ```
 
 :::note
-The order of evaluation of multiple scripts installed via [BrowserContext.AddInitScriptAsync()](/api/class-browsercontext.mdx#browser-context-add-init-script) and [Page.AddInitScriptAsync()](/api/class-page.mdx#page-add-init-script) is not defined.
+Порядок выполнения нескольких скриптов, установленных через [BrowserContext.AddInitScriptAsync()](/api/class-browsercontext.mdx#browser-context-add-init-script) и [Page.AddInitScriptAsync()](/api/class-page.mdx#page-add-init-script), не определен.
 :::
 
-**Arguments**
+**Аргументы**
 - `script` [string] | [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-add-init-script-option-script"/><a href="#browser-context-add-init-script-option-script" class="list-anchor">#</a>
   
-  Script to be evaluated in all pages in the browser context.
+  Скрипт, который будет выполнен на всех страницах в контексте браузера.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-add-init-script-return"/><a href="#browser-context-add-init-script-return" class="list-anchor">#</a>
 
 ---
 
 ### BackgroundPages {#browser-context-background-pages}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.BackgroundPages</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.11</font><x-search>browserContext.BackgroundPages</x-search>
 
 :::note
 
-Background pages are only supported on Chromium-based browsers.
+Фоновые страницы поддерживаются только в браузерах на основе Chromium.
 :::
 
-All existing background pages in the context.
+Все существующие фоновые страницы в контексте.
 
-**Usage**
+**Использование**
 
 ```csharp
 BrowserContext.BackgroundPages
 ```
 
-**Returns**
+**Возвращает**
 - [IEnumerable]&lt;[Page]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-background-pages-return"/><a href="#browser-context-background-pages-return" class="list-anchor">#</a>
 
 ---
 
 ### Browser {#browser-context-browser}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.Browser</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.Browser</x-search>
 
-Returns the browser instance of the context. If it was launched as a persistent context null gets returned.
+Возвращает экземпляр браузера контекста. Если он был запущен как постоянный контекст, возвращается null.
 
-**Usage**
+**Использование**
 
 ```csharp
 BrowserContext.Browser
 ```
 
-**Returns**
+**Возвращает**
 - [Browser]?<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-browser-return"/><a href="#browser-context-browser-return" class="list-anchor">#</a>
 
 ---
 
 ### ClearCookiesAsync {#browser-context-clear-cookies}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.ClearCookiesAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.ClearCookiesAsync</x-search>
 
-Removes cookies from context. Accepts optional filter.
+Удаляет куки из контекста. Принимает необязательный фильтр.
 
-**Usage**
+**Использование**
 
 ```csharp
 await context.ClearCookiesAsync();
@@ -169,91 +167,91 @@ await context.ClearCookiesAsync(new() { Path = "/api/v1" });
 await context.ClearCookiesAsync(new() { Name = "session-id", Domain = "my-origin.com" });
 ```
 
-**Arguments**
-- `options` `BrowserContextClearCookiesOptions?` *(optional)*
-  - `Domain|DomainRegex` [string]? | [Regex]? *(optional)* <font size="2">Added in: v1.43</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-cookies-option-domain"/><a href="#browser-context-clear-cookies-option-domain" class="list-anchor">#</a>
+**Аргументы**
+- `options` `BrowserContextClearCookiesOptions?` *(опционально)*
+  - `Domain|DomainRegex` [string]? | [Regex]? *(опционально)* <font size="2">Добавлено в: v1.43</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-cookies-option-domain"/><a href="#browser-context-clear-cookies-option-domain" class="list-anchor">#</a>
     
-    Only removes cookies with the given domain.
-  - `Name|NameRegex` [string]? | [Regex]? *(optional)* <font size="2">Added in: v1.43</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-cookies-option-name"/><a href="#browser-context-clear-cookies-option-name" class="list-anchor">#</a>
+    Удаляет только куки с указанным доменом.
+  - `Name|NameRegex` [string]? | [Regex]? *(опционально)* <font size="2">Добавлено в: v1.43</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-cookies-option-name"/><a href="#browser-context-clear-cookies-option-name" class="list-anchor">#</a>
     
-    Only removes cookies with the given name.
-  - `Path|PathRegex` [string]? | [Regex]? *(optional)* <font size="2">Added in: v1.43</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-cookies-option-path"/><a href="#browser-context-clear-cookies-option-path" class="list-anchor">#</a>
+    Удаляет только куки с указанным именем.
+  - `Path|PathRegex` [string]? | [Regex]? *(опционально)* <font size="2">Добавлено в: v1.43</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-cookies-option-path"/><a href="#browser-context-clear-cookies-option-path" class="list-anchor">#</a>
     
-    Only removes cookies with the given path.
+    Удаляет только куки с указанным путем.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-cookies-return"/><a href="#browser-context-clear-cookies-return" class="list-anchor">#</a>
 
 ---
 
 ### ClearPermissionsAsync {#browser-context-clear-permissions}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.ClearPermissionsAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.ClearPermissionsAsync</x-search>
 
-Clears all permission overrides for the browser context.
+Очищает все переопределения разрешений для контекста браузера.
 
-**Usage**
+**Использование**
 
 ```csharp
 var context = await browser.NewContextAsync();
 await context.GrantPermissionsAsync(new[] { "clipboard-read" });
-// Alternatively, you can use the helper class ContextPermissions
-//  to specify the permissions...
-// do stuff ...
+// В качестве альтернативы, вы можете использовать вспомогательный класс ContextPermissions
+// для указания разрешений...
+// выполняйте действия ...
 await context.ClearPermissionsAsync();
 ```
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-permissions-return"/><a href="#browser-context-clear-permissions-return" class="list-anchor">#</a>
 
 ---
 
 ### CloseAsync {#browser-context-close}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.CloseAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.CloseAsync</x-search>
 
-Closes the browser context. All the pages that belong to the browser context will be closed.
+Закрывает контекст браузера. Все страницы, принадлежащие контексту браузера, будут закрыты.
 
 :::note
 
-The default browser context cannot be closed.
+Контекст браузера по умолчанию не может быть закрыт.
 :::
 
-**Usage**
+**Использование**
 
 ```csharp
 await BrowserContext.CloseAsync(options);
 ```
 
-**Arguments**
-- `options` `BrowserContextCloseOptions?` *(optional)*
-  - `Reason` [string]? *(optional)* <font size="2">Added in: v1.40</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-close-option-reason"/><a href="#browser-context-close-option-reason" class="list-anchor">#</a>
+**Аргументы**
+- `options` `BrowserContextCloseOptions?` *(опционально)*
+  - `Reason` [string]? *(опционально)* <font size="2">Добавлено в: v1.40</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-close-option-reason"/><a href="#browser-context-close-option-reason" class="list-anchor">#</a>
     
-    The reason to be reported to the operations interrupted by the context closure.
+    Причина, которая будет сообщена операциям, прерванным закрытием контекста.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-close-return"/><a href="#browser-context-close-return" class="list-anchor">#</a>
 
 ---
 
 ### CookiesAsync {#browser-context-cookies}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.CookiesAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.CookiesAsync</x-search>
 
-If no URLs are specified, this method returns all cookies. If URLs are specified, only cookies that affect those URLs are returned.
+Если URL-адреса не указаны, этот метод возвращает все куки. Если URL-адреса указаны, возвращаются только куки, которые влияют на эти URL-адреса.
 
-**Usage**
+**Использование**
 
 ```csharp
 await BrowserContext.CookiesAsync(urls);
 ```
 
-**Arguments**
-- `urls` [string]? | [IEnumerable]?&lt;[string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-cookies-option-urls"/><a href="#browser-context-cookies-option-urls" class="list-anchor">#</a>
+**Аргументы**
+- `urls` [string]? | [IEnumerable]?&lt;[string]&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-cookies-option-urls"/><a href="#browser-context-cookies-option-urls" class="list-anchor">#</a>
   
-  Optional list of URLs.
+  Необязательный список URL-адресов.
 
-**Returns**
+**Возвращает**
 - [IEnumerable]&lt;`Cookie`&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-cookies-return"/><a href="#browser-context-cookies-return" class="list-anchor">#</a>
   - `name` [string]
     
@@ -269,7 +267,7 @@ await BrowserContext.CookiesAsync(urls);
     
   - `expires` [float]
     
-    Unix time in seconds.
+    Время Unix в секундах.
   - `httpOnly` [bool]
     
     
@@ -283,17 +281,17 @@ await BrowserContext.CookiesAsync(urls);
 
 ### ExposeBindingAsync {#browser-context-expose-binding}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.ExposeBindingAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.ExposeBindingAsync</x-search>
 
-The method adds a function called [name](/api/class-browsercontext.mdx#browser-context-expose-binding-option-name) on the `window` object of every frame in every page in the context. When called, the function executes [callback](/api/class-browsercontext.mdx#browser-context-expose-binding-option-callback) and returns a [Promise] which resolves to the return value of [callback](/api/class-browsercontext.mdx#browser-context-expose-binding-option-callback). If the [callback](/api/class-browsercontext.mdx#browser-context-expose-binding-option-callback) returns a [Promise], it will be awaited.
+Метод добавляет функцию с именем [name](/api/class-browsercontext.mdx#browser-context-expose-binding-option-name) в объект `window` каждого фрейма на каждой странице в контексте. При вызове функция выполняет [callback](/api/class-browsercontext.mdx#browser-context-expose-binding-option-callback) и возвращает [Promise], который разрешается в возвращаемое значение [callback](/api/class-browsercontext.mdx#browser-context-expose-binding-option-callback). Если [callback](/api/class-browsercontext.mdx#browser-context-expose-binding-option-callback) возвращает [Promise], он будет ожидаться.
 
-The first argument of the [callback](/api/class-browsercontext.mdx#browser-context-expose-binding-option-callback) function contains information about the caller: `{ browserContext: BrowserContext, page: Page, frame: Frame }`.
+Первый аргумент функции [callback](/api/class-browsercontext.mdx#browser-context-expose-binding-option-callback) содержит информацию о вызывающем: `{ browserContext: BrowserContext, page: Page, frame: Frame }`.
 
-See [Page.ExposeBindingAsync()](/api/class-page.mdx#page-expose-binding) for page-only version.
+См. [Page.ExposeBindingAsync()](/api/class-page.mdx#page-expose-binding) для версии только для страницы.
 
-**Usage**
+**Использование**
 
-An example of exposing page URL to all frames in all pages in the context:
+Пример предоставления URL страницы всем фреймам на всех страницах в контексте:
 
 ```csharp
 using Microsoft.Playwright;
@@ -314,41 +312,41 @@ await page.SetContentAsync("<script>\n" +
 await page.GetByRole(AriaRole.Button).ClickAsync();
 ```
 
-**Arguments**
+**Аргументы**
 - `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-binding-option-name"/><a href="#browser-context-expose-binding-option-name" class="list-anchor">#</a>
   
-  Name of the function on the window object.
+  Имя функции в объекте window.
 - `callback` [Action]&lt;BindingSource, T, [TResult]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-binding-option-callback"/><a href="#browser-context-expose-binding-option-callback" class="list-anchor">#</a>
   
-  Callback function that will be called in the Playwright's context.
-- `options` `BrowserContextExposeBindingOptions?` *(optional)*
-  - `Handle` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-binding-option-handle"/><a href="#browser-context-expose-binding-option-handle" class="list-anchor">#</a>
+  Функция обратного вызова, которая будет вызвана в контексте Playwright.
+- `options` `BrowserContextExposeBindingOptions?` *(опционально)*
+  - `Handle` [bool]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-binding-option-handle"/><a href="#browser-context-expose-binding-option-handle" class="list-anchor">#</a>
     
-    :::warning[Deprecated]
-    This option will be removed in the future.
+    :::warning[Устарело]
+    Эта опция будет удалена в будущем.
     :::
     
     
-    Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is supported. When passing by value, multiple arguments are supported.
+    Передавать аргумент как handle, вместо передачи по значению. При передаче handle поддерживается только один аргумент. При передаче по значению поддерживается несколько аргументов.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-binding-return"/><a href="#browser-context-expose-binding-return" class="list-anchor">#</a>
 
 ---
 
 ### ExposeFunctionAsync {#browser-context-expose-function}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.ExposeFunctionAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.ExposeFunctionAsync</x-search>
 
-The method adds a function called [name](/api/class-browsercontext.mdx#browser-context-expose-function-option-name) on the `window` object of every frame in every page in the context. When called, the function executes [callback](/api/class-browsercontext.mdx#browser-context-expose-function-option-callback) and returns a [Promise] which resolves to the return value of [callback](/api/class-browsercontext.mdx#browser-context-expose-function-option-callback).
+Метод добавляет функцию с именем [name](/api/class-browsercontext.mdx#browser-context-expose-function-option-name) в объект `window` каждого фрейма на каждой странице в контексте. При вызове функция выполняет [callback](/api/class-browsercontext.mdx#browser-context-expose-function-option-callback) и возвращает [Promise], который разрешается в возвращаемое значение [callback](/api/class-browsercontext.mdx#browser-context-expose-function-option-callback).
 
-If the [callback](/api/class-browsercontext.mdx#browser-context-expose-function-option-callback) returns a [Promise], it will be awaited.
+Если [callback](/api/class-browsercontext.mdx#browser-context-expose-function-option-callback) возвращает [Promise], он будет ожидаться.
 
-See [Page.ExposeFunctionAsync()](/api/class-page.mdx#page-expose-function) for page-only version.
+См. [Page.ExposeFunctionAsync()](/api/class-page.mdx#page-expose-function) для версии только для страницы.
 
-**Usage**
+**Использование**
 
-An example of adding a `sha256` function to all pages in the context:
+Пример добавления функции `sha256` на все страницы в контексте:
 
 ```csharp
 using Microsoft.Playwright;
@@ -385,42 +383,42 @@ class BrowserContextExamples
 }
 ```
 
-**Arguments**
+**Аргументы**
 - `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-function-option-name"/><a href="#browser-context-expose-function-option-name" class="list-anchor">#</a>
   
-  Name of the function on the window object.
+  Имя функции в объекте window.
 - `callback` [Action]&lt;T, [TResult]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-function-option-callback"/><a href="#browser-context-expose-function-option-callback" class="list-anchor">#</a>
   
-  Callback function that will be called in the Playwright's context.
+  Функция обратного вызова, которая будет вызвана в контексте Playwright.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-function-return"/><a href="#browser-context-expose-function-return" class="list-anchor">#</a>
 
 ---
 
 ### GrantPermissionsAsync {#browser-context-grant-permissions}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.GrantPermissionsAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.GrantPermissionsAsync</x-search>
 
-Grants specified permissions to the browser context. Only grants corresponding permissions to the given origin if specified.
+Предоставляет указанные разрешения для контекста браузера. Предоставляет соответствующие разрешения только для указанного источника, если он указан.
 
-**Usage**
+**Использование**
 
 ```csharp
 await BrowserContext.GrantPermissionsAsync(permissions, options);
 ```
 
-**Arguments**
+**Аргументы**
 - `permissions` [IEnumerable]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-grant-permissions-option-permissions"/><a href="#browser-context-grant-permissions-option-permissions" class="list-anchor">#</a>
   
-  A list of permissions to grant.
+  Список разрешений для предоставления.
   
   :::danger
   
-  Supported permissions differ between browsers, and even between different versions of the same browser. Any permission may stop working after an update.
+  Поддерживаемые разрешения различаются между браузерами и даже между разными версиями одного и того же браузера. Любое разрешение может перестать работать после обновления.
   :::
   
-  Here are some permissions that may be supported by some browsers:
+  Вот некоторые разрешения, которые могут поддерживаться некоторыми браузерами:
   * `'accelerometer'`
   * `'ambient-light-sensor'`
   * `'background-sync'`
@@ -431,96 +429,96 @@ await BrowserContext.GrantPermissionsAsync(permissions, options);
   * `'gyroscope'`
   * `'magnetometer'`
   * `'microphone'`
-  * `'midi-sysex'` (system-exclusive midi)
+  * `'midi-sysex'` (системно-эксклюзивный midi)
   * `'midi'`
   * `'notifications'`
   * `'payment-handler'`
   * `'storage-access'`
-- `options` `BrowserContextGrantPermissionsOptions?` *(optional)*
-  - `Origin` [string]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-grant-permissions-option-origin"/><a href="#browser-context-grant-permissions-option-origin" class="list-anchor">#</a>
+- `options` `BrowserContextGrantPermissionsOptions?` *(опционально)*
+  - `Origin` [string]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-grant-permissions-option-origin"/><a href="#browser-context-grant-permissions-option-origin" class="list-anchor">#</a>
     
-    The [origin] to grant permissions to, e.g. "https://example.com".
+    [Источник], для которого предоставляются разрешения, например, "https://example.com".
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-grant-permissions-return"/><a href="#browser-context-grant-permissions-return" class="list-anchor">#</a>
 
 ---
 
 ### NewCDPSessionAsync {#browser-context-new-cdp-session}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.NewCDPSessionAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.11</font><x-search>browserContext.NewCDPSessionAsync</x-search>
 
 :::note
 
-CDP sessions are only supported on Chromium-based browsers.
+Сессии CDP поддерживаются только в браузерах на основе Chromium.
 :::
 
-Returns the newly created session.
+Возвращает вновь созданную сессию.
 
-**Usage**
+**Использование**
 
 ```csharp
 await BrowserContext.NewCDPSessionAsync(page);
 ```
 
-**Arguments**
+**Аргументы**
 - `page` [Page] | [Frame]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-new-cdp-session-option-page"/><a href="#browser-context-new-cdp-session-option-page" class="list-anchor">#</a>
   
-  Target to create new session for. For backwards-compatibility, this parameter is named `page`, but it can be a `Page` or `Frame` type.
+  Цель для создания новой сессии. Для обратной совместимости этот параметр называется `page`, но он может быть типа `Page` или `Frame`.
 
-**Returns**
+**Возвращает**
 - [CDPSession]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-new-cdp-session-return"/><a href="#browser-context-new-cdp-session-return" class="list-anchor">#</a>
 
 ---
 
 ### NewPageAsync {#browser-context-new-page}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.NewPageAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.NewPageAsync</x-search>
 
-Creates a new page in the browser context.
+Создает новую страницу в контексте браузера.
 
-**Usage**
+**Использование**
 
 ```csharp
 await BrowserContext.NewPageAsync();
 ```
 
-**Returns**
+**Возвращает**
 - [Page]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-new-page-return"/><a href="#browser-context-new-page-return" class="list-anchor">#</a>
 
 ---
 
 ### Pages {#browser-context-pages}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.Pages</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.Pages</x-search>
 
-Returns all open pages in the context.
+Возвращает все открытые страницы в контексте.
 
-**Usage**
+**Использование**
 
 ```csharp
 BrowserContext.Pages
 ```
 
-**Returns**
+**Возвращает**
 - [IEnumerable]&lt;[Page]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-pages-return"/><a href="#browser-context-pages-return" class="list-anchor">#</a>
 
 ---
 
 ### RouteAsync {#browser-context-route}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.RouteAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.RouteAsync</x-search>
 
-Routing provides the capability to modify network requests that are made by any page in the browser context. Once route is enabled, every request matching the url pattern will stall unless it's continued, fulfilled or aborted.
+Маршрутизация предоставляет возможность изменять сетевые запросы, которые выполняются любой страницей в контексте браузера. Как только маршрут включен, каждый запрос, соответствующий шаблону URL, будет приостановлен, если он не будет продолжен, выполнен или прерван.
 
 :::note
 
-[BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting [ServiceWorkers](/api/class-browser.mdx#browser-new-context-option-service-workers) to `'block'`.
+[BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) не будет перехватывать запросы, перехваченные Service Worker. См. [эту](https://github.com/microsoft/playwright/issues/1090) проблему. Мы рекомендуем отключать Service Workers при использовании перехвата запросов, установив [ServiceWorkers](/api/class-browser.mdx#browser-new-context-option-service-workers) в `'block'`.
 :::
 
-**Usage**
+**Использование**
 
-An example of a naive handler that aborts all image requests:
+Пример простого обработчика, который прерывает все запросы изображений:
 
 ```csharp
 var context = await browser.NewContextAsync();
@@ -530,7 +528,7 @@ await page.GotoAsync("https://theverge.com");
 await browser.CloseAsync();
 ```
 
-or the same snippet using a regex pattern instead:
+или тот же фрагмент с использованием шаблона регулярного выражения:
 
 ```csharp
 var context = await browser.NewContextAsync();
@@ -540,7 +538,7 @@ await page.GotoAsync("https://theverge.com");
 await browser.CloseAsync();
 ```
 
-It is possible to examine the request to decide the route action. For example, mocking all requests that contain some post data, and leaving all other requests as is:
+Возможно исследовать запрос, чтобы решить, какое действие маршрута предпринять. Например, имитация всех запросов, содержащих некоторые данные POST, и оставление всех остальных запросов без изменений:
 
 ```csharp
 await page.RouteAsync("/api/**", async r =>
@@ -552,85 +550,85 @@ await page.RouteAsync("/api/**", async r =>
 });
 ```
 
-Page routes (set up with [Page.RouteAsync()](/api/class-page.mdx#page-route)) take precedence over browser context routes when request matches both handlers.
+Маршруты страниц (установленные с помощью [Page.RouteAsync()](/api/class-page.mdx#page-route)) имеют приоритет над маршрутами контекста браузера, когда запрос соответствует обоим обработчикам.
 
-To remove a route with its handler you can use [BrowserContext.UnrouteAsync()](/api/class-browsercontext.mdx#browser-context-unroute).
+Чтобы удалить маршрут с его обработчиком, вы можете использовать [BrowserContext.UnrouteAsync()](/api/class-browsercontext.mdx#browser-context-unroute).
 
 :::note
 
-Enabling routing disables http cache.
+Включение маршрутизации отключает http-кэш.
 :::
 
-**Arguments**
+**Аргументы**
 - `url` [string] | [Regex] | [Func]&lt;[string], bool&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-option-url"/><a href="#browser-context-route-option-url" class="list-anchor">#</a>
   
-  A glob pattern, regex pattern or predicate receiving [URL] to match while routing. When a [BaseURL](/api/class-browser.mdx#browser-new-context-option-base-url) via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.
+  Шаблон глоба, шаблон регулярного выражения или предикат, получающий [URL] для сопоставления при маршрутизации. Когда [BaseURL](/api/class-browser.mdx#browser-new-context-option-base-url) через параметры контекста был предоставлен и переданный URL является путем, он объединяется через [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) конструктор.
 - `handler` [Action]&lt;[Route]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-option-handler"/><a href="#browser-context-route-option-handler" class="list-anchor">#</a>
   
-  handler function to route the request.
-- `options` `BrowserContextRouteOptions?` *(optional)*
-  - `Times` [int]? *(optional)* <font size="2">Added in: v1.15</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-option-times"/><a href="#browser-context-route-option-times" class="list-anchor">#</a>
+  Функция обработчика для маршрутизации запроса.
+- `options` `BrowserContextRouteOptions?` *(опционально)*
+  - `Times` [int]? *(опционально)* <font size="2">Добавлено в: v1.15</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-option-times"/><a href="#browser-context-route-option-times" class="list-anchor">#</a>
     
-    How often a route should be used. By default it will be used every time.
+    Сколько раз маршрут должен использоваться. По умолчанию он будет использоваться каждый раз.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-return"/><a href="#browser-context-route-return" class="list-anchor">#</a>
 
 ---
 
 ### RouteFromHARAsync {#browser-context-route-from-har}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.23</font><x-search>browserContext.RouteFromHARAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.23</font><x-search>browserContext.RouteFromHARAsync</x-search>
 
-If specified the network requests that are made in the context will be served from the HAR file. Read more about [Replaying from HAR](../mock.mdx#replaying-from-har).
+Если указано, сетевые запросы, сделанные в контексте, будут обслуживаться из HAR-файла. Подробнее читайте в разделе [Воспроизведение из HAR](../mock.mdx#replaying-from-har).
 
-Playwright will not serve requests intercepted by Service Worker from the HAR file. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting [ServiceWorkers](/api/class-browser.mdx#browser-new-context-option-service-workers) to `'block'`.
+Playwright не будет обслуживать запросы, перехваченные Service Worker, из HAR-файла. См. [эту](https://github.com/microsoft/playwright/issues/1090) проблему. Мы рекомендуем отключать Service Workers при использовании перехвата запросов, установив [ServiceWorkers](/api/class-browser.mdx#browser-new-context-option-service-workers) в `'block'`.
 
-**Usage**
+**Использование**
 
 ```csharp
 await BrowserContext.RouteFromHARAsync(har, options);
 ```
 
-**Arguments**
+**Аргументы**
 - `har` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-har"/><a href="#browser-context-route-from-har-option-har" class="list-anchor">#</a>
   
-  Path to a [HAR](http://www.softwareishard.com/blog/har-12-spec) file with prerecorded network data. If `path` is a relative path, then it is resolved relative to the current working directory.
-- `options` `BrowserContextRouteFromHAROptions?` *(optional)*
-  - `NotFound` `enum HarNotFound { Abort, Fallback }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-not-found"/><a href="#browser-context-route-from-har-option-not-found" class="list-anchor">#</a>
-    * If set to 'abort' any request not found in the HAR file will be aborted.
-    * If set to 'fallback' falls through to the next route handler in the handler chain.
+  Путь к [HAR](http://www.softwareishard.com/blog/har-12-spec) файлу с предварительно записанными сетевыми данными. Если `path` является относительным путем, то он разрешается относительно текущей рабочей директории.
+- `options` `BrowserContextRouteFromHAROptions?` *(опционально)*
+  - `NotFound` `enum HarNotFound { Abort, Fallback }?` *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-not-found"/><a href="#browser-context-route-from-har-option-not-found" class="list-anchor">#</a>
+    * Если установлено значение 'abort', любой запрос, не найденный в HAR-файле, будет прерван.
+    * Если установлено значение 'fallback', переходит к следующему обработчику маршрута в цепочке обработчиков.
     
-    Defaults to abort.
-  - `Update` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-update"/><a href="#browser-context-route-from-har-option-update" class="list-anchor">#</a>
+    По умолчанию прерывается.
+  - `Update` [bool]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-update"/><a href="#browser-context-route-from-har-option-update" class="list-anchor">#</a>
     
-    If specified, updates the given HAR with the actual network information instead of serving from file. The file is written to disk when [BrowserContext.CloseAsync()](/api/class-browsercontext.mdx#browser-context-close) is called.
-  - `UpdateContent` `enum RouteFromHarUpdateContentPolicy { Embed, Attach }?` *(optional)* <font size="2">Added in: v1.32</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-update-content"/><a href="#browser-context-route-from-har-option-update-content" class="list-anchor">#</a>
+    Если указано, обновляет данный HAR с фактической сетевой информацией вместо обслуживания из файла. Файл записывается на диск, когда вызывается [BrowserContext.CloseAsync()](/api/class-browsercontext.mdx#browser-context-close).
+  - `UpdateContent` `enum RouteFromHarUpdateContentPolicy { Embed, Attach }?` *(опционально)* <font size="2">Добавлено в: v1.32</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-update-content"/><a href="#browser-context-route-from-har-option-update-content" class="list-anchor">#</a>
     
-    Optional setting to control resource content management. If `attach` is specified, resources are persisted as separate files or entries in the ZIP archive. If `embed` is specified, content is stored inline the HAR file.
-  - `UpdateMode` `enum HarMode { Full, Minimal }?` *(optional)* <font size="2">Added in: v1.32</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-update-mode"/><a href="#browser-context-route-from-har-option-update-mode" class="list-anchor">#</a>
+    Опциональная настройка для управления содержимым ресурсов. Если указано `attach`, ресурсы сохраняются как отдельные файлы или записи в ZIP-архиве. Если указано `embed`, содержимое хранится встроенным в HAR-файл.
+  - `UpdateMode` `enum HarMode { Full, Minimal }?` *(опционально)* <font size="2">Добавлено в: v1.32</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-update-mode"/><a href="#browser-context-route-from-har-option-update-mode" class="list-anchor">#</a>
     
-    When set to `minimal`, only record information necessary for routing from HAR. This omits sizes, timing, page, cookies, security and other types of HAR information that are not used when replaying from HAR. Defaults to `minimal`.
-  - `Url|UrlRegex` [string]? | [Regex]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-url"/><a href="#browser-context-route-from-har-option-url" class="list-anchor">#</a>
+    Когда установлено значение `minimal`, записывается только информация, необходимая для маршрутизации из HAR. Это исключает размеры, время, страницу, куки, безопасность и другие типы информации HAR, которые не используются при воспроизведении из HAR. По умолчанию `minimal`.
+  - `Url|UrlRegex` [string]? | [Regex]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-url"/><a href="#browser-context-route-from-har-option-url" class="list-anchor">#</a>
     
-    A glob pattern, regular expression or predicate to match the request URL. Only requests with URL matching the pattern will be served from the HAR file. If not specified, all requests are served from the HAR file.
+    Шаблон глоба, регулярное выражение или предикат для сопоставления URL запроса. Только запросы с URL, соответствующим шаблону, будут обслуживаться из HAR-файла. Если не указано, все запросы обслуживаются из HAR-файла.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-return"/><a href="#browser-context-route-from-har-return" class="list-anchor">#</a>
 
 ---
 
 ### RouteWebSocketAsync {#browser-context-route-web-socket}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>browserContext.RouteWebSocketAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.48</font><x-search>browserContext.RouteWebSocketAsync</x-search>
 
-This method allows to modify websocket connections that are made by any page in the browser context.
+Этот метод позволяет изменять соединения WebSocket, которые создаются любой страницей в контексте браузера.
 
-Note that only `WebSocket`s created after this method was called will be routed. It is recommended to call this method before creating any pages.
+Обратите внимание, что только `WebSocket`, созданные после вызова этого метода, будут маршрутизироваться. Рекомендуется вызывать этот метод перед созданием любых страниц.
 
-**Usage**
+**Использование**
 
-Below is an example of a simple handler that blocks some websocket messages. See [WebSocketRoute] for more details and examples.
+Ниже приведен пример простого обработчика, который блокирует некоторые сообщения WebSocket. Подробнее и примеры смотрите в [WebSocketRoute].
 
 ```csharp
 await context.RouteWebSocketAsync("/ws", async ws => {
@@ -643,134 +641,134 @@ await context.RouteWebSocketAsync("/ws", async ws => {
 });
 ```
 
-**Arguments**
+**Аргументы**
 - `url` [string] | [Regex] | [Func]&lt;[string], bool&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-web-socket-option-url"/><a href="#browser-context-route-web-socket-option-url" class="list-anchor">#</a>
   
-  Only WebSockets with the url matching this pattern will be routed. A string pattern can be relative to the [BaseURL](/api/class-browser.mdx#browser-new-context-option-base-url) context option.
+  Только WebSocket с URL, соответствующим этому шаблону, будут маршрутизироваться. Строковый шаблон может быть относительным к опции контекста [BaseURL](/api/class-browser.mdx#browser-new-context-option-base-url).
 - `handler` [Action]&lt;[WebSocketRoute]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-web-socket-option-handler"/><a href="#browser-context-route-web-socket-option-handler" class="list-anchor">#</a>
   
-  Handler function to route the WebSocket.
+  Функция-обработчик для маршрутизации WebSocket.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-web-socket-return"/><a href="#browser-context-route-web-socket-return" class="list-anchor">#</a>
 
 ---
 
 ### RunAndWaitForConsoleMessageAsync {#browser-context-wait-for-console-message}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.34</font><x-search>browserContext.RunAndWaitForConsoleMessageAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.34</font><x-search>browserContext.RunAndWaitForConsoleMessageAsync</x-search>
 
-Performs action and waits for a [ConsoleMessage] to be logged by in the pages in the context. If predicate is provided, it passes [ConsoleMessage] value into the `predicate` function and waits for `predicate(message)` to return a truthy value. Will throw an error if the page is closed before the [BrowserContext.Console](/api/class-browsercontext.mdx#browser-context-event-console) event is fired.
+Выполняет действие и ждет, пока [ConsoleMessage] не будет зарегистрировано на страницах в контексте. Если предикат предоставлен, он передает значение [ConsoleMessage] в функцию `predicate` и ждет, пока `predicate(message)` не вернет истинное значение. Выдаст ошибку, если страница будет закрыта до того, как событие [BrowserContext.Console](/api/class-browsercontext.mdx#browser-context-event-console) будет вызвано.
 
-**Usage**
+**Использование**
 
 ```csharp
 await BrowserContext.RunAndWaitForConsoleMessageAsync(action, options);
 ```
 
-**Arguments**
+**Аргументы**
 - `action` [Func]&lt;[Task]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-action"/><a href="#browser-context-wait-for-console-message-option-action" class="list-anchor">#</a>
   
-  Action that triggers the event.
-- `options` `BrowserContextRunAndWaitForConsoleMessageOptions?` *(optional)*
-  - `Predicate` [Func]&lt;[ConsoleMessage]?, bool&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-predicate"/><a href="#browser-context-wait-for-console-message-option-predicate" class="list-anchor">#</a>
+  Действие, которое вызывает событие.
+- `options` `BrowserContextRunAndWaitForConsoleMessageOptions?` *(опционально)*
+  - `Predicate` [Func]&lt;[ConsoleMessage]?, bool&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-predicate"/><a href="#browser-context-wait-for-console-message-option-predicate" class="list-anchor">#</a>
     
-    Receives the [ConsoleMessage] object and resolves to truthy value when the waiting should resolve.
-  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-timeout"/><a href="#browser-context-wait-for-console-message-option-timeout" class="list-anchor">#</a>
+    Получает объект [ConsoleMessage] и разрешается в истинное значение, когда ожидание должно завершиться.
+  - `Timeout` [float]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-timeout"/><a href="#browser-context-wait-for-console-message-option-timeout" class="list-anchor">#</a>
     
-    Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
+    Максимальное время ожидания в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
 
-**Returns**
+**Возвращает**
 - [ConsoleMessage]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-return"/><a href="#browser-context-wait-for-console-message-return" class="list-anchor">#</a>
 
 ---
 
 ### WaitForConsoleMessageAsync {#browser-context-wait-for-console-message}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.34</font><x-search>browserContext.WaitForConsoleMessageAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.34</font><x-search>browserContext.WaitForConsoleMessageAsync</x-search>
 
-Performs action and waits for a [ConsoleMessage] to be logged by in the pages in the context. If predicate is provided, it passes [ConsoleMessage] value into the `predicate` function and waits for `predicate(message)` to return a truthy value. Will throw an error if the page is closed before the [BrowserContext.Console](/api/class-browsercontext.mdx#browser-context-event-console) event is fired.
+Выполняет действие и ждет, пока [ConsoleMessage] не будет зарегистрировано на страницах в контексте. Если предикат предоставлен, он передает значение [ConsoleMessage] в функцию `predicate` и ждет, пока `predicate(message)` не вернет истинное значение. Выдаст ошибку, если страница будет закрыта до того, как событие [BrowserContext.Console](/api/class-browsercontext.mdx#browser-context-event-console) будет вызвано.
 
-**Usage**
+**Использование**
 
 ```csharp
 await BrowserContext.WaitForConsoleMessageAsync(action, options);
 ```
 
-**Arguments**
-- `options` `BrowserContextRunAndWaitForConsoleMessageOptions?` *(optional)*
-  - `Predicate` [Func]&lt;[ConsoleMessage]?, bool&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-predicate"/><a href="#browser-context-wait-for-console-message-option-predicate" class="list-anchor">#</a>
+**Аргументы**
+- `options` `BrowserContextRunAndWaitForConsoleMessageOptions?` *(опционально)*
+  - `Predicate` [Func]&lt;[ConsoleMessage]?, bool&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-predicate"/><a href="#browser-context-wait-for-console-message-option-predicate" class="list-anchor">#</a>
     
-    Receives the [ConsoleMessage] object and resolves to truthy value when the waiting should resolve.
-  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-timeout"/><a href="#browser-context-wait-for-console-message-option-timeout" class="list-anchor">#</a>
+    Получает объект [ConsoleMessage] и разрешается в истинное значение, когда ожидание должно завершиться.
+  - `Timeout` [float]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-timeout"/><a href="#browser-context-wait-for-console-message-option-timeout" class="list-anchor">#</a>
     
-    Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
+    Максимальное время ожидания в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
 
-**Returns**
+**Возвращает**
 - [ConsoleMessage]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-return"/><a href="#browser-context-wait-for-console-message-return" class="list-anchor">#</a>
 
 ---
 
 ### RunAndWaitForPageAsync {#browser-context-wait-for-page}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>browserContext.RunAndWaitForPageAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>browserContext.RunAndWaitForPageAsync</x-search>
 
-Performs action and waits for a new [Page] to be created in the context. If predicate is provided, it passes [Page] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the context closes before new [Page] is created.
+Выполняет действие и ждет, пока в контексте не будет создана новая [Page]. Если предикат предоставлен, он передает значение [Page] в функцию `predicate` и ждет, пока `predicate(event)` не вернет истинное значение. Выдаст ошибку, если контекст закроется до создания новой [Page].
 
-**Usage**
+**Использование**
 
 ```csharp
 await BrowserContext.RunAndWaitForPageAsync(action, options);
 ```
 
-**Arguments**
-- `action` [Func]&lt;[Task]&gt; <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-action"/><a href="#browser-context-wait-for-page-option-action" class="list-anchor">#</a>
+**Аргументы**
+- `action` [Func]&lt;[Task]&gt; <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-action"/><a href="#browser-context-wait-for-page-option-action" class="list-anchor">#</a>
   
-  Action that triggers the event.
-- `options` `BrowserContextRunAndWaitForPageOptions?` *(optional)*
-  - `Predicate` [Func]&lt;[Page]?, bool&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-predicate"/><a href="#browser-context-wait-for-page-option-predicate" class="list-anchor">#</a>
+  Действие, которое вызывает событие.
+- `options` `BrowserContextRunAndWaitForPageOptions?` *(опционально)*
+  - `Predicate` [Func]&lt;[Page]?, bool&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-predicate"/><a href="#browser-context-wait-for-page-option-predicate" class="list-anchor">#</a>
     
-    Receives the [Page] object and resolves to truthy value when the waiting should resolve.
-  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-timeout"/><a href="#browser-context-wait-for-page-option-timeout" class="list-anchor">#</a>
+    Получает объект [Page] и разрешается в истинное значение, когда ожидание должно завершиться.
+  - `Timeout` [float]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-timeout"/><a href="#browser-context-wait-for-page-option-timeout" class="list-anchor">#</a>
     
-    Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
+    Максимальное время ожидания в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
 
-**Returns**
+**Возвращает**
 - [Page]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-page-return"/><a href="#browser-context-wait-for-page-return" class="list-anchor">#</a>
 
 ---
 
 ### WaitForPageAsync {#browser-context-wait-for-page}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>browserContext.WaitForPageAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>browserContext.WaitForPageAsync</x-search>
 
-Performs action and waits for a new [Page] to be created in the context. If predicate is provided, it passes [Page] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the context closes before new [Page] is created.
+Выполняет действие и ждет, пока в контексте не будет создана новая [Page]. Если предикат предоставлен, он передает значение [Page] в функцию `predicate` и ждет, пока `predicate(event)` не вернет истинное значение. Выдаст ошибку, если контекст закроется до создания новой [Page].
 
-**Usage**
+**Использование**
 
 ```csharp
 await BrowserContext.WaitForPageAsync(action, options);
 ```
 
-**Arguments**
-- `options` `BrowserContextRunAndWaitForPageOptions?` *(optional)*
-  - `Predicate` [Func]&lt;[Page]?, bool&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-predicate"/><a href="#browser-context-wait-for-page-option-predicate" class="list-anchor">#</a>
+**Аргументы**
+- `options` `BrowserContextRunAndWaitForPageOptions?` *(опционально)*
+  - `Predicate` [Func]&lt;[Page]?, bool&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-predicate"/><a href="#browser-context-wait-for-page-option-predicate" class="list-anchor">#</a>
     
-    Receives the [Page] object and resolves to truthy value when the waiting should resolve.
-  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-timeout"/><a href="#browser-context-wait-for-page-option-timeout" class="list-anchor">#</a>
+    Получает объект [Page] и разрешается в истинное значение, когда ожидание должно завершиться.
+  - `Timeout` [float]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-timeout"/><a href="#browser-context-wait-for-page-option-timeout" class="list-anchor">#</a>
     
-    Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
+    Максимальное время ожидания в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
 
-**Returns**
+**Возвращает**
 - [Page]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-wait-for-page-return"/><a href="#browser-context-wait-for-page-return" class="list-anchor">#</a>
 
 ---
 
 ### SetDefaultNavigationTimeout {#browser-context-set-default-navigation-timeout}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.SetDefaultNavigationTimeout</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.SetDefaultNavigationTimeout</x-search>
 
-This setting will change the default maximum navigation time for the following methods and related shortcuts:
+Эта настройка изменит максимальное время навигации по умолчанию для следующих методов и связанных с ними ярлыков:
 * [Page.GoBackAsync()](/api/class-page.mdx#page-go-back)
 * [Page.GoForwardAsync()](/api/class-page.mdx#page-go-forward)
 * [Page.GotoAsync()](/api/class-page.mdx#page-goto)
@@ -780,80 +778,80 @@ This setting will change the default maximum navigation time for the following m
 
 :::note
 
-[Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) and [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) take priority over [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout).
+[Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) и [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) имеют приоритет над [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout).
 :::
 
-**Usage**
+**Использование**
 
 ```csharp
 BrowserContext.SetDefaultNavigationTimeout(timeout);
 ```
 
-**Arguments**
+**Аргументы**
 - `timeout` [float]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-default-navigation-timeout-option-timeout"/><a href="#browser-context-set-default-navigation-timeout-option-timeout" class="list-anchor">#</a>
   
-  Maximum navigation time in milliseconds
+  Максимальное время навигации в миллисекундах
 
 ---
 
 ### SetDefaultTimeout {#browser-context-set-default-timeout}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.SetDefaultTimeout</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.SetDefaultTimeout</x-search>
 
-This setting will change the default maximum time for all the methods accepting [timeout](/api/class-browsercontext.mdx#browser-context-set-default-timeout-option-timeout) option.
+Эта настройка изменит максимальное время по умолчанию для всех методов, принимающих опцию [timeout](/api/class-browsercontext.mdx#browser-context-set-default-timeout-option-timeout).
 
 :::note
 
-[Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout), [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) and [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout) take priority over [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
+[Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout), [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) и [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout) имеют приоритет над [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
 :::
 
-**Usage**
+**Использование**
 
 ```csharp
 BrowserContext.SetDefaultTimeout(timeout);
 ```
 
-**Arguments**
+**Аргументы**
 - `timeout` [float]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-default-timeout-option-timeout"/><a href="#browser-context-set-default-timeout-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds. Pass `0` to disable timeout.
+  Максимальное время в миллисекундах. Передайте `0`, чтобы отключить тайм-аут.
 
 ---
 
 ### SetExtraHTTPHeadersAsync {#browser-context-set-extra-http-headers}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.SetExtraHTTPHeadersAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.SetExtraHTTPHeadersAsync</x-search>
 
-The extra HTTP headers will be sent with every request initiated by any page in the context. These headers are merged with page-specific extra HTTP headers set with [Page.SetExtraHTTPHeadersAsync()](/api/class-page.mdx#page-set-extra-http-headers). If page overrides a particular header, page-specific header value will be used instead of the browser context header value.
+Дополнительные HTTP-заголовки будут отправляться с каждым запросом, инициированным любой страницей в контексте. Эти заголовки объединяются с дополнительными HTTP-заголовками, установленными для страницы с помощью [Page.SetExtraHTTPHeadersAsync()](/api/class-page.mdx#page-set-extra-http-headers). Если страница переопределяет конкретный заголовок, будет использоваться значение заголовка, специфичное для страницы, вместо значения заголовка контекста браузера.
 
 :::note
 
-[BrowserContext.SetExtraHTTPHeadersAsync()](/api/class-browsercontext.mdx#browser-context-set-extra-http-headers) does not guarantee the order of headers in the outgoing requests.
+[BrowserContext.SetExtraHTTPHeadersAsync()](/api/class-browsercontext.mdx#browser-context-set-extra-http-headers) не гарантирует порядок заголовков в исходящих запросах.
 :::
 
-**Usage**
+**Использование**
 
 ```csharp
 await BrowserContext.SetExtraHTTPHeadersAsync(headers);
 ```
 
-**Arguments**
+**Аргументы**
 - `headers` [IDictionary]&lt;[string], [string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-extra-http-headers-option-headers"/><a href="#browser-context-set-extra-http-headers-option-headers" class="list-anchor">#</a>
   
-  An object containing additional HTTP headers to be sent with every request. All header values must be strings.
+  Объект, содержащий дополнительные HTTP-заголовки, которые будут отправляться с каждым запросом. Все значения заголовков должны быть строками.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-extra-http-headers-return"/><a href="#browser-context-set-extra-http-headers-return" class="list-anchor">#</a>
 
 ---
 
 ### SetGeolocationAsync {#browser-context-set-geolocation}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.SetGeolocationAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.SetGeolocationAsync</x-search>
 
-Sets the context's geolocation. Passing `null` or `undefined` emulates position unavailable.
+Устанавливает геолокацию контекста. Передача `null` или `undefined` эмулирует недоступность позиции.
 
-**Usage**
+**Использование**
 
 ```csharp
 await context.SetGeolocationAsync(new Geolocation()
@@ -864,192 +862,192 @@ await context.SetGeolocationAsync(new Geolocation()
 ```
 
 :::note
-Consider using [BrowserContext.GrantPermissionsAsync()](/api/class-browsercontext.mdx#browser-context-grant-permissions) to grant permissions for the browser context pages to read its geolocation.
+Рассмотрите возможность использования [BrowserContext.GrantPermissionsAsync()](/api/class-browsercontext.mdx#browser-context-grant-permissions) для предоставления разрешений страницам контекста браузера на чтение его геолокации.
 :::
 
-**Arguments**
+**Аргументы**
 - `geolocation` Geolocation?<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-geolocation-option-geolocation"/><a href="#browser-context-set-geolocation-option-geolocation" class="list-anchor">#</a>
   - `Latitude` [float]
     
-    Latitude between -90 and 90.
+    Широта между -90 и 90.
   - `Longitude` [float]
     
-    Longitude between -180 and 180.
-  - `Accuracy` [float]? *(optional)*
+    Долгота между -180 и 180.
+  - `Accuracy` [float]? *(опционально)*
     
-    Non-negative accuracy value. Defaults to `0`.
+    Неотрицательное значение точности. По умолчанию `0`.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-geolocation-return"/><a href="#browser-context-set-geolocation-return" class="list-anchor">#</a>
 
 ---
 
 ### SetOfflineAsync {#browser-context-set-offline}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.SetOfflineAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.SetOfflineAsync</x-search>
 
-**Usage**
+**Использование**
 
 ```csharp
 await BrowserContext.SetOfflineAsync(offline);
 ```
 
-**Arguments**
+**Аргументы**
 - `offline` [bool]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-offline-option-offline"/><a href="#browser-context-set-offline-option-offline" class="list-anchor">#</a>
   
-  Whether to emulate network being offline for the browser context.
+  Эмулировать ли отсутствие сети для контекста браузера.
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-offline-return"/><a href="#browser-context-set-offline-return" class="list-anchor">#</a>
 
 ---
 
 ### StorageStateAsync {#browser-context-storage-state}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.StorageStateAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.StorageStateAsync</x-search>
 
-Returns storage state for this browser context, contains current cookies, local storage snapshot and IndexedDB snapshot.
+Возвращает состояние хранилища для этого контекста браузера, содержит текущие куки, снимок локального хранилища и снимок IndexedDB.
 
-**Usage**
+**Использование**
 
 ```csharp
 await BrowserContext.StorageStateAsync(options);
 ```
 
-**Arguments**
-- `options` `BrowserContextStorageStateOptions?` *(optional)*
-  - `IndexedDB` [bool]? *(optional)* <font size="2">Added in: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-indexed-db"/><a href="#browser-context-storage-state-option-indexed-db" class="list-anchor">#</a>
+**Аргументы**
+- `options` `BrowserContextStorageStateOptions?` *(опционально)*
+  - `IndexedDB` [bool]? *(опционально)* <font size="2">Добавлено в: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-indexed-db"/><a href="#browser-context-storage-state-option-indexed-db" class="list-anchor">#</a>
     
-    Set to `true` to include [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) in the storage state snapshot. If your application uses IndexedDB to store authentication tokens, like Firebase Authentication, enable this.
+    Установите в `true`, чтобы включить [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) в снимок состояния хранилища. Если ваше приложение использует IndexedDB для хранения токенов аутентификации, таких как Firebase Authentication, включите это.
     
     :::note
     
-    IndexedDBs with typed arrays are currently not supported.
+    IndexedDB с типизированными массивами в настоящее время не поддерживается.
     :::
     
-  - `Path` [string]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-path"/><a href="#browser-context-storage-state-option-path" class="list-anchor">#</a>
+  - `Path` [string]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-path"/><a href="#browser-context-storage-state-option-path" class="list-anchor">#</a>
     
-    The file path to save the storage state to. If [Path](/api/class-browsercontext.mdx#browser-context-storage-state-option-path) is a relative path, then it is resolved relative to current working directory. If no path is provided, storage state is still returned, but won't be saved to the disk.
+    Путь к файлу для сохранения состояния хранилища. Если [Path](/api/class-browsercontext.mdx#browser-context-storage-state-option-path) является относительным путем, то он разрешается относительно текущей рабочей директории. Если путь не указан, состояние хранилища все равно возвращается, но не будет сохранено на диск.
 
-**Returns**
+**Возвращает**
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-return"/><a href="#browser-context-storage-state-return" class="list-anchor">#</a>
 
 ---
 
 ### UnrouteAsync {#browser-context-unroute}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.UnrouteAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.UnrouteAsync</x-search>
 
-Removes a route created with [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route). When [handler](/api/class-browsercontext.mdx#browser-context-unroute-option-handler) is not specified, removes all routes for the [url](/api/class-browsercontext.mdx#browser-context-unroute-option-url).
+Удаляет маршрут, созданный с помощью [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route). Когда [handler](/api/class-browsercontext.mdx#browser-context-unroute-option-handler) не указан, удаляет все маршруты для [url](/api/class-browsercontext.mdx#browser-context-unroute-option-url).
 
-**Usage**
+**Использование**
 
 ```csharp
 await BrowserContext.UnrouteAsync(url, handler);
 ```
 
-**Arguments**
+**Аргументы**
 - `url` [string] | [Regex] | [Func]&lt;[string], bool&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-unroute-option-url"/><a href="#browser-context-unroute-option-url" class="list-anchor">#</a>
   
-  A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route).
-- `handler` [Action]&lt;[Route]?&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-unroute-option-handler"/><a href="#browser-context-unroute-option-handler" class="list-anchor">#</a>
+  Шаблон глоба, шаблон регулярного выражения или предикат, получающий [URL], использованный для регистрации маршрутизации с [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route).
+- `handler` [Action]&lt;[Route]?&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-unroute-option-handler"/><a href="#browser-context-unroute-option-handler" class="list-anchor">#</a>
   
-  Optional handler function used to register a routing with [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route).
+  Опциональная функция-обработчик, использованная для регистрации маршрутизации с [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route).
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-unroute-return"/><a href="#browser-context-unroute-return" class="list-anchor">#</a>
 
 ---
 
 ### UnrouteAllAsync {#browser-context-unroute-all}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.41</font><x-search>browserContext.UnrouteAllAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.41</font><x-search>browserContext.UnrouteAllAsync</x-search>
 
-Removes all routes created with [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) and [BrowserContext.RouteFromHARAsync()](/api/class-browsercontext.mdx#browser-context-route-from-har).
+Удаляет все маршруты, созданные с помощью [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) и [BrowserContext.RouteFromHARAsync()](/api/class-browsercontext.mdx#browser-context-route-from-har).
 
-**Usage**
+**Использование**
 
 ```csharp
 await BrowserContext.UnrouteAllAsync(options);
 ```
 
-**Arguments**
-- `options` `BrowserContextUnrouteAllOptions?` *(optional)*
-  - `Behavior` `enum UnrouteBehavior { Wait, IgnoreErrors, Default }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-unroute-all-option-behavior"/><a href="#browser-context-unroute-all-option-behavior" class="list-anchor">#</a>
+**Аргументы**
+- `options` `BrowserContextUnrouteAllOptions?` *(опционально)*
+  - `Behavior` `enum UnrouteBehavior { Wait, IgnoreErrors, Default }?` *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-unroute-all-option-behavior"/><a href="#browser-context-unroute-all-option-behavior" class="list-anchor">#</a>
     
-    Specifies whether to wait for already running handlers and what to do if they throw errors:
-    * `'default'` - do not wait for current handler calls (if any) to finish, if unrouted handler throws, it may result in unhandled error
-    * `'wait'` - wait for current handler calls (if any) to finish
-    * `'ignoreErrors'` - do not wait for current handler calls (if any) to finish, all errors thrown by the handlers after unrouting are silently caught
+    Указывает, ждать ли уже выполняющихся обработчиков и что делать, если они выбрасывают ошибки:
+    * `'default'` - не ждать завершения текущих вызовов обработчиков (если есть), если удаленный обработчик выбрасывает ошибку, это может привести к необработанной ошибке
+    * `'wait'` - ждать завершения текущих вызовов обработчиков (если есть)
+    * `'ignoreErrors'` - не ждать завершения текущих вызовов обработчиков (если есть), все ошибки, выброшенные обработчиками после удаления маршрутизации, тихо перехватываются
 
-**Returns**
+**Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-unroute-all-return"/><a href="#browser-context-unroute-all-return" class="list-anchor">#</a>
 
 ---
 
-## Properties
+## Свойства
 
 ### APIRequest {#browser-context-request}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>browserContext.APIRequest</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>browserContext.APIRequest</x-search>
 
-API testing helper associated with this context. Requests made with this API will use context cookies.
+Помощник для тестирования API, связанный с этим контекстом. Запросы, сделанные с помощью этого API, будут использовать куки контекста.
 
-**Usage**
+**Использование**
 
 ```csharp
 BrowserContext.APIRequest
 ```
 
-**Type**
+**Тип**
 - [APIRequestContext]
 
 ---
 
 ### Clock {#browser-context-clock}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>browserContext.Clock</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.45</font><x-search>browserContext.Clock</x-search>
 
-Playwright has ability to mock clock and passage of time.
+Playwright имеет возможность имитировать часы и ход времени.
 
-**Usage**
+**Использование**
 
 ```csharp
 BrowserContext.Clock
 ```
 
-**Type**
+**Тип**
 - [Clock]
 
 ---
 
 ### Tracing {#browser-context-tracing}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>browserContext.Tracing</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>browserContext.Tracing</x-search>
 
-**Usage**
+**Использование**
 
 ```csharp
 BrowserContext.Tracing
 ```
 
-**Type**
+**Тип**
 - [Tracing]
 
 ---
 
-## Events
+## События
 
 ### event BackgroundPage {#browser-context-event-background-page}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.event BackgroundPage</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.11</font><x-search>browserContext.event BackgroundPage</x-search>
 
 :::note
 
-Only works with Chromium browser's persistent context.
+Работает только с постоянным контекстом браузера Chromium.
 :::
 
-Emitted when new background page is created in the context.
+Вызывается, когда в контексте создается новая фоновая страница.
 
 ```csharp
 context.BackgroundPage += (_, backgroundPage) =>
@@ -1059,46 +1057,46 @@ context.BackgroundPage += (_, backgroundPage) =>
 
 ```
 
-**Usage**
+**Использование**
 
 ```csharp
 BrowserContext.BackgroundPage += async (_, page) => {};
 ```
 
-**Event data**
+**Данные события**
 - [Page]
 
 ---
 
 ### event Close {#browser-context-event-close}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.event Close</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.event Close</x-search>
 
-Emitted when Browser context gets closed. This might happen because of one of the following:
-* Browser context is closed.
-* Browser application is closed or crashed.
-* The [Browser.CloseAsync()](/api/class-browser.mdx#browser-close) method was called.
+Вызывается, когда контекст браузера закрывается. Это может произойти по одной из следующих причин:
+* Контекст браузера закрыт.
+* Приложение браузера закрыто или аварийно завершено.
+* Метод [Browser.CloseAsync()](/api/class-browser.mdx#browser-close) был вызван.
 
-**Usage**
+**Использование**
 
 ```csharp
 BrowserContext.Close += async (_, browserContext) => {};
 ```
 
-**Event data**
+**Данные события**
 - [BrowserContext]
 
 ---
 
 ### event Console {#browser-context-event-console}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.34</font><x-search>browserContext.event Console</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.34</font><x-search>browserContext.event Console</x-search>
 
-Emitted when JavaScript within the page calls one of console API methods, e.g. `console.log` or `console.dir`.
+Вызывается, когда JavaScript на странице вызывает один из методов консоли API, например, `console.log` или `console.dir`.
 
-The arguments passed into `console.log` and the page are available on the [ConsoleMessage] event handler argument.
+Аргументы, переданные в `console.log`, и страница доступны в аргументе обработчика события [ConsoleMessage].
 
-**Usage**
+**Использование**
 
 ```csharp
 context.Console += async (_, msg) =>
@@ -1110,18 +1108,18 @@ context.Console += async (_, msg) =>
 await page.EvaluateAsync("console.log('hello', 5, { foo: 'bar' })");
 ```
 
-**Event data**
+**Данные события**
 - [ConsoleMessage]
 
 ---
 
-### event Dialog {#browser-context-event-dialog}
+### событие Dialog {#browser-context-event-dialog}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.34</font><x-search>browserContext.event Dialog</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.34</font><x-search>browserContext.event Dialog</x-search>
 
-Emitted when a JavaScript dialog appears, such as `alert`, `prompt`, `confirm` or `beforeunload`. Listener **must** either [Dialog.AcceptAsync()](/api/class-dialog.mdx#dialog-accept) or [Dialog.DismissAsync()](/api/class-dialog.mdx#dialog-dismiss) the dialog - otherwise the page will [freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking) waiting for the dialog, and actions like click will never finish.
+Вызывается, когда появляется JavaScript-диалог, такой как `alert`, `prompt`, `confirm` или `beforeunload`. Слушатель **должен** либо [Dialog.AcceptAsync()](/api/class-dialog.mdx#dialog-accept), либо [Dialog.DismissAsync()](/api/class-dialog.mdx#dialog-dismiss) диалог - в противном случае страница [заморозится](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking), ожидая диалог, и действия, такие как клик, никогда не завершатся.
 
-**Usage**
+**Использование**
 
 ```csharp
 Context.Dialog += async (_, dialog) =>
@@ -1131,21 +1129,21 @@ Context.Dialog += async (_, dialog) =>
 ```
 
 :::note
-When no [Page.Dialog](/api/class-page.mdx#page-event-dialog) or [BrowserContext.Dialog](/api/class-browsercontext.mdx#browser-context-event-dialog) listeners are present, all dialogs are automatically dismissed.
+Когда нет слушателей [Page.Dialog](/api/class-page.mdx#page-event-dialog) или [BrowserContext.Dialog](/api/class-browsercontext.mdx#browser-context-event-dialog), все диалоги автоматически отклоняются.
 :::
 
-**Event data**
+**Данные события**
 - [Dialog]
 
 ---
 
-### event Page {#browser-context-event-page}
+### событие Page {#browser-context-event-page}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.event Page</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.event Page</x-search>
 
-The event is emitted when a new Page is created in the BrowserContext. The page may still be loading. The event will also fire for popup pages. See also [Page.Popup](/api/class-page.mdx#page-event-popup) to receive events about popups relevant to a specific page.
+Событие вызывается, когда в BrowserContext создается новая страница. Страница может все еще загружаться. Событие также будет срабатывать для всплывающих страниц. См. также [Page.Popup](/api/class-page.mdx#page-event-popup) для получения событий о всплывающих окнах, относящихся к конкретной странице.
 
-The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup. If you would like to route/listen to this network request, use [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) and [BrowserContext.Request](/api/class-browsercontext.mdx#browser-context-event-request) respectively instead of similar methods on the [Page].
+Самый ранний момент, когда страница доступна, это когда она перешла на начальный URL. Например, при открытии всплывающего окна с помощью `window.open('http://example.com')`, это событие сработает, когда сетевой запрос к "http://example.com" будет выполнен и его ответ начнет загружаться во всплывающем окне. Если вы хотите маршрутизировать/слушать этот сетевой запрос, используйте [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) и [BrowserContext.Request](/api/class-browsercontext.mdx#browser-context-event-request) соответственно, вместо аналогичных методов на [Page].
 
 ```csharp
 var popup = await context.RunAndWaitForPageAsync(async =>
@@ -1156,108 +1154,108 @@ Console.WriteLine(await popup.EvaluateAsync<string>("location.href"));
 ```
 
 :::note
-Use [Page.WaitForLoadStateAsync()](/api/class-page.mdx#page-wait-for-load-state) to wait until the page gets to a particular state (you should not need it in most cases).
+Используйте [Page.WaitForLoadStateAsync()](/api/class-page.mdx#page-wait-for-load-state), чтобы дождаться, пока страница достигнет определенного состояния (в большинстве случаев это не потребуется).
 :::
 
-**Usage**
+**Использование**
 
 ```csharp
 BrowserContext.Page += async (_, page) => {};
 ```
 
-**Event data**
+**Данные события**
 - [Page]
 
 ---
 
-### event Request {#browser-context-event-request}
+### событие Request {#browser-context-event-request}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>browserContext.event Request</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>browserContext.event Request</x-search>
 
-Emitted when a request is issued from any pages created through this context. The [request] object is read-only. To only listen for requests from a particular page, use [Page.Request](/api/class-page.mdx#page-event-request).
+Вызывается, когда запрос отправляется с любой страницы, созданной через этот контекст. Объект [request] доступен только для чтения. Чтобы слушать запросы только с определенной страницы, используйте [Page.Request](/api/class-page.mdx#page-event-request).
 
-In order to intercept and mutate requests, see [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) or [Page.RouteAsync()](/api/class-page.mdx#page-route).
+Для перехвата и изменения запросов, см. [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) или [Page.RouteAsync()](/api/class-page.mdx#page-route).
 
-**Usage**
+**Использование**
 
 ```csharp
 BrowserContext.Request += async (_, request) => {};
 ```
 
-**Event data**
+**Данные события**
 - [Request]
 
 ---
 
-### event RequestFailed {#browser-context-event-request-failed}
+### событие RequestFailed {#browser-context-event-request-failed}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>browserContext.event RequestFailed</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>browserContext.event RequestFailed</x-search>
 
-Emitted when a request fails, for example by timing out. To only listen for failed requests from a particular page, use [Page.RequestFailed](/api/class-page.mdx#page-event-request-failed).
+Вызывается, когда запрос не удается выполнить, например, из-за тайм-аута. Чтобы слушать только неудачные запросы с определенной страницы, используйте [Page.RequestFailed](/api/class-page.mdx#page-event-request-failed).
 
 :::note
 
-HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [BrowserContext.RequestFinished](/api/class-browsercontext.mdx#browser-context-event-request-finished) event and not with [BrowserContext.RequestFailed](/api/class-browsercontext.mdx#browser-context-event-request-failed).
+Ответы с HTTP-ошибками, такие как 404 или 503, все еще считаются успешными с точки зрения HTTP, поэтому запрос завершится событием [BrowserContext.RequestFinished](/api/class-browsercontext.mdx#browser-context-event-request-finished), а не [BrowserContext.RequestFailed](/api/class-browsercontext.mdx#browser-context-event-request-failed).
 :::
 
-**Usage**
+**Использование**
 
 ```csharp
 BrowserContext.RequestFailed += async (_, request) => {};
 ```
 
-**Event data**
+**Данные события**
 - [Request]
 
 ---
 
-### event RequestFinished {#browser-context-event-request-finished}
+### событие RequestFinished {#browser-context-event-request-finished}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>browserContext.event RequestFinished</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>browserContext.event RequestFinished</x-search>
 
-Emitted when a request finishes successfully after downloading the response body. For a successful response, the sequence of events is `request`, `response` and `requestfinished`. To listen for successful requests from a particular page, use [Page.RequestFinished](/api/class-page.mdx#page-event-request-finished).
+Вызывается, когда запрос успешно завершается после загрузки тела ответа. Для успешного ответа последовательность событий: `request`, `response` и `requestfinished`. Чтобы слушать успешные запросы с определенной страницы, используйте [Page.RequestFinished](/api/class-page.mdx#page-event-request-finished).
 
-**Usage**
+**Использование**
 
 ```csharp
 BrowserContext.RequestFinished += async (_, request) => {};
 ```
 
-**Event data**
+**Данные события**
 - [Request]
 
 ---
 
-### event Response {#browser-context-event-response}
+### событие Response {#browser-context-event-response}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>browserContext.event Response</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>browserContext.event Response</x-search>
 
-Emitted when [response] status and headers are received for a request. For a successful response, the sequence of events is `request`, `response` and `requestfinished`. To listen for response events from a particular page, use [Page.Response](/api/class-page.mdx#page-event-response).
+Вызывается, когда статус и заголовки [response] получены для запроса. Для успешного ответа последовательность событий: `request`, `response` и `requestfinished`. Чтобы слушать события ответа с определенной страницы, используйте [Page.Response](/api/class-page.mdx#page-event-response).
 
-**Usage**
+**Использование**
 
 ```csharp
 BrowserContext.Response += async (_, response) => {};
 ```
 
-**Event data**
+**Данные события**
 - [Response]
 
 ---
 
-### event WebError {#browser-context-event-web-error}
+### событие WebError {#browser-context-event-web-error}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.38</font><x-search>browserContext.event WebError</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.38</font><x-search>browserContext.event WebError</x-search>
 
-Emitted when exception is unhandled in any of the pages in this context. To listen for errors from a particular page, use [Page.PageError](/api/class-page.mdx#page-event-page-error) instead.
+Вызывается, когда исключение не обрабатывается на любой из страниц в этом контексте. Чтобы слушать ошибки с определенной страницы, используйте [Page.PageError](/api/class-page.mdx#page-event-page-error).
 
-**Usage**
+**Использование**
 
 ```csharp
 BrowserContext.WebError += async (_, webError) => {};
 ```
 
-**Event data**
+**Данные события**
 - [WebError]
 
 

@@ -6,66 +6,62 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+Класс Accessibility предоставляет методы для инспектирования дерева доступности Chromium. Дерево доступности используется вспомогательными технологиями, такими как [скринридеры](https://en.wikipedia.org/wiki/Screen_reader) или [переключатели](https://en.wikipedia.org/wiki/Switch_access).
 
-The Accessibility class provides methods for inspecting Chromium's accessibility tree. The accessibility tree is used by assistive technology such as [screen readers](https://en.wikipedia.org/wiki/Screen_reader) or [switches](https://en.wikipedia.org/wiki/Switch_access).
+Доступность — это очень специфичная для платформы вещь. На разных платформах существуют различные скринридеры, которые могут давать совершенно разные результаты.
 
-Accessibility is a very platform-specific thing. On different platforms, there are different screen readers that might have wildly different output.
+Рендеринг-движки Chromium, Firefox и WebKit имеют концепцию "дерева доступности", которое затем переводится в различные платформенно-специфичные API. Пространство имен Accessibility предоставляет доступ к этому дереву доступности.
 
-Rendering engines of Chromium, Firefox and WebKit have a concept of "accessibility tree", which is then translated into different platform-specific APIs. Accessibility namespace gives access to this Accessibility Tree.
-
-Most of the accessibility tree gets filtered out when converting from internal browser AX Tree to Platform-specific AX-Tree or by assistive technologies themselves. By default, Playwright tries to approximate this filtering, exposing only the "interesting" nodes of the tree.
-
+Большая часть дерева доступности отфильтровывается при преобразовании из внутреннего AX-дерева браузера в платформенно-специфичное AX-дерево или самими вспомогательными технологиями. По умолчанию Playwright пытается приблизительно воспроизвести эту фильтрацию, показывая только "интересные" узлы дерева.
 
 ---
 
-## Deprecated
+## Устарело
 
 ### SnapshotAsync {#accessibility-snapshot}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>accessibility.SnapshotAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до версии v1.9</font><x-search>accessibility.SnapshotAsync</x-search>
 
-:::warning Deprecated
+:::warning Устарело
 
-This method is deprecated. Please use other libraries such as [Axe](https://www.deque.com/axe/) if you need to test page accessibility. See our Node.js [guide](https://playwright.dev/docs/accessibility-testing) for integration with Axe.
+Этот метод устарел. Пожалуйста, используйте другие библиотеки, такие как [Axe](https://www.deque.com/axe/), если вам нужно тестировать доступность страницы. См. наше руководство по Node.js [здесь](https://playwright.dev/docs/accessibility-testing) для интеграции с Axe.
 
 :::
 
-
-Captures the current state of the accessibility tree. The returned object represents the root accessible node of the page.
+Фиксирует текущее состояние дерева доступности. Возвращаемый объект представляет корневой доступный узел страницы.
 
 :::note
 
-The Chromium accessibility tree contains nodes that go unused on most platforms and by most screen readers. Playwright will discard them as well for an easier to process tree, unless [InterestingOnly](/api/class-accessibility.mdx#accessibility-snapshot-option-interesting-only) is set to `false`.
+Дерево доступности Chromium содержит узлы, которые не используются на большинстве платформ и большинством скринридеров. Playwright также отбрасывает их для упрощения обработки дерева, если только [InterestingOnly](/api/class-accessibility.mdx#accessibility-snapshot-option-interesting-only) не установлен в `false`.
 :::
 
-**Usage**
+**Использование**
 
-An example of dumping the entire accessibility tree:
-
-```csharp
-var accessibilitySnapshot = await page.Accessibility.SnapshotAsync();
-Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(accessibilitySnapshot));
-```
-
-An example of logging the focused node's name:
+Пример вывода всего дерева доступности:
 
 ```csharp
 var accessibilitySnapshot = await page.Accessibility.SnapshotAsync();
 Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(accessibilitySnapshot));
 ```
 
-**Arguments**
-- `options` `AccessibilitySnapshotOptions?` *(optional)*
-  - `InterestingOnly` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="accessibility-snapshot-option-interesting-only"/><a href="#accessibility-snapshot-option-interesting-only" class="list-anchor">#</a>
-    
-    Prune uninteresting nodes from the tree. Defaults to `true`.
-  - `Root` [ElementHandle]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="accessibility-snapshot-option-root"/><a href="#accessibility-snapshot-option-root" class="list-anchor">#</a>
-    
-    The root DOM element for the snapshot. Defaults to the whole page.
+Пример логирования имени сфокусированного узла:
 
-**Returns**
+```csharp
+var accessibilitySnapshot = await page.Accessibility.SnapshotAsync();
+Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(accessibilitySnapshot));
+```
+
+**Аргументы**
+- `options` `AccessibilitySnapshotOptions?` *(опционально)*
+  - `InterestingOnly` [bool]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="accessibility-snapshot-option-interesting-only"/><a href="#accessibility-snapshot-option-interesting-only" class="list-anchor">#</a>
+    
+    Обрезать неинтересные узлы из дерева. По умолчанию `true`.
+  - `Root` [ElementHandle]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="accessibility-snapshot-option-root"/><a href="#accessibility-snapshot-option-root" class="list-anchor">#</a>
+    
+    Корневой DOM элемент для снимка. По умолчанию вся страница.
+
+**Возвращает**
 - [JsonElement]?<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="accessibility-snapshot-return"/><a href="#accessibility-snapshot-return" class="list-anchor">#</a>
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

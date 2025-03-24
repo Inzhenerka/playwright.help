@@ -1,50 +1,50 @@
 ---
 id: test-runners
-title: "Test Runners"
+title: "Тестовые фреймворки"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-While Playwright for .NET isn't tied to a particular test runner or testing framework, in our experience the easiest way of getting started is by using the base classes we provide for MSTest, NUnit, or xUnit. These classes support running tests on multiple browser engines, adjusting launch/context options and getting a [Page]/[BrowserContext] instance per test out of the box. 
+Хотя Playwright для .NET не привязан к какому-либо конкретному тестовому фреймворку или среде выполнения тестов, по нашему опыту, самый простой способ начать — это использовать базовые классы, которые мы предоставляем для MSTest, NUnit или xUnit. Эти классы поддерживают запуск тестов на нескольких движках браузеров, настройку параметров запуска/контекста и получение экземпляра [Page]/[BrowserContext] для каждого теста из коробки.
 
-Playwright and Browser instances will be reused between tests for better performance. We recommend running each test case in a new BrowserContext, this way browser state will be isolated between the tests.
+Экземпляры Playwright и Browser будут повторно использоваться между тестами для повышения производительности. Мы рекомендуем запускать каждый тестовый случай в новом BrowserContext, чтобы состояние браузера было изолировано между тестами.
 
 <Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, ] }>
 
 <TabItem value="nunit">
 
-Playwright provides base classes to write tests with NUnit via the [`Microsoft.Playwright.NUnit`](https://www.nuget.org/packages/Microsoft.Playwright.NUnit) package.
+Playwright предоставляет базовые классы для написания тестов с использованием NUnit через пакет [`Microsoft.Playwright.NUnit`](https://www.nuget.org/packages/Microsoft.Playwright.NUnit).
 
 </TabItem>
 
 <TabItem value="mstest">
 
-Playwright provides base classes to write tests with MSTest via the [`Microsoft.Playwright.MSTest`](https://www.nuget.org/packages/Microsoft.Playwright.MSTest) package.
+Playwright предоставляет базовые классы для написания тестов с использованием MSTest через пакет [`Microsoft.Playwright.MSTest`](https://www.nuget.org/packages/Microsoft.Playwright.MSTest).
 
 </TabItem>
 
 <TabItem value="xunit">
 
-Playwright provides base classes to write tests with xUnit via the [`Microsoft.Playwright.Xunit`](https://www.nuget.org/packages/Microsoft.Playwright.Xunit) package.
+Playwright предоставляет базовые классы для написания тестов с использованием xUnit через пакет [`Microsoft.Playwright.Xunit`](https://www.nuget.org/packages/Microsoft.Playwright.Xunit).
 
 </TabItem>
 
 </Tabs>
 
-Check out the [installation guide](./intro.mdx) to get started.
+Ознакомьтесь с [руководством по установке](./intro.mdx), чтобы начать.
 
-## Running tests in Parallel
+## Запуск тестов в параллельном режиме
 
 <Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, ] }>
 
 <TabItem value="nunit">
 
-By default NUnit will run all test files in parallel, while running tests inside each file sequentially (`ParallelScope.Self`). It will create as many processes as there are cores on the host system. You can adjust this behavior using the NUnit.NumberOfTestWorkers parameter. Only `ParallelScope.Self` is supported.
+По умолчанию NUnit будет запускать все тестовые файлы параллельно, а тесты внутри каждого файла последовательно (`ParallelScope.Self`). Он создаст столько процессов, сколько ядер на хост-системе. Вы можете настроить это поведение, используя параметр NUnit.NumberOfTestWorkers. Поддерживается только `ParallelScope.Self`.
 
-For CPU-bound tests, we recommend using as many workers as there are cores on your system, divided by 2. For IO-bound tests you can use as many workers as you have cores.
+Для тестов, зависящих от процессора, мы рекомендуем использовать столько рабочих потоков, сколько ядер на вашей системе, деленное на 2. Для тестов, зависящих от ввода-вывода, вы можете использовать столько рабочих потоков, сколько у вас ядер.
 
 ```bash
 dotnet test -- NUnit.NumberOfTestWorkers=5
@@ -54,7 +54,7 @@ dotnet test -- NUnit.NumberOfTestWorkers=5
 
 <TabItem value="mstest">
 
-By default MSTest will run all classes in parallel, while running tests inside each class sequentially (`ExecutionScope.ClassLevel`). It will create as many processes as there are cores on the host system. You can adjust this behavior by using the following CLI parameter or using a `.runsettings` file, see below. Running tests in parallel at the method level (`ExecutionScope.MethodLevel`) is not supported.
+По умолчанию MSTest будет запускать все классы параллельно, а тесты внутри каждого класса последовательно (`ExecutionScope.ClassLevel`). Он создаст столько процессов, сколько ядер на хост-системе. Вы можете настроить это поведение, используя следующий параметр CLI или файл `.runsettings`, см. ниже. Запуск тестов в параллельном режиме на уровне метода (`ExecutionScope.MethodLevel`) не поддерживается.
 
 ```bash
 dotnet test --settings:.runsettings -- MSTest.Parallelize.Workers=4
@@ -64,27 +64,27 @@ dotnet test --settings:.runsettings -- MSTest.Parallelize.Workers=4
 
 <TabItem value="xunit">
 
-By default xUnit will run all classes in parallel, while running tests inside each class sequentially. It will create by default as many processes as there are cores on the system. You can adjust this behavior by using the following CLI parameter or using a `.runsettings` file, see below.
+По умолчанию xUnit будет запускать все классы параллельно, а тесты внутри каждого класса последовательно. По умолчанию он создаст столько процессов, сколько ядер на системе. Вы можете настроить это поведение, используя следующий параметр CLI или файл `.runsettings`, см. ниже.
 
 ```bash
 dotnet test -- xUnit.MaxParallelThreads=5
 ```
 
 :::note
-We recommend xUnit 2.8+ which uses the [`conservative` parallelism algorithm](https://xunit.net/docs/running-tests-in-parallel.html#algorithms) by default.
+Мы рекомендуем xUnit 2.8+, который по умолчанию использует [`консервативный` алгоритм параллелизма](https://xunit.net/docs/running-tests-in-parallel.html#algorithms).
 :::
 
 </TabItem>
 
 </Tabs>
 
-## Customizing [BrowserContext] options
+## Настройка параметров [BrowserContext]
 
 <Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, ] }>
 
 <TabItem value="nunit">
 
-To customize context options, you can override the `ContextOptions` method of your test class derived from `Microsoft.Playwright.MSTest.PageTest` or `Microsoft.Playwright.MSTest.ContextTest`. See the following example:
+Чтобы настроить параметры контекста, вы можете переопределить метод `ContextOptions` вашего тестового класса, производного от `Microsoft.Playwright.MSTest.PageTest` или `Microsoft.Playwright.MSTest.ContextTest`. См. следующий пример:
 
 ```csharp
 using Microsoft.Playwright.NUnit;
@@ -98,7 +98,7 @@ public class MyTest : PageTest
     [Test]
     public async Task TestWithCustomContextOptions()
     {
-        // The following Page (and BrowserContext) instance has the custom colorScheme, viewport and baseURL set:
+        // Следующий экземпляр Page (и BrowserContext) имеет установленные пользовательские colorScheme, viewport и baseURL:
         await Page.GotoAsync("/login");
     }
 
@@ -122,7 +122,7 @@ public class MyTest : PageTest
 
 <TabItem value="mstest">
 
-To customize context options, you can override the `ContextOptions` method of your test class derived from `Microsoft.Playwright.MSTest.PageTest` or `Microsoft.Playwright.MSTest.ContextTest`. See the following example:
+Чтобы настроить параметры контекста, вы можете переопределить метод `ContextOptions` вашего тестового класса, производного от `Microsoft.Playwright.MSTest.PageTest` или `Microsoft.Playwright.MSTest.ContextTest`. См. следующий пример:
 
 ```csharp
 using System.Threading.Tasks;
@@ -138,7 +138,7 @@ public class ExampleTest : PageTest
     [TestMethod]
     public async Task TestWithCustomContextOptions()
     {
-        // The following Page (and BrowserContext) instance has the custom colorScheme, viewport and baseURL set:
+        // Следующий экземпляр Page (и BrowserContext) имеет установленные пользовательские colorScheme, viewport и baseURL:
         await Page.GotoAsync("/login");
     }
 
@@ -163,7 +163,7 @@ public class ExampleTest : PageTest
 
 <TabItem value="xunit">
 
-To customize context options, you can override the `ContextOptions` method of your test class derived from `Microsoft.Playwright.Xunit.PageTest` or `Microsoft.Playwright.Xunit.ContextTest`. See the following example:
+Чтобы настроить параметры контекста, вы можете переопределить метод `ContextOptions` вашего тестового класса, производного от `Microsoft.Playwright.Xunit.PageTest` или `Microsoft.Playwright.Xunit.ContextTest`. См. следующий пример:
 
 ```csharp
 using Microsoft.Playwright;
@@ -176,7 +176,7 @@ public class UnitTest1 : PageTest
     [Fact]
     public async Task TestWithCustomContextOptions()
     {
-        // The following Page (and BrowserContext) instance has the custom colorScheme, viewport and baseURL set:
+        // Следующий экземпляр Page (и BrowserContext) имеет установленные пользовательские colorScheme, viewport и baseURL:
         await Page.GotoAsync("/login");
     }
     public override BrowserNewContextOptions ContextOptions()
@@ -199,9 +199,9 @@ public class UnitTest1 : PageTest
 
 </Tabs>
 
-## Customizing [Browser]/launch options
+## Настройка параметров запуска [Browser]
 
-[Browser]/launch options can be overridden either using a run settings file or by setting the run settings options directly via the CLI. See the following example:
+Параметры запуска [Browser] могут быть переопределены либо с использованием файла настроек запуска, либо путем установки параметров настроек запуска непосредственно через CLI. См. следующий пример:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -220,31 +220,31 @@ public class UnitTest1 : PageTest
 dotnet test -- Playwright.BrowserName=chromium Playwright.LaunchOptions.Headless=false Playwright.LaunchOptions.Channel=msedge
 ```
 
-## Using Verbose API Logs
+## Использование подробных логов API
 
-When you have enabled the [verbose API log](./debug.mdx#verbose-api-logs), via the `DEBUG` environment variable, you will see the messages in the standard error stream. Within Visual Studio, that will be the `Tests` pane of the `Output` window. It will also be displayed in the `Test Log` for each test.
+Когда вы включили [подробный лог API](./debug.mdx#verbose-api-logs) через переменную окружения `DEBUG`, вы увидите сообщения в стандартном потоке ошибок. В Visual Studio это будет панель `Tests` окна `Output`. Это также будет отображаться в `Test Log` для каждого теста.
 
-## Using the .runsettings file
+## Использование файла .runsettings
 
-When running tests from Visual Studio, you can take advantage of the `.runsettings` file. The following shows a reference of the supported values.
+При запуске тестов из Visual Studio вы можете воспользоваться файлом `.runsettings`. Ниже приведена ссылка на поддерживаемые значения.
 
 <Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, ] }>
 
 <TabItem value="nunit">
 
-For example, to specify the number of workers you can use `NUnit.NumberOfTestWorkers` or to enable `DEBUG` logs `RunConfiguration.EnvironmentVariables`.
+Например, чтобы указать количество рабочих потоков, вы можете использовать `NUnit.NumberOfTestWorkers` или включить логи `DEBUG` через `RunConfiguration.EnvironmentVariables`.
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <RunSettings>
-  <!-- NUnit adapter -->  
+  <!-- Адаптер NUnit -->  
   <NUnit>
     <NumberOfTestWorkers>24</NumberOfTestWorkers>
   </NUnit>
-  <!-- General run configuration -->
+  <!-- Общая конфигурация запуска -->
   <RunConfiguration>
     <EnvironmentVariables>
-      <!-- For debugging selectors, it's recommend to set the following environment variable -->
+      <!-- Для отладки селекторов рекомендуется установить следующую переменную окружения -->
       <DEBUG>pw:api</DEBUG>
     </EnvironmentVariables>
   </RunConfiguration>
@@ -264,21 +264,21 @@ For example, to specify the number of workers you can use `NUnit.NumberOfTestWor
 
 <TabItem value="mstest">
 
-For example, to specify the number of workers, you can use `MSTest.Parallelize.Workers`. You can also enable `DEBUG` logs using `RunConfiguration.EnvironmentVariables`.
+Например, чтобы указать количество рабочих потоков, вы можете использовать `MSTest.Parallelize.Workers`. Вы также можете включить логи `DEBUG` через `RunConfiguration.EnvironmentVariables`.
 
 ```xml
 <RunSettings>
-  <!-- MSTest adapter -->  
+  <!-- Адаптер MSTest -->  
   <MSTest>
     <Parallelize>
       <Workers>4</Workers>
       <Scope>ClassLevel</Scope>
     </Parallelize>
   </MSTest>
-  <!-- General run configuration -->
+  <!-- Общая конфигурация запуска -->
   <RunConfiguration>
     <EnvironmentVariables>
-      <!-- For debugging selectors, it's recommend to set the following environment variable -->
+      <!-- Для отладки селекторов рекомендуется установить следующую переменную окружения -->
       <DEBUG>pw:api</DEBUG>
     </EnvironmentVariables>
   </RunConfiguration>
@@ -298,19 +298,19 @@ For example, to specify the number of workers, you can use `MSTest.Parallelize.W
 
 <TabItem value="xunit">
 
-For example, to specify the number of workers, you can use `xUnit.MaxParallelThreads`. You can also enable `DEBUG` logs using `RunConfiguration.EnvironmentVariables`.
+Например, чтобы указать количество рабочих потоков, вы можете использовать `xUnit.MaxParallelThreads`. Вы также можете включить логи `DEBUG` через `RunConfiguration.EnvironmentVariables`.
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <RunSettings>
-  <!-- See https://xunit.net/docs/runsettings -->
+  <!-- См. https://xunit.net/docs/runsettings -->
   <xUnit>
     <MaxParallelThreads>1</MaxParallelThreads>
   </xUnit>
-  <!-- General run configuration -->
+  <!-- Общая конфигурация запуска -->
   <RunConfiguration>
     <EnvironmentVariables>
-      <!-- For debugging selectors, it's recommend to set the following environment variable -->
+      <!-- Для отладки селекторов рекомендуется установить следующую переменную окружения -->
       <DEBUG>pw:api</DEBUG>
     </EnvironmentVariables>
   </RunConfiguration>
@@ -330,37 +330,36 @@ For example, to specify the number of workers, you can use `xUnit.MaxParallelThr
 
 </Tabs>
 
-## Base classes for Playwright
+## Базовые классы для Playwright
 
 <Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, ] }>
 
 <TabItem value="nunit">
 
-There are a few base classes available to you in `Microsoft.Playwright.NUnit` namespace:
+В пространстве имен `Microsoft.Playwright.NUnit` доступны несколько базовых классов:
 
 </TabItem>
 
 <TabItem value="mstest">
 
-There are a few base classes available to you in `Microsoft.Playwright.MSTest` namespace:
+В пространстве имен `Microsoft.Playwright.MSTest` доступны несколько базовых классов:
 
 </TabItem>
 
 <TabItem value="xunit">
 
-There are a few base classes available to you in `Microsoft.Playwright.Xunit` namespace:
+В пространстве имен `Microsoft.Playwright.Xunit` доступны несколько базовых классов:
 
 </TabItem>
 
 </Tabs>
 
-|Test          |Description|
+|Тест          |Описание|
 |--------------|-----------|
-|PageTest      |Each test gets a fresh copy of a web [Page] created in its own unique [BrowserContext]. Extending this class is the simplest way of writing a fully-functional Playwright test.<br></br><br></br>Note: You can override the `ContextOptions` method in each test file to control context options, the ones typically passed into the [Browser.NewContextAsync()](/api/class-browser.mdx#browser-new-context) method. That way you can specify all kinds of emulation options for your test file individually.|
-|ContextTest   |Each test will get a fresh copy of a [BrowserContext]. You can create as many pages in this context as you'd like. Using this test is the easiest way to test multi-page scenarios where you need more than one tab.<br></br><br></br>Note: You can override the `ContextOptions` method in each test file to control context options, the ones typically passed into the [Browser.NewContextAsync()](/api/class-browser.mdx#browser-new-context) method. That way you can specify all kinds of emulation options for your test file individually.|
-|BrowserTest   |Each test will get a browser and can create as many contexts as it likes. Each test is responsible for cleaning up all the contexts it created.|
-|PlaywrightTest|This gives each test a Playwright object so that the test could start and stop as many browsers as it likes.|
-
+|PageTest      |Каждый тест получает свежую копию веб-страницы [Page], созданную в своем уникальном [BrowserContext]. Расширение этого класса — самый простой способ написания полнофункционального теста Playwright.<br></br><br></br>Примечание: Вы можете переопределить метод `ContextOptions` в каждом тестовом файле, чтобы управлять параметрами контекста, которые обычно передаются в метод [Browser.NewContextAsync()](/api/class-browser.mdx#browser-new-context). Таким образом, вы можете указать все виды параметров эмуляции для вашего тестового файла индивидуально.|
+|ContextTest   |Каждый тест получит свежую копию [BrowserContext]. Вы можете создать столько страниц в этом контексте, сколько захотите. Использование этого теста — самый простой способ тестирования многопользовательских сценариев, где вам нужно больше одной вкладки.<br></br><br></br>Примечание: Вы можете переопределить метод `ContextOptions` в каждом тестовом файле, чтобы управлять параметрами контекста, которые обычно передаются в метод [Browser.NewContextAsync()](/api/class-browser.mdx#browser-new-context). Таким образом, вы можете указать все виды параметров эмуляции для вашего тестового файла индивидуально.|
+|BrowserTest   |Каждый тест получит браузер и может создать столько контекстов, сколько захочет. Каждый тест несет ответственность за очистку всех созданных им контекстов.|
+|PlaywrightTest|Это дает каждому тесту объект Playwright, чтобы тест мог запускать и останавливать столько браузеров, сколько захочет.|
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

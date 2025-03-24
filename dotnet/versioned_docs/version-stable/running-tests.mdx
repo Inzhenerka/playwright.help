@@ -1,32 +1,32 @@
 ---
 id: running-tests
-title: "Running and debugging tests"
+title: "Запуск и отладка тестов"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-You can run a single test, a set of tests or all tests. Tests can be run on different browsers. By default, tests are run in a headless manner, meaning no browser window will be opened while running the tests and results will be seen in the terminal. If you prefer, you can run your tests in headed mode by using the `headless` test run parameter.
+Вы можете запускать один тест, набор тестов или все тесты. Тесты могут быть запущены в разных браузерах. По умолчанию тесты запускаются в безголовом режиме, то есть окно браузера не будет открываться во время выполнения тестов, и результаты будут видны в терминале. Если вы предпочитаете, вы можете запускать тесты в режиме с графическим интерфейсом, используя параметр запуска теста `headless`.
 
-**You will learn**
-- [How to run tests](#running-tests)
-- [How to debug tests](#debugging-tests)
+**Вы узнаете**
+- [Как запускать тесты](#running-tests)
+- [Как отлаживать тесты](#debugging-tests)
 
-## Running tests
+## Запуск тестов
 
-### Run all tests
+### Запуск всех тестов
 
-Use the following command to run all tests.
+Используйте следующую команду для запуска всех тестов.
 
 ```bash
 dotnet test
 ```
 
-### Run tests in headed mode
+### Запуск тестов в режиме с графическим интерфейсом
 
-Use the following command to run your tests in headed mode opening a browser window for each test.
+Используйте следующую команду для запуска тестов в режиме с графическим интерфейсом, открывая окно браузера для каждого теста.
 
 <Tabs
   groupId="bash-flavor"
@@ -62,9 +62,9 @@ dotnet test
 </TabItem>
 </Tabs>
 
-### Run tests on different browsers: Browser env
+### Запуск тестов в разных браузерах: переменная окружения Browser
 
-Specify which browser you would like to run your tests on via the `BROWSER` environment variable.
+Укажите, в каком браузере вы хотите запустить тесты, через переменную окружения `BROWSER`.
 
 <Tabs
   groupId="bash-flavor"
@@ -100,15 +100,15 @@ dotnet test
 </TabItem>
 </Tabs>
 
-### Run tests on different browsers: launch configuration
+### Запуск тестов в разных браузерах: конфигурация запуска
 
-Specify which browser you would like to run your tests on by adjusting the launch configuration options:
+Укажите, в каком браузере вы хотите запустить тесты, изменив параметры конфигурации запуска:
 
 ```bash
 dotnet test -- Playwright.BrowserName=webkit
 ```
 
-To run your test on multiple browsers or configurations, you need to invoke the `dotnet test` command multiple times. There you can then either specify the `BROWSER` environment variable or set the `Playwright.BrowserName` via the runsettings file:
+Чтобы запустить тесты в нескольких браузерах или конфигурациях, вам нужно вызвать команду `dotnet test` несколько раз. Вы можете либо указать переменную окружения `BROWSER`, либо задать `Playwright.BrowserName` через файл runsettings:
 
 ```bash
 dotnet test --settings:chromium.runsettings
@@ -125,29 +125,29 @@ dotnet test --settings:webkit.runsettings
   </RunSettings>
 ```
 
-For more information see [selective unit tests](https://docs.microsoft.com/en-us/dotnet/core/testing/selective-unit-tests?pivots=mstest) in the Microsoft docs.
+Для получения дополнительной информации смотрите [избирательные модульные тесты](https://docs.microsoft.com/en-us/dotnet/core/testing/selective-unit-tests?pivots=mstest) в документации Microsoft.
 
-### Run specific tests
+### Запуск конкретных тестов
 
-To run a single test file, use the filter flag followed by the class name of the test you want to run.
+Чтобы запустить один файл теста, используйте флаг фильтрации, за которым следует имя класса теста, который вы хотите запустить.
 
 ```bash
 dotnet test --filter "ExampleTest"
 ```
 
-To run a set of test files, use the filter flag followed by the class names of the tests you want to run.
+Чтобы запустить набор файлов тестов, используйте флаг фильтрации, за которым следуют имена классов тестов, которые вы хотите запустить.
 
 ```bash
 dotnet test --filter "ExampleTest1|ExampleTest2"
 ```
 
-To run a test with a specific title use the filter flag followed by *Name~* and the title of the test.
+Чтобы запустить тест с определенным заголовком, используйте флаг фильтрации, за которым следует *Name~* и заголовок теста.
 
 ```bash
 dotnet test --filter "Name~GetStartedLink"
 ```
 
-### Run tests with multiple workers:
+### Запуск тестов с несколькими рабочими потоками:
 
 <Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, ] }>
 
@@ -173,20 +173,20 @@ dotnet test -- MSTest.Parallelize.Workers=5
 dotnet test -- xUnit.MaxParallelThreads=5
 ```
 
-See [here](https://xunit.net/docs/running-tests-in-parallel.html) for more information to run tests in parallel with xUnit.
+Смотрите [здесь](https://xunit.net/docs/running-tests-in-parallel.html) для получения дополнительной информации о запуске тестов параллельно с xUnit.
 
 :::note
 
-We recommend xUnit 2.8+ which uses the [`conservative` parallelism algorithm](https://xunit.net/docs/running-tests-in-parallel.html#algorithms) by default.
+Мы рекомендуем xUnit 2.8+, который по умолчанию использует [`консервативный` алгоритм параллелизма](https://xunit.net/docs/running-tests-in-parallel.html#algorithms).
 :::
 
 </TabItem>
 
 </Tabs>
 
-## Debugging Tests
+## Отладка тестов
 
-Since Playwright runs in .NET, you can debug it with your debugger of choice in e.g. Visual Studio Code or Visual Studio. Playwright comes with the Playwright Inspector which allows you to step through Playwright API calls, see their debug logs and explore [locators](./locators.mdx).
+Поскольку Playwright работает в .NET, вы можете отлаживать его с помощью вашего любимого отладчика, например, в Visual Studio Code или Visual Studio. Playwright поставляется с Playwright Inspector, который позволяет пошагово выполнять вызовы API Playwright, просматривать их журналы отладки и исследовать [локаторы](./locators.mdx).
 
 <Tabs
   groupId="bash-flavor"
@@ -222,15 +222,15 @@ dotnet test
 </TabItem>
 </Tabs>
 
-![debugging tests with playwright inspector](https://github.com/microsoft/playwright/assets/13063165/a1e758d3-d379-414f-be0b-7339f12bb635)
+![отладка тестов с помощью Playwright Inspector](https://github.com/microsoft/playwright/assets/13063165/a1e758d3-d379-414f-be0b-7339f12bb635)
 
-Check out our [debugging guide](./debug.mdx) to learn more about the [Playwright Inspector](./debug.mdx#playwright-inspector) as well as debugging with [Browser Developer tools](./debug.mdx#browser-developer-tools).
+Ознакомьтесь с нашим [руководством по отладке](./debug.mdx), чтобы узнать больше о [Playwright Inspector](./debug.mdx#playwright-inspector), а также об отладке с помощью [инструментов разработчика браузера](./debug.mdx#browser-developer-tools).
 
-## What's Next
-- [Generate tests with Codegen](./codegen-intro.mdx)
-- [See a trace of your tests](./trace-viewer-intro.mdx)
-- [Run tests on CI](./ci-intro.mdx)
-- [Learn more about the MSTest and NUnit base classes](./test-runners.mdx)
+## Что дальше
+- [Генерация тестов с помощью Codegen](./codegen-intro.mdx)
+- [Просмотр трассировки ваших тестов](./trace-viewer-intro.mdx)
+- [Запуск тестов на CI](./ci-intro.mdx)
+- [Узнайте больше о базовых классах MSTest и NUnit](./test-runners.mdx)
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"

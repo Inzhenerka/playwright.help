@@ -1,33 +1,33 @@
 ---
 id: writing-tests
-title: "Writing tests"
+title: "Написание тестов"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
-Playwright tests are simple, they
-- **perform actions**, and
-- **assert the state** against expectations.
+Тесты Playwright просты, они
+- **выполняют действия**, и
+- **проверяют состояние** на соответствие ожиданиям.
 
-There is no need to wait for anything prior to performing an action: Playwright automatically waits for the wide range of [actionability](./actionability.mdx) checks to pass prior to performing each action.
+Нет необходимости ожидать чего-либо перед выполнением действия: Playwright автоматически ожидает, пока не пройдут различные проверки [доступности](./actionability.mdx) перед выполнением каждого действия.
 
-There is also no need to deal with the race conditions when performing the checks - Playwright assertions are designed in a way that they describe the expectations that need to be eventually met.
+Также нет необходимости решать проблемы с условиями гонки при выполнении проверок - утверждения Playwright разработаны таким образом, чтобы описывать ожидания, которые должны быть в конечном итоге выполнены.
 
-That's it! These design choices allow Playwright users to forget about flaky timeouts and racy checks in their tests altogether.
+Вот и все! Эти проектные решения позволяют пользователям Playwright забыть о ненадежных таймаутах и гонках в своих тестах.
 
-**You will learn**
-- [How to write the first test](/writing-tests.mdx#first-test)
-- [How to perform actions](/writing-tests.mdx#actions)
-- [How to use assertions](/writing-tests.mdx#assertions)
-- [How tests run in isolation](/writing-tests.mdx#test-isolation)
-- [How to use test hooks](/writing-tests.mdx#using-test-hooks)
+**Вы узнаете**
+- [Как написать первый тест](/writing-tests.mdx#first-test)
+- [Как выполнять действия](/writing-tests.mdx#actions)
+- [Как использовать утверждения](/writing-tests.mdx#assertions)
+- [Как тесты выполняются изолированно](/writing-tests.mdx#test-isolation)
+- [Как использовать хуки тестов](/writing-tests.mdx#using-test-hooks)
 
-## First test
+## Первый тест
 
-Take a look at the following example to see how to write a test.
+Посмотрите на следующий пример, чтобы увидеть, как написать тест.
 
 <Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, ] }>
 
@@ -51,7 +51,7 @@ public class ExampleTest : PageTest
     {
         await Page.GotoAsync("https://playwright.dev");
 
-        // Expect a title "to contain" a substring.
+        // Ожидаем, что заголовок "содержит" подстроку.
         await Expect(Page).ToHaveTitleAsync(new Regex("Playwright"));
     }
 
@@ -60,10 +60,10 @@ public class ExampleTest : PageTest
     {
         await Page.GotoAsync("https://playwright.dev");
 
-        // Click the get started link.
+        // Клик по ссылке "Get started".
         await Page.GetByRole(AriaRole.Link, new() { Name = "Get started" }).ClickAsync();
 
-        // Expects page to have a heading with the name of Installation.
+        // Ожидаем, что на странице будет заголовок с именем Installation.
         await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Installation" })).ToBeVisibleAsync();
     } 
 }
@@ -90,7 +90,7 @@ public class ExampleTest : PageTest
     {
         await Page.GotoAsync("https://playwright.dev");
 
-        // Expect a title "to contain" a substring.
+        // Ожидаем, что заголовок "содержит" подстроку.
         await Expect(Page).ToHaveTitleAsync(new Regex("Playwright"));
     }
 
@@ -99,10 +99,10 @@ public class ExampleTest : PageTest
     {
         await Page.GotoAsync("https://playwright.dev");
 
-        // Click the get started link.
+        // Клик по ссылке "Get started".
         await Page.GetByRole(AriaRole.Link, new() { Name = "Get started" }).ClickAsync();
 
-        // Expects page to have a heading with the name of Installation.
+        // Ожидаем, что на странице будет заголовок с именем Installation.
         await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Installation" })).ToBeVisibleAsync();
     } 
 }
@@ -126,7 +126,7 @@ public class UnitTest1: PageTest
     {
         await Page.GotoAsync("https://playwright.dev");
 
-        // Expect a title "to contain" a substring.
+        // Ожидаем, что заголовок "содержит" подстроку.
         await Expect(Page).ToHaveTitleAsync(new Regex("Playwright"));
     }
 
@@ -135,10 +135,10 @@ public class UnitTest1: PageTest
     {
         await Page.GotoAsync("https://playwright.dev");
 
-        // Click the get started link.
+        // Клик по ссылке "Get started".
         await Page.GetByRole(AriaRole.Link, new() { Name = "Get started" }).ClickAsync();
 
-        // Expects page to have a heading with the name of Installation.
+        // Ожидаем, что на странице будет заголовок с именем Installation.
         await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Installation" })).ToBeVisibleAsync();
     } 
 }
@@ -148,78 +148,78 @@ public class UnitTest1: PageTest
 
 </Tabs>
 
-## Actions
+## Действия
 
-### Navigation
+### Навигация
 
-Most of the tests will start by navigating the page to a URL. After that, the test will be able to interact with the page elements.
+Большинство тестов начнется с перехода страницы на URL. После этого тест сможет взаимодействовать с элементами страницы.
 
 ```csharp
 await Page.GotoAsync("https://playwright.dev");
 ```
 
-Playwright will wait for the page to reach the load state prior to moving forward. Learn more about the [Page.GotoAsync()](/api/class-page.mdx#page-goto) options.
+Playwright будет ждать, пока страница достигнет состояния загрузки, прежде чем продолжить. Узнайте больше о параметрах [Page.GotoAsync()](/api/class-page.mdx#page-goto).
 
-### Interactions
+### Взаимодействия
 
-Performing actions starts with locating the elements. Playwright uses [Locators API](./locators.mdx) for that. Locators represent a way to find element(s) on the page at any moment, learn more about the [different types](./locators.mdx) of locators available. Playwright will wait for the element to be [actionable](./actionability.mdx) prior to performing the action, so there is no need to wait for it to become available.
+Выполнение действий начинается с поиска элементов. Playwright использует [API локаторов](./locators.mdx) для этого. Локаторы представляют собой способ найти элемент(ы) на странице в любой момент, узнайте больше о [различных типах](./locators.mdx) доступных локаторов. Playwright будет ждать, пока элемент станет [доступным для действия](./actionability.mdx) перед выполнением действия, так что нет необходимости ждать, пока он станет доступным.
 
 ```csharp
-// Create a locator.
+// Создать локатор.
 var getStarted = Page.GetByRole(AriaRole.Link, new() { Name = "Get started" });
 
-// Click it.
+// Кликнуть по нему.
 await getStarted.ClickAsync();
 ```
 
-In most cases, it'll be written in one line:
+В большинстве случаев это будет записано в одну строку:
 
 ```csharp
 await Page.GetByRole(AriaRole.Link, new() { Name = "Get started" }).ClickAsync();
 ```
 
-### Basic actions
+### Основные действия
 
-This is the list of the most popular Playwright actions. Note that there are many more, so make sure to check the [Locator API](./api/class-locator.mdx) section to learn more about them.
+Это список самых популярных действий Playwright. Обратите внимание, что их гораздо больше, поэтому обязательно ознакомьтесь с разделом [API локаторов](./api/class-locator.mdx), чтобы узнать о них больше.
 
-| Action | Description |
+| Действие | Описание |
 | :- | :- |
-| [Locator.CheckAsync()](/api/class-locator.mdx#locator-check) | Check the input checkbox |
-| [Locator.ClickAsync()](/api/class-locator.mdx#locator-click) | Click the element |
-| [Locator.UncheckAsync()](/api/class-locator.mdx#locator-uncheck) | Uncheck the input checkbox |
-| [Locator.HoverAsync()](/api/class-locator.mdx#locator-hover) | Hover mouse over the element |
-| [Locator.FillAsync()](/api/class-locator.mdx#locator-fill) | Fill the form field, input text |
-| [Locator.FocusAsync()](/api/class-locator.mdx#locator-focus) | Focus the element |
-| [Locator.PressAsync()](/api/class-locator.mdx#locator-press) | Press single key |
-| [Locator.SetInputFilesAsync()](/api/class-locator.mdx#locator-set-input-files) | Pick files to upload |
-| [Locator.SelectOptionAsync()](/api/class-locator.mdx#locator-select-option) | Select option in the drop down |
+| [Locator.CheckAsync()](/api/class-locator.mdx#locator-check) | Установить флажок ввода |
+| [Locator.ClickAsync()](/api/class-locator.mdx#locator-click) | Кликнуть по элементу |
+| [Locator.UncheckAsync()](/api/class-locator.mdx#locator-uncheck) | Снять флажок ввода |
+| [Locator.HoverAsync()](/api/class-locator.mdx#locator-hover) | Навести курсор на элемент |
+| [Locator.FillAsync()](/api/class-locator.mdx#locator-fill) | Заполнить поле формы, ввести текст |
+| [Locator.FocusAsync()](/api/class-locator.mdx#locator-focus) | Сфокусироваться на элементе |
+| [Locator.PressAsync()](/api/class-locator.mdx#locator-press) | Нажать одну клавишу |
+| [Locator.SetInputFilesAsync()](/api/class-locator.mdx#locator-set-input-files) | Выбрать файлы для загрузки |
+| [Locator.SelectOptionAsync()](/api/class-locator.mdx#locator-select-option) | Выбрать опцию в выпадающем списке |
 
-## Assertions
+## Утверждения
 
-Playwright provides an async function called [Expect](./test-assertions) to assert and wait until the expected condition is met.
+Playwright предоставляет асинхронную функцию под названием [Expect](./test-assertions) для утверждения и ожидания, пока ожидаемое условие не будет выполнено.
 
 ```csharp
 await Expect(Page).ToHaveTitleAsync(new Regex("Playwright"));
 ```
 
-Here is the list of the most popular async assertions. Note that there are [many more](./test-assertions.mdx) to get familiar with:
+Вот список самых популярных асинхронных утверждений. Обратите внимание, что их [гораздо больше](./test-assertions.mdx), чтобы с ними ознакомиться:
 
-| Assertion | Description |
+| Утверждение | Описание |
 | :- | :- |
-| [Expect(Locator).ToBeCheckedAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-checked) | Checkbox is checked |
-| [Expect(Locator).ToBeEnabledAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-enabled) | Control is enabled |
-| [Expect(Locator).ToBeVisibleAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible) | Element is visible |
-| [Expect(Locator).ToContainTextAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-contain-text) | Element contains text |
-| [Expect(Locator).ToHaveAttributeAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-attribute) | Element has attribute |
-| [Expect(Locator).ToHaveCountAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-count) | List of elements has given length |
-| [Expect(Locator).ToHaveTextAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text) | Element matches text |
-| [Expect(Locator).ToHaveValueAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-value) | Input element has value |
-| [Expect(Page).ToHaveTitleAsync()](/api/class-pageassertions.mdx#page-assertions-to-have-title) | Page has title |
-| [Expect(Page).ToHaveURLAsync()](/api/class-pageassertions.mdx#page-assertions-to-have-url) | Page has URL |
+| [Expect(Locator).ToBeCheckedAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-checked) | Флажок установлен |
+| [Expect(Locator).ToBeEnabledAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-enabled) | Элемент управления включен |
+| [Expect(Locator).ToBeVisibleAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible) | Элемент виден |
+| [Expect(Locator).ToContainTextAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-contain-text) | Элемент содержит текст |
+| [Expect(Locator).ToHaveAttributeAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-attribute) | Элемент имеет атрибут |
+| [Expect(Locator).ToHaveCountAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-count) | Список элементов имеет заданную длину |
+| [Expect(Locator).ToHaveTextAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text) | Элемент соответствует тексту |
+| [Expect(Locator).ToHaveValueAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-value) | Элемент ввода имеет значение |
+| [Expect(Page).ToHaveTitleAsync()](/api/class-pageassertions.mdx#page-assertions-to-have-title) | Страница имеет заголовок |
+| [Expect(Page).ToHaveURLAsync()](/api/class-pageassertions.mdx#page-assertions-to-have-url) | Страница имеет URL |
 
-## Test Isolation
+## Изоляция тестов
 
-The Playwright NUnit and MSTest test framework base classes will isolate each test from each other by providing a separate `Page` instance. Pages are isolated between tests due to the Browser Context, which is equivalent to a brand new browser profile, where every test gets a fresh environment, even when multiple tests run in a single Browser.
+Базовые классы тестовых фреймворков Playwright NUnit и MSTest изолируют каждый тест друг от друга, предоставляя отдельный экземпляр `Page`. Страницы изолированы между тестами благодаря Контексту Браузера, который эквивалентен совершенно новому профилю браузера, где каждый тест получает свежую среду, даже когда несколько тестов выполняются в одном браузере.
 
 <Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, ] }>
 
@@ -290,13 +290,13 @@ public class UnitTest1: PageTest
 
 </Tabs>
 
-## Using Test Hooks
+## Использование хуков тестов
 
 <Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, ] }>
 
 <TabItem value="nunit">
 
-You can use `SetUp`/`TearDown` to prepare and clean up your test environment:
+Вы можете использовать `SetUp`/`TearDown` для подготовки и очистки вашей тестовой среды:
 
 ```csharp title="UnitTest1.cs"
 using System.Threading.Tasks;
@@ -312,7 +312,7 @@ public class ExampleTest : PageTest
     [Test]
     public async Task MainNavigation()
     {
-        // Assertions use the expect API.
+        // Утверждения используют API expect.
         await Expect(Page).ToHaveURLAsync("https://playwright.dev/");
     }
 
@@ -328,7 +328,7 @@ public class ExampleTest : PageTest
 
 <TabItem value="mstest">
 
-You can use `TestInitialize`/`TestCleanup` to prepare and clean up your test environment:
+Вы можете использовать `TestInitialize`/`TestCleanup` для подготовки и очистки вашей тестовой среды:
 
 ```csharp title="UnitTest1.cs"
 using System.Threading.Tasks;
@@ -343,7 +343,7 @@ public class ExampleTest : PageTest
     [TestMethod]
     public async Task MainNavigation()
     {
-        // Assertions use the expect API.
+        // Утверждения используют API expect.
         await Expect(Page).ToHaveURLAsync("https://playwright.dev/");
     }
 
@@ -359,7 +359,7 @@ public class ExampleTest : PageTest
 
 <TabItem value="xunit">
 
-You can use `InitializeAsync`/`DisposeAsync` to prepare and clean up your test environment:
+Вы можете использовать `InitializeAsync`/`DisposeAsync` для подготовки и очистки вашей тестовой среды:
 
 ```csharp title="UnitTest1.cs"
 using Microsoft.Playwright;
@@ -372,7 +372,7 @@ public class UnitTest1: PageTest
     [Fact]
     public async Task MainNavigation()
     {
-        // Assertions use the expect API.
+        // Утверждения используют API expect.
         await Expect(Page).ToHaveURLAsync("https://playwright.dev/");
     }
 
@@ -394,12 +394,12 @@ public class UnitTest1: PageTest
 
 </Tabs>
 
-## What's Next
-- [Run single test, multiple tests, headed mode](./running-tests.mdx)
-- [Generate tests with Codegen](./codegen-intro.mdx)
-- [See a trace of your tests](./trace-viewer-intro.mdx)
-- [Run tests on CI](./ci-intro.mdx)
-- [Learn more about the MSTest, NUnit, or xUnit base classes](./test-runners.mdx)
+## Что дальше
+- [Запуск одного теста, нескольких тестов, режим с интерфейсом](./running-tests.mdx)
+- [Генерация тестов с помощью Codegen](./codegen-intro.mdx)
+- [Просмотр трассировки ваших тестов](./trace-viewer-intro.mdx)
+- [Запуск тестов на CI](./ci-intro.mdx)
+- [Узнайте больше о базовых классах MSTest, NUnit или xUnit](./test-runners.mdx)
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"

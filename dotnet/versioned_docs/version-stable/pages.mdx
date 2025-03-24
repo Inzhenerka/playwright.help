@@ -6,92 +6,91 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Pages
+## Страницы
 
-Each [BrowserContext] can have multiple pages. A [Page] refers to a single tab or a popup window within a browser context. It should be used to navigate to URLs and interact with the page content.
+Каждый [BrowserContext] может содержать несколько страниц. [Page] относится к одной вкладке или всплывающему окну в контексте браузера. Он должен использоваться для навигации по URL-адресам и взаимодействия с содержимым страницы.
 
 ```csharp
-// Create a page.
+// Создать страницу.
 var page = await context.NewPageAsync();
 
-// Navigate explicitly, similar to entering a URL in the browser.
+// Явная навигация, аналогично вводу URL в браузере.
 await page.GotoAsync("http://example.com");
-// Fill an input.
+// Заполнить поле ввода.
 await page.Locator("#search").FillAsync("query");
 
-// Navigate implicitly by clicking a link.
+// Неявная навигация путем нажатия на ссылку.
 await page.Locator("#submit").ClickAsync();
-// Expect a new url.
+// Ожидание нового URL.
 Console.WriteLine(page.Url);
 ```
 
-## Multiple pages
+## Несколько страниц
 
-Each browser context can host multiple pages (tabs).
-* Each page behaves like a focused, active page. Bringing the page to front is not required.
-* Pages inside a context respect context-level emulation, like viewport sizes, custom network routes or browser locale.
+Каждый контекст браузера может содержать несколько страниц (вкладок).
+* Каждая страница ведет себя как сфокусированная, активная страница. Выводить страницу на передний план не требуется.
+* Страницы внутри контекста учитывают эмуляцию на уровне контекста, такую как размеры окна просмотра, пользовательские маршруты сети или локаль браузера.
 
 ```csharp
-// Create two pages
+// Создать две страницы
 var pageOne = await context.NewPageAsync();
 var pageTwo = await context.NewPageAsync();
 
-// Get pages of a browser context
+// Получить страницы контекста браузера
 var allPages = context.Pages;
 ```
 
-## Handling new pages
+## Обработка новых страниц
 
-The `page` event on browser contexts can be used to get new pages that are created in the context. This can be used to handle new pages opened by `target="_blank"` links.
+Событие `page` в контекстах браузера может использоваться для получения новых страниц, которые создаются в контексте. Это может быть использовано для обработки новых страниц, открытых ссылками с `target="_blank"`.
 
 ```csharp
-// Get page after a specific action (e.g. clicking a link)
+// Получить страницу после конкретного действия (например, нажатия на ссылку)
 var newPage = await context.RunAndWaitForPageAsync(async () =>
 {
     await page.GetByText("open new tab").ClickAsync();
 });
-// Interact with the new page normally
+// Взаимодействовать с новой страницей как обычно
 await newPage.GetByRole(AriaRole.Button).ClickAsync();
 Console.WriteLine(await newPage.TitleAsync());
 ```
 
-If the action that triggers the new page is unknown, the following pattern can be used.
+Если действие, которое вызывает новую страницу, неизвестно, можно использовать следующий шаблон.
 
 ```csharp
-// Get all new pages (including popups) in the context
+// Получить все новые страницы (включая всплывающие окна) в контексте
 context.Page += async  (_, page) => {
     await page.WaitForLoadStateAsync();
     Console.WriteLine(await page.TitleAsync());
 };
 ```
 
-## Handling popups
+## Обработка всплывающих окон
 
-If the page opens a pop-up (e.g. pages opened by `target="_blank"` links), you can get a reference to it by listening to the `popup` event on the page.
+Если страница открывает всплывающее окно (например, страницы, открытые ссылками с `target="_blank"`), вы можете получить ссылку на него, прослушивая событие `popup` на странице.
 
-This event is emitted in addition to the `browserContext.on('page')` event, but only for popups relevant to this page.
+Это событие генерируется в дополнение к событию `browserContext.on('page')`, но только для всплывающих окон, относящихся к этой странице.
 
 ```csharp
-// Get popup after a specific action (e.g., click)
+// Получить всплывающее окно после конкретного действия (например, нажатия)
 var popup = await page.RunAndWaitForPopupAsync(async () =>
 {
     await page.GetByText("open the popup").ClickAsync();
 });
-// Interact with the popup normally
+// Взаимодействовать с всплывающим окном как обычно
 await popup.GetByRole(AriaRole.Button).ClickAsync();
 Console.WriteLine(await popup.TitleAsync());
 ```
 
-If the action that triggers the popup is unknown, the following pattern can be used.
+Если действие, которое вызывает всплывающее окно, неизвестно, можно использовать следующий шаблон.
 
 ```csharp
-// Get all popups when they open
+// Получить все всплывающие окна, когда они открываются
 page.Popup += async  (_, popup) => {
     await popup.WaitForLoadStateAsync();
     Console.WriteLine(await page.TitleAsync());
 };
 ```
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
