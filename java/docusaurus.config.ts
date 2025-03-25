@@ -190,8 +190,8 @@ module.exports = {
     },
     algolia: {
       indexName: 'playwright-java',
-      appId: 'K09ICMCV6X',
-      apiKey: 'a5b64422711c37ab6a0ce4d86d16cdd9',
+      appId: 'CULHF9H6SY',
+      apiKey: 'a80ce53f4162ad05607078eb2930b18f',
     },
     image: '/img/playwright-cover.jpg',
   },
