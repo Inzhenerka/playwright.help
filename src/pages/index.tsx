@@ -231,7 +231,7 @@ const Home: React.FC = () => {
             </Link>
             <Link
                 className={styles.getStarted}
-                to="https://inzhenerka.tech/playwright"
+                to="https://inzhenerka.tech/testing"
             >
               Пройти обучение
             </Link>
