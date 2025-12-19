@@ -84,7 +84,7 @@ await Expect(page.Locator("banner")).ToMatchAriaSnapshotAsync(@"
 - **"name"**: Доступное имя элемента. Строки в кавычках указывают на точные значения, `/patterns/` используются для регулярных выражений.
 - **[attribute=value]**: Атрибуты и значения в квадратных скобках представляют конкретные ARIA атрибуты, такие как `checked`, `disabled`, `expanded`, `level`, `pressed` или `selected`.
 
-Эти значения получены из ARIA атрибутов или рассчитаны на основе HTML семантики. Чтобы исследовать структуру дерева доступности страницы, используйте [Chrome DevTools Accessibility Pane](https://developer.chrome.com/docs/devtools/accessibility/reference#pane).
+Эти значения берутся из ARIA-атрибутов или вычисляются на основе семантики HTML. Чтобы посмотреть структуру дерева доступности (accessibility tree) страницы, используйте вкладку [Chrome DevTools Accessibility Tab](https://developer.chrome.com/docs/devtools/accessibility/reference#tab).
 
 ## Сопоставление снимков
 
@@ -162,7 +162,48 @@ await Expect(page.Locator("body")).ToMatchAriaSnapshotAsync(@"
 
 Частичные сопоставления позволяют создавать гибкие тесты снимков, которые проверяют основную структуру страницы без навязывания конкретного содержимого или атрибутов.
 
-### Сопоставление с регулярными выражениями
+### Strict matching
+
+By default, a template containing the subset of children will be matched:
+
+```html
+<ul>
+  <li>Feature A</li>
+  <li>Feature B</li>
+  <li>Feature C</li>
+</ul>
+```
+
+*aria snapshot for partial match*
+
+```yaml
+- list
+  - listitem: Feature B
+```
+
+The `/children` property can be used to control how child elements are matched:
+- `contain` (default): Matches if all specified children are present in order
+- `equal`: Matches if the children exactly match the specified list in order
+- `deep-equal`: Matches if the children exactly match the specified list in order, including nested children
+
+```html
+<ul>
+  <li>Feature A</li>
+  <li>Feature B</li>
+  <li>Feature C</li>
+</ul>
+```
+
+*aria snapshot will fail due to Feature C not being in the template*
+
+```yaml
+- list
+  - /children: equal
+  - listitem: Feature A
+  - listitem: Feature B
+```
+
+### Matching with regular expressions
 
 Регулярные выражения позволяют гибко сопоставлять элементы с динамическим или переменным текстом. Доступные имена и текст могут поддерживать шаблоны регулярных выражений.
 
@@ -338,7 +379,6 @@ Console.WriteLine(snapshot);
 ```
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -404,6 +444,7 @@ Console.WriteLine(snapshot);
 [Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1 "Action"
 [Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2 "Func"
 [IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable "IEnumerable"
+[IReadOnlyList]: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1?view=net-9.0 "IReadOnlyList"
 [IDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary "IDictionary"
 [Task]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-5.0 "Task"
 [IReadOnlyDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2 "IReadOnlyDictionary"

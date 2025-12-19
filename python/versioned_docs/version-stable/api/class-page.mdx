@@ -199,8 +199,8 @@ page.get_by_role("button", name="Start here").click()
 <TabItem value="async">
 
 ```py
-# Настройка обработчика.
-def handler():
+# Настраиваем обработчик.
+async def handler():
   await page.get_by_role("button", name="No thanks").click()
 await page.add_locator_handler(page.get_by_text("Sign up to the newsletter"), handler)
 
@@ -240,7 +240,7 @@ page.get_by_role("button", name="Start here").click()
 
 ```py
 # Настройка обработчика.
-def handler():
+async def handler():
   await page.get_by_role("button", name="Remind me later").click()
 await page.add_locator_handler(page.get_by_text("Confirm your security details"), handler)
 
@@ -280,7 +280,7 @@ page.get_by_role("button", name="Start here").click()
 
 ```py
 # Настройка обработчика.
-def handler():
+async def handler():
   await page.evaluate("window.removeObstructionsForTestIfNeeded()")
 await page.add_locator_handler(page.locator("body"), handler, no_wait_after=True)
 
@@ -314,7 +314,7 @@ page.add_locator_handler(page.get_by_label("Close"), handler, times=1)
 <TabItem value="async">
 
 ```py
-def handler(locator):
+async def handler(locator):
   await locator.click()
 await page.add_locator_handler(page.get_by_label("Close"), handler, times=1)
 ```
@@ -452,6 +452,23 @@ page.close(**kwargs)
 
 ---
 
+### console_messages {#page-console-messages}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.56</font><x-search>page.console_messages</x-search>
+
+Returns up to (currently) 200 last console messages from this page. See [page.on("console")](/api/class-page.mdx#page-event-console) for more details.
+
+**Usage**
+
+```python
+page.console_messages()
+```
+
+**Returns**
+- [List]\[[ConsoleMessage]\]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-console-messages-return"/><a href="#page-console-messages-return" class="list-anchor">#</a>
+
+---
+
 ### content {#page-content}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до версии v1.9</font><x-search>page.content</x-search>
@@ -539,7 +556,10 @@ await page.drag_and_drop(
   - `y` [float]
     
     
-  Кликает на исходный элемент в этой точке относительно верхнего левого угла рамки элемента. Если не указано, используется видимая точка элемента.
+  Кликает по исходному элементу в этой точке, заданной относительно верхнего левого угла области padding элемента. Если не указано, используется какая‑то видимая точка элемента.
+- `steps` [int] *(опционально)* <font size="2">Добавлено в: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-drag-and-drop-option-steps"/><a href="#page-drag-and-drop-option-steps" class="list-anchor">#</a>
+  
+  По умолчанию `1`. Отправляет `n` интерполированных событий `mousemove`, чтобы смоделировать перемещение между `mousedown` и `mouseup` при перетаскивании. Если установить `1`, будет сгенерировано одно событие `mousemove` в точке назначения.
 - `strict` [bool] *(опционально)* <font size="2">Добавлено в: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-drag-and-drop-option-strict"/><a href="#page-drag-and-drop-option-strict" class="list-anchor">#</a>
   
   Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов выбрасывает исключение.
@@ -2194,11 +2214,28 @@ page.opener()
 
 ---
 
+### page_errors {#page-page-errors}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.56</font><x-search>page.page_errors</x-search>
+
+Returns up to (currently) 200 last page errors from this page. See [page.on("pageerror")](/api/class-page.mdx#page-event-page-error) for more details.
+
+**Usage**
+
+```python
+page.page_errors()
+```
+
+**Returns**
+- [List]\[[Error]\]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-page-errors-return"/><a href="#page-page-errors-return" class="list-anchor">#</a>
+
+---
+
 ### pause {#page-pause}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>page.pause</x-search>
 
-Приостанавливает выполнение скрипта. Playwright остановит выполнение скрипта и будет ждать, пока пользователь не нажмет кнопку 'Resume' в оверлее страницы или не вызовет `playwright.resume()` в консоли DevTools.
+Приостанавливает выполнение скрипта. Playwright остановит выполнение и будет ждать, пока пользователь либо нажмёт кнопку «Resume» в оверлее страницы, либо вызовет `playwright.resume()` в консоли DevTools.
 
 Пользователь может исследовать селекторы или выполнять ручные шаги во время паузы. Возобновление продолжит выполнение оригинального скрипта с того места, где он был приостановлен.
 
@@ -2466,6 +2503,27 @@ page.request_gc()
 
 ---
 
+### requests {#page-requests}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.56</font><x-search>page.requests</x-search>
+
+Returns up to (currently) 100 last network request from this page. See [page.on("request")](/api/class-page.mdx#page-event-request) for more details.
+
+Returned requests should be accessed immediately, otherwise they might be collected to prevent unbounded memory growth as new requests come in. Once collected, retrieving most information about the request is impossible.
+
+Note that requests reported through the [page.on("request")](/api/class-page.mdx#page-event-request) request are not collected, so there is a trade off between efficient memory usage with [page.requests()](/api/class-page.mdx#page-requests) and the amount of available information reported through [page.on("request")](/api/class-page.mdx#page-event-request).
+
+**Usage**
+
+```python
+page.requests()
+```
+
+**Returns**
+- [List]\[[Request]\]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-requests-return"/><a href="#page-requests-return" class="list-anchor">#</a>
+
+---
+
 ### route {#page-route}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>page.route</x-search>
@@ -2600,6 +2658,14 @@ await page.route("/api/**", handle_route)
 
 **Аргументы**
 - `url` [str] | [Pattern] | [Callable]\[[URL]\]:[bool]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-option-url"/><a href="#page-route-option-url" class="list-anchor">#</a>
+  
+  Глоб-шаблон, регулярное выражение или предикат, который получает [URL] для сопоставления при маршрутизации. Если в опциях контекста задан [base_url](/api/class-browser.mdx#browser-new-context-option-base-url) и переданный URL — строка, не начинающаяся с `*`, он будет разрешён с помощью конструктора [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL).
+- `handler` [Callable]\[[Route], [Request]\]:[Promise]\[[Any]\] | [Any]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-option-handler"/><a href="#page-route-option-handler" class="list-anchor">#</a>
+  
+  Функция-обработчик для маршрутизации запроса.
+- `times` [int] *(опционально)* <font size="2">Добавлено в: v1.15</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-option-times"/><a href="#page-route-option-times" class="list-anchor">#</a>
+  
+  Сколько раз должен применяться route. По умолчанию он будет применяться каждый раз.
 
   Глобальный шаблон, регулярное выражение или предикат, получающий [URL] для сопоставления при маршрутизации. Когда [base_url](/api/class-browser.mdx#browser-new-context-option-base-url) через параметры контекста был предоставлен и переданный URL является путем, он объединяется через конструктор [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL).
 - `handler` [Callable]\[[Route], [Request]\]:[Promise]\[[Any]\] | [Any]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-option-handler"/><a href="#page-route-option-handler" class="list-anchor">#</a>
@@ -4026,27 +4092,6 @@ page.on("worker", handler)
 ---
 
 ## Устаревшие
-
-### accessibility {#page-accessibility}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до версии v1.9</font><x-search>page.accessibility</x-search>
-
-:::warning Устарело
-
-Это свойство не рекомендуется использовать. Пожалуйста, используйте другие библиотеки, такие как [Axe](https://www.deque.com/axe/), если вам нужно тестировать доступность страницы. См. наш [руководство](https://playwright.dev/docs/accessibility-testing) по интеграции с Axe для Node.js.
-
-:::
-
-**Использование**
-
-```python
-page.accessibility
-```
-
-**Тип**
-- [Accessibility]
-
----
 
 ### check {#page-check}
 
@@ -5801,7 +5846,6 @@ await page.wait_for_timeout(1000)
 **Возвращает**
 - [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-timeout-return"/><a href="#page-wait-for-timeout-return" class="list-anchor">#</a>
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"

@@ -92,6 +92,44 @@ worker.url();
 
 ---
 
+### waitForEvent {#worker-wait-for-event}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.57</font><x-search>worker.waitForEvent</x-search>
+
+Ждёт срабатывания события и передаёт его значение в функцию-предикат. Возвращается, когда предикат возвращает truthy-значение. Выбросит ошибку, если страница будет закрыта до того, как событие сработает. Возвращает значение данных события.
+
+**Использование**
+
+```js
+// Начните ждать загрузку до клика. Обратите внимание: без await.
+const consolePromise = worker.waitForEvent('console');
+await worker.evaluate('console.log(42)');
+const consoleMessage = await consolePromise;
+```
+
+**Аргументы**
+- `event` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="worker-wait-for-event-option-event"/><a href="#worker-wait-for-event-option-event" class="list-anchor">#</a>
+  
+  Имя события — то же, которое обычно передают в `*.on(event)`.
+- `optionsOrPredicate` [function] | [Object] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="worker-wait-for-event-option-options-or-predicate"/><a href="#worker-wait-for-event-option-options-or-predicate" class="list-anchor">#</a>
+  - `predicate` [function]
+    
+    Получает данные события и возвращает truthy-значение, когда ожидание должно завершиться.
+  - `timeout` [number] *(опционально)*
+    
+    Максимальное время ожидания в миллисекундах. По умолчанию `0` — без таймаута. Значение по умолчанию можно изменить через опцию `actionTimeout` в конфиге или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+  
+  Либо предикат, получающий событие, либо объект опций. Необязательно.
+- `options` [Object] *(опционально)*
+  - `predicate` [function] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="worker-wait-for-event-option-predicate"/><a href="#worker-wait-for-event-option-predicate" class="list-anchor">#</a>
+    
+    Получает данные события и возвращает truthy-значение, когда ожидание должно завершиться.
+
+**Возвращает**
+- [Promise]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="worker-wait-for-event-return"/><a href="#worker-wait-for-event-return" class="list-anchor">#</a>
+
+---
+
 ## События
 
 ### on('close') {#worker-event-close}
@@ -107,8 +145,24 @@ worker.on('close', data => {});
 **Данные события**
 - [Worker]
 
+---
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+### on('console') {#worker-event-console}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.57</font><x-search>worker.on('console')</x-search>
+
+Emitted when JavaScript within the worker calls one of console API methods, e.g. `console.log` or `console.dir`.
+
+**Usage**
+
+```js
+worker.on('console', data => {});
+```
+
+**Event data**
+- [ConsoleMessage]
+
+
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

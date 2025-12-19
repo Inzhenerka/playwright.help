@@ -8,19 +8,23 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Введение
 
-Playwright Test был создан специально для удовлетворения потребностей в end-to-end тестировании. Playwright поддерживает все современные движки рендеринга, включая Chromium, WebKit и Firefox. Тестируйте на Windows, Linux и macOS, локально или на CI, в безголовом или обычном режиме с нативной эмуляцией мобильных устройств Google Chrome для Android и Mobile Safari.
+Playwright Test — это фреймворк для end-to-end тестирования современных веб‑приложений. Он включает раннер тестов, ассерты, изоляцию, параллельный запуск и богатый набор инструментов. Playwright поддерживает Chromium, WebKit и Firefox на Windows, Linux и macOS — локально или в CI, в headless-режиме или с видимым браузером, с нативной мобильной эмуляцией для Chrome (Android) и Mobile Safari.
 
 **Вы узнаете**
 - [Как установить Playwright](/intro.mdx#installing-playwright)
-- [Что установлено](/intro.mdx#whats-installed)
+- [Что устанавливается](/intro.mdx#whats-installed)
 - [Как запустить пример теста](/intro.mdx#running-the-example-test)
-- [Как открыть HTML отчет о тестировании](/intro.mdx#html-test-reports)
+- [Как открыть HTML-отчёт тестов](/intro.mdx#html-test-reports)
 
 ## Установка Playwright
 
-Начните с установки Playwright с помощью npm, yarn или pnpm. В качестве альтернативы вы также можете начать и запустить свои тесты, используя [расширение VS Code](./getting-started-vscode.mdx).
+Начните с установки Playwright одним из следующих способов.
 
-<Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
+### С помощью npm, yarn или pnpm
+
+Команда ниже либо инициализирует новый проект, либо добавляет Playwright в уже существующий.
+
+<Tabs groupId="js-package-manager" defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
 
 <TabItem value="npm">
 
@@ -48,35 +52,39 @@ pnpm create playwright
 
 </Tabs>
 
-Запустите команду установки и выберите следующее, чтобы начать:
-- Выберите между TypeScript или JavaScript (по умолчанию TypeScript)
-- Название папки с тестами (по умолчанию tests или e2e, если у вас уже есть папка tests в проекте)
-- Добавьте рабочий процесс GitHub Actions для легкого запуска тестов на CI
-- Установите браузеры Playwright (по умолчанию true)
+При появлении запросов выберите/подтвердите:
+- TypeScript или JavaScript (по умолчанию: TypeScript)
+- имя папки с тестами (по умолчанию: `tests`, или `e2e`, если `tests` уже существует)
+- добавить workflow GitHub Actions (рекомендуется для CI)
+- установить браузеры Playwright (по умолчанию: да)
+
+Команду можно запустить повторно позже — она не перезаписывает существующие тесты.
+
+### С помощью расширения VS Code
+
+Вы также можете создавать и запускать тесты с помощью [расширения VS Code](./getting-started-vscode.mdx).
 
 ## Что установлено
 
-Playwright загрузит необходимые браузеры, а также создаст следующие файлы.
+Playwright скачивает необходимые бинарники браузеров и создаёт структуру проекта, приведённую ниже.
 
 ```bash
-playwright.config.ts
+playwright.config.ts         # Test configuration
 package.json
-package-lock.json
+package-lock.json            # Or yarn.lock / pnpm-lock.yaml
 tests/
-  example.spec.ts
-tests-examples/
-  demo-todo-app.spec.ts
+  example.spec.ts            # Minimal example test
 ```
 
-[playwright.config](./test-configuration.mdx) – это место, где вы можете добавить конфигурацию для Playwright, включая изменение браузеров, на которых вы хотите запускать Playwright. Если вы запускаете тесты в уже существующем проекте, зависимости будут добавлены непосредственно в ваш `package.json`.
+Файл [playwright.config](./test-configuration.mdx) централизует конфигурацию: целевые браузеры, таймауты, повторы, проекты, репортеры и многое другое. В существующих проектах зависимости добавляются в ваш текущий `package.json`.
 
-Папка `tests` содержит базовый пример теста, чтобы помочь вам начать тестирование. Для более детального примера ознакомьтесь с папкой `tests-examples`, которая содержит тесты, написанные для тестирования приложения todo.
+Папка `tests/` содержит минимальный стартовый тест.
 
 ## Запуск примера теста
 
-По умолчанию тесты будут запускаться на всех 3 браузерах: Chromium, Firefox и WebKit, используя 3 рабочих процесса. Это можно настроить в [файле playwright.config](./test-configuration.mdx). Тесты запускаются в безголовом режиме, что означает, что браузер не откроется при запуске тестов. Результаты тестов и логи тестов будут показаны в терминале.
+По умолчанию тесты запускаются в headless-режиме параллельно в Chromium, Firefox и WebKit (настраивается в [playwright.config](./test-configuration.mdx)). Вывод и сводные результаты отображаются в терминале.
 
-<Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
+<Tabs groupId="js-package-manager" defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
 
 <TabItem value="npm">
 
@@ -104,13 +112,21 @@ pnpm exec playwright test
 
 </Tabs>
 
-![тесты, выполняемые в командной строке](https://github.com/microsoft/playwright/assets/13063165/981c1b2b-dc7e-4b85-b241-272b44da6628)  Ознакомьтесь с нашей документацией по [запуску тестов](./running-tests.mdx), чтобы узнать больше о запуске тестов в обычном режиме, запуске нескольких тестов, запуске конкретных тестов и т.д.
+![запуск тестов в командной строке](../images/getting-started/run-tests-cli.png)
+
+Советы:
+- Чтобы видеть окно браузера: добавьте `--headed`.
+- Чтобы запустить один проект/браузер: `--project=chromium`.
+- Чтобы запустить один файл: `npx playwright test tests/example.spec.ts`.
+- Чтобы открыть UI для тестирования: `--ui`.
+
+Подробнее о фильтрации, headed-режиме, шардинге и повторах см. в [Running Tests](./running-tests.mdx).
 
 ## HTML отчеты о тестах
 
-После завершения теста будет сгенерирован [HTML отчет](./test-reporters.mdx#html-reporter), который покажет вам полный отчет о ваших тестах, позволяя фильтровать отчет по браузерам, пройденным тестам, неудачным тестам, пропущенным тестам и нестабильным тестам. Вы можете нажать на каждый тест и изучить ошибки теста, а также каждый шаг теста. По умолчанию HTML отчет открывается автоматически, если некоторые из тестов не прошли.
+После запуска тестов [HTML Reporter](./test-reporters.mdx#html-reporter) предоставляет дашборд с фильтрами по браузеру, пройденным, упавшим, пропущенным, нестабильным (flaky) тестам и не только. Нажмите на тест, чтобы посмотреть ошибки, вложения и шаги. Он автоматически открывается только при падениях; вручную его можно открыть командой ниже.
 
-<Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
+<Tabs groupId="js-package-manager" defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
 
 <TabItem value="npm">
 
@@ -138,13 +154,13 @@ pnpm exec playwright show-report
 
 </Tabs>
 
-![HTML отчет](https://github.com/microsoft/playwright/assets/13063165/38ec17a7-9e61-4002-b137-a93812765501)
+![HTML отчет](../images/getting-started/html-report-basic.png)
 
 ## Запуск примера теста в UI режиме
 
-Запустите свои тесты в [UI режиме](./test-ui-mode.mdx) для улучшенного опыта разработчика с отладкой с перемоткой времени, режимом наблюдения и многим другим.
+Запускайте тесты в [UI Mode](./test-ui-mode.mdx), чтобы использовать watch-режим, живой просмотр шагов, отладку с перемоткой времени (time travel) и многое другое.
 
-<Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
+<Tabs groupId="js-package-manager" defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
 
 <TabItem value="npm">
 
@@ -172,21 +188,20 @@ pnpm exec playwright test --ui
 
 </Tabs>
 
-![UI режим](https://github.com/microsoft/playwright/assets/13063165/c5b501cc-4f5d-485a-87cc-66044c651786)
+![UI Mode](../images/getting-started/ui-mode.png)
 
-Ознакомьтесь с нашим [подробным руководством по UI режиму](./test-ui-mode.mdx), чтобы узнать больше о его функциях.
+См. [подробное руководство по UI Mode](./test-ui-mode.mdx): фильтры watch-режима, детали шагов и интеграция с трассами.
 
 ## Обновление Playwright
 
-Чтобы обновить Playwright до последней версии, выполните следующую команду:
+Обновите Playwright и скачайте новые бинарники браузеров и их зависимости:
 
-<Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
+<Tabs groupId="js-package-manager" defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
 
 <TabItem value="npm">
 
 ```bash
 npm install -D @playwright/test@latest
-# Также загрузите новые бинарные файлы браузеров и их зависимости:
 npx playwright install --with-deps
 ```
 
@@ -196,7 +211,6 @@ npx playwright install --with-deps
 
 ```bash
 yarn add --dev @playwright/test@latest
-# Также загрузите новые бинарные файлы браузеров и их зависимости:
 yarn playwright install --with-deps
 ```
 
@@ -206,7 +220,6 @@ yarn playwright install --with-deps
 
 ```bash
 pnpm install --save-dev @playwright/test@latest
-# Также загрузите новые бинарные файлы браузеров и их зависимости:
 pnpm exec playwright install --with-deps
 ```
 
@@ -214,9 +227,9 @@ pnpm exec playwright install --with-deps
 
 </Tabs>
 
-Вы всегда можете проверить, какая версия Playwright у вас установлена, выполнив следующую команду:
+Проверьте установленную версию:
 
-<Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
+<Tabs groupId="js-package-manager" defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
 
 <TabItem value="npm">
 
@@ -245,19 +258,18 @@ pnpm exec playwright --version
 </Tabs>
 
 ## Системные требования
-- Последняя версия Node.js 18, 20 или 22.
-- Windows 10+, Windows Server 2016+ или Windows Subsystem for Linux (WSL).
-- macOS 13 Ventura или новее.
-- Debian 12, Ubuntu 22.04, Ubuntu 24.04 на архитектуре x86-64 и arm64.
+- Node.js: последняя версия 20.x, 22.x или 24.x.
+- Windows 11+, Windows Server 2019+ или Windows Subsystem for Linux (WSL).
+- macOS 14 (Ventura) или новее.
+- Debian 12 / 13, Ubuntu 22.04 / 24.04 (x86-64 или arm64).
 
 ## Что дальше
-- [Пишите тесты, используя утверждения, ориентированные на веб, фикстуры страниц и локаторы](./writing-tests.mdx)
-- [Запустите один тест, несколько тестов, режим с интерфейсом](./running-tests.mdx)
-- [Генерируйте тесты с помощью Codegen](./codegen-intro.mdx)
-- [Просмотрите трассировку ваших тестов](./trace-viewer-intro.mdx)
+- [Пишите тесты с web-first assertions, фикстурами и локаторами](./writing-tests.mdx)
+- [Запускайте один или несколько тестов; headed-режим](./running-tests.mdx)
+- [Генерируйте тесты с Codegen](./codegen-intro.mdx)
+- [Смотрите трассу ваших тестов](./trace-viewer-intro.mdx)
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

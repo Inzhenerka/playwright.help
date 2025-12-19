@@ -8,7 +8,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Введение
 
-Тесты Playwright могут выполняться на любом провайдере CI. Это руководство охватывает один из способов запуска тестов на GitHub с использованием GitHub Actions. Если вы хотите узнать больше или как настроить других провайдеров CI, ознакомьтесь с нашей подробной [документацией по непрерывной интеграции](./ci.mdx).
+Тесты Playwright можно запускать у любого CI-провайдера. В этом руководстве показан один из способов запуска тестов на GitHub с помощью GitHub Actions. Если вы хотите узнать больше или понять, как настроить других CI-провайдеров, посмотрите нашу подробную [документацию по Continuous Integration](./ci.mdx).
 
 #### Вы узнаете
 - [Как настроить GitHub Actions](/ci-intro.mdx#setting-up-github-actions)
@@ -19,7 +19,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Настройка GitHub Actions
 
-При [установке Playwright](./intro.mdx) с использованием [расширения VS Code](./getting-started-vscode.mdx) или с помощью `npm init playwright@latest` вам предлагается добавить рабочий процесс [GitHub Actions](https://docs.github.com/en/actions). Это создает файл `playwright.yml` внутри папки `.github/workflows`, содержащий все необходимое для запуска ваших тестов при каждом пуше и pull-запросе в основную/мастер-ветку. Вот как выглядит этот файл:
+При [установке Playwright](./intro.mdx) с помощью [расширения VS Code](./getting-started-vscode.mdx) или через `npm init playwright@latest` вам предлагается добавить workflow для [GitHub Actions](https://docs.github.com/en/actions). В результате создаётся файл `playwright.yml` в папке `.github/workflows`, содержащий всё необходимое, чтобы ваши тесты запускались при каждом push и pull request в ветку main/master. Вот как выглядит этот файл:
 
 ```yml title=".github/workflows/playwright.yml"
 name: Playwright Tests
@@ -33,8 +33,8 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - uses: actions/checkout@v5
+    - uses: actions/setup-node@v5
       with:
         node-version: lts/*
     - name: Install dependencies
@@ -51,45 +51,50 @@ jobs:
         retention-days: 30
 ```
 
-Рабочий процесс выполняет следующие шаги:
-1. Клонирование вашего репозитория 2. Установка Node.js 3. Установка зависимостей NPM 4. Установка браузеров Playwright 5. Запуск тестов Playwright 6. Загрузка HTML-отчета в интерфейс GitHub
+Workflow выполняет следующие шаги:
+1. Клонирует ваш репозиторий
+1. Устанавливает Node.js
+1. Устанавливает зависимости NPM
+1. Устанавливает браузеры Playwright
+1. Запускает тесты Playwright
+1. Загружает HTML-отчёт в интерфейс GitHub
 
 Чтобы узнать больше об этом, см. ["Понимание GitHub Actions"](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions).
 
 ## Создание репозитория и пуш в GitHub
 
-После того как вы настроили [рабочий процесс GitHub Actions](#setting-up-github-actions), все, что вам нужно сделать, это [создать репозиторий на GitHub](https://docs.github.com/en/get-started/quickstart/create-a-repo) или запушить ваш код в существующий репозиторий. Следуйте инструкциям на GitHub и не забудьте [инициализировать git-репозиторий](https://github.com/git-guides/git-init) с помощью команды `git init`, чтобы вы могли [добавлять](https://github.com/git-guides/git-add), [коммитить](https://github.com/git-guides/git-commit) и [пушить](https://github.com/git-guides/git-push) ваш код.
+После того как вы настроите [workflow GitHub Actions](#setting-up-github-actions), останется только [создать репозиторий на GitHub](https://docs.github.com/en/get-started/quickstart/create-a-repo) или отправить код в уже существующий репозиторий. Следуйте инструкциям GitHub и не забудьте [инициализировать git-репозиторий](https://github.com/git-guides/git-init) командой `git init`, чтобы затем вы могли [добавлять](https://github.com/git-guides/git-add), [коммитить](https://github.com/git-guides/git-commit) и [пушить](https://github.com/git-guides/git-push) свой код.
 
 ###### 
 <img width="861" alt="Создание репозитория и пуш в GitHub" src="https://user-images.githubusercontent.com/13063165/183423254-d2735278-a2ab-4d63-bb99-48d8e5e447bc.png"/>
 
 ## Открытие рабочих процессов
 
-Нажмите на вкладку **Actions**, чтобы увидеть рабочие процессы. Здесь вы увидите, прошли ли ваши тесты или нет.
+Перейдите на вкладку **Actions**, чтобы увидеть workflow. Там вы увидите, прошли ли ваши тесты или упали.
 
 ###### 
 ![открытие рабочего процесса](https://user-images.githubusercontent.com/13063165/183423783-58bf2008-514e-4f96-9c12-c9a55703960c.png)
 
 ## Просмотр логов тестов
 
-Нажатие на выполнение рабочего процесса покажет вам все действия, которые GitHub выполнил, а нажатие на **Run Playwright tests** покажет сообщения об ошибках, что ожидалось и что было получено, а также журнал вызовов.
+Клик по запуску workflow покажет все действия, которые выполнил GitHub, а клик по **Run Playwright tests** — сообщения об ошибках, что ожидалось и что было получено, а также лог вызовов.
 
 ###### 
 ![Просмотр логов тестов](https://user-images.githubusercontent.com/13063165/183423783-58bf2008-514e-4f96-9c12-c9a55703960c.png)
 
 ## HTML-отчет
 
-HTML-отчет показывает вам полный отчет о ваших тестах. Вы можете фильтровать отчет по браузерам, пройденным тестам, неудачным тестам, пропущенным тестам и нестабильным тестам.
+HTML Report показывает полный отчёт по вашим тестам. Вы можете фильтровать отчёт по браузерам, пройденным тестам, упавшим тестам, пропущенным тестам и нестабильным (flaky) тестам.
 
 ### Загрузка HTML-отчета
 
-В разделе Артефакты нажмите на **playwright-report**, чтобы загрузить ваш отчет в формате zip-файла.
+В разделе Artifacts нажмите на **playwright-report**, чтобы скачать отчёт в виде zip-архива.
 
 <img width="972" alt="Загрузка HTML-отчета" src="https://user-images.githubusercontent.com/13063165/183437023-524f1803-84e4-4862-9ce3-1d55af0e023e.png" />
 
 ### Просмотр HTML-отчета
 
-Локальное открытие отчета не будет работать как ожидалось, так как вам нужен веб-сервер, чтобы все работало правильно. Сначала извлеките zip, желательно в папку, в которой уже установлен Playwright. Используя командную строку, перейдите в директорию, где находится отчет, и используйте `npx playwright show-report`, за которым следует имя извлеченной папки. Это запустит отчет и позволит вам просмотреть его в вашем браузере.
+Локально открыть отчёт «как есть» не получится: чтобы всё работало корректно, нужен веб‑сервер. Сначала распакуйте zip, желательно в папку, где уже установлен Playwright. Затем в командной строке перейдите в каталог с отчётом и выполните `npx playwright show-report`, указав имя распакованной папки. Команда поднимет сервер с отчётом и позволит посмотреть его в браузере.
 
 ```bash
 npx playwright show-report name-of-my-extracted-playwright-report
@@ -97,7 +102,7 @@ npx playwright show-report name-of-my-extracted-playwright-report
 
 ![просмотр HTML-отчета](https://github.com/microsoft/playwright/assets/13063165/c5f60e56-fb75-4a2d-a4b6-054b8c5d69c1)
 
-Чтобы узнать больше об отчетах, ознакомьтесь с нашим подробным руководством по [HTML Reporter](/test-reporters.mdx#html-reporter)
+Чтобы узнать больше об отчётах, посмотрите наше подробное руководство по [HTML Reporter](/test-reporters.mdx#html-reporter).
 
 ## Просмотр трассировки
 
@@ -121,8 +126,8 @@ npx playwright show-report name-of-my-extracted-playwright-report
    - `AZCOPY_SPA_CLIENT_SECRET`
    - `AZCOPY_TENANT_ID`
    
-   Для подробного руководства о том, как авторизовать сервисный принципал с использованием клиентского секрета, обратитесь к [этой документации Microsoft](https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-authorize-azure-active-directory#authorize-a-service-principal-by-using-a-client-secret-1).
-1. Добавьте шаг, который загружает HTML-отчет в Azure Storage.
+   Подробное руководство о том, как авторизовать сервисный принципал (service principal) с помощью client secret, см. в [этой документации Microsoft](https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-authorize-azure-active-directory#authorize-a-service-principal-by-using-a-client-secret).
+1. Добавьте шаг, который загружает HTML-отчёт в Azure Storage.
    
    ```yaml title=".github/workflows/playwright.yml"
    ...
@@ -143,19 +148,22 @@ npx playwright show-report name-of-my-extracted-playwright-report
 
 :::note
 
-Этот шаг не будет работать для pull-запросов, созданных из форкнутого репозитория, потому что такой рабочий процесс [не имеет доступа к секретам](https://docs.github.com/en/actions/security-guides/encrypted-secrets#using-encrypted-secrets-in-a-workflow).
+Этот шаг не будет работать для pull request’ов, созданных из форка, потому что такой workflow [не имеет доступа к секретам](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions#using-secrets-in-a-workflow).
 :::
 
+## Правильная работа с секретами
+
+Артефакты вроде файлов трассировки, HTML-отчётов или даже логов консоли содержат информацию о выполнении ваших тестов. Они могут содержать чувствительные данные: учётные данные тестового пользователя, токены доступа к staging-бэкенду, исходники тестов, а иногда даже исходный код вашего приложения. Обращайтесь с этими файлами так же осторожно, как и с этими чувствительными данными. Если вы загружаете отчёты и трассы как часть CI-workflow, убедитесь, что вы загружаете их только в доверенные хранилища артефактов или шифруете файлы перед загрузкой. То же касается обмена артефактами с коллегами: используйте доверенный файлообменник или шифруйте файлы перед отправкой.
+
 ## Что дальше
-- [Узнайте, как использовать Локаторы](./locators.mdx)
-- [Узнайте, как выполнять Действия](./input.mdx)
-- [Узнайте, как писать Утверждения](./test-assertions.mdx)
-- [Узнайте больше о Просмотрщике Трассировки](/trace-viewer.mdx)
-- [Узнайте больше способов запуска тестов на GitHub Actions](/ci.mdx#github-actions)
-- [Узнайте больше о запуске тестов на других провайдерах CI](/ci.mdx)
+- [Узнайте, как использовать Locators](./locators.mdx)
+- [Узнайте, как выполнять Actions](./input.mdx)
+- [Узнайте, как писать Assertions](./test-assertions.mdx)
+- [Узнайте больше про Trace Viewer](/trace-viewer.mdx)
+- [Узнайте другие способы запуска тестов в GitHub Actions](/ci.mdx#github-actions)
+- [Узнайте больше о запуске тестов у других CI-провайдеров](/ci.mdx)
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

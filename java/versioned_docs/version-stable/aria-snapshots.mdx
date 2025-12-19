@@ -84,7 +84,7 @@ assertThat(page.locator("banner")).matchesAriaSnapshot("""
 - **"name"**: Доступное имя элемента. Строки в кавычках указывают точные значения, `/patterns/` используются для регулярных выражений.
 - **[attribute=value]**: Атрибуты и значения в квадратных скобках представляют конкретные ARIA атрибуты, такие как `checked`, `disabled`, `expanded`, `level`, `pressed` или `selected`.
 
-Эти значения получены из ARIA атрибутов или вычислены на основе HTML семантики. Чтобы исследовать структуру дерева доступности страницы, используйте [Chrome DevTools Accessibility Pane](https://developer.chrome.com/docs/devtools/accessibility/reference#pane).
+Эти значения берутся из ARIA-атрибутов или вычисляются на основе семантики HTML. Чтобы посмотреть структуру дерева доступности (accessibility tree) страницы, используйте вкладку [Chrome DevTools Accessibility Tab](https://developer.chrome.com/docs/devtools/accessibility/reference#tab).
 
 ## Сопоставление снимков
 
@@ -161,6 +161,47 @@ assertThat(page.locator("body")).matchesAriaSnapshot("""
 ```
 
 Частичные сопоставления позволяют создавать гибкие тесты снимков, которые проверяют основную структуру страницы без навязывания конкретного содержимого или атрибутов.
+
+### Strict matching
+
+By default, a template containing the subset of children will be matched:
+
+```html
+<ul>
+  <li>Feature A</li>
+  <li>Feature B</li>
+  <li>Feature C</li>
+</ul>
+```
+
+*aria snapshot for partial match*
+
+```yaml
+- list
+  - listitem: Feature B
+```
+
+The `/children` property can be used to control how child elements are matched:
+- `contain` (default): Matches if all specified children are present in order
+- `equal`: Matches if the children exactly match the specified list in order
+- `deep-equal`: Matches if the children exactly match the specified list in order, including nested children
+
+```html
+<ul>
+  <li>Feature A</li>
+  <li>Feature B</li>
+  <li>Feature C</li>
+</ul>
+```
+
+*aria snapshot will fail due to Feature C not being in the template*
+
+```yaml
+- list
+  - /children: equal
+  - listitem: Feature A
+  - listitem: Feature B
+```
 
 ### Сопоставление с регулярными выражениями
 

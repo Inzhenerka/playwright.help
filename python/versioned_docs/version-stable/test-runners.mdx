@@ -65,9 +65,10 @@ def test_my_app_is_working(fixture_name):
 - `browser_channel`: Канал браузера в виде строки.
 - `is_chromium`, `is_webkit`, `is_firefox`: Булевы значения для соответствующих типов браузеров.
 
-**Настройка параметров фикстур**: Для фикстур `browser` и `context` используйте следующие фикстуры для определения пользовательских параметров запуска.
-- `browser_type_launch_args`: Переопределяет аргументы запуска для [browser_type.launch()](/api/class-browsertype.mdx#browser-type-launch). Должен возвращать Dict.
-- `browser_context_args`: Переопределяет параметры для [browser.new_context()](/api/class-browser.mdx#browser-new-context). Должен возвращать Dict.
+**Настройка опций фикстур**: для фикстур `browser` и `context` используйте следующие фикстуры, чтобы задавать пользовательские опции запуска.
+- `browser_type_launch_args`: переопределяет аргументы запуска для [browser_type.launch()](/api/class-browsertype.mdx#browser-type-launch). Должна возвращать Dict.
+- `browser_context_args`: переопределяет опции для [browser.new_context()](/api/class-browser.mdx#browser-new-context). Должна возвращать Dict.
+- `connect_options`: подключается к существующему браузеру через WebSocket endpoint. Должна возвращать Dict с опциями [browser_type.connect()](/api/class-browsertype.mdx#browser-type-connect).
 
 Также возможно переопределить параметры контекста ([browser.new_context()](/api/class-browser.mdx#browser-new-context)) для одного теста, используя маркер `browser_context_args`:
 
@@ -216,6 +217,18 @@ def browser_context_args(browser_context_args, playwright):
 
 Или через CLI `--device="iPhone 11 Pro"`
 
+### Подключение к удалённым браузерам
+
+```py title="conftest.py"
+import pytest
+
+@pytest.fixture(scope="session")
+def connect_options():
+    return {
+        "wsEndpoint": "ws://localhost:8080/ws"
+    }
+```
+
 ### Использование с `unittest.TestCase`
 
 Смотрите следующий пример для использования с `unittest.TestCase`. Это имеет ограничение, что может быть указан только один браузер, и не создается матрица из нескольких браузеров при указании нескольких.
@@ -257,7 +270,9 @@ def test_bing_is_working(page):
 
 ## Асинхронные фикстуры
 
-Если вы хотите использовать асинхронные фикстуры, вы можете использовать плагин [`pytest-playwright-asyncio`](https://pypi.org/project/pytest-playwright-asyncio/). Убедитесь, что используете `pytest-asyncio>=0.24.0` и ваши тесты используют [`loop_scope=session`](https://pytest-asyncio.readthedocs.io/en/latest/how-to-guides/run_session_tests_in_same_loop.html).
+Чтобы использовать асинхронные фикстуры, установите [`pytest-playwright-asyncio`](https://pypi.org/project/pytest-playwright-asyncio/).
+
+Убедитесь, что вы используете `pytest-asyncio>=0.26.0`, и задайте [`asyncio_default_test_loop_scope = session`](https://pytest-asyncio.readthedocs.io/en/v0.26.0/how-to-guides/change_default_test_loop.html) в конфигурации (`pytest.ini/pyproject.toml/setup.cfg`).
 
 ```python
 import pytest
@@ -270,7 +285,6 @@ async def test_foo(page: Page):
 ```
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"

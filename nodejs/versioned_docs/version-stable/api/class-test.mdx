@@ -63,9 +63,9 @@ test('another test @smoke', async ({ page }) => {
 
 Теги тестов отображаются в отчете о тестировании и доступны для пользовательского репортера через свойство `TestCase.tags`.
 
-Вы также можете фильтровать тесты по их тегам во время выполнения теста:
-* в [командной строке](../test-cli.mdx#reference);
-* в конфигурации с помощью [testConfig.grep](/api/class-testconfig.mdx#test-config-grep) и [testProject.grep](/api/class-testproject.mdx#test-project-grep);
+Вы также можете фильтровать тесты по их тегам во время выполнения:
+* в [командной строке](../test-cli.mdx#all-options);
+* в конфиге с помощью [testConfig.grep](/api/class-testconfig.mdx#test-config-grep) и [testProject.grep](/api/class-testproject.mdx#test-project-grep);
 
 Узнайте больше о [тегировании](../test-annotations.mdx#tag-tests).
 
@@ -256,7 +256,7 @@ test.beforeAll('Setup', async () => {
 ```
 
 **Аргументы**
-- `title` [string] *(optional)* <font size="2">Added in: v1.38</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-before-all-option-title"/><a href="#test-before-all-option-title" class="list-anchor">#</a>
+- `title` [string] *(опционально)* <font size="2">Added in: v1.38</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-before-all-option-title"/><a href="#test-before-all-option-title" class="list-anchor">#</a>
   
   Заголовок хука.
 - `hookFunction` [function]\([Fixtures], [TestInfo]\)<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-before-all-option-hook-function"/><a href="#test-before-all-option-hook-function" class="list-anchor">#</a>
@@ -312,7 +312,7 @@ test.beforeEach('Open start URL', async ({ page }) => {
 ```
 
 **Аргументы**
-- `title` [string] *(optional)* <font size="2">Added in: v1.38</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-before-each-option-title"/><a href="#test-before-each-option-title" class="list-anchor">#</a>
+- `title` [string] *(опционально)* <font size="2">Added in: v1.38</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-before-each-option-title"/><a href="#test-before-each-option-title" class="list-anchor">#</a>
   
   Заголовок хука.
 - `hookFunction` [function]\([Fixtures], [TestInfo]\)<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-before-each-option-hook-function"/><a href="#test-before-each-option-hook-function" class="list-anchor">#</a>
@@ -418,18 +418,18 @@ test.describe('two annotated tests', {
 Узнайте больше о [аннотациях тестов](../test-annotations.mdx).
 
 **Аргументы**
-- `title` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-option-title"/><a href="#test-describe-option-title" class="list-anchor">#</a>
+- `title` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-option-title"/><a href="#test-describe-option-title" class="list-anchor">#</a>
   
   Заголовок группы.
-- `details` [Object] *(optional)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-option-details"/><a href="#test-describe-option-details" class="list-anchor">#</a>
-  - `tag` [string] | [Array]&lt;[string]&gt; *(optional)*
+- `details` [Object] *(опционально)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-option-details"/><a href="#test-describe-option-details" class="list-anchor">#</a>
+  - `tag` [string] | [Array]&lt;[string]&gt; *(опционально)*
     
     
-  - `annotation` [Object] | [Array]&lt;[Object]&gt; *(optional)*
+  - `annotation` [Object] | [Array]&lt;[Object]&gt; *(опционально)*
     - `type` [string]
       
       
-    - `description` [string] *(optional)*
+    - `description` [string] *(опционально)*
       
       
     
@@ -458,7 +458,18 @@ test.describe('two annotated tests', {
   test('runs in parallel 2', async ({ page }) => {});
   ```
   
-* Запуск тестов последовательно, повторяя с начала.
+* Запуск тестов по порядку, с независимым повтором каждого упавшего теста.
+  
+  Это режим по умолчанию. Его может быть полезно явно указать, чтобы переопределить конфигурацию проекта, в которой используется `fullyParallel`.
+
+  ```js
+  // Тесты в этом файле выполняются по порядку. Повторы (если есть) выполняются независимо.
+  test.describe.configure({ mode: 'default' });
+  test('runs first', async ({ page }) => {});
+  test('runs second', async ({ page }) => {});
+  ```
+  
+* Последовательный запуск тестов с повтором с самого начала. Если один из последовательных тестов падает, все последующие тесты пропускаются.
   
   :::note
   
@@ -500,14 +511,14 @@ test.describe('two annotated tests', {
   ```
   
 **Аргументы**
-- `options` [Object] *(optional)*
-  - `mode` "default" | "parallel" | "serial" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-configure-option-mode"/><a href="#test-describe-configure-option-mode" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `mode` "default" | "parallel" | "serial" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-configure-option-mode"/><a href="#test-describe-configure-option-mode" class="list-anchor">#</a>
     
     Режим выполнения. Узнайте больше о режимах выполнения [здесь](../test-parallel.mdx).
-  - `retries` [number] *(optional)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-configure-option-retries"/><a href="#test-describe-configure-option-retries" class="list-anchor">#</a>
+  - `retries` [number] *(опционально)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-configure-option-retries"/><a href="#test-describe-configure-option-retries" class="list-anchor">#</a>
     
     Количество повторных попыток для каждого теста.
-  - `timeout` [number] *(optional)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-configure-option-timeout"/><a href="#test-describe-configure-option-timeout" class="list-anchor">#</a>
+  - `timeout` [number] *(опционально)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-configure-option-timeout"/><a href="#test-describe-configure-option-timeout" class="list-anchor">#</a>
     
     Тайм-аут для каждого теста в миллисекундах. Переопределяет [testProject.timeout](/api/class-testproject.mdx#test-project-timeout) и [testConfig.timeout](/api/class-testconfig.mdx#test-config-timeout).
 
@@ -541,18 +552,18 @@ test.describe.fixme(() => {
 ```
 
 **Аргументы**
-- `title` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-fixme-option-title"/><a href="#test-describe-fixme-option-title" class="list-anchor">#</a>
+- `title` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-fixme-option-title"/><a href="#test-describe-fixme-option-title" class="list-anchor">#</a>
   
   Заголовок группы.
-- `details` [Object] *(optional)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-fixme-option-details"/><a href="#test-describe-fixme-option-details" class="list-anchor">#</a>
-  - `tag` [string] | [Array]&lt;[string]&gt; *(optional)*
+- `details` [Object] *(опционально)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-fixme-option-details"/><a href="#test-describe-fixme-option-details" class="list-anchor">#</a>
+  - `tag` [string] | [Array]&lt;[string]&gt; *(опционально)*
     
     
-  - `annotation` [Object] | [Array]&lt;[Object]&gt; *(optional)*
+  - `annotation` [Object] | [Array]&lt;[Object]&gt; *(опционально)*
     - `type` [string]
       
       
-    - `description` [string] *(optional)*
+    - `description` [string] *(опционально)*
       
       
     
@@ -594,18 +605,18 @@ test.describe.only(() => {
 ```
 
 **Аргументы**
-- `title` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-only-option-title"/><a href="#test-describe-only-option-title" class="list-anchor">#</a>
+- `title` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-only-option-title"/><a href="#test-describe-only-option-title" class="list-anchor">#</a>
   
   Заголовок группы.
-- `details` [Object] *(optional)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-only-option-details"/><a href="#test-describe-only-option-details" class="list-anchor">#</a>
-  - `tag` [string] | [Array]&lt;[string]&gt; *(optional)*
+- `details` [Object] *(опционально)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-only-option-details"/><a href="#test-describe-only-option-details" class="list-anchor">#</a>
+  - `tag` [string] | [Array]&lt;[string]&gt; *(опционально)*
     
     
-  - `annotation` [Object] | [Array]&lt;[Object]&gt; *(optional)*
+  - `annotation` [Object] | [Array]&lt;[Object]&gt; *(опционально)*
     - `type` [string]
       
       
-    - `description` [string] *(optional)*
+    - `description` [string] *(опционально)*
       
       
     
@@ -647,15 +658,15 @@ test.describe.skip(() => {
 - `title` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-skip-option-title"/><a href="#test-describe-skip-option-title" class="list-anchor">#</a>
   
   Заголовок группы.
-- `details` [Object] *(optional)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-skip-option-details"/><a href="#test-describe-skip-option-details" class="list-anchor">#</a>
-  - `tag` [string] | [Array]&lt;[string]&gt; *(optional)*
+- `details` [Object] *(опционально)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-skip-option-details"/><a href="#test-describe-skip-option-details" class="list-anchor">#</a>
+  - `tag` [string] | [Array]&lt;[string]&gt; *(опционально)*
     
     
-  - `annotation` [Object] | [Array]&lt;[Object]&gt; *(optional)*
+  - `annotation` [Object] | [Array]&lt;[Object]&gt; *(опционально)*
     - `type` [string]
       
       
-    - `description` [string] *(optional)*
+    - `description` [string] *(опционально)*
       
       
     
@@ -1044,10 +1055,10 @@ test('less readable', async ({ page }) => {
   Тело теста, которое принимает один или два аргумента: объект с фикстурами и опциональный [TestInfo].
 - `condition` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-fixme-option-condition"/><a href="#test-fixme-option-condition" class="list-anchor">#</a>
   
-  Тест помечается как "должен провалиться", когда условие `true`.
+  Тест помечается как «fixme», когда условие равно `true`.
 - `callback` [function]\([Fixtures]\):[boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-fixme-option-callback"/><a href="#test-fixme-option-callback" class="list-anchor">#</a>
   
-  Функция, которая возвращает, следует ли пометить как "должен провалиться", на основе фикстур теста. Тест или тесты помечаются как "должен провалиться", когда возвращаемое значение `true`.
+  Функция, которая на основе фикстур теста возвращает, нужно ли помечать его как «fixme». Тест (или тесты) помечаются как «fixme», когда возвращаемое значение равно `true`.
 - `description` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-fixme-option-description"/><a href="#test-fixme-option-description" class="list-anchor">#</a>
   
   Опциональное описание, которое будет отражено в отчете о тестировании.
@@ -1178,7 +1189,7 @@ test.only('focus this test', async ({ page }) => {
 
 Пропустить тест. Playwright не будет выполнять тест после вызова `test.skip()`.
 
-Пропущенные тесты не должны выполняться. Если вы намерены исправить тест, используйте [test.fixme()](/api/class-test.mdx#test-fixme).
+Пропущенные тесты вообще не должны выполняться. Если вы планируете исправить тест, используйте вместо этого [test.fixme()](/api/class-test.mdx#test-fixme).
 
 Чтобы объявить пропущенный тест:
 * `test.skip(title, body)`
@@ -1227,7 +1238,7 @@ test('тест только для Safari 2', async ({ page }) => {
 });
 ```
 
-Вы также можете вызвать `test.skip()` без аргументов внутри тела теста, чтобы всегда помечать тест как неудачный. Мы рекомендуем использовать `test.skip(title, body)` вместо этого.
+Вы также можете вызвать `test.skip()` без аргументов внутри тела теста, чтобы всегда пропускать тест. Однако мы рекомендуем вместо этого использовать `test.skip(title, body)`.
 
 ```js
 import { test, expect } from '@playwright/test';
@@ -1239,32 +1250,32 @@ test('менее читаемый', async ({ page }) => {
 ```
 
 **Аргументы**
-- `title` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-skip-option-title"/><a href="#test-skip-option-title" class="list-anchor">#</a>
+- `title` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-skip-option-title"/><a href="#test-skip-option-title" class="list-anchor">#</a>
   
   Название теста.
-- `details` [Object] *(optional)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-skip-option-details"/><a href="#test-skip-option-details" class="list-anchor">#</a>
-  - `tag` [string] | [Array]&lt;[string]&gt; *(optional)*
+- `details` [Object] *(опционально)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-skip-option-details"/><a href="#test-skip-option-details" class="list-anchor">#</a>
+  - `tag` [string] | [Array]&lt;[string]&gt; *(опционально)*
     
     
-  - `annotation` [Object] | [Array]&lt;[Object]&gt; *(optional)*
+  - `annotation` [Object] | [Array]&lt;[Object]&gt; *(опционально)*
     - `type` [string]
       
       
-    - `description` [string] *(optional)*
+    - `description` [string] *(опционально)*
       
       
     
   См. [test()](/api/class-test.mdx#test-call) для описания деталей теста.
-- `body` [function]\([Fixtures], [TestInfo]\) *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-skip-option-body"/><a href="#test-skip-option-body" class="list-anchor">#</a>
+- `body` [function]\([Fixtures], [TestInfo]\) *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-skip-option-body"/><a href="#test-skip-option-body" class="list-anchor">#</a>
   
   Тело теста, которое принимает один или два аргумента: объект с фикстурами и необязательный [TestInfo].
-- `condition` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-skip-option-condition"/><a href="#test-skip-option-condition" class="list-anchor">#</a>
+- `condition` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-skip-option-condition"/><a href="#test-skip-option-condition" class="list-anchor">#</a>
   
-  Тест помечается как "должен провалиться", когда условие `true`.
-- `callback` [function]\([Fixtures]\):[boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-skip-option-callback"/><a href="#test-skip-option-callback" class="list-anchor">#</a>
+  Тест помечается как «skipped», когда условие равно `true`.
+- `callback` [function]\([Fixtures]\):[boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-skip-option-callback"/><a href="#test-skip-option-callback" class="list-anchor">#</a>
   
-  Функция, которая возвращает, следует ли пометить как "должен провалиться", на основе фикстур теста. Тест или тесты помечаются как "должен провалиться", когда возвращаемое значение `true`.
-- `description` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-skip-option-description"/><a href="#test-skip-option-description" class="list-anchor">#</a>
+  Функция, которая на основе фикстур теста возвращает, нужно ли помечать его как «skipped». Тест (или тесты) помечаются как «skipped», когда возвращаемое значение равно `true`.
+- `description` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-skip-option-description"/><a href="#test-skip-option-description" class="list-anchor">#</a>
   
   Необязательное описание, которое будет отражено в отчете о тестировании.
 
@@ -1321,13 +1332,13 @@ test('провал в Safari 2', async ({ page }) => {
 ```
 
 **Аргументы**
-- `condition` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-slow-option-condition"/><a href="#test-slow-option-condition" class="list-anchor">#</a>
+- `condition` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-slow-option-condition"/><a href="#test-slow-option-condition" class="list-anchor">#</a>
   
   Тест помечается как "медленный", когда условие `true`.
-- `callback` [function]\([Fixtures]\):[boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-slow-option-callback"/><a href="#test-slow-option-callback" class="list-anchor">#</a>
+- `callback` [function]\([Fixtures]\):[boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-slow-option-callback"/><a href="#test-slow-option-callback" class="list-anchor">#</a>
   
   Функция, которая возвращает, следует ли пометить как "медленный", на основе фикстур теста. Тест или тесты помечаются как "медленный", когда возвращаемое значение `true`.
-- `description` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-slow-option-description"/><a href="#test-slow-option-description" class="list-anchor">#</a>
+- `description` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-slow-option-description"/><a href="#test-slow-option-description" class="list-anchor">#</a>
   
   Необязательное описание, которое будет отражено в отчете о тестировании.
 
@@ -1406,7 +1417,7 @@ function step(target: Function, context: ClassMethodDecoratorContext) {
     const name = this.constructor.name + '.' + (context.name as string);
     return test.step(name, async () => {
       return await target.call(this, ...args);
-    });
+    }, { box: true });
   };
 }
 
@@ -1660,18 +1671,18 @@ test.describe.parallel(() => {
 ```
 
 **Аргументы**
-- `title` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-parallel-option-title"/><a href="#test-describe-parallel-option-title" class="list-anchor">#</a>
+- `title` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-parallel-option-title"/><a href="#test-describe-parallel-option-title" class="list-anchor">#</a>
   
   Заголовок группы.
-- `details` [Object] *(optional)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-parallel-option-details"/><a href="#test-describe-parallel-option-details" class="list-anchor">#</a>
-  - `tag` [string] | [Array]&lt;[string]&gt; *(optional)*
+- `details` [Object] *(опционально)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-parallel-option-details"/><a href="#test-describe-parallel-option-details" class="list-anchor">#</a>
+  - `tag` [string] | [Array]&lt;[string]&gt; *(опционально)*
     
     
-  - `annotation` [Object] | [Array]&lt;[Object]&gt; *(optional)*
+  - `annotation` [Object] | [Array]&lt;[Object]&gt; *(опционально)*
     - `type` [string]
       
       
-    - `description` [string] *(optional)*
+    - `description` [string] *(опционально)*
       
       
     
@@ -1715,18 +1726,18 @@ test.describe.parallel.only(() => {
 ```
 
 **Аргументы**
-- `title` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-parallel-only-option-title"/><a href="#test-describe-parallel-only-option-title" class="list-anchor">#</a>
+- `title` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-parallel-only-option-title"/><a href="#test-describe-parallel-only-option-title" class="list-anchor">#</a>
   
   Заголовок группы.
-- `details` [Object] *(optional)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-parallel-only-option-details"/><a href="#test-describe-parallel-only-option-details" class="list-anchor">#</a>
-  - `tag` [string] | [Array]&lt;[string]&gt; *(optional)*
+- `details` [Object] *(опционально)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-parallel-only-option-details"/><a href="#test-describe-parallel-only-option-details" class="list-anchor">#</a>
+  - `tag` [string] | [Array]&lt;[string]&gt; *(опционально)*
     
     
-  - `annotation` [Object] | [Array]&lt;[Object]&gt; *(optional)*
+  - `annotation` [Object] | [Array]&lt;[Object]&gt; *(опционально)*
     - `type` [string]
       
       
-    - `description` [string] *(optional)*
+    - `description` [string] *(опционально)*
       
       
     
@@ -1776,18 +1787,18 @@ test.describe.serial(() => {
 ```
 
 **Аргументы**
-- `title` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-serial-option-title"/><a href="#test-describe-serial-option-title" class="list-anchor">#</a>
+- `title` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-serial-option-title"/><a href="#test-describe-serial-option-title" class="list-anchor">#</a>
   
   Заголовок группы.
-- `details` [Object] *(optional)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-serial-option-details"/><a href="#test-describe-serial-option-details" class="list-anchor">#</a>
-  - `tag` [string] | [Array]&lt;[string]&gt; *(optional)*
+- `details` [Object] *(опционально)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-serial-option-details"/><a href="#test-describe-serial-option-details" class="list-anchor">#</a>
+  - `tag` [string] | [Array]&lt;[string]&gt; *(опционально)*
     
     
-  - `annotation` [Object] | [Array]&lt;[Object]&gt; *(optional)*
+  - `annotation` [Object] | [Array]&lt;[Object]&gt; *(опционально)*
     - `type` [string]
       
       
-    - `description` [string] *(optional)*
+    - `description` [string] *(опционально)*
       
       
     
@@ -1842,15 +1853,15 @@ test.describe.serial.only(() => {
 - `title` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-serial-only-option-title"/><a href="#test-describe-serial-only-option-title" class="list-anchor">#</a>
   
   Заголовок группы.
-- `details` [Object] *(optional)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-serial-only-option-details"/><a href="#test-describe-serial-only-option-details" class="list-anchor">#</a>
-  - `tag` [string] | [Array]&lt;[string]&gt; *(optional)*
+- `details` [Object] *(опционально)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-serial-only-option-details"/><a href="#test-describe-serial-only-option-details" class="list-anchor">#</a>
+  - `tag` [string] | [Array]&lt;[string]&gt; *(опционально)*
     
     
-  - `annotation` [Object] | [Array]&lt;[Object]&gt; *(optional)*
+  - `annotation` [Object] | [Array]&lt;[Object]&gt; *(опционально)*
     - `type` [string]
       
       
-    - `description` [string] *(optional)*
+    - `description` [string] *(опционально)*
       
       
     
@@ -1860,7 +1871,6 @@ test.describe.serial.only(() => {
   Функция обратного вызова, которая выполняется сразу при вызове [test.describe.serial.only()](/api/class-test.mdx#test-describe-serial-only). Любые тесты, добавленные в эту функцию, будут принадлежать группе.
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

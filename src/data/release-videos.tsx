@@ -2,6 +2,26 @@ import { Video } from './types';
 
 const releaseVideos: Video[] = [
   {
+    version: '1.56',
+    id: "_AifxZGxwuk",
+    highlights: ['agents', 'planner', 'generator', 'healer'],
+  },
+  {
+    version: '1.52 & 1.53',
+    id: "6s4hQy5Nel0",
+    highlights: ['fix with AI', 'describe a locator', 'title in html report'],
+  },
+  {
+    version: '1.51',
+    id: "-xWHilObrS0",
+    highlights: ['copy prompt', 'git info', 'firebase auth', 'test steps'],
+  },
+  {
+    version: '1.49',
+    id: "S5wCft-ImKk",
+    highlights: ['aria snapshots', 'chrome headless'],
+  },
+  {
     version: '1.48',
     id: "VGlkSBkMVCQ",
     highlights: ['webSocket routing', 'UI mode / Trace Viewer'],

@@ -38,6 +38,11 @@ module.exports = {
         },
         {
           type: 'link',
+          label: 'MCP и агенты',
+          href: '/community/mcp-videos'
+        },
+        {
+          type: 'link',
           label: 'Изучение',
           href: '/community/learn-videos'
         }

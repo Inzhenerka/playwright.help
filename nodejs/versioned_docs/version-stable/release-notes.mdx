@@ -9,12 +9,266 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
-## Версия 1.51
+## Version 1.57
 
-### StorageState для indexedDB
-* Новая опция [indexedDB](/api/class-browsercontext.mdx#browser-context-storage-state-option-indexed-db) для [browserContext.storageState()](/api/class-browsercontext.mdx#browser-context-storage-state) позволяет сохранять и восстанавливать содержимое IndexedDB. Полезно, когда ваше приложение использует [IndexedDB API](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) для хранения токенов аутентификации, таких как Firebase Authentication.
+### Speedboard
 
-  Вот пример, следующий [руководству по аутентификации](./auth.mdx#basic-shared-account-in-all-tests):
+In HTML reporter, there's a new tab we call "Speedboard":
+
+![Speedboard](../images/speedboard.png)
+
+It shows you all your executed tests sorted by slowness, and can help you understand where your test suite is taking longer than expected. Take a look at yours - maybe you'll find some tests that are spending a longer time waiting than they should!
+
+### Chrome for Testing
+
+Starting with this release, Playwright switches from Chromium, to using [Chrome for Testing](https://developer.chrome.com/blog/chrome-for-testing/) builds. Both headed and headless browsers are subject to this. Your tests should still be passing after upgrading to Playwright 1.57.
+
+We're expecting no functional changes to come from this switch. The biggest change is the new icon and title in your toolbar.
+
+![new and old logo](../images/cft-logo-change.png)
+
+If you still see an unexpected behaviour change, please [file an issue](https://github.com/microsoft/playwright/issues/new).
+
+On Arm64 Linux, Playwright continues to use Chromium.
+
+### Waiting for webserver output
+
+[testConfig.webServer](/api/class-testconfig.mdx#test-config-web-server) added a `wait` field. Pass a regular expression, and Playwright will wait until the webserver logs match it.
+
+```js
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  webServer: {
+    command: 'npm run start',
+    wait: {
+      stdout: '/Listening on port (?<my_server_port>\\d+)/'
+    },
+  },
+});
+```
+
+If you include a named capture group into the expression, then Playwright will provide the capture group contents via environment variables:
+
+```js
+import { test, expect } from '@playwright/test';
+
+test.use({ baseUrl: `http://localhost:${process.env.MY_SERVER_PORT ?? 3000}` });
+
+test('homepage', async ({ page }) => {
+  await page.goto('/');
+});
+```
+
+This is not just useful for capturing varying ports of dev servers. You can also use it to wait for readiness of a service that doesn't expose an HTTP readiness check, but instead prints a readiness message to stdout or stderr.
+
+### Breaking Change
+
+After 3 years of being deprecated, we removed `Page#accessibility` from our API. Please use other libraries such as [Axe](https://www.deque.com/axe/) if you need to test page accessibility. See our Node.js [guide](https://playwright.dev/docs/accessibility-testing) for integration with Axe.
+
+### New APIs
+- New property [testConfig.tag](/api/class-testconfig.mdx#test-config-tag) adds a tag to all tests in this run. This is useful when using [merge-reports](./test-sharding.mdx#merging-reports-from-multiple-shards).
+- [worker.on('console')](/api/class-worker.mdx#worker-event-console) event is emitted when JavaScript within the worker calls one of console API methods, e.g. console.log or console.dir. [worker.waitForEvent()](/api/class-worker.mdx#worker-wait-for-event) can be used to wait for it.
+- [locator.description()](/api/class-locator.mdx#locator-description) returns locator description previously set with [locator.describe()](/api/class-locator.mdx#locator-describe), and `Locator.toString()` now uses the description when available.
+- New option [steps](/api/class-locator.mdx#locator-click-option-steps) in [locator.click()](/api/class-locator.mdx#locator-click) and [locator.dragTo()](/api/class-locator.mdx#locator-drag-to) that configures the number of `mousemove` events emitted while moving the mouse pointer to the target element.
+- Network requests issued by [Service Workers](./service-workers.mdx#network-events-and-routing) are now reported and can be routed through the [BrowserContext](./api/class-browsercontext.mdx), only in Chromium. You can opt out using the `PLAYWRIGHT_DISABLE_SERVICE_WORKER_NETWORK` environment variable.
+- Console messages from Service Workers are dispatched through [worker.on('console')](/api/class-worker.mdx#worker-event-console). You can opt out of this using the `PLAYWRIGHT_DISABLE_SERVICE_WORKER_CONSOLE` environment variable.
+
+### Browser Versions
+- Chromium 143.0.7499.4
+- Mozilla Firefox 142.0.1
+- WebKit 26.0
+
+## Version 1.56
+
+<LiteYouTube id="_AifxZGxwuk" title="Playwright 1.56 - Introducing Playwright Test Agents" />
+
+### Playwright Test Agents
+
+Introducing Playwright Test Agents, three custom agent definitions designed to guide LLMs through the core process of building a Playwright test:
+* **🎭 planner** explores the app and produces a Markdown test plan
+* **🎭 generator** transforms the Markdown plan into the Playwright Test files
+* **🎭 healer** executes the test suite and automatically repairs failing tests
+
+Run `npx playwright init-agents` with your client of choice to generate the latest agent definitions:
+
+```bash
+# Generate agent files for each agentic loop
+# Visual Studio Code
+npx playwright init-agents --loop=vscode
+# Claude Code
+npx playwright init-agents --loop=claude
+# opencode
+npx playwright init-agents --loop=opencode
+```
+
+[Learn more about Playwright Test Agents](./test-agents.mdx)
+
+### New APIs
+- New methods [page.consoleMessages()](/api/class-page.mdx#page-console-messages) and [page.pageErrors()](/api/class-page.mdx#page-page-errors) for retrieving the most recent console messages from the page
+- New method [page.requests()](/api/class-page.mdx#page-requests) for retrieving the most recent network requests from the page
+- Added [`--test-list` and `--test-list-invert`](./test-cli.mdx#test-list) to allow manual specification of specific tests from a file
+
+### UI Mode and HTML Reporter
+- Added option to `'html'` reporter to disable the "Copy prompt" button
+- Added option to `'html'` reporter and UI Mode to merge files, collapsing test and describe blocks into a single unified list
+- Added option to UI Mode mirroring the `--update-snapshots` options
+- Added option to UI Mode to run only a single worker at a time
+
+### Breaking Changes
+- Event [browserContext.on('backgroundpage')](/api/class-browsercontext.mdx#browser-context-event-background-page) has been deprecated and will not be emitted. Method [browserContext.backgroundPages()](/api/class-browsercontext.mdx#browser-context-background-pages) will return an empty list
+
+### Miscellaneous
+- Aria snapshots render and compare `input` `placeholder`
+- Added environment variable `PLAYWRIGHT_TEST` to Playwright worker processes to allow discriminating on testing status
+
+### Browser Versions
+- Chromium 141.0.7390.37
+- Mozilla Firefox 142.0.1
+- WebKit 26.0
+
+## Version 1.55
+
+### New APIs
+- New Property [testStepInfo.titlePath](/api/class-teststepinfo.mdx#test-step-info-title-path) Returns the full title path starting from the test file, including test and step titles.
+
+### Codegen
+- Automatic `toBeVisible()` assertions: Codegen can now generate automatic `toBeVisible()` assertions for common UI interactions. This feature can be enabled in the Codegen settings UI.
+
+### Breaking Changes
+- ⚠️ Dropped support for Chromium extension manifest v2.
+
+### Miscellaneous
+- Added support for Debian 13 "Trixie".
+
+### Browser Versions
+- Chromium 140.0.7339.16
+- Mozilla Firefox 141.0
+- WebKit 26.0
+
+This version was also tested against the following stable channels:
+- Google Chrome 139
+- Microsoft Edge 139
+
+## Version 1.54
+
+### Основные моменты
+- New cookie property `partitionKey` in [browserContext.cookies()](/api/class-browsercontext.mdx#browser-context-cookies) and [browserContext.addCookies()](/api/class-browsercontext.mdx#browser-context-add-cookies). This property allows to save and restore partitioned cookies. See [CHIPS MDN article](https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Privacy_sandbox/Partitioned_cookies) for more information. Note that browsers have different support and defaults for cookie partitioning.
+- New option `noSnippets` to disable code snippets in the html report.
+  
+  ```js
+  import { defineConfig } from '@playwright/test';
+  
+  export default defineConfig({
+    reporter: [['html', { noSnippets: true }]]
+  });
+  ```
+  
+- New property `location` in test annotations, for example in [testResult.annotations](/api/class-testresult.mdx#test-result-annotations) and [testInfo.annotations](/api/class-testinfo.mdx#test-info-annotations). It shows where the annotation like `test.skip` or `test.fixme` was added.
+
+### Command Line
+- New option `--user-data-dir` in multiple commands. You can specify the same user data dir to reuse browsing state, like authentication, between sessions.
+  
+  ```bash
+  npx playwright codegen --user-data-dir=./user-data
+  ```
+  
+- Option `-gv` has been removed from the `npx playwright test` command. Use `--grep-invert` instead.
+- `npx playwright open` does not open the test recorder anymore. Use `npx playwright codegen` instead.
+
+### Miscellaneous
+- Support for Node.js 16 has been removed.
+- Support for Node.js 18 has been deprecated, and will be removed in the future.
+
+### Browser Versions
+- Chromium 139.0.7258.5
+- Mozilla Firefox 140.0.2
+- WebKit 26.0
+
+This version was also tested against the following stable channels:
+- Google Chrome 140
+- Microsoft Edge 140
+
+## Version 1.53
+
+### Trace Viewer and HTML Reporter Updates
+- New Steps in Trace Viewer and HTML reporter: ![New Trace Viewer Steps](https://github.com/user-attachments/assets/1963ff7d-4070-41be-a79b-4333176921a2)
+- New option in `'html'` reporter to set the title of a specific test run:
+  
+  ```js
+  import { defineConfig } from '@playwright/test';
+  
+  export default defineConfig({
+    reporter: [['html', { title: 'Custom test run #1028' }]]
+  });
+  ```
+  
+### Miscellaneous
+- New option [kind](/api/class-testinfo.mdx#test-info-snapshot-path-option-kind) in [testInfo.snapshotPath()](/api/class-testinfo.mdx#test-info-snapshot-path) controls which snapshot path template is used.
+- New method [locator.describe()](/api/class-locator.mdx#locator-describe) to describe a locator. Used for trace viewer and reports.
+  
+  ```js
+  const button = page.getByTestId('btn-sub').describe('Subscribe button');
+  await button.click();
+  ```
+  
+- `npx playwright install --list` will now list all installed browsers, versions and locations.
+
+### Browser Versions
+- Chromium 138.0.7204.4
+- Mozilla Firefox 139.0
+- WebKit 18.5
+
+This version was also tested against the following stable channels:
+- Google Chrome 137
+- Microsoft Edge 137
+
+## Version 1.52
+
+### Основные моменты
+- New method [expect(locator).toContainClass()](/api/class-locatorassertions.mdx#locator-assertions-to-contain-class) to ergonomically assert individual class names on the element.
+  
+  ```ts
+  await expect(page.getByRole('listitem', { name: 'Ship v1.52' })).toContainClass('done');
+  ```
+  
+- [Aria Snapshots](./aria-snapshots.mdx) got two new properties: [`/children`](./aria-snapshots.mdx#strict-matching) for strict matching and `/url` for links.
+  
+  ```ts
+  await expect(locator).toMatchAriaSnapshot(`
+    - list
+      - /children: equal
+      - listitem: Feature A
+      - listitem:
+        - link "Feature B":
+          - /url: "https://playwright.dev"
+  `);
+  ```
+  
+### Test Runner
+- New property [testProject.workers](/api/class-testproject.mdx#test-project-workers) allows to specify the number of concurrent worker processes to use for a test project. The global limit of property [testConfig.workers](/api/class-testconfig.mdx#test-config-workers) still applies.
+- New [testConfig.failOnFlakyTests](/api/class-testconfig.mdx#test-config-fail-on-flaky-tests) option to fail the test run if any flaky tests are detected, similarly to `--fail-on-flaky-tests`. This is useful for CI/CD environments where you want to ensure that all tests are stable before deploying.
+- New property [testResult.annotations](/api/class-testresult.mdx#test-result-annotations) contains annotations for each test retry.
+
+### Miscellaneous
+- New option [maxRedirects](/api/class-apirequest.mdx#api-request-new-context-option-max-redirects) in [apiRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context) to control the maximum number of redirects.
+- HTML reporter now supports *NOT filtering* via `!@my-tag` or `!my-file.spec.ts` or `!p:my-project`.
+
+### Breaking Changes
+- Glob URL patterns in methods like [page.route()](/api/class-page.mdx#page-route) do not support `?` and `[]` anymore. We recommend using regular expressions instead.
+- Method [route.continue()](/api/class-route.mdx#route-continue) does not allow to override the `Cookie` header anymore. If a `Cookie` header is provided, it will be ignored, and the cookie will be loaded from the browser's cookie store. To set custom cookies, use [browserContext.addCookies()](/api/class-browsercontext.mdx#browser-context-add-cookies).
+- macOS 13 is now deprecated and will no longer receive WebKit updates. Please upgrade to a more recent macOS version to continue benefiting from the latest WebKit improvements.
+
+### Browser Versions
+- Chromium 136.0.7103.25
+- Mozilla Firefox 137.0
+- WebKit 18.4
+
+This version was also tested against the following stable channels:
+- Google Chrome 135
+- Microsoft Edge 135
+
+## Version 1.51
 
   ```js title="tests/auth.setup.ts"
   import { test as setup, expect } from '@playwright/test';
@@ -307,7 +561,7 @@ npx playwright test --tsconfig tsconfig.test.json
 
 Теперь вы можете передавать [`URLSearchParams`](https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams) и `string` в качестве параметров запроса в [APIRequestContext]:
 
-```ts
+```js
 test('query params', async ({ request }) => {
   const searchParams = new URLSearchParams();
   searchParams.set('userId', 1);
@@ -348,7 +602,7 @@ Playwright теперь позволяет предоставлять клиен
 
 Следующий фрагмент кода настраивает клиентский сертификат для `https://example.com`:
 
-```ts
+```js
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
@@ -387,7 +641,7 @@ npx playwright test --only-changed=main
 
 Вот пример повторного использования ваших существующих обработчиков MSW в тесте.
 
-```ts
+```js
 import { handlers } from '@src/mocks/handlers';
 
 test.beforeEach(async ({ router }) => {
@@ -471,7 +725,7 @@ await expect(page.getByTestId('current-time')).toHaveText('2/2/2024, 10:30:00 AM
 - Новые опции [testConfig.respectGitIgnore](/api/class-testconfig.mdx#test-config-respect-git-ignore) и [testProject.respectGitIgnore](/api/class-testproject.mdx#test-project-respect-git-ignore) контролируют, исключаются ли файлы, соответствующие шаблонам `.gitignore`, при поиске тестов.
 - Новое свойство `timeout` теперь доступно для пользовательских сопоставителей expect. Это свойство учитывает `playwright.config.ts` и `expect.configure()`.
   
-  ```ts
+  ```js
   import { expect as baseExpect } from '@playwright/test';
   
   export const expect = baseExpect.extend({
@@ -486,14 +740,14 @@ await expect(page.getByTestId('current-time')).toHaveText('2/2/2024, 10:30:00 AM
 ### Разное
 - Метод [locator.setInputFiles()](/api/class-locator.mdx#locator-set-input-files) теперь поддерживает загрузку каталога для элементов `<input type=file webkitdirectory>`.
   
-  ```ts
+  ```js
   await page.getByLabel('Upload directory').setInputFiles(path.join(__dirname, 'mydir'));
   ```
   
 - Несколько методов, таких как [locator.click()](/api/class-locator.mdx#locator-click) или [locator.press()](/api/class-locator.mdx#locator-press), теперь поддерживают модификаторную клавишу `ControlOrMeta`. Эта клавиша сопоставляется с `Meta` на macOS и с `Control` на Windows и Linux.
   
-  ```ts
-  // Нажмите общую комбинацию клавиш Control+S или Meta+S для выполнения операции "Сохранить".
+  ```js
+  // Нажмите распространённое сочетание клавиш Control+S или Meta+S, чтобы выполнить операцию «Сохранить».
   await page.keyboard.press('ControlOrMeta+S');
   ```
   
@@ -731,7 +985,7 @@ test('test customer login', {
 npx playwright test --grep @fast
 ```
 
-- Флаг командной строки `--project` [теперь поддерживает](./test-cli#reference) подстановочный знак '*':
+- Командный [флаг](./test-cli#all-options) `--project` теперь поддерживает подстановочный символ `*`:
 
 ```sh
 npx playwright test --project='*mobile*'
@@ -1654,7 +1908,7 @@ await page.goto('https://playwright.dev', {
 ### Тестовый запуск
 * [test.step()](/api/class-test.mdx#test-step) теперь возвращает значение функции шага:
   
-  ```ts
+  ```js
   test('should work', async ({ page }) => {
     const pageTitle = await test.step('get title', async () => {
       await page.goto('https://playwright.dev');
@@ -1691,7 +1945,7 @@ await page.goto('https://playwright.dev', {
 
 Запускайте несколько веб-серверов, баз данных или других процессов, передавая массив конфигураций:
 
-```ts title="playwright.config.ts"
+```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
 export default defineConfig({
   webServer: [
@@ -1730,7 +1984,7 @@ Playwright теперь поддерживает Debian 11 Bullseye на x86_64 
 
 Теперь можно вызывать [test.describe()](/api/class-test.mdx#test-describe) для создания наборов без заголовка. Это полезно для предоставления группе тестов общего параметра с помощью [test.use()](/api/class-test.mdx#test-use).
 
-```ts
+```js
 test.describe(() => {
   test.use({ colorScheme: 'dark' });
 
@@ -1817,7 +2071,7 @@ npx playwright open --save-har=github.har.zip https://github.com/microsoft
 
 Кроме того, вы можете записать HAR программно:
 
-```ts
+```js
 const context = await browser.newContext({
   recordHar: { path: 'github.har.zip' }
 });
@@ -1827,7 +2081,7 @@ await context.close();
 
 Используйте новые методы [page.routeFromHAR()](/api/class-page.mdx#page-route-from-har) или [browserContext.routeFromHAR()](/api/class-browsercontext.mdx#browser-context-route-from-har) для обслуживания соответствующих ответов из файла [HAR](http://www.softwareishard.com/blog/har-12-spec/):
 
-```ts
+```js
 await context.routeFromHAR('github.har.zip');
 ```
 
@@ -1839,7 +2093,7 @@ await context.routeFromHAR('github.har.zip');
 
 Рассмотрим следующий пример:
 
-```ts
+```js
 // Удалите заголовок из всех запросов.
 test.beforeEach(async ({ page }) => {
   await page.route('**/*', async route => {
@@ -1874,7 +2128,7 @@ test('should work', async ({ page }) => {
 ### Разное
 * Если есть служебный работник, который мешает, теперь вы можете легко отключить его с помощью новой опции контекста `serviceWorkers`:
   
-  ```ts title="playwright.config.ts"
+  ```js title="playwright.config.ts"
   export default {
     use: {
       serviceWorkers: 'block',
@@ -1884,7 +2138,7 @@ test('should work', async ({ page }) => {
   
 * Использование пути `.zip` для опции контекста `recordHar` автоматически архивирует полученный HAR:
   
-  ```ts
+  ```js
   const context = await browser.newContext({
     recordHar: {
       path: 'github.har.zip',
@@ -1894,7 +2148,7 @@ test('should work', async ({ page }) => {
   
 * Если вы собираетесь редактировать HAR вручную, рассмотрите возможность использования режима записи HAR `"minimal"`, который записывает только информацию, необходимую для воспроизведения:
   
-  ```ts
+  ```js
   const context = await browser.newContext({
     recordHar: {
       path: 'github.har',
@@ -1917,13 +2171,13 @@ WebServer is now considered "ready" if request to the specified url has any of t
 <LiteYouTube id="keV2CIgtBlg" title="Playwright 1.22" />
 
 ### Основные моменты
-- Тестирование компонентов (предварительный просмотр)
-
-  Playwright Test теперь может тестировать ваши компоненты [React](https://reactjs.org/), [Vue.js](https://vuejs.org/) или [Svelte](https://svelte.dev/). Вы можете использовать все функции Playwright Test (такие как параллелизация, эмуляция и отладка), запуская компоненты в реальных браузерах.
-
+- Тестирование компонентов (preview)
+  
+  Playwright Test теперь может тестировать ваши компоненты [React](https://reactjs.org/), [Vue.js](https://vuejs.org/) или [Svelte](https://svelte.dev/). При запуске компонентов в реальных браузерах можно использовать все возможности Playwright Test (например, параллельный запуск, эмуляцию и отладку).
+  
   Вот как выглядит типичный тест компонента:
-
-  ```ts title="App.spec.tsx"
+  
+  ```js title="App.spec.tsx"
   import { test, expect } from '@playwright/experimental-ct-react';
   import App from './App';
   
@@ -2035,19 +2289,19 @@ WebServer is now considered "ready" if request to the specified url has any of t
     maxDiffPixels: 27, // разрешить не более 27 различных пикселей.
   });
   ```
-
+  
   Удобнее всего указать `maxDiffPixels` или `maxDiffPixelRatio` один раз в [testConfig.expect](/api/class-testconfig.mdx#test-config-expect).
-- Playwright Test теперь добавляет режим [testConfig.fullyParallel](/api/class-testconfig.mdx#test-config-fully-parallel). По умолчанию Playwright Test параллелизует между файлами. В полностью параллельном режиме тесты внутри одного файла также выполняются параллельно. Вы также можете использовать флаг командной строки `--fully-parallel`.
+- В Playwright Test появился режим [testConfig.fullyParallel](/api/class-testconfig.mdx#test-config-fully-parallel). По умолчанию Playwright Test распараллеливает выполнение между файлами. В режиме fully parallel тесты внутри одного файла тоже выполняются параллельно. Также можно использовать флаг командной строки `--fully-parallel`.
 
-  ```ts title="playwright.config.ts"
+  ```js title="playwright.config.ts"
   export default {
     fullyParallel: true,
   };
   ```
+  
+- [testProject.grep](/api/class-testproject.mdx#test-project-grep) и [testProject.grepInvert](/api/class-testproject.mdx#test-project-grep-invert) теперь можно настраивать для каждого проекта отдельно. Например, теперь можно настроить проект smoke-тестов с помощью `grep`:
 
-- [testProject.grep](/api/class-testproject.mdx#test-project-grep) и [testProject.grepInvert](/api/class-testproject.mdx#test-project-grep-invert) теперь настраиваются для каждого проекта. Например, теперь вы можете настроить проект тестов на дым с использованием `grep`:
-
-  ```ts title="playwright.config.ts"
+  ```js title="playwright.config.ts"
   export default {
     projects: [
       {
@@ -2320,7 +2574,7 @@ Playwright 1.16 представляет новое [тестирование AP
 
 Чтобы сделать запрос от имени страницы Playwright, используйте **новый [page.request](/api/class-page.mdx#page-request) API**:
 
-```ts
+```js
 import { test, expect } from '@playwright/test';
 
 test('context fetch', async ({ page }) => {
@@ -2332,7 +2586,7 @@ test('context fetch', async ({ page }) => {
 
 Чтобы сделать автономный запрос из node.js к конечной точке API, используйте **новый [`request` fixture](./api/class-fixtures#fixtures-request)**:
 
-```ts
+```js
 import { test, expect } from '@playwright/test';
 
 test('context fetch', async ({ request }) => {
@@ -2350,7 +2604,7 @@ test('context fetch', async ({ request }) => {
 
 Например, мы можем размыть все изображения на странице:
 
-```ts
+```js
 import { test, expect } from '@playwright/test';
 import jimp from 'jimp'; // библиотека обработки изображений
 
@@ -2393,7 +2647,7 @@ HTML-репортер содержит всю информацию о теста
 
 Особенно полезно при работе со списками:
 
-```ts
+```js
 import { test, expect } from '@playwright/test';
 
 test('context fetch', async ({ page }) => {
@@ -2464,7 +2718,7 @@ test('context fetch', async ({ page }) => {
 
 #### 🤝 `test.parallel()` запуск тестов в одном файле параллельно
 
-```ts
+```js
 test.describe.parallel('group', () => {
   test('runs in parallel 1', async ({ page }) => {
   });
@@ -2582,7 +2836,7 @@ Playwright Test будет повторно тестировать узел с �
 
 Объявляет группу тестов, которые всегда должны выполняться последовательно. Если один из тестов не проходит, все последующие тесты пропускаются. Все тесты в группе повторяются вместе.
 
-```ts
+```js
 test.describe.serial('group', () => {
   test('runs first', async ({ page }) => { /* ... */ });
   test('runs second', async ({ page }) => { /* ... */ });
@@ -2595,7 +2849,7 @@ test.describe.serial('group', () => {
 
 Разделите длинные тесты на несколько шагов, используя API `test.step()`:
 
-```ts
+```js
 import { test, expect } from '@playwright/test';
 
 test('test', async ({ page }) => {
@@ -2614,7 +2868,7 @@ test('test', async ({ page }) => {
 
 Чтобы запустить сервер во время тестов, используйте опцию [`webServer`](./test-webserver) в файле конфигурации. Сервер будет ожидать доступности указанного URL перед выполнением тестов, и URL будет передан Playwright в качестве [`baseURL`](./api/class-testoptions#test-options-base-url) при создании контекста.
 
-```ts title="playwright.config.ts"
+```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
 export default defineConfig({
   webServer: {
@@ -2688,7 +2942,7 @@ npm i -D @playwright/test
 
 Простой тест `tests/foo.spec.ts`:
 
-```ts
+```js
 import { test, expect } from '@playwright/test';
 
 test('basic test', async ({ page }) => {
@@ -2715,7 +2969,7 @@ npx playwright test
 
 Трассы записываются с использованием нового API [browserContext.tracing](/api/class-browsercontext.mdx#browser-context-tracing):
 
-```ts
+```js
 const browser = await chromium.launch();
 const context = await browser.newContext();
 
@@ -2867,7 +3121,6 @@ npx playwright show-trace trace.zip
 - Mozilla Firefox 84.0b9
 - WebKit 14.1
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

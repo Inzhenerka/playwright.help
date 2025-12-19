@@ -49,15 +49,15 @@ await browserContext.addCookies([cookieObject1, cookieObject2]);
     Либо url, либо домен / путь обязательны. Опционально.
   - `domain` [string] *(опционально)*
     
-    Чтобы куки применялись ко всем поддоменам, префиксируйте домен точкой, например: ".example.com". Либо url, либо домен / путь обязательны. Опционально.
+    Либо `url`, либо сразу оба `domain` и `path` — обязательны. Необязательно.
+  - `domain` [string] *(опционально)*
+    
+    Чтобы cookie применялась и ко всем поддоменам, добавьте точку в начале домена, например: ".example.com". Либо `url`, либо сразу оба `domain` и `path` — обязательны. Необязательно.
   - `path` [string] *(опционально)*
     
-    Либо url, либо домен / путь обязательны. Опционально.
+    Либо `url`, либо сразу оба `domain` и `path` — обязательны. Необязательно.
   - `expires` [number] *(опционально)*
-    
-    Unix время в секундах. Опционально.
-  - `httpOnly` [boolean] *(опционально)*
-    
+
     Опционально.
   - `secure` [boolean] *(опционально)*
     
@@ -65,6 +65,12 @@ await browserContext.addCookies([cookieObject1, cookieObject2]);
   - `sameSite` "Strict" | "Lax" | "None" *(опционально)*
     
     Опционально.
+  - `sameSite` "Strict" | "Lax" | "None" *(опционально)*
+    
+    Опционально.
+  - `partitionKey` [string] *(опционально)*
+    
+    Для разделённых сторонних cookie (также известных как [CHIPS](https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Privacy_sandbox/Partitioned_cookies)) — ключ раздела (partition key). Необязательно.
 
 **Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-add-cookies-return"/><a href="#browser-context-add-cookies-return" class="list-anchor">#</a>
@@ -120,33 +126,11 @@ await browserContext.addInitScript({
 
 ---
 
-### backgroundPages {#browser-context-background-pages}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.11</font><x-search>browserContext.backgroundPages</x-search>
-
-:::note
-
-Фоновая страница поддерживается только в браузерах на основе Chromium.
-:::
-
-Все существующие фоновые страницы в контексте.
-
-**Использование**
-
-```js
-browserContext.backgroundPages();
-```
-
-**Возвращает**
-- [Array]&lt;[Page]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-background-pages-return"/><a href="#browser-context-background-pages-return" class="list-anchor">#</a>
-
----
-
 ### browser {#browser-context-browser}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.browser</x-search>
 
-Возвращает экземпляр браузера контекста. Если он был запущен как постоянный контекст, возвращается null.
+Возвращает экземпляр браузера, которому принадлежит этот контекст. Возвращает `null`, если контекст создан вне обычного браузера, например в Android или Electron.
 
 **Использование**
 
@@ -278,6 +262,10 @@ await browserContext.cookies(urls);
   - `secure` [boolean]
     
   - `sameSite` "Strict" | "Lax" | "None"
+    
+    
+  - `partitionKey` [string] *(опционально)*
+    
     
 ---
 
@@ -420,6 +408,8 @@ await browserContext.grantPermissions(permissions, options);
   * `'clipboard-write'`
   * `'geolocation'`
   * `'gyroscope'`
+  * `'local-fonts'`
+  * `'local-network-access'`
   * `'magnetometer'`
   * `'microphone'`
   * `'midi-sysex'` (системно-эксклюзивный midi)
@@ -582,7 +572,7 @@ await context.route('/api/**', async route => {
 **Аргументы**
 - `url` [string] | [RegExp] | [function]\([URL]\):[boolean]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-option-url"/><a href="#browser-context-route-option-url" class="list-anchor">#</a>
   
-  Шаблон glob, регулярное выражение или предикат, принимающий [URL] для сопоставления при маршрутизации. Когда [baseURL](/api/class-browser.mdx#browser-new-context-option-base-url) через параметры контекста был предоставлен, и переданный URL является путем, он объединяется с помощью конструктора [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL).
+  Глоб-шаблон, регулярное выражение или предикат, который получает [URL] для сопоставления при маршрутизации. Если в опциях контекста задан [baseURL](/api/class-browser.mdx#browser-new-context-option-base-url) и переданный URL — строка, не начинающаяся с `*`, он будет разрешён с помощью конструктора [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL).
 - `handler` [function]\([Route], [Request]\):[Promise]&lt;[Object]&gt; | [Object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-option-handler"/><a href="#browser-context-route-option-handler" class="list-anchor">#</a>
   
   Функция обработчика для маршрутизации запроса.
@@ -848,14 +838,8 @@ await browserContext.storageState(options);
 - `options` [Object] *(опционально)*
   - `indexedDB` [boolean] *(опционально)* <font size="2">Добавлено в: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-indexed-db"/><a href="#browser-context-storage-state-option-indexed-db" class="list-anchor">#</a>
     
-    Установите в `true`, чтобы включить [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) в снимок состояния хранилища. Если ваше приложение использует IndexedDB для хранения токенов аутентификации, таких как аутентификация Firebase, включите это.
-    
-    :::note
-    
-    IndexedDB с типизированными массивами в настоящее время не поддерживается.
-    :::
-    
-  - `path` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-path"/><a href="#browser-context-storage-state-option-path" class="list-anchor">#</a>
+    Установите `true`, чтобы включить [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) в снимок состояния хранилища. Если ваше приложение использует IndexedDB для хранения токенов аутентификации (например, Firebase Authentication), включите это.
+  - `path` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-path"/><a href="#browser-context-storage-state-option-path" class="list-anchor">#</a>
     
     Путь к файлу для сохранения состояния хранилища. Если [path](/api/class-browsercontext.mdx#browser-context-storage-state-option-path) является относительным путем, он разрешается относительно текущей рабочей директории. Если путь не указан, состояние хранилища все равно возвращается, но не сохраняется на диск.
 
@@ -1037,32 +1021,6 @@ browserContext.tracing
 ---
 
 ## События
-
-### on('backgroundpage') {#browser-context-event-background-page}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.11</font><x-search>browserContext.on('backgroundpage')</x-search>
-
-:::note
-
-Работает только с постоянным контекстом браузера Chromium.
-:::
-
-Событие, которое возникает, когда новая фоновая страница создается в контексте.
-
-```js
-const backgroundPage = await context.waitForEvent('backgroundpage');
-```
-
-**Использование**
-
-```js
-browserContext.on('backgroundpage', data => {});
-```
-
-**Данные события**
-- [Page]
-
----
 
 ### on('close') {#browser-context-event-close}
 
@@ -1278,6 +1236,54 @@ browserContext.on('weberror', data => {});
 
 ## Устарело
 
+### on('backgroundpage') {#browser-context-event-background-page}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.on('backgroundpage')</x-search>
+
+:::warning Deprecated
+
+Background pages have been removed from Chromium together with Manifest V2 extensions.
+
+:::
+
+
+This event is not emitted.
+
+**Usage**
+
+```js
+browserContext.on('backgroundpage', data => {});
+```
+
+**Event data**
+- [Page]
+
+---
+
+### backgroundPages {#browser-context-background-pages}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.backgroundPages</x-search>
+
+:::warning Deprecated
+
+Background pages have been removed from Chromium together with Manifest V2 extensions.
+
+:::
+
+
+Returns an empty list.
+
+**Usage**
+
+```js
+browserContext.backgroundPages();
+```
+
+**Returns**
+- [Array]&lt;[Page]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-background-pages-return"/><a href="#browser-context-background-pages-return" class="list-anchor">#</a>
+
+---
+
 ### setHTTPCredentials {#browser-context-set-http-credentials}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.setHTTPCredentials</x-search>
@@ -1304,8 +1310,6 @@ await browserContext.setHTTPCredentials(httpCredentials);
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-http-credentials-return"/><a href="#browser-context-set-http-credentials-return" class="list-anchor">#</a>
 
 
-
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

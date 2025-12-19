@@ -187,14 +187,6 @@ var browser = await playwright.Chromium.LaunchAsync(new() {
   - `ChromiumSandbox` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-chromium-sandbox"/><a href="#browser-type-launch-option-chromium-sandbox" class="list-anchor">#</a>
     
     Enable Chromium sandboxing. Defaults to `false`.
-  - `Devtools` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-devtools"/><a href="#browser-type-launch-option-devtools" class="list-anchor">#</a>
-    
-    :::warning[Deprecated]
-    Use [debugging tools](../debug.mdx) instead.
-    :::
-    
-    
-    **Chromium-only** Whether to auto-open a Developer Tools panel for each tab. If this option is `true`, the [Headless](/api/class-browsertype.mdx#browser-type-launch-option-headless) option will be set `false`.
   - `DownloadsPath` [string]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-downloads-path"/><a href="#browser-type-launch-option-downloads-path" class="list-anchor">#</a>
     
     If specified, accepted downloads are downloaded into this directory. Otherwise, temporary directory is created and is deleted when browser is closed. In either case, the downloads are deleted when the browser context they were created in is closed.
@@ -207,6 +199,8 @@ var browser = await playwright.Chromium.LaunchAsync(new() {
   - `FirefoxUserPrefs` [IDictionary]?&lt;[string], [object]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-firefox-user-prefs"/><a href="#browser-type-launch-option-firefox-user-prefs" class="list-anchor">#</a>
     
     Firefox user preferences. Learn more about the Firefox user preferences at [`about:config`](https://support.mozilla.org/en-US/kb/about-config-editor-firefox).
+    
+    You can also provide a path to a custom [`policies.json` file](https://mozilla.github.io/policy-templates/) via `PLAYWRIGHT_FIREFOX_POLICIES_JSON` environment variable.
   - `HandleSIGHUP` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-handle-sighup"/><a href="#browser-type-launch-option-handle-sighup" class="list-anchor">#</a>
     
     Close the browser process on SIGHUP. Defaults to `true`.
@@ -218,7 +212,7 @@ var browser = await playwright.Chromium.LaunchAsync(new() {
     Close the browser process on SIGTERM. Defaults to `true`.
   - `Headless` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-headless"/><a href="#browser-type-launch-option-headless" class="list-anchor">#</a>
     
-    Whether to run browser in headless mode. More details for [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode). Defaults to `true` unless the [Devtools](/api/class-browsertype.mdx#browser-type-launch-option-devtools) option is `true`.
+    Whether to run browser in headless mode. More details for [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and [Firefox](https://hacks.mozilla.org/2017/12/using-headless-mode-in-firefox/). Defaults to `true`.
   - `IgnoreAllDefaultArgs` [bool]? *(optional)* <font size="2">Added in: v1.9</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-ignore-all-default-args"/><a href="#browser-type-launch-option-ignore-all-default-args" class="list-anchor">#</a>
     
     If `true`, Playwright does not pass its own configurations args and only uses the ones from [Args](/api/class-browsertype.mdx#browser-type-launch-option-args). Dangerous option; use with care. Defaults to `false`.
@@ -272,7 +266,17 @@ await BrowserType.LaunchPersistentContextAsync(userDataDir, options);
 **Arguments**
 - `userDataDir` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-user-data-dir"/><a href="#browser-type-launch-persistent-context-option-user-data-dir" class="list-anchor">#</a>
   
-  Path to a User Data Directory, which stores browser session data like cookies and local storage. More details for [Chromium](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md#introduction) and [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Command_Line_Options#User_Profile). Note that Chromium's user data directory is the **parent** directory of the "Profile Path" seen at `chrome://version`. Pass an empty string to use a temporary directory instead.
+  Path to a User Data Directory, which stores browser session data like cookies and local storage. Pass an empty string to create a temporary directory.
+  
+  More details for [Chromium](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md#introduction) and [Firefox](https://wiki.mozilla.org/Firefox/CommandLineOptions#User_profile). Chromium's user data directory is the **parent** directory of the "Profile Path" seen at `chrome://version`.
+  
+  Note that browsers do not allow launching multiple instances with the same User Data Directory.
+  
+  :::warning
+  
+  Chromium/Chrome: Due to recent Chrome policy changes, automating the default Chrome user profile is not supported. Pointing `userDataDir` to Chrome's main "User Data" directory (the profile used for your regular browsing) may result in pages not loading or the browser exiting. Create and use a separate directory (for example, an empty folder) as your automation profile instead. See https://developer.chrome.com/blog/remote-debugging-port for details.
+  :::
+  
 - `options` `BrowserTypeLaunchPersistentContextOptions?` *(optional)*
   - `AcceptDownloads` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-accept-downloads"/><a href="#browser-type-launch-persistent-context-option-accept-downloads" class="list-anchor">#</a>
     
@@ -336,6 +340,8 @@ await BrowserType.LaunchPersistentContextAsync(userDataDir, options);
     
     An array of client certificates to be used. Each certificate object must have either both `certPath` and `keyPath`, a single `pfxPath`, or their corresponding direct value equivalents (`cert` and `key`, or `pfx`). Optionally, `passphrase` property should be provided if the certificate is encrypted. The `origin` property should be provided with an exact match to the request origin that the certificate is valid for.
     
+    Client certificate authentication is only active when at least one client certificate is provided. If you want to reject all client certificates sent by the server, you need to provide a client certificate with an `origin` that does not match any of the domains you plan to visit.
+    
     :::note
     
     When using WebKit on macOS, accessing `localhost` will not pick up client certificates. You can make it work by replacing `localhost` with `local.playwright`.
@@ -350,14 +356,6 @@ await BrowserType.LaunchPersistentContextAsync(userDataDir, options);
   - `DeviceScaleFactor` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-device-scale-factor"/><a href="#browser-type-launch-persistent-context-option-device-scale-factor" class="list-anchor">#</a>
     
     Specify device scale factor (can be thought of as dpr). Defaults to `1`. Learn more about [emulating devices with device scale factor](../emulation.mdx#devices).
-  - `Devtools` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-devtools"/><a href="#browser-type-launch-persistent-context-option-devtools" class="list-anchor">#</a>
-    
-    :::warning[Deprecated]
-    Use [debugging tools](../debug.mdx) instead.
-    :::
-    
-    
-    **Chromium-only** Whether to auto-open a Developer Tools panel for each tab. If this option is `true`, the [Headless](/api/class-browsertype.mdx#browser-type-launch-persistent-context-option-headless) option will be set `false`.
   - `DownloadsPath` [string]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-downloads-path"/><a href="#browser-type-launch-persistent-context-option-downloads-path" class="list-anchor">#</a>
     
     If specified, accepted downloads are downloaded into this directory. Otherwise, temporary directory is created and is deleted when browser is closed. In either case, the downloads are deleted when the browser context they were created in is closed.
@@ -373,6 +371,8 @@ await BrowserType.LaunchPersistentContextAsync(userDataDir, options);
   - `FirefoxUserPrefs` [IDictionary]?&lt;[string], [object]&gt; *(optional)* <font size="2">Added in: v1.40</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-firefox-user-prefs"/><a href="#browser-type-launch-persistent-context-option-firefox-user-prefs" class="list-anchor">#</a>
     
     Firefox user preferences. Learn more about the Firefox user preferences at [`about:config`](https://support.mozilla.org/en-US/kb/about-config-editor-firefox).
+    
+    You can also provide a path to a custom [`policies.json` file](https://mozilla.github.io/policy-templates/) via `PLAYWRIGHT_FIREFOX_POLICIES_JSON` environment variable.
   - `ForcedColors` `enum ForcedColors { Active, None, Null }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-forced-colors"/><a href="#browser-type-launch-persistent-context-option-forced-colors" class="list-anchor">#</a>
     
     Emulates `'forced-colors'` media feature, supported values are `'active'`, `'none'`. See [Page.EmulateMediaAsync()](/api/class-page.mdx#page-emulate-media) for more details. Passing `'null'` resets emulation to system defaults. Defaults to `'none'`.
@@ -400,7 +400,7 @@ await BrowserType.LaunchPersistentContextAsync(userDataDir, options);
     Specifies if viewport supports touch events. Defaults to false. Learn more about [mobile emulation](../emulation.mdx#devices).
   - `Headless` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-headless"/><a href="#browser-type-launch-persistent-context-option-headless" class="list-anchor">#</a>
     
-    Whether to run browser in headless mode. More details for [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode). Defaults to `true` unless the [Devtools](/api/class-browsertype.mdx#browser-type-launch-option-devtools) option is `true`.
+    Whether to run browser in headless mode. More details for [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and [Firefox](https://hacks.mozilla.org/2017/12/using-headless-mode-in-firefox/). Defaults to `true`.
   - `HttpCredentials` HttpCredentials? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-http-credentials"/><a href="#browser-type-launch-persistent-context-option-http-credentials" class="list-anchor">#</a>
     - `Username` [string]
       
@@ -551,7 +551,6 @@ BrowserType.Name
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-name-return"/><a href="#browser-type-name-return" class="list-anchor">#</a>
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -617,6 +616,7 @@ BrowserType.Name
 [Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1 "Action"
 [Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2 "Func"
 [IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable "IEnumerable"
+[IReadOnlyList]: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1?view=net-9.0 "IReadOnlyList"
 [IDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary "IDictionary"
 [Task]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-5.0 "Task"
 [IReadOnlyDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2 "IReadOnlyDictionary"

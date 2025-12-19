@@ -2,6 +2,38 @@ import { Video } from './types';
 
 const conferenceVideos: Video[] = [
   {
+    title: "AI Testing & Browser Automation with Playwright",
+    id: 'pGPWSILa0PM',
+    year: '2025',
+    conference: 'AI Driven Development Day',
+    language: 'English',
+    speakers: ['Debbie O\'Brien ']
+  },
+  {
+    title: "AI-Powered Debugging & Browser Automation with Playwright MCP",
+    id: 'rrrklkDzQ1M',
+    year: '2025',
+    conference: 'Frontend Nation',
+    language: 'English',
+    speakers: ['Debbie O\'Brien ']
+  },
+  {
+    title: "Advanced Playwright Debugging and Test Resilience",
+    id: 'zyOJfGtJ3Rw',
+    year: '2025',
+    conference: 'Microsoft Build',
+    language: 'English',
+    speakers: ['Debbie O\'Brien ', 'Max Schmitt']
+  },
+  {
+    title: "Advanced Playwright Techniques for Flawless Testing",
+    id: 'ybYK9jM0lco',
+    year: '2024',
+    conference: 'NDC Copenhagen',
+    language: 'English',
+    speakers: ['Debbie O\'Brien']
+  },
+  {
     title: "Advanced Playwright Techniques for Flawless Testing",
     id: 'O0TeeSbQPWY',
     year: '2024',

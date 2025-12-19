@@ -202,7 +202,7 @@ page.get_by_role("button", name="Start here").click()
 
 ```py
 # Setup the handler.
-def handler():
+async def handler():
   await page.get_by_role("button", name="No thanks").click()
 await page.add_locator_handler(page.get_by_text("Sign up to the newsletter"), handler)
 
@@ -242,7 +242,7 @@ page.get_by_role("button", name="Start here").click()
 
 ```py
 # Setup the handler.
-def handler():
+async def handler():
   await page.get_by_role("button", name="Remind me later").click()
 await page.add_locator_handler(page.get_by_text("Confirm your security details"), handler)
 
@@ -282,7 +282,7 @@ page.get_by_role("button", name="Start here").click()
 
 ```py
 # Setup the handler.
-def handler():
+async def handler():
   await page.evaluate("window.removeObstructionsForTestIfNeeded()")
 await page.add_locator_handler(page.locator("body"), handler, no_wait_after=True)
 
@@ -316,7 +316,7 @@ page.add_locator_handler(page.get_by_label("Close"), handler, times=1)
 <TabItem value="async">
 
 ```py
-def handler(locator):
+async def handler(locator):
   await locator.click()
 await page.add_locator_handler(page.get_by_label("Close"), handler, times=1)
 ```
@@ -454,6 +454,23 @@ page.close(**kwargs)
 
 ---
 
+### console_messages {#page-console-messages}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.56</font><x-search>page.console_messages</x-search>
+
+Returns up to (currently) 200 last console messages from this page. See [page.on("console")](/api/class-page.mdx#page-event-console) for more details.
+
+**Usage**
+
+```python
+page.console_messages()
+```
+
+**Returns**
+- [List]\[[ConsoleMessage]\]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-console-messages-return"/><a href="#page-console-messages-return" class="list-anchor">#</a>
+
+---
+
 ### content {#page-content}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.content</x-search>
@@ -543,6 +560,9 @@ await page.drag_and_drop(
     
     
   Clicks on the source element at this point relative to the top-left corner of the element's padding box. If not specified, some visible point of the element is used.
+- `steps` [int] *(optional)* <font size="2">Added in: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-drag-and-drop-option-steps"/><a href="#page-drag-and-drop-option-steps" class="list-anchor">#</a>
+  
+  Defaults to 1. Sends `n` interpolated `mousemove` events to represent travel between the `mousedown` and `mouseup` of the drag. When set to 1, emits a single `mousemove` event at the destination location.
 - `strict` [bool] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-drag-and-drop-option-strict"/><a href="#page-drag-and-drop-option-strict" class="list-anchor">#</a>
   
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -2197,11 +2217,28 @@ page.opener()
 
 ---
 
+### page_errors {#page-page-errors}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.56</font><x-search>page.page_errors</x-search>
+
+Returns up to (currently) 200 last page errors from this page. See [page.on("pageerror")](/api/class-page.mdx#page-event-page-error) for more details.
+
+**Usage**
+
+```python
+page.page_errors()
+```
+
+**Returns**
+- [List]\[[Error]\]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-page-errors-return"/><a href="#page-page-errors-return" class="list-anchor">#</a>
+
+---
+
 ### pause {#page-pause}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.pause</x-search>
 
-Pauses script execution. Playwright will stop executing the script and wait for the user to either press 'Resume' button in the page overlay or to call `playwright.resume()` in the DevTools console.
+Pauses script execution. Playwright will stop executing the script and wait for the user to either press the 'Resume' button in the page overlay or to call `playwright.resume()` in the DevTools console.
 
 User can inspect selectors or perform manual steps while paused. Resume will continue running the original script from the place it was paused.
 
@@ -2466,6 +2503,27 @@ page.request_gc()
 
 **Returns**
 - [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-request-gc-return"/><a href="#page-request-gc-return" class="list-anchor">#</a>
+
+---
+
+### requests {#page-requests}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.56</font><x-search>page.requests</x-search>
+
+Returns up to (currently) 100 last network request from this page. See [page.on("request")](/api/class-page.mdx#page-event-request) for more details.
+
+Returned requests should be accessed immediately, otherwise they might be collected to prevent unbounded memory growth as new requests come in. Once collected, retrieving most information about the request is impossible.
+
+Note that requests reported through the [page.on("request")](/api/class-page.mdx#page-event-request) request are not collected, so there is a trade off between efficient memory usage with [page.requests()](/api/class-page.mdx#page-requests) and the amount of available information reported through [page.on("request")](/api/class-page.mdx#page-event-request).
+
+**Usage**
+
+```python
+page.requests()
+```
+
+**Returns**
+- [List]\[[Request]\]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-requests-return"/><a href="#page-requests-return" class="list-anchor">#</a>
 
 ---
 
@@ -4029,28 +4087,6 @@ page.on("worker", handler)
 ---
 
 ## Deprecated
-
-### accessibility {#page-accessibility}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.accessibility</x-search>
-
-:::warning Deprecated
-
-This property is discouraged. Please use other libraries such as [Axe](https://www.deque.com/axe/) if you need to test page accessibility. See our Node.js [guide](https://playwright.dev/docs/accessibility-testing) for integration with Axe.
-
-:::
-
-
-**Usage**
-
-```python
-page.accessibility
-```
-
-**Type**
-- [Accessibility]
-
----
 
 ### check {#page-check}
 
@@ -5851,7 +5887,6 @@ await page.wait_for_timeout(1000)
 - [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-timeout-return"/><a href="#page-wait-for-timeout-return" class="list-anchor">#</a>
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"

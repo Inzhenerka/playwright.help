@@ -22,7 +22,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 ### Загрузка образа
 
 ```bash
-docker pull mcr.microsoft.com/playwright/dotnet:v1.50.0-noble
+docker pull mcr.microsoft.com/playwright/dotnet:v1.56.0-noble
 ```
 
 ### Запуск образа
@@ -34,7 +34,7 @@ docker pull mcr.microsoft.com/playwright/dotnet:v1.50.0-noble
 На доверенных веб-сайтах вы можете избежать создания отдельного пользователя и использовать root, так как вы доверяете коду, который будет выполняться в браузерах.
 
 ```bash
-docker run -it --rm --ipc=host mcr.microsoft.com/playwright/dotnet:v1.50.0-noble /bin/bash
+docker run -it --rm --ipc=host mcr.microsoft.com/playwright/dotnet:v1.56.0-noble /bin/bash
 ```
 
 #### Обход и скрейпинг
@@ -42,7 +42,7 @@ docker run -it --rm --ipc=host mcr.microsoft.com/playwright/dotnet:v1.50.0-noble
 На ненадежных веб-сайтах рекомендуется использовать отдельного пользователя для запуска браузеров в сочетании с профилем seccomp. Внутри контейнера или если вы используете Docker-образ как базовый образ, вам нужно использовать `adduser` для этого.
 
 ```bash
-docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_profile.json mcr.microsoft.com/playwright/dotnet:v1.50.0-noble /bin/bash
+docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_profile.json mcr.microsoft.com/playwright/dotnet:v1.56.0-noble /bin/bash
 ```
 
 [`seccomp_profile.json`](https://github.com/microsoft/playwright/blob/main/utils/docker/seccomp_profile.json) необходим для запуска Chromium с песочницей. Это [профиль seccomp по умолчанию для Docker](https://github.com/docker/engine/blob/d0d99b04cf6e00ed3fc27e81fc3d94e7eda70af3/profiles/seccomp/default.json) с дополнительными разрешениями на клонирование пространства имен пользователя:
@@ -62,9 +62,12 @@ docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_prof
 }
 ```
 
-:::note
-Использование `--ipc=host` рекомендуется при использовании Chrome ([документация Docker](https://docs.docker.com/engine/reference/run/#ipc-settings---ipc)). Chrome может исчерпать память без этого флага.
-:::
+### Recommended Docker Configuration
+
+When running Playwright in Docker, the following configuration is recommended:
+1. **Using [`--init`](https://docs.docker.com/reference/cli/docker/container/run/#init)** Docker flag is recommended to avoid special treatment for processes with PID=1. This is a common reason for zombie processes.
+1. **Using `--ipc=host`** is recommended when using Chromium. Without it, Chromium can run out of memory and crash. Learn more about this option in [Docker docs](https://docs.docker.com/reference/cli/docker/container/run/#ipc).
+1. **If seeing weird errors when launching Chromium**, try running your container with `docker run --cap-add=SYS_ADMIN` when developing locally.
 
 ### Использование в CI
 
@@ -79,7 +82,7 @@ docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_prof
 Запустите Playwright Server в Docker:
 
 ```bash
-docker run -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.50.0-noble /bin/sh -c "npx -y playwright@1.50.0 run-server --port 3000 --host 0.0.0.0"
+docker run -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.56.0-noble /bin/sh -c "npx -y playwright@1.56.0 run-server --port 3000 --host 0.0.0.0"
 ```
 
 #### Подключение к серверу
@@ -96,7 +99,7 @@ await using var browser = await playwright.Chromium.ConnectAsync("ws://127.0.0.1
 Если вам нужно получить доступ к локальным серверам из контейнера Docker:
 
 ```bash
-docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.50.0-noble /bin/sh -c "npx -y playwright@1.50.0 run-server --port 3000 --host 0.0.0.0"
+docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.56.0-noble /bin/sh -c "npx -y playwright@1.56.0 run-server --port 3000 --host 0.0.0.0"
 ```
 
 Это делает `hostmachine` указывающим на localhost хоста. Ваши тесты должны использовать `hostmachine` вместо `localhost` при доступе к локальным серверам.
@@ -111,9 +114,9 @@ docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --wo
 Смотрите [все доступные теги образов].
 
 В настоящее время мы публикуем образы с следующими тегами:
-- `:v1.50.0` - Docker-образ Playwright версии v1.50.0 на основе Ubuntu 24.04 LTS (Noble Numbat).
-- `:v1.50.0-noble` - Docker-образ Playwright версии v1.50.0 на основе Ubuntu 24.04 LTS (Noble Numbat).
-- `:v1.50.0-jammy` - Docker-образ Playwright версии v1.50.0 на основе Ubuntu 22.04 LTS (Jammy Jellyfish).
+- `:v1.56.0` - Playwright v1.56.0 release docker image based on Ubuntu 24.04 LTS (Noble Numbat).
+- `:v1.56.0-noble` - Playwright v1.56.0 release docker image based on Ubuntu 24.04 LTS (Noble Numbat).
+- `:v1.56.0-jammy` - Playwright v1.56.0 release docker image based on Ubuntu 22.04 LTS (Jammy Jellyfish).
 
 :::note
 
@@ -138,7 +141,6 @@ docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --wo
 curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --install-dir /usr/share/dotnet --channel 9.0
 ```
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -204,6 +206,7 @@ curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --install-dir /
 [Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1 "Action"
 [Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2 "Func"
 [IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable "IEnumerable"
+[IReadOnlyList]: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1?view=net-9.0 "IReadOnlyList"
 [IDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary "IDictionary"
 [Task]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-5.0 "Task"
 [IReadOnlyDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2 "IReadOnlyDictionary"

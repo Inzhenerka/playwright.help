@@ -78,21 +78,8 @@ HAR-файл — это [HTTP Archive](http://www.softwareishard.com/blog/har-12
 
 Установка опции `update` в true создаст или обновит HAR-файл с актуальной сетевой информацией вместо обслуживания запросов из HAR-файла. Используйте это при создании теста для заполнения HAR реальными данными.
 
-```js
-test('records or updates the HAR file', async ({ page }) => {
-  // Get the response from the HAR file
-  await page.routeFromHAR('./hars/fruit.har', {
-    url: '*/**/api/v1/fruits',
-    update: true,
-  });
-
-  // Go to the page
-  await page.goto('https://demo.playwright.dev/api-mocking');
-
-  // Assert that the fruit is visible
-  await expect(page.getByText('Strawberry')).toBeVisible();
-});
-```
+#### 
+Alternatively, you can also record HAR files by using the [recordHar](/api/class-browser.mdx#browser-new-context-option-record-har) option in [browser.newContext()](/api/class-browser.mdx#browser-new-context) when creating a browser context. This allows you to capture all network traffic for the entire context until the context is closed.
 
 ### Изменение HAR-файла
 
@@ -153,7 +140,7 @@ npx playwright open --save-har=example.har --save-har-glob="**/api/**" https://e
 
 ## Мокирование WebSockets
 
-Следующий код перехватит соединения WebSocket и замокирует всю коммуникацию через WebSocket, вместо подключения к серверу. Этот пример отвечает на `"request"` с `"response"`.
+Следующий код перехватывает WebSocket-подключения и замокает всю коммуникацию по WebSocket, вместо подключения к серверу. В этом примере на `"request"` отправляется ответ `"response"`.
 
 ```js
 await page.routeWebSocket('wss://example.com/ws', ws => {
@@ -181,7 +168,6 @@ await page.routeWebSocket('wss://example.com/ws', ws => {
 Для получения более подробной информации смотрите [WebSocketRoute].
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

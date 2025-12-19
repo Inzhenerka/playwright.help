@@ -308,6 +308,23 @@ await page.close(options);
 
 ---
 
+### consoleMessages {#page-console-messages}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.56</font><x-search>page.consoleMessages</x-search>
+
+Returns up to (currently) 200 last console messages from this page. See [page.on('console')](/api/class-page.mdx#page-event-console) for more details.
+
+**Usage**
+
+```js
+await page.consoleMessages();
+```
+
+**Returns**
+- [Promise]&lt;[Array]&lt;[ConsoleMessage]&gt;&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-console-messages-return"/><a href="#page-console-messages-return" class="list-anchor">#</a>
+
+---
+
 ### content {#page-content}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.content</x-search>
@@ -386,6 +403,9 @@ await page.dragAndDrop('#source', '#target', {
       
       
     Clicks on the source element at this point relative to the top-left corner of the element's padding box. If not specified, some visible point of the element is used.
+  - `steps` [number] *(optional)* <font size="2">Added in: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-drag-and-drop-option-steps"/><a href="#page-drag-and-drop-option-steps" class="list-anchor">#</a>
+    
+    Defaults to 1. Sends `n` interpolated `mousemove` events to represent travel between the `mousedown` and `mouseup` of the drag. When set to 1, emits a single `mousemove` event at the destination location.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-drag-and-drop-option-strict"/><a href="#page-drag-and-drop-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -678,6 +698,36 @@ const crypto = require('crypto');
 
 **Returns**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-function-return"/><a href="#page-expose-function-return" class="list-anchor">#</a>
+
+---
+
+### extract {#page-extract}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.58</font><x-search>page.extract</x-search>
+
+Extract information from the page using the agentic loop, return it in a given Zod format.
+
+**Usage**
+
+```js
+await page.extract('List of items in the cart', z.object({
+  title: z.string().describe('Item title to extract'),
+  price: z.string().describe('Item price to extract'),
+}).array());
+```
+
+**Arguments**
+- `query` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-extract-option-query"/><a href="#page-extract-option-query" class="list-anchor">#</a>
+  
+  Task to perform using agentic loop.
+- `schema` [z.ZodSchema]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-extract-option-schema"/><a href="#page-extract-option-schema" class="list-anchor">#</a>
+- `options` [Object] *(optional)*
+  - `maxTurns` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-extract-option-max-turns"/><a href="#page-extract-option-max-turns" class="list-anchor">#</a>
+    
+    Maximum number of agentic steps to take while extracting the information.
+
+**Returns**
+- [Promise]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-extract-return"/><a href="#page-extract-return" class="list-anchor">#</a>
 
 ---
 
@@ -1302,11 +1352,28 @@ await page.opener();
 
 ---
 
+### pageErrors {#page-page-errors}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.56</font><x-search>page.pageErrors</x-search>
+
+Returns up to (currently) 200 last page errors from this page. See [page.on('pageerror')](/api/class-page.mdx#page-event-page-error) for more details.
+
+**Usage**
+
+```js
+await page.pageErrors();
+```
+
+**Returns**
+- [Promise]&lt;[Array]&lt;[Error]&gt;&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-page-errors-return"/><a href="#page-page-errors-return" class="list-anchor">#</a>
+
+---
+
 ### pause {#page-pause}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.pause</x-search>
 
-Pauses script execution. Playwright will stop executing the script and wait for the user to either press 'Resume' button in the page overlay or to call `playwright.resume()` in the DevTools console.
+Pauses script execution. Playwright will stop executing the script and wait for the user to either press the 'Resume' button in the page overlay or to call `playwright.resume()` in the DevTools console.
 
 User can inspect selectors or perform manual steps while paused. Resume will continue running the original script from the place it was paused.
 
@@ -1448,6 +1515,35 @@ The [format](/api/class-page.mdx#page-pdf-option-format) options are:
 
 ---
 
+### perform {#page-perform}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.58</font><x-search>page.perform</x-search>
+
+Perform action using agentic loop.
+
+**Usage**
+
+```js
+await page.perform('Click submit button');
+```
+
+**Arguments**
+- `task` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-perform-option-task"/><a href="#page-perform-option-task" class="list-anchor">#</a>
+  
+  Task to perform using agentic loop.
+- `options` [Object] *(optional)*
+  - `key` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-perform-option-key"/><a href="#page-perform-option-key" class="list-anchor">#</a>
+    
+    All the agentic actions are converted to the Playwright calls and are cached. By default, they are cached globally with the `task` as a key. This option allows controlling the cache key explicitly.
+  - `maxTurns` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-perform-option-max-turns"/><a href="#page-perform-option-max-turns" class="list-anchor">#</a>
+    
+    Maximum number of agentic steps to take while performing this action.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-perform-return"/><a href="#page-perform-return" class="list-anchor">#</a>
+
+---
+
 ### reload {#page-reload}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.reload</x-search>
@@ -1560,6 +1656,27 @@ await page.requestGC();
 
 **Returns**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-request-gc-return"/><a href="#page-request-gc-return" class="list-anchor">#</a>
+
+---
+
+### requests {#page-requests}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.56</font><x-search>page.requests</x-search>
+
+Returns up to (currently) 100 last network request from this page. See [page.on('request')](/api/class-page.mdx#page-event-request) for more details.
+
+Returned requests should be accessed immediately, otherwise they might be collected to prevent unbounded memory growth as new requests come in. Once collected, retrieving most information about the request is impossible.
+
+Note that requests reported through the [page.on('request')](/api/class-page.mdx#page-event-request) request are not collected, so there is a trade off between efficient memory usage with [page.requests()](/api/class-page.mdx#page-requests) and the amount of available information reported through [page.on('request')](/api/class-page.mdx#page-event-request).
+
+**Usage**
+
+```js
+await page.requests();
+```
+
+**Returns**
+- [Promise]&lt;[Array]&lt;[Request]&gt;&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-requests-return"/><a href="#page-requests-return" class="list-anchor">#</a>
 
 ---
 
@@ -2967,28 +3084,6 @@ const divCounts = await page.$$eval('div', (divs, min) => divs.length >= min, 10
 
 **Returns**
 - [Promise]&lt;[Serializable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-eval-on-selector-all-return"/><a href="#page-eval-on-selector-all-return" class="list-anchor">#</a>
-
----
-
-### accessibility {#page-accessibility}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.accessibility</x-search>
-
-:::warning Deprecated
-
-This property is discouraged. Please use other libraries such as [Axe](https://www.deque.com/axe/) if you need to test page accessibility. See our Node.js [guide](https://playwright.dev/docs/accessibility-testing) for integration with Axe.
-
-:::
-
-
-**Usage**
-
-```js
-page.accessibility
-```
-
-**Type**
-- [Accessibility]
 
 ---
 
@@ -4460,7 +4555,6 @@ await page.waitForTimeout(1000);
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-timeout-return"/><a href="#page-wait-for-timeout-return" class="list-anchor">#</a>
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

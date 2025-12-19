@@ -41,23 +41,36 @@ browserContext.addCookies(Arrays.asList(cookieObject1, cookieObject2));
 **Аргументы**
 - `cookies` [List]&lt;`Cookie`&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-add-cookies-option-cookies"/><a href="#browser-context-add-cookies-option-cookies" class="list-anchor">#</a>
   - `setName` [String]
-
+    
+    
   - `setValue` [String]
+    
+    
+  - `setUrl` [String] *(optional)*
+    
+    Either `url` or both `domain` and `path` are required. Optional.
+  - `setDomain` [String] *(optional)*
+    
+    For the cookie to apply to all subdomains as well, prefix domain with a dot, like this: ".example.com". Either `url` or both `domain` and `path` are required. Optional.
+  - `setPath` [String] *(optional)*
+    
+    Either `url` or both `domain` and `path` are required. Optional.
+  - `setExpires` [double] *(optional)*
+    
+    Unix time in seconds. Optional.
+  - `setHttpOnly` [boolean] *(optional)*
+    
+    Optional.
+  - `setSecure` [boolean] *(optional)*
+    
+    Optional.
+  - `setSameSite` `enum SameSiteAttribute { STRICT, LAX, NONE }` *(optional)*
+    
+    Optional.
+  - `setPartitionKey` [String] *(optional)*
+    
+    For partitioned third-party cookies (aka [CHIPS](https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Privacy_sandbox/Partitioned_cookies)), the partition key. Optional.
 
-  - `setUrl` [String] *(опционально)*
-    Необходимо указать либо `url`, либо `domain` и `path`. Необязательный параметр.
-  - `setDomain` [String] *(опционально)*
-    Чтобы cookie применялась ко всем поддоменам, добавьте точку перед доменом, например: ".example.com". Необходимо указать либо `url`, либо `domain` и `path`. Необязательный параметр.
-  - `setPath` [String] *(опционально)*
-    Необходимо указать либо `url`, либо `domain` и `path`. Необязательный параметр.
-  - `setExpires` [double] *(опционально)*
-    Время в формате Unix (в секундах). Необязательный параметр.
-  - `setHttpOnly` [boolean] *(опционально)*
-    Необязательный параметр.
-  - `setSecure` [boolean] *(опционально)*
-    Необязательный параметр.
-  - `setSameSite` `enum SameSiteAttribute { STRICT, LAX, NONE }` *(опционально)*
-    Необязательный параметр.
 
 **Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-add-cookies-return"/><a href="#browser-context-add-cookies-return" class="list-anchor">#</a>
@@ -101,33 +114,11 @@ browserContext.addInitScript(Paths.get("preload.js"));
 
 ---
 
-### backgroundPages {#browser-context-background-pages}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.11</font><x-search>browserContext.backgroundPages</x-search>
-
-:::note
-
-Фоновые страницы поддерживаются только в браузерах на базе Chromium.
-:::
-
-Все существующие фоновые страницы в данном контексте.
-
-**Использование**
-
-```java
-BrowserContext.backgroundPages();
-```
-
-**Возвращает**
-- [List]&lt;[Page]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-background-pages-return"/><a href="#browser-context-background-pages-return" class="list-anchor">#</a>
-
----
-
 ### browser {#browser-context-browser}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.browser</x-search>
 
-Возвращает экземпляр браузера, к которому относится данный контекст. Если контекст был создан как постоянный (persistent), возвращается `null`.
+Возвращает экземпляр браузера, которому принадлежит контекст. Возвращает `null`, если контекст создан вне обычного браузера, например в Android или Electron.
 
 **Использование**
 
@@ -248,7 +239,9 @@ BrowserContext.cookies(urls);
   - `httpOnly` [boolean]
   - `secure` [boolean]
   - `sameSite` `enum SameSiteAttribute { STRICT, LAX, NONE }`
-
+  - `partitionKey` [String] *(опционально)*
+    
+    
 ---
 
 ### exposeBinding {#browser-context-expose-binding}
@@ -402,6 +395,8 @@ BrowserContext.grantPermissions(permissions, options);
   * `'clipboard-write'`
   * `'geolocation'`
   * `'gyroscope'`
+  * `'local-fonts'`
+  * `'local-network-access'`
   * `'magnetometer'`
   * `'microphone'`
   * `'midi-sysex'` (system-exclusive midi)
@@ -535,7 +530,7 @@ context.route("/api/**", route -> {
 **Аргументы**
 - `url` [String] | [Pattern] | [Predicate]&lt;[String]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-option-url"/><a href="#browser-context-route-option-url" class="list-anchor">#</a>
   
-  Глобальный шаблон, регулярное выражение или предикат, получающий [URL] для сопоставления при маршрутизации. Когда [setBaseURL](/api/class-browser.mdx#browser-new-context-option-base-url) через параметры контекста был предоставлен и переданный URL является путем, он объединяется через конструктор [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL).
+  Шаблон glob, регулярное выражение или предикат, который получает [URL] для сопоставления при маршрутизации. Если в параметрах контекста задан [setBaseURL](/api/class-browser.mdx#browser-new-context-option-base-url) и переданный URL является строкой, не начинающейся с `*`, он будет разрешён с помощью конструктора [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL).
 - `handler` [Consumer]&lt;[Route]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-option-handler"/><a href="#browser-context-route-option-handler" class="list-anchor">#</a>
   
   Функция-обработчик для маршрутизации запроса.
@@ -779,15 +774,9 @@ BrowserContext.storageState(options);
 - `options` `BrowserContext.StorageStateOptions` *(опционально)*
   - `setIndexedDB` [boolean] *(опционально)* <font size="2">Добавлено в: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-indexed-db"/><a href="#browser-context-storage-state-option-indexed-db" class="list-anchor">#</a>
     
-    Установите значение `true`, чтобы включить [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) в снимок состояния хранилища. Если ваше приложение использует IndexedDB для хранения токенов аутентификации, таких как Firebase Authentication, включите это.
-    
-    :::note
-    
-    IndexedDB с типизированными массивами в настоящее время не поддерживается.
-    :::
-    
-  - `setPath` [Path] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-path"/><a href="#browser-context-storage-state-option-path" class="list-anchor">#</a>
-    
+    Установите значение `true`, чтобы включить [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) в снимок состояния хранилища (storage state). Если ваше приложение использует IndexedDB для хранения токенов аутентификации, например Firebase Authentication, включите этот параметр.
+  - `setPath` [Path] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-path"/><a href="#browser-context-storage-state-option-path" class="list-anchor">#</a>
+
     Путь к файлу для сохранения состояния хранилища. Если [setPath](/api/class-browsercontext.mdx#browser-context-storage-state-option-path) является относительным путем, то он разрешается относительно текущей рабочей директории. Если путь не указан, состояние хранилища все равно возвращается, но не будет сохранено на диск.
 
 **Возвращает**
@@ -987,34 +976,6 @@ BrowserContext.tracing()
 
 ## Events
 
-### onBackgroundPage(handler) {#browser-context-event-background-page}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.11</font><x-search>browserContext.onBackgroundPage(handler)</x-search>
-
-:::note
-
-Работает только с постоянным контекстом браузера Chromium.
-:::
-
-Вызывается, когда в контексте создается новая фоновая страница.
-
-```java
-context.onBackgroundPage(backgroundPage -> {
-  System.out.println(backgroundPage.url());
-});
-```
-
-**Использование**
-
-```java
-BrowserContext.onBackgroundPage(handler)
-```
-
-**Данные события**
-- [Page]
-
----
-
 ### onClose(handler) {#browser-context-event-close}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserContext.onClose(handler)</x-search>
@@ -1200,6 +1161,56 @@ BrowserContext.onWebError(handler)
 
 **Данные события**
 - [WebError]
+
+---
+
+## Deprecated
+
+### onBackgroundPage(handler) {#browser-context-event-background-page}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.onBackgroundPage(handler)</x-search>
+
+:::warning Deprecated
+
+Background pages have been removed from Chromium together with Manifest V2 extensions.
+
+:::
+
+
+This event is not emitted.
+
+**Usage**
+
+```java
+BrowserContext.onBackgroundPage(handler)
+```
+
+**Event data**
+- [Page]
+
+---
+
+### backgroundPages {#browser-context-background-pages}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.backgroundPages</x-search>
+
+:::warning Deprecated
+
+Background pages have been removed from Chromium together with Manifest V2 extensions.
+
+:::
+
+
+Returns an empty list.
+
+**Usage**
+
+```java
+BrowserContext.backgroundPages();
+```
+
+**Returns**
+- [List]&lt;[Page]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-background-pages-return"/><a href="#browser-context-background-pages-return" class="list-anchor">#</a>
 
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

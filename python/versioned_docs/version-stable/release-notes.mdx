@@ -7,7 +7,126 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Версия 1.51
+## Version 1.56
+
+### New APIs
+- New methods [page.console_messages()](/api/class-page.mdx#page-console-messages) and [page.page_errors()](/api/class-page.mdx#page-page-errors) for retrieving the most recent console messages from the page
+- New method [page.requests()](/api/class-page.mdx#page-requests) for retrieving the most recent network requests from the page
+
+### Breaking Changes
+- Event [browser_context.on("backgroundpage")](/api/class-browsercontext.mdx#browser-context-event-background-page) has been deprecated and will not be emitted. Method [browser_context.background_pages](/api/class-browsercontext.mdx#browser-context-background-pages) will return an empty list
+
+### Miscellaneous
+- Aria snapshots render and compare `input` `placeholder`
+
+### Browser Versions
+- Chromium 141.0.7390.37
+- Mozilla Firefox 142.0.1
+- WebKit 26.0
+
+## Version 1.55
+
+### Codegen
+- Automatic `to_be_visible()` assertions: Codegen can now generate automatic `to_be_visible()` assertions for common UI interactions. This feature can be enabled in the Codegen settings UI.
+
+### Breaking Changes
+- ⚠️ Dropped support for Chromium extension manifest v2.
+
+### Miscellaneous
+- Added support for Debian 13 "Trixie".
+
+### Browser Versions
+- Chromium 140.0.7339.16
+- Mozilla Firefox 141.0
+- WebKit 26.0
+
+This version was also tested against the following stable channels:
+- Google Chrome 139
+- Microsoft Edge 139
+
+## Version 1.54
+
+### Highlights
+- New cookie property `partition_key` in [browser_context.cookies()](/api/class-browsercontext.mdx#browser-context-cookies) and [browser_context.add_cookies()](/api/class-browsercontext.mdx#browser-context-add-cookies). This property allows to save and restore partitioned cookies. See [CHIPS MDN article](https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Privacy_sandbox/Partitioned_cookies) for more information. Note that browsers have different support and defaults for cookie partitioning.
+- New option `--user-data-dir` in multiple commands. You can specify the same user data dir to reuse browsing state, like authentication, between sessions.
+  
+  ```bash
+  playwright codegen --user-data-dir=./user-data
+  ```
+  
+- `playwright open` does not open the test recorder anymore. Use `playwright codegen` instead.
+
+### Browser Versions
+- Chromium 139.0.7258.5
+- Mozilla Firefox 140.0.2
+- WebKit 26.0
+
+This version was also tested against the following stable channels:
+- Google Chrome 140
+- Microsoft Edge 140
+
+## Version 1.53
+
+### Trace Viewer and HTML Reporter Updates
+- New Steps in Trace Viewer: ![New Trace Viewer Steps](https://github.com/user-attachments/assets/1963ff7d-4070-41be-a79b-4333176921a2)
+- New method [locator.describe()](/api/class-locator.mdx#locator-describe) to describe a locator. Used for trace viewer.
+  
+  ```python
+  button = page.get_by_test_id("btn-sub").describe("Subscribe button")
+  button.click()
+  ```
+  
+- `python -m playwright install --list` will now list all installed browsers, versions and locations.
+
+### Browser Versions
+- Chromium 138.0.7204.4
+- Mozilla Firefox 139.0
+- WebKit 18.5
+
+This version was also tested against the following stable channels:
+- Google Chrome 137
+- Microsoft Edge 137
+
+## Version 1.52
+
+### Highlights
+- New method [expect(locator).to_contain_class()](/api/class-locatorassertions.mdx#locator-assertions-to-contain-class) to ergonomically assert individual class names on the element.
+  
+  ```python
+    expect(page.get_by_role('listitem', name='Ship v1.52')).to_contain_class('done')
+  ```
+  
+- [Aria Snapshots](./aria-snapshots.mdx) got two new properties: [`/children`](./aria-snapshots.mdx#strict-matching) for strict matching and `/url` for links.
+  
+  ```python
+  expect(locator).to_match_aria_snapshot("""
+    - list
+      - /children: equal
+      - listitem: Feature A
+      - listitem:
+        - link "Feature B":
+          - /url: "https://playwright.dev"
+  """)
+  ```
+  
+### Miscellaneous
+- New option [max_redirects](/api/class-apirequest.mdx#api-request-new-context-option-max-redirects) in [api_request.new_context()](/api/class-apirequest.mdx#api-request-new-context) to control the maximum number of redirects.
+
+### Breaking Changes
+- Glob URL patterns in methods like [page.route()](/api/class-page.mdx#page-route) do not support `?` and `[]` anymore. We recommend using regular expressions instead.
+- Method [route.continue_()](/api/class-route.mdx#route-continue) does not allow to override the `Cookie` header anymore. If a `Cookie` header is provided, it will be ignored, and the cookie will be loaded from the browser's cookie store. To set custom cookies, use [browser_context.add_cookies()](/api/class-browsercontext.mdx#browser-context-add-cookies).
+- macOS 13 is now deprecated and will no longer receive WebKit updates. Please upgrade to a more recent macOS version to continue benefiting from the latest WebKit improvements.
+
+### Browser Versions
+- Chromium 136.0.7103.25
+- Mozilla Firefox 137.0
+- WebKit 18.4
+
+This version was also tested against the following stable channels:
+- Google Chrome 135
+- Microsoft Edge 135
+
+## Version 1.51
 
 ### Основные моменты
 * Новая опция [indexed_db](/api/class-browsercontext.mdx#browser-context-storage-state-option-indexed-db) для [browser_context.storage_state()](/api/class-browsercontext.mdx#browser-context-storage-state) позволяет сохранять и восстанавливать содержимое IndexedDB. Полезно, когда ваше приложение использует [IndexedDB API](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) для хранения токенов аутентификации, таких как Firebase Authentication.
@@ -1750,7 +1869,6 @@ playwright show-trace trace.zip
 - WebKit 14.1
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"

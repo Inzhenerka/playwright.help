@@ -169,14 +169,14 @@ texts = await page.get_by_role("link").all_text_contents()
 <TabItem value="sync">
 
 ```py
-button = page.get_by_role("button").and_(page.getByTitle("Subscribe"))
+button = page.get_by_role("button").and_(page.get_by_title("Subscribe"))
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-button = page.get_by_role("button").and_(page.getByTitle("Subscribe"))
+button = page.get_by_role("button").and_(page.get_by_title("Subscribe"))
 ```
 
 </TabItem>
@@ -578,9 +578,12 @@ await page.locator("canvas").click(
   - `y` [float]
     
     
-  Точка, используемая относительно верхнего левого угла рамки элемента. Если не указано, используется видимая точка элемента.
-- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-click-option-timeout"/><a href="#locator-click-option-timeout" class="list-anchor">#</a>
+  Точка, используемая относительно верхнего левого угла области padding элемента. Если не указана, используется какая‑то видимая точка элемента.
+- `steps` [int] *(опционально)* <font size="2">Добавлено в: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-click-option-steps"/><a href="#locator-click-option-steps" class="list-anchor">#</a>
   
+  По умолчанию `1`. Отправляет `n` интерполированных событий `mousemove`, чтобы смоделировать перемещение между текущей позицией курсора Playwright и указанной точкой назначения. Если установить `1`, будет сгенерировано одно событие `mousemove` в точке назначения.
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-click-option-timeout"/><a href="#locator-click-option-timeout" class="list-anchor">#</a>
+ 
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 - `trial` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-click-option-trial"/><a href="#locator-click-option-trial" class="list-anchor">#</a>
   
@@ -685,7 +688,10 @@ locator.dblclick(**kwargs)
   - `y` [float]
     
     
-  Точка для использования относительно верхнего левого угла элемента. Если не указано, используется видимая точка элемента.
+  Точка, используемая относительно верхнего левого угла области padding элемента. Если не указана, используется какая‑то видимая точка элемента.
+- `steps` [int] *(опционально)* <font size="2">Добавлено в: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-dblclick-option-steps"/><a href="#locator-dblclick-option-steps" class="list-anchor">#</a>
+  
+  По умолчанию `1`. Отправляет `n` интерполированных событий `mousemove`, чтобы смоделировать перемещение между текущей позицией курсора Playwright и указанной точкой назначения. Если установить `1`, будет сгенерировано одно событие `mousemove` в точке назначения.
 - `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-dblclick-option-timeout"/><a href="#locator-dblclick-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
@@ -711,6 +717,50 @@ locator.dblclick(**kwargs)
 
 `element.dblclick()` генерирует два события `click` и одно событие `dblclick`.
 :::
+
+---
+
+### describe {#locator-describe}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.53</font><x-search>locator.describe</x-search>
+
+Describes the locator, description is used in the trace viewer and reports. Returns the locator pointing to the same element.
+
+**Usage**
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+button = page.get_by_test_id("btn-sub").describe("Subscribe button")
+button.click()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+button = page.get_by_test_id("btn-sub").describe("Subscribe button")
+await button.click()
+```
+
+</TabItem>
+</Tabs>
+
+**Arguments**
+- `description` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-describe-option-description"/><a href="#locator-describe-option-description" class="list-anchor">#</a>
+  
+  Locator description.
+
+**Returns**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-describe-return"/><a href="#locator-describe-return" class="list-anchor">#</a>
 
 ---
 
@@ -879,7 +929,10 @@ await source.drag_to(
   - `y` [float]
     
     
-  Клик по исходному элементу в этой точке относительно верхнего левого угла элемента. Если не указано, используется видимая точка элемента.
+  Кликает по исходному элементу в этой точке, заданной относительно верхнего левого угла области padding элемента. Если не указано, используется какая‑то видимая точка элемента.
+- `steps` [int] *(опционально)* <font size="2">Добавлено в: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drag-to-option-steps"/><a href="#locator-drag-to-option-steps" class="list-anchor">#</a>
+  
+  По умолчанию `1`. Отправляет `n` интерполированных событий `mousemove`, чтобы смоделировать перемещение между `mousedown` и `mouseup` при перетаскивании. Если установить `1`, будет сгенерировано одно событие `mousemove` в точке назначения.
 - `target_position` [Dict] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drag-to-option-target-position"/><a href="#locator-drag-to-option-target-position" class="list-anchor">#</a>
   - `x` [float]
     
@@ -912,16 +965,44 @@ await source.drag_to(
 
 **Использование**
 
+Передача аргумента в [expression](/api/class-locator.mdx#locator-evaluate-option-expression):
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+result = page.get_by_testid("myId").evaluate("(element, [x, y]) => element.textContent + ' ' + x * y", [7, 8])
+print(result) # prints "myId text 56"
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+result = await page.get_by_testid("myId").evaluate("(element, [x, y]) => element.textContent + ' ' + x * y", [7, 8])
+print(result) # prints "myId text 56"
+```
+
+</TabItem>
+</Tabs>
+
 **Аргументы**
 - `expression` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-option-expression"/><a href="#locator-evaluate-option-expression" class="list-anchor">#</a>
   
   JavaScript выражение, которое будет выполнено в контексте браузера. Если выражение оценивается как функция, функция автоматически вызывается.
-- `arg` [EvaluationArgument] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-option-arg"/><a href="#locator-evaluate-option-arg" class="list-anchor">#</a>
+- `arg` [EvaluationArgument] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-option-arg"/><a href="#locator-evaluate-option-arg" class="list-anchor">#</a>
   
   Необязательный аргумент для передачи в [expression](/api/class-locator.mdx#locator-evaluate-option-expression).
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-option-timeout"/><a href="#locator-evaluate-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-option-timeout"/><a href="#locator-evaluate-option-timeout" class="list-anchor">#</a>
   
-  Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
+  Максимальное время ожидания локатора перед выполнением вычисления (в миллисекундах). Обратите внимание: после того как локатор будет найден, само вычисление таймаутом не ограничивается. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить таймаут.
 
 **Возвращает**
 - [Dict]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-return"/><a href="#locator-evaluate-return" class="list-anchor">#</a>
@@ -974,7 +1055,7 @@ more_than_ten = await locator.evaluate_all("(divs, min) => divs.length > min", 1
 - `expression` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-all-option-expression"/><a href="#locator-evaluate-all-option-expression" class="list-anchor">#</a>
   
   JavaScript выражение, которое будет выполнено в контексте браузера. Если выражение оценивается как функция, функция автоматически вызывается.
-- `arg` [EvaluationArgument] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-all-option-arg"/><a href="#locator-evaluate-all-option-arg" class="list-anchor">#</a>
+- `arg` [EvaluationArgument] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-all-option-arg"/><a href="#locator-evaluate-all-option-arg" class="list-anchor">#</a>
   
   Необязательный аргумент для передачи в [expression](/api/class-locator.mdx#locator-evaluate-all-option-expression).
 
@@ -1008,12 +1089,12 @@ locator.evaluate_handle(expression, **kwargs)
 - `expression` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-handle-option-expression"/><a href="#locator-evaluate-handle-option-expression" class="list-anchor">#</a>
   
   JavaScript выражение, которое будет выполнено в контексте браузера. Если выражение оценивается как функция, функция автоматически вызывается.
-- `arg` [EvaluationArgument] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-handle-option-arg"/><a href="#locator-evaluate-handle-option-arg" class="list-anchor">#</a>
+- `arg` [EvaluationArgument] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-handle-option-arg"/><a href="#locator-evaluate-handle-option-arg" class="list-anchor">#</a>
   
   Необязательный аргумент для передачи в [expression](/api/class-locator.mdx#locator-evaluate-handle-option-expression).
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-handle-option-timeout"/><a href="#locator-evaluate-handle-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-handle-option-timeout"/><a href="#locator-evaluate-handle-option-timeout" class="list-anchor">#</a>
   
-  Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
+  Максимальное время ожидания локатора перед выполнением вычисления (в миллисекундах). Обратите внимание: после того как локатор будет найден, само вычисление таймаутом не ограничивается. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить таймаут.
 
 **Возвращает**
 - [JSHandle]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-handle-return"/><a href="#locator-evaluate-handle-return" class="list-anchor">#</a>
@@ -1068,17 +1149,17 @@ await page.get_by_role("textbox").fill("example value")
 - `value` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-fill-option-value"/><a href="#locator-fill-option-value" class="list-anchor">#</a>
   
   Значение для установки в элемент `<input>`, `<textarea>` или `[contenteditable]`.
-- `force` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-fill-option-force"/><a href="#locator-fill-option-force" class="list-anchor">#</a>
+- `force` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-fill-option-force"/><a href="#locator-fill-option-force" class="list-anchor">#</a>
   
   Следует ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
-- `no_wait_after` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-fill-option-no-wait-after"/><a href="#locator-fill-option-no-wait-after" class="list-anchor">#</a>
+- `no_wait_after` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-fill-option-no-wait-after"/><a href="#locator-fill-option-no-wait-after" class="list-anchor">#</a>
   
   :::warning[Устарело]
   Эта опция не имеет эффекта.
   :::
   
   Эта опция не имеет эффекта.
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-fill-option-timeout"/><a href="#locator-fill-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-fill-option-timeout"/><a href="#locator-fill-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -1137,25 +1218,25 @@ await row_locator.filter(has_text="text in column 1").filter(
 </Tabs>
 
 **Аргументы**
-- `has` [Locator] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-option-has"/><a href="#locator-filter-option-has" class="list-anchor">#</a>
+- `has` [Locator] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-option-has"/><a href="#locator-filter-option-has" class="list-anchor">#</a>
   
   Сужает результаты метода до тех, которые содержат элементы, соответствующие этому относительному локатору. Например, `article`, который имеет `text=Playwright`, соответствует `<article><div>Playwright</div></article>`.
   
   Внутренний локатор **должен быть относительным** к внешнему локатору и запрашивается, начиная с совпадения внешнего локатора, а не с корня документа. Например, вы можете найти `content`, который имеет `div` в `<article><content><div>Playwright</div></content></article>`. Однако поиск `content`, который имеет `article div`, не удастся, потому что внутренний локатор должен быть относительным и не должен использовать элементы за пределами `content`.
   
   Обратите внимание, что внешние и внутренние локаторы должны принадлежать к одной и той же рамке. Внутренний локатор не должен содержать [FrameLocator]s.
-- `has_not` [Locator] *(optional)* <font size="2">Добавлено в: v1.33</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-option-has-not"/><a href="#locator-filter-option-has-not" class="list-anchor">#</a>
+- `has_not` [Locator] *(опционально)* <font size="2">Добавлено в: v1.33</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-option-has-not"/><a href="#locator-filter-option-has-not" class="list-anchor">#</a>
   
   Соответствует элементам, которые не содержат элемент, соответствующий внутреннему локатору. Внутренний локатор запрашивается относительно внешнего. Например, `article`, который не имеет `div`, соответствует `<article><span>Playwright</span></article>`.
   
   Обратите внимание, что внешние и внутренние локаторы должны принадлежать к одной и той же рамке. Внутренний локатор не должен содержать [FrameLocator]s.
-- `has_not_text` [str] | [Pattern] *(optional)* <font size="2">Добавлено в: v1.33</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-option-has-not-text"/><a href="#locator-filter-option-has-not-text" class="list-anchor">#</a>
+- `has_not_text` [str] | [Pattern] *(опционально)* <font size="2">Добавлено в: v1.33</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-option-has-not-text"/><a href="#locator-filter-option-has-not-text" class="list-anchor">#</a>
   
   Соответствует элементам, которые не содержат указанный текст где-либо внутри, возможно, в дочернем или потомственном элементе. При передаче [строки] сопоставление нечувствительно к регистру и ищет подстроку.
-- `has_text` [str] | [Pattern] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-option-has-text"/><a href="#locator-filter-option-has-text" class="list-anchor">#</a>
+- `has_text` [str] | [Pattern] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-option-has-text"/><a href="#locator-filter-option-has-text" class="list-anchor">#</a>
   
   Соответствует элементам, содержащим указанный текст где-либо внутри, возможно, в дочернем или потомственном элементе. При передаче [строки] сопоставление нечувствительно к регистру и ищет подстроку. Например, `"Playwright"` соответствует `<article><div>Playwright</div></article>`.
-- `visible` [bool] *(optional)* <font size="2">Добавлено в: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-option-visible"/><a href="#locator-filter-option-visible" class="list-anchor">#</a>
+- `visible` [bool] *(опционально)* <font size="2">Добавлено в: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-option-visible"/><a href="#locator-filter-option-visible" class="list-anchor">#</a>
   
   Соответствует только видимым или невидимым элементам.
 
@@ -1178,7 +1259,7 @@ locator.focus(**kwargs)
 ```
 
 **Аргументы**
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-focus-option-timeout"/><a href="#locator-focus-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-focus-option-timeout"/><a href="#locator-focus-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
@@ -1664,7 +1745,7 @@ page.get_by_text(re.compile("^hello$", re.IGNORECASE))
 - `text` [str] | [Pattern]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-text-option-text"/><a href="#locator-get-by-text-option-text" class="list-anchor">#</a>
   
   Текст для поиска элемента.
-- `exact` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-text-option-exact"/><a href="#locator-get-by-text-option-exact" class="list-anchor">#</a>
+- `exact` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-text-option-exact"/><a href="#locator-get-by-text-option-exact" class="list-anchor">#</a>
   
   Искать точное совпадение: с учетом регистра и всей строки. По умолчанию false. Игнорируется при поиске по регулярному выражению. Обратите внимание, что точное совпадение все равно обрезает пробелы.
 
@@ -1723,7 +1804,7 @@ await expect(page.get_by_title("Issues count")).to_have_text("25 issues")
 - `text` [str] | [Pattern]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-title-option-text"/><a href="#locator-get-by-title-option-text" class="list-anchor">#</a>
   
   Текст для поиска элемента.
-- `exact` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-title-option-exact"/><a href="#locator-get-by-title-option-exact" class="list-anchor">#</a>
+- `exact` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-title-option-exact"/><a href="#locator-get-by-title-option-exact" class="list-anchor">#</a>
   
   Искать точное совпадение: с учетом регистра и всей строки. По умолчанию false. Игнорируется при поиске по регулярному выражению. Обратите внимание, что точное совпадение все равно обрезает пробелы.
 
@@ -1782,13 +1863,13 @@ await page.get_by_role("link").hover()
 </Tabs>
 
 **Аргументы**
-- `force` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-force"/><a href="#locator-hover-option-force" class="list-anchor">#</a>
+- `force` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-force"/><a href="#locator-hover-option-force" class="list-anchor">#</a>
   
   Пропустить проверки [actionability](../actionability.mdx). По умолчанию `false`.
-- `modifiers` [List]\["Alt" | "Control" | "ControlOrMeta" | "Meta" | "Shift"\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-modifiers"/><a href="#locator-hover-option-modifiers" class="list-anchor">#</a>
+- `modifiers` [List]\["Alt" | "Control" | "ControlOrMeta" | "Meta" | "Shift"\] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-modifiers"/><a href="#locator-hover-option-modifiers" class="list-anchor">#</a>
   
   Модификаторные клавиши для нажатия. Обеспечивает, что только эти модификаторы будут нажаты во время операции, а затем восстанавливает текущие модификаторы. Если не указано, используются текущие нажатые модификаторы. "ControlOrMeta" разрешается в "Control" на Windows и Linux и в "Meta" на macOS.
-- `no_wait_after` [bool] *(optional)* <font size="2">Добавлено в: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-no-wait-after"/><a href="#locator-hover-option-no-wait-after" class="list-anchor">#</a>
+- `no_wait_after` [bool] *(опционально)* <font size="2">Добавлено в: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-no-wait-after"/><a href="#locator-hover-option-no-wait-after" class="list-anchor">#</a>
   
   :::warning[Устарело]
   Этот параметр не имеет эффекта.
@@ -1796,7 +1877,7 @@ await page.get_by_role("link").hover()
   
   
   Этот параметр не имеет эффекта.
-- `position` [Dict] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-position"/><a href="#locator-hover-option-position" class="list-anchor">#</a>
+- `position` [Dict] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-position"/><a href="#locator-hover-option-position" class="list-anchor">#</a>
   - `x` [float]
     
     
@@ -1804,10 +1885,10 @@ await page.get_by_role("link").hover()
     
     
   Точка для использования относительно верхнего левого угла элемента. Если не указано, используется видимая точка элемента.
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-timeout"/><a href="#locator-hover-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-timeout"/><a href="#locator-hover-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
-- `trial` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-trial"/><a href="#locator-hover-option-trial" class="list-anchor">#</a>
+- `trial` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-trial"/><a href="#locator-hover-option-trial" class="list-anchor">#</a>
   
   Если установлено, этот метод выполняет только проверки [actionability](../actionability.mdx) и пропускает действие. По умолчанию `false`. Полезно для ожидания, пока элемент будет готов к действию без его выполнения. Обратите внимание, что клавиатурные `modifiers` будут нажаты независимо от `trial`, чтобы позволить тестировать элементы, которые видны только при нажатии этих клавиш.
 
@@ -1841,7 +1922,7 @@ locator.inner_html(**kwargs)
 ```
 
 **Аргументы**
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-inner-html-option-timeout"/><a href="#locator-inner-html-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-inner-html-option-timeout"/><a href="#locator-inner-html-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -1869,7 +1950,7 @@ locator.inner_text(**kwargs)
 ```
 
 **Аргументы**
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-inner-text-option-timeout"/><a href="#locator-inner-text-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-inner-text-option-timeout"/><a href="#locator-inner-text-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -1916,7 +1997,7 @@ value = await page.get_by_role("textbox").input_value()
 </Tabs>
 
 **Аргументы**
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-input-value-option-timeout"/><a href="#locator-input-value-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-input-value-option-timeout"/><a href="#locator-input-value-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -1967,7 +2048,7 @@ checked = await page.get_by_role("checkbox").is_checked()
 </Tabs>
 
 **Аргументы**
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-is-checked-option-timeout"/><a href="#locator-is-checked-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-is-checked-option-timeout"/><a href="#locator-is-checked-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -2014,7 +2095,7 @@ disabled = await page.get_by_role("button").is_disabled()
 </Tabs>
 
 **Аргументы**
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-is-disabled-option-timeout"/><a href="#locator-is-disabled-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-is-disabled-option-timeout"/><a href="#locator-is-disabled-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -2061,7 +2142,7 @@ editable = await page.get_by_role("textbox").is_editable()
 </Tabs>
 
 **Аргументы**
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-is-editable-option-timeout"/><a href="#locator-is-editable-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-is-editable-option-timeout"/><a href="#locator-is-editable-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -2108,7 +2189,7 @@ enabled = await page.get_by_role("button").is_enabled()
 </Tabs>
 
 **Аргументы**
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-is-enabled-option-timeout"/><a href="#locator-is-enabled-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-is-enabled-option-timeout"/><a href="#locator-is-enabled-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -2508,17 +2589,17 @@ await locator.press("Enter")
 - `text` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-press-sequentially-option-text"/><a href="#locator-press-sequentially-option-text" class="list-anchor">#</a>
   
   Строка символов для поочередного нажатия в сфокусированном элементе.
-- `delay` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-press-sequentially-option-delay"/><a href="#locator-press-sequentially-option-delay" class="list-anchor">#</a>
+- `delay` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-press-sequentially-option-delay"/><a href="#locator-press-sequentially-option-delay" class="list-anchor">#</a>
   
   Время ожидания между нажатиями клавиш в миллисекундах. По умолчанию 0.
-- `no_wait_after` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-press-sequentially-option-no-wait-after"/><a href="#locator-press-sequentially-option-no-wait-after" class="list-anchor">#</a>
+- `no_wait_after` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-press-sequentially-option-no-wait-after"/><a href="#locator-press-sequentially-option-no-wait-after" class="list-anchor">#</a>
   
   :::warning[Устарело]
   Этот параметр не имеет эффекта.
   :::
   
   Этот параметр не имеет эффекта.
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-press-sequentially-option-timeout"/><a href="#locator-press-sequentially-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-press-sequentially-option-timeout"/><a href="#locator-press-sequentially-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Установите `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -2586,43 +2667,43 @@ await page.get_by_role("link").screenshot(animations="disabled", path="link.png"
 </Tabs>
 
 **Аргументы**
-- `animations` "disabled" | "allow" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-animations"/><a href="#locator-screenshot-option-animations" class="list-anchor">#</a>
+- `animations` "disabled" | "allow" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-animations"/><a href="#locator-screenshot-option-animations" class="list-anchor">#</a>
   
   При установке в `"disabled"`, останавливает CSS-анимации, CSS-переходы и веб-анимации. Анимации получают разное обращение в зависимости от их продолжительности:
   * конечные анимации быстро перематываются до завершения, чтобы они вызвали событие `transitionend`.
   * бесконечные анимации отменяются до начального состояния, а затем воспроизводятся после скриншота.
   
   По умолчанию `"allow"`, что оставляет анимации нетронутыми.
-- `caret` "hide" | "initial" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-caret"/><a href="#locator-screenshot-option-caret" class="list-anchor">#</a>
+- `caret` "hide" | "initial" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-caret"/><a href="#locator-screenshot-option-caret" class="list-anchor">#</a>
   
   При установке в `"hide"`, скриншот скроет текстовый курсор. При установке в `"initial"`, поведение текстового курсора не изменится. По умолчанию `"hide"`.
-- `mask` [List]\[[Locator]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-mask"/><a href="#locator-screenshot-option-mask" class="list-anchor">#</a>
+- `mask` [List]\[[Locator]\] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-mask"/><a href="#locator-screenshot-option-mask" class="list-anchor">#</a>
   
   Укажите локаторы, которые должны быть замаскированы при создании скриншота. Замаскированные элементы будут покрыты розовым прямоугольником `#FF00FF` (настраивается с помощью [mask_color](/api/class-locator.mdx#locator-screenshot-option-mask-color)), который полностью покрывает их ограничивающий прямоугольник. Маска также применяется к невидимым элементам, см. [Matching only visible elements](../locators.mdx#matching-only-visible-elements) для отключения этого.
-- `mask_color` [str] *(optional)* <font size="2">Добавлено в: v1.35</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-mask-color"/><a href="#locator-screenshot-option-mask-color" class="list-anchor">#</a>
+- `mask_color` [str] *(опционально)* <font size="2">Добавлено в: v1.35</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-mask-color"/><a href="#locator-screenshot-option-mask-color" class="list-anchor">#</a>
   
   Укажите цвет наложения для замаскированных элементов в [CSS color format](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value). Цвет по умолчанию розовый `#FF00FF`.
-- `omit_background` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-omit-background"/><a href="#locator-screenshot-option-omit-background" class="list-anchor">#</a>
+- `omit_background` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-omit-background"/><a href="#locator-screenshot-option-omit-background" class="list-anchor">#</a>
   
   Скрывает белый фон по умолчанию и позволяет делать скриншоты с прозрачностью. Не применимо к изображениям `jpeg`. По умолчанию `false`.
-- `path` [Union]\[[str], [pathlib.Path]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-path"/><a href="#locator-screenshot-option-path" class="list-anchor">#</a>
+- `path` [Union]\[[str], [pathlib.Path]\] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-path"/><a href="#locator-screenshot-option-path" class="list-anchor">#</a>
   
   Путь к файлу для сохранения изображения. Тип скриншота будет определен по расширению файла. Если [path](/api/class-locator.mdx#locator-screenshot-option-path) является относительным путем, то он разрешается относительно текущей рабочей директории. Если путь не указан, изображение не будет сохранено на диск.
-- `quality` [int] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-quality"/><a href="#locator-screenshot-option-quality" class="list-anchor">#</a>
+- `quality` [int] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-quality"/><a href="#locator-screenshot-option-quality" class="list-anchor">#</a>
   
   Качество изображения, от 0 до 100. Не применимо к изображениям `png`.
-- `scale` "css" | "device" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-scale"/><a href="#locator-screenshot-option-scale" class="list-anchor">#</a>
+- `scale` "css" | "device" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-scale"/><a href="#locator-screenshot-option-scale" class="list-anchor">#</a>
   
   При установке в `"css"`, скриншот будет иметь один пиксель на каждый css пиксель на странице. Для устройств с высоким разрешением это позволит уменьшить размер скриншотов. Использование опции `"device"` создаст один пиксель на каждый пиксель устройства, так что скриншоты устройств с высоким разрешением будут в два раза больше или даже больше.
   
   По умолчанию `"device"`.
-- `style` [str] *(optional)* <font size="2">Добавлено в: v1.41</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-style"/><a href="#locator-screenshot-option-style" class="list-anchor">#</a>
+- `style` [str] *(опционально)* <font size="2">Добавлено в: v1.41</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-style"/><a href="#locator-screenshot-option-style" class="list-anchor">#</a>
   
   Текст таблицы стилей для применения при создании скриншота. Здесь вы можете скрыть динамические элементы, сделать элементы невидимыми или изменить их свойства, чтобы помочь вам создавать повторяемые скриншоты. Эта таблица стилей проникает в Shadow DOM и применяется к внутренним фреймам.
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-timeout"/><a href="#locator-screenshot-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-timeout"/><a href="#locator-screenshot-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Установите `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
-- `type` "png" | "jpeg" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-type"/><a href="#locator-screenshot-option-type" class="list-anchor">#</a>
+- `type` "png" | "jpeg" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-type"/><a href="#locator-screenshot-option-type" class="list-anchor">#</a>
   
   Укажите тип скриншота, по умолчанию `png`.
 
@@ -2655,7 +2736,7 @@ locator.scroll_into_view_if_needed(**kwargs)
 ```
 
 **Аргументы**
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-scroll-into-view-if-needed-option-timeout"/><a href="#locator-scroll-into-view-if-needed-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-scroll-into-view-if-needed-option-timeout"/><a href="#locator-scroll-into-view-if-needed-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Установите `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
@@ -2715,29 +2796,29 @@ await element.select_option(value=["red", "green", "blue"])
 </Tabs>
 
 **Аргументы**
-- `force` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-option-option-force"/><a href="#locator-select-option-option-force" class="list-anchor">#</a>
+- `force` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-option-option-force"/><a href="#locator-select-option-option-force" class="list-anchor">#</a>
   
   Следует ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
-- `no_wait_after` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-option-option-no-wait-after"/><a href="#locator-select-option-option-no-wait-after" class="list-anchor">#</a>
+- `no_wait_after` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-option-option-no-wait-after"/><a href="#locator-select-option-option-no-wait-after" class="list-anchor">#</a>
   
   :::warning[Устарело]
   Этот параметр не имеет эффекта.
   :::
   
   Этот параметр не имеет эффекта.
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-option-option-timeout"/><a href="#locator-select-option-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-option-option-timeout"/><a href="#locator-select-option-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Установите `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-- `element` [ElementHandle] | [List]\[[ElementHandle]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-option-option-element"/><a href="#locator-select-option-option-element" class="list-anchor">#</a>
+- `element` [ElementHandle] | [List]\[[ElementHandle]\] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-option-option-element"/><a href="#locator-select-option-option-element" class="list-anchor">#</a>
   
   Элементы опций для выбора. Необязательно.
-- `index` [int] | [List]\[[int]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-option-option-index"/><a href="#locator-select-option-option-index" class="list-anchor">#</a>
+- `index` [int] | [List]\[[int]\] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-option-option-index"/><a href="#locator-select-option-option-index" class="list-anchor">#</a>
   
   Опции для выбора по индексу. Необязательно.
-- `value` [str] | [List]\[[str]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-option-option-value"/><a href="#locator-select-option-option-value" class="list-anchor">#</a>
+- `value` [str] | [List]\[[str]\] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-option-option-value"/><a href="#locator-select-option-option-value" class="list-anchor">#</a>
   
   Опции для выбора по значению. Если `<select>` имеет атрибут `multiple`, все указанные опции будут выбраны, в противном случае будет выбрана только первая опция, соответствующая одной из переданных опций. Необязательно.
-- `label` [str] | [List]\[[str]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-option-option-label"/><a href="#locator-select-option-option-label" class="list-anchor">#</a>
+- `label` [str] | [List]\[[str]\] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-option-option-label"/><a href="#locator-select-option-option-label" class="list-anchor">#</a>
   
   Опции для выбора по метке. Если `<select>` имеет атрибут `multiple`, все указанные опции будут выбраны, в противном случае будет выбрана только первая опция, соответствующая одной из переданных опций. Необязательно.
 
@@ -2772,10 +2853,10 @@ locator.select_text(**kwargs)
 ```
 
 **Аргументы**
-- `force` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-text-option-force"/><a href="#locator-select-text-option-force" class="list-anchor">#</a>
+- `force` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-text-option-force"/><a href="#locator-select-text-option-force" class="list-anchor">#</a>
   
   Нужно ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-text-option-timeout"/><a href="#locator-select-text-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-text-option-timeout"/><a href="#locator-select-text-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -2820,17 +2901,17 @@ await page.get_by_role("checkbox").set_checked(True)
 - `checked` [bool]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-checked"/><a href="#locator-set-checked-option-checked" class="list-anchor">#</a>
   
   Нужно ли установить или снять флажок.
-- `force` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-force"/><a href="#locator-set-checked-option-force" class="list-anchor">#</a>
+- `force` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-force"/><a href="#locator-set-checked-option-force" class="list-anchor">#</a>
   
   Нужно ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
-- `no_wait_after` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-no-wait-after"/><a href="#locator-set-checked-option-no-wait-after" class="list-anchor">#</a>
+- `no_wait_after` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-no-wait-after"/><a href="#locator-set-checked-option-no-wait-after" class="list-anchor">#</a>
   
   :::warning[Deprecated]
   Этот параметр не имеет эффекта.
   :::
   
   Этот параметр не имеет эффекта.
-- `position` [Dict] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-position"/><a href="#locator-set-checked-option-position" class="list-anchor">#</a>
+- `position` [Dict] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-position"/><a href="#locator-set-checked-option-position" class="list-anchor">#</a>
   - `x` [float]
     
     
@@ -2838,10 +2919,10 @@ await page.get_by_role("checkbox").set_checked(True)
     
     
   Точка, используемая относительно верхнего левого угла элемента. Если не указано, используется видимая точка элемента.
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-timeout"/><a href="#locator-set-checked-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-timeout"/><a href="#locator-set-checked-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
-- `trial` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-trial"/><a href="#locator-set-checked-option-trial" class="list-anchor">#</a>
+- `trial` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-trial"/><a href="#locator-set-checked-option-trial" class="list-anchor">#</a>
   
   Если установлено, этот метод только выполняет проверки [actionability](../actionability.mdx) и пропускает действие. По умолчанию `false`. Полезно для ожидания, пока элемент будет готов к действию без его выполнения.
 
@@ -2939,14 +3020,14 @@ await page.get_by_label("Upload file").set_input_files(
   - `buffer` [bytes]
     
     Содержимое файла
-- `no_wait_after` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-input-files-option-no-wait-after"/><a href="#locator-set-input-files-option-no-wait-after" class="list-anchor">#</a>
+- `no_wait_after` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-input-files-option-no-wait-after"/><a href="#locator-set-input-files-option-no-wait-after" class="list-anchor">#</a>
   
   :::warning[Deprecated]
   Этот параметр не имеет эффекта.
   :::
   
   Этот параметр не имеет эффекта.
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-input-files-option-timeout"/><a href="#locator-set-input-files-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-input-files-option-timeout"/><a href="#locator-set-input-files-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
@@ -2975,20 +3056,20 @@ locator.tap(**kwargs)
 ```
 
 **Аргументы**
-- `force` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-force"/><a href="#locator-tap-option-force" class="list-anchor">#</a>
+- `force` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-force"/><a href="#locator-tap-option-force" class="list-anchor">#</a>
   
   Нужно ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
-- `modifiers` [List]\["Alt" | "Control" | "ControlOrMeta" | "Meta" | "Shift"\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-modifiers"/><a href="#locator-tap-option-modifiers" class="list-anchor">#</a>
+- `modifiers` [List]\["Alt" | "Control" | "ControlOrMeta" | "Meta" | "Shift"\] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-modifiers"/><a href="#locator-tap-option-modifiers" class="list-anchor">#</a>
   
   Модификаторы клавиш для нажатия. Гарантирует, что только эти модификаторы нажаты во время операции, а затем восстанавливает текущие модификаторы. Если не указано, используются текущие нажатые модификаторы. "ControlOrMeta" разрешается как "Control" на Windows и Linux и как "Meta" на macOS.
-- `no_wait_after` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-no-wait-after"/><a href="#locator-tap-option-no-wait-after" class="list-anchor">#</a>
+- `no_wait_after` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-no-wait-after"/><a href="#locator-tap-option-no-wait-after" class="list-anchor">#</a>
   
   :::warning[Deprecated]
   Этот параметр не имеет эффекта.
   :::
   
   Этот параметр не имеет эффекта.
-- `position` [Dict] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-position"/><a href="#locator-tap-option-position" class="list-anchor">#</a>
+- `position` [Dict] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-position"/><a href="#locator-tap-option-position" class="list-anchor">#</a>
   - `x` [float]
     
     
@@ -2996,10 +3077,10 @@ locator.tap(**kwargs)
     
     
   Точка, используемая относительно верхнего левого угла элемента. Если не указано, используется видимая точка элемента.
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-timeout"/><a href="#locator-tap-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-timeout"/><a href="#locator-tap-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-- `trial` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-trial"/><a href="#locator-tap-option-trial" class="list-anchor">#</a>
+- `trial` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-trial"/><a href="#locator-tap-option-trial" class="list-anchor">#</a>
   
   Если установлено, этот метод только выполняет проверки [actionability](../actionability.mdx) и пропускает действие. По умолчанию `false`. Полезно для ожидания, пока элемент будет готов к действию без его выполнения. Обратите внимание, что клавиатурные `modifiers` будут нажаты независимо от `trial`, чтобы позволить тестировать элементы, которые видны только при нажатии этих клавиш.
 
@@ -3043,7 +3124,7 @@ locator.text_content(**kwargs)
 ```
 
 **Аргументы**
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-text-content-option-timeout"/><a href="#locator-text-content-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-text-content-option-timeout"/><a href="#locator-text-content-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
@@ -3085,17 +3166,17 @@ await page.get_by_role("checkbox").uncheck()
 </Tabs>
 
 **Аргументы**
-- `force` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-force"/><a href="#locator-uncheck-option-force" class="list-anchor">#</a>
+- `force` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-force"/><a href="#locator-uncheck-option-force" class="list-anchor">#</a>
   
   Следует ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
-- `no_wait_after` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-no-wait-after"/><a href="#locator-uncheck-option-no-wait-after" class="list-anchor">#</a>
+- `no_wait_after` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-no-wait-after"/><a href="#locator-uncheck-option-no-wait-after" class="list-anchor">#</a>
   
   :::warning[Устарело]
   Этот параметр не имеет эффекта.
   :::
   
   Этот параметр не имеет эффекта.
-- `position` [Dict] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-position"/><a href="#locator-uncheck-option-position" class="list-anchor">#</a>
+- `position` [Dict] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-position"/><a href="#locator-uncheck-option-position" class="list-anchor">#</a>
   - `x` [float]
     
     
@@ -3103,10 +3184,10 @@ await page.get_by_role("checkbox").uncheck()
     
     
   Точка, используемая относительно верхнего левого угла элемента. Если не указано, используется видимая точка элемента.
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-timeout"/><a href="#locator-uncheck-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-timeout"/><a href="#locator-uncheck-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
-- `trial` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-trial"/><a href="#locator-uncheck-option-trial" class="list-anchor">#</a>
+- `trial` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-trial"/><a href="#locator-uncheck-option-trial" class="list-anchor">#</a>
   
   Если установлено, этот метод выполняет только проверки [actionability](../actionability.mdx) и пропускает действие. По умолчанию `false`. Полезно для ожидания, пока элемент будет готов к действию, без его выполнения.
 
@@ -3165,14 +3246,14 @@ await order_sent.wait_for()
 </Tabs>
 
 **Аргументы**
-- `state` "attached" | "detached" | "visible" | "hidden" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-option-state"/><a href="#locator-wait-for-option-state" class="list-anchor">#</a>
+- `state` "attached" | "detached" | "visible" | "hidden" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-option-state"/><a href="#locator-wait-for-option-state" class="list-anchor">#</a>
   
   По умолчанию `'visible'`. Может быть:
   * `'attached'` - ожидание, пока элемент будет присутствовать в DOM.
   * `'detached'` - ожидание, пока элемент не будет присутствовать в DOM.
   * `'visible'` - ожидание, пока элемент не будет иметь пустую ограничивающую рамку и `visibility:hidden`. Обратите внимание, что элемент без содержимого или с `display:none` имеет пустую ограничивающую рамку и не считается видимым.
   * `'hidden'` - ожидание, пока элемент не будет отсоединен от DOM, или иметь пустую ограничивающую рамку или `visibility:hidden`. Это противоположно опции `'visible'`.
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-option-timeout"/><a href="#locator-wait-for-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-option-timeout"/><a href="#locator-wait-for-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -3227,6 +3308,51 @@ await frame_locator.get_by_role("button").click()
 
 **Возвращает**
 - [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-content-frame-return"/><a href="#locator-content-frame-return" class="list-anchor">#</a>
+
+---
+
+### description {#locator-description}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.57</font><x-search>locator.description</x-search>
+
+Returns locator description previously set with [locator.describe()](/api/class-locator.mdx#locator-describe). Returns `null` if no custom description has been set. Prefer `Locator.toString()` for a human-readable representation, as it uses the description when available.
+
+**Usage**
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+button = page.get_by_role("button").describe("Subscribe button")
+print(button.description())  # "Subscribe button"
+
+input = page.get_by_role("textbox")
+print(input.description())  # None
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+button = page.get_by_role("button").describe("Subscribe button")
+print(button.description())  # "Subscribe button"
+
+input = page.get_by_role("textbox")
+print(input.description())  # None
+```
+
+</TabItem>
+</Tabs>
+
+**Returns**
+- [NoneType] | [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-description-return"/><a href="#locator-description-return" class="list-anchor">#</a>
 
 ---
 
@@ -3323,7 +3449,7 @@ locator.element_handle(**kwargs)
 ```
 
 **Аргументы**
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-element-handle-option-timeout"/><a href="#locator-element-handle-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-element-handle-option-timeout"/><a href="#locator-element-handle-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) методы.
 
@@ -3375,17 +3501,17 @@ locator.element_handles()
 - `text` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-type-option-text"/><a href="#locator-type-option-text" class="list-anchor">#</a>
   
   Текст для ввода в сфокусированный элемент.
-- `delay` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-type-option-delay"/><a href="#locator-type-option-delay" class="list-anchor">#</a>
+- `delay` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-type-option-delay"/><a href="#locator-type-option-delay" class="list-anchor">#</a>
   
   Время ожидания между нажатиями клавиш в миллисекундах. По умолчанию 0.
-- `no_wait_after` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-type-option-no-wait-after"/><a href="#locator-type-option-no-wait-after" class="list-anchor">#</a>
+- `no_wait_after` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-type-option-no-wait-after"/><a href="#locator-type-option-no-wait-after" class="list-anchor">#</a>
   
   :::warning[Deprecated]
   Этот параметр не имеет эффекта.
   :::
   
   Этот параметр не имеет эффекта.
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-type-option-timeout"/><a href="#locator-type-option-timeout" class="list-anchor">#</a>
+- `timeout` [float] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-type-option-timeout"/><a href="#locator-type-option-timeout" class="list-anchor">#</a>
   
   Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -3393,7 +3519,6 @@ locator.element_handles()
 - [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-type-return"/><a href="#locator-type-return" class="list-anchor">#</a>
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"

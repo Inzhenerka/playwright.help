@@ -66,7 +66,7 @@ test('another test @smoke', async ({ page }) => {
 Test tags are displayed in the test report, and are available to a custom reporter via `TestCase.tags` property.
 
 You can also filter tests by their tags during test execution:
-* in the [command line](../test-cli.mdx#reference);
+* in the [command line](../test-cli.mdx#all-options);
 * in the config with [testConfig.grep](/api/class-testconfig.mdx#test-config-grep) and [testProject.grep](/api/class-testproject.mdx#test-project-grep);
 
 Learn more about [tagging](../test-annotations.mdx#tag-tests).
@@ -460,7 +460,18 @@ Learn more about the execution modes [here](../test-parallel.mdx).
   test('runs in parallel 2', async ({ page }) => {});
   ```
   
-* Running tests serially, retrying from the start.
+* Running tests in order, retrying each failed test independently.
+  
+  This is the default mode. It can be useful to set it explicitly to override project configuration that uses `fullyParallel`.
+  
+  ```js
+  // Tests in this file run in order. Retries, if any, run independently.
+  test.describe.configure({ mode: 'default' });
+  test('runs first', async ({ page }) => {});
+  test('runs second', async ({ page }) => {});
+  ```
+  
+* Running tests serially, retrying from the start. If one of the serial tests fails, all subsequent tests are skipped.
   
   :::note
   
@@ -1046,10 +1057,10 @@ test('less readable', async ({ page }) => {
   Test body that takes one or two arguments: an object with fixtures and optional [TestInfo].
 - `condition` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-fixme-option-condition"/><a href="#test-fixme-option-condition" class="list-anchor">#</a>
   
-  Test is marked as "should fail" when the condition is `true`.
+  Test is marked as "fixme" when the condition is `true`.
 - `callback` [function]\([Fixtures]\):[boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-fixme-option-callback"/><a href="#test-fixme-option-callback" class="list-anchor">#</a>
   
-  A function that returns whether to mark as "should fail", based on test fixtures. Test or tests are marked as "should fail" when the return value is `true`.
+  A function that returns whether to mark as "fixme", based on test fixtures. Test or tests are marked as "fixme" when the return value is `true`.
 - `description` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-fixme-option-description"/><a href="#test-fixme-option-description" class="list-anchor">#</a>
   
   Optional description that will be reflected in a test report.
@@ -1180,7 +1191,7 @@ Timeout for the currently running test is available through [testInfo.timeout](/
 
 Skip a test. Playwright will not run the test past the `test.skip()` call.
 
-Skipped tests are not supposed to be ever run. If you intent to fix the test, use [test.fixme()](/api/class-test.mdx#test-fixme) instead.
+Skipped tests are not supposed to be ever run. If you intend to fix the test, use [test.fixme()](/api/class-test.mdx#test-fixme) instead.
 
 To declare a skipped test:
 * `test.skip(title, body)`
@@ -1229,7 +1240,7 @@ test('Safari-only test 2', async ({ page }) => {
 });
 ```
 
-You can also call `test.skip()` without arguments inside the test body to always mark the test as failed. We recommend using `test.skip(title, body)` instead.
+You can also call `test.skip()` without arguments inside the test body to always skip the test. However, we recommend using `test.skip(title, body)` instead.
 
 ```js
 import { test, expect } from '@playwright/test';
@@ -1262,10 +1273,10 @@ test('less readable', async ({ page }) => {
   Test body that takes one or two arguments: an object with fixtures and optional [TestInfo].
 - `condition` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-skip-option-condition"/><a href="#test-skip-option-condition" class="list-anchor">#</a>
   
-  Test is marked as "should fail" when the condition is `true`.
+  Test is marked as "skipped" when the condition is `true`.
 - `callback` [function]\([Fixtures]\):[boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-skip-option-callback"/><a href="#test-skip-option-callback" class="list-anchor">#</a>
   
-  A function that returns whether to mark as "should fail", based on test fixtures. Test or tests are marked as "should fail" when the return value is `true`.
+  A function that returns whether to mark as "skipped", based on test fixtures. Test or tests are marked as "skipped" when the return value is `true`.
 - `description` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-skip-option-description"/><a href="#test-skip-option-description" class="list-anchor">#</a>
   
   Optional description that will be reflected in a test report.
@@ -1408,7 +1419,7 @@ function step(target: Function, context: ClassMethodDecoratorContext) {
     const name = this.constructor.name + '.' + (context.name as string);
     return test.step(name, async () => {
       return await target.call(this, ...args);
-    });
+    }, { box: true });
   };
 }
 
@@ -1866,7 +1877,6 @@ test.describe.serial.only(() => {
   A callback that is run immediately when calling [test.describe.serial.only()](/api/class-test.mdx#test-describe-serial-only). Any tests added in this callback will belong to the group.
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

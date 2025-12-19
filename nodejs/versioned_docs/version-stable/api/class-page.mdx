@@ -307,6 +307,23 @@ await page.close(options);
 
 ---
 
+### consoleMessages {#page-console-messages}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.56</font><x-search>page.consoleMessages</x-search>
+
+Returns up to (currently) 200 last console messages from this page. See [page.on('console')](/api/class-page.mdx#page-event-console) for more details.
+
+**Usage**
+
+```js
+await page.consoleMessages();
+```
+
+**Returns**
+- [Promise]&lt;[Array]&lt;[ConsoleMessage]&gt;&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-console-messages-return"/><a href="#page-console-messages-return" class="list-anchor">#</a>
+
+---
+
 ### content {#page-content}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>page.content</x-search>
@@ -384,7 +401,10 @@ await page.dragAndDrop('#source', '#target', {
     - `y` [number]
       
       
-    Кликает на исходный элемент в этой точке относительно верхнего левого угла рамки элемента. Если не указано, используется видимая точка элемента.
+    Кликает по исходному элементу в этой точке, заданной относительно верхнего левого угла области padding элемента. Если не указано, используется какая‑то видимая точка элемента.
+  - `steps` [number] *(опционально)* <font size="2">Добавлено в: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-drag-and-drop-option-steps"/><a href="#page-drag-and-drop-option-steps" class="list-anchor">#</a>
+    
+    По умолчанию `1`. Отправляет `n` интерполированных событий `mousemove`, чтобы смоделировать перемещение между `mousedown` и `mouseup` при перетаскивании. Если установить `1`, будет сгенерировано одно событие `mousemove` в точке назначения.
   - `strict` [boolean] *(опционально)* <font size="2">Добавлено в: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-drag-and-drop-option-strict"/><a href="#page-drag-and-drop-option-strict" class="list-anchor">#</a>
     
     Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов выбрасывает исключение.
@@ -1133,11 +1153,11 @@ await page.goForward(options);
 ```
 
 **Аргументы**
-- `options` [Object] *(optional)*
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-go-forward-option-timeout"/><a href="#page-go-forward-option-timeout" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-go-forward-option-timeout"/><a href="#page-go-forward-option-timeout" class="list-anchor">#</a>
     
     Максимальное время операции в миллисекундах. По умолчанию `0` - без тайм-аута. Значение по умолчанию можно изменить с помощью опции `navigationTimeout` в конфигурации или с помощью методов [browserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
-  - `waitUntil` "load" | "domcontentloaded" | "networkidle" | "commit" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-go-forward-option-wait-until"/><a href="#page-go-forward-option-wait-until" class="list-anchor">#</a>
+  - `waitUntil` "load" | "domcontentloaded" | "networkidle" | "commit" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-go-forward-option-wait-until"/><a href="#page-go-forward-option-wait-until" class="list-anchor">#</a>
     
     Когда считать операцию успешной, по умолчанию `load`. События могут быть:
     * `'domcontentloaded'` - считать операцию завершенной, когда событие `DOMContentLoaded` будет вызвано.
@@ -1185,14 +1205,14 @@ await page.goto(url, options);
 - `url` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-goto-option-url"/><a href="#page-goto-option-url" class="list-anchor">#</a>
   
   URL для перехода на страницу. URL должен включать схему, например, `https://`. Когда через параметры контекста был предоставлен [baseURL](/api/class-browser.mdx#browser-new-context-option-base-url) и переданный URL является путем, он объединяется с помощью конструктора [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL).
-- `options` [Object] *(optional)*
-  - `referer` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-goto-option-referer"/><a href="#page-goto-option-referer" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `referer` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-goto-option-referer"/><a href="#page-goto-option-referer" class="list-anchor">#</a>
     
     Значение заголовка Referer. Если предоставлено, оно будет иметь приоритет над значением заголовка referer, установленным с помощью [page.setExtraHTTPHeaders()](/api/class-page.mdx#page-set-extra-http-headers).
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-goto-option-timeout"/><a href="#page-goto-option-timeout" class="list-anchor">#</a>
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-goto-option-timeout"/><a href="#page-goto-option-timeout" class="list-anchor">#</a>
     
     Максимальное время операции в миллисекундах. По умолчанию `0` - без тайм-аута. Значение по умолчанию можно изменить с помощью опции `navigationTimeout` в конфигурации или с помощью методов [browserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
-  - `waitUntil` "load" | "domcontentloaded" | "networkidle" | "commit" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-goto-option-wait-until"/><a href="#page-goto-option-wait-until" class="list-anchor">#</a>
+  - `waitUntil` "load" | "domcontentloaded" | "networkidle" | "commit" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-goto-option-wait-until"/><a href="#page-goto-option-wait-until" class="list-anchor">#</a>
     
     Когда считать операцию успешной, по умолчанию `load`. События могут быть:
     * `'domcontentloaded'` - считать операцию завершенной, когда событие `DOMContentLoaded` будет вызвано.
@@ -1241,23 +1261,23 @@ page.locator(selector, options);
 - `selector` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-locator-option-selector"/><a href="#page-locator-option-selector" class="list-anchor">#</a>
   
   Селектор для использования при разрешении DOM элемента.
-- `options` [Object] *(optional)*
-  - `has` [Locator] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-locator-option-has"/><a href="#page-locator-option-has" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `has` [Locator] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-locator-option-has"/><a href="#page-locator-option-has" class="list-anchor">#</a>
     
     Сужает результаты метода до тех, которые содержат элементы, соответствующие этому относительному локатору. Например, `article`, который имеет `text=Playwright`, соответствует `<article><div>Playwright</div></article>`.
     
     Внутренний локатор **должен быть относительным** к внешнему локатору и запрашивается начиная с совпадения внешнего локатора, а не с корня документа. Например, вы можете найти `content`, который имеет `div` в `<article><content><div>Playwright</div></content></article>`. Однако поиск `content`, который имеет `article div`, не удастся, потому что внутренний локатор должен быть относительным и не должен использовать элементы за пределами `content`.
     
     Обратите внимание, что внешние и внутренние локаторы должны принадлежать одному и тому же фрейму. Внутренний локатор не должен содержать [FrameLocator]s.
-  - `hasNot` [Locator] *(optional)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-locator-option-has-not"/><a href="#page-locator-option-has-not" class="list-anchor">#</a>
+  - `hasNot` [Locator] *(опционально)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-locator-option-has-not"/><a href="#page-locator-option-has-not" class="list-anchor">#</a>
     
     Соответствует элементам, которые не содержат элемент, соответствующий внутреннему локатору. Внутренний локатор запрашивается относительно внешнего. Например, `article`, который не имеет `div`, соответствует `<article><span>Playwright</span></article>`.
     
     Обратите внимание, что внешние и внутренние локаторы должны принадлежать одному и тому же фрейму. Внутренний локатор не должен содержать [FrameLocator]s.
-  - `hasNotText` [string] | [RegExp] *(optional)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-locator-option-has-not-text"/><a href="#page-locator-option-has-not-text" class="list-anchor">#</a>
+  - `hasNotText` [string] | [RegExp] *(опционально)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-locator-option-has-not-text"/><a href="#page-locator-option-has-not-text" class="list-anchor">#</a>
     
     Соответствует элементам, которые не содержат указанный текст где-либо внутри, возможно, в дочернем или потомственном элементе. При передаче [string] сопоставление нечувствительно к регистру и ищет подстроку.
-  - `hasText` [string] | [RegExp] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-locator-option-has-text"/><a href="#page-locator-option-has-text" class="list-anchor">#</a>
+  - `hasText` [string] | [RegExp] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-locator-option-has-text"/><a href="#page-locator-option-has-text" class="list-anchor">#</a>
     
     Соответствует элементам, содержащим указанный текст где-либо внутри, возможно, в дочернем или потомственном элементе. При передаче [string] сопоставление нечувствительно к регистру и ищет подстроку. Например, `"Playwright"` соответствует `<article><div>Playwright</div></article>`.
 
@@ -1300,11 +1320,28 @@ await page.opener();
 
 ---
 
+### pageErrors {#page-page-errors}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.56</font><x-search>page.pageErrors</x-search>
+
+Returns up to (currently) 200 last page errors from this page. See [page.on('pageerror')](/api/class-page.mdx#page-event-page-error) for more details.
+
+**Usage**
+
+```js
+await page.pageErrors();
+```
+
+**Returns**
+- [Promise]&lt;[Array]&lt;[Error]&gt;&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-page-errors-return"/><a href="#page-page-errors-return" class="list-anchor">#</a>
+
+---
+
 ### pause {#page-pause}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>page.pause</x-search>
 
-Приостанавливает выполнение скрипта. Playwright остановит выполнение и будет ждать, пока пользователь нажмёт кнопку "Resume" в оверлее страницы или вызовет `playwright.resume()` в консоли DevTools.
+Приостанавливает выполнение скрипта. Playwright остановит выполнение и будет ждать, пока пользователь либо нажмёт кнопку «Resume» в оверлее страницы, либо вызовет `playwright.resume()` в консоли DevTools.
 
 Во время паузы можно исследовать селекторы или выполнять ручные действия. После возобновления выполнение продолжится с того места, где было приостановлено.
 
@@ -1442,11 +1479,11 @@ await page.reload(options);
 ```
 
 **Аргументы**
-- `options` [Object] *(optional)*
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-reload-option-timeout"/><a href="#page-reload-option-timeout" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-reload-option-timeout"/><a href="#page-reload-option-timeout" class="list-anchor">#</a>
     
     Максимальное время операции в миллисекундах. По умолчанию `0` - без тайм-аута. Значение по умолчанию можно изменить с помощью опции `navigationTimeout` в конфигурации или с помощью методов [browserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
-  - `waitUntil` "load" | "domcontentloaded" | "networkidle" | "commit" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-reload-option-wait-until"/><a href="#page-reload-option-wait-until" class="list-anchor">#</a>
+  - `waitUntil` "load" | "domcontentloaded" | "networkidle" | "commit" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-reload-option-wait-until"/><a href="#page-reload-option-wait-until" class="list-anchor">#</a>
     
     Когда считать операцию успешной, по умолчанию `load`. События могут быть:
     * `'domcontentloaded'` - считать операцию завершенной, когда событие `DOMContentLoaded` будет вызвано.
@@ -1479,9 +1516,9 @@ await page.removeAllListeners('request', { behavior: 'wait' });
 ```
 
 **Аргументы**
-- `type` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-remove-all-listeners-option-type"/><a href="#page-remove-all-listeners-option-type" class="list-anchor">#</a>
-- `options` [Object] *(optional)*
-  - `behavior` "wait" | "ignoreErrors" | "default" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-remove-all-listeners-option-behavior"/><a href="#page-remove-all-listeners-option-behavior" class="list-anchor">#</a>
+- `type` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-remove-all-listeners-option-type"/><a href="#page-remove-all-listeners-option-type" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `behavior` "wait" | "ignoreErrors" | "default" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-remove-all-listeners-option-behavior"/><a href="#page-remove-all-listeners-option-behavior" class="list-anchor">#</a>
     
     Указывает, ждать ли уже выполняющихся слушателей и что делать, если они вызывают ошибки:
     * `'default'` - не ждать завершения текущих вызовов слушателей (если есть), если слушатель вызывает ошибку, это может привести к необработанной ошибке
@@ -1540,6 +1577,27 @@ await page.requestGC();
 
 **Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-request-gc-return"/><a href="#page-request-gc-return" class="list-anchor">#</a>
+
+---
+
+### requests {#page-requests}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.56</font><x-search>page.requests</x-search>
+
+Returns up to (currently) 100 last network request from this page. See [page.on('request')](/api/class-page.mdx#page-event-request) for more details.
+
+Returned requests should be accessed immediately, otherwise they might be collected to prevent unbounded memory growth as new requests come in. Once collected, retrieving most information about the request is impossible.
+
+Note that requests reported through the [page.on('request')](/api/class-page.mdx#page-event-request) request are not collected, so there is a trade off between efficient memory usage with [page.requests()](/api/class-page.mdx#page-requests) and the amount of available information reported through [page.on('request')](/api/class-page.mdx#page-event-request).
+
+**Usage**
+
+```js
+await page.requests();
+```
+
+**Returns**
+- [Promise]&lt;[Array]&lt;[Request]&gt;&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-requests-return"/><a href="#page-requests-return" class="list-anchor">#</a>
 
 ---
 
@@ -1607,12 +1665,12 @@ await page.route('/api/**', async route => {
 **Аргументы**
 - `url` [string] | [RegExp] | [function]\([URL]\):[boolean]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-option-url"/><a href="#page-route-option-url" class="list-anchor">#</a>
   
-  Глобальный шаблон, шаблон регулярного выражения или предикат, получающий [URL] для сопоставления при маршрутизации. Когда [baseURL](/api/class-browser.mdx#browser-new-context-option-base-url) через параметры контекста был предоставлен и переданный URL является путем, он объединяется через конструктор [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL).
+  Глоб-шаблон, регулярное выражение или предикат, который получает [URL] для сопоставления при маршрутизации. Если в опциях контекста задан [baseURL](/api/class-browser.mdx#browser-new-context-option-base-url) и переданный URL — строка, не начинающаяся с `*`, он будет разрешён с помощью конструктора [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL).
 - `handler` [function]\([Route], [Request]\):[Promise]&lt;[Object]&gt; | [Object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-option-handler"/><a href="#page-route-option-handler" class="list-anchor">#</a>
   
   функция-обработчик для маршрутизации запроса.
-- `options` [Object] *(optional)*
-  - `times` [number] *(optional)* <font size="2">Added in: v1.15</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-option-times"/><a href="#page-route-option-times" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `times` [number] *(опционально)* <font size="2">Added in: v1.15</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-option-times"/><a href="#page-route-option-times" class="list-anchor">#</a>
     
     Сколько раз маршрут должен использоваться. По умолчанию он будет использоваться каждый раз.
 
@@ -2067,17 +2125,17 @@ const download = await downloadPromise;
 - `event` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-event-option-event"/><a href="#page-wait-for-event-option-event" class="list-anchor">#</a>
   
   Имя события, обычно передаваемое в `*.on(event)`.
-- `optionsOrPredicate` [function] | [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-event-option-options-or-predicate"/><a href="#page-wait-for-event-option-options-or-predicate" class="list-anchor">#</a>
+- `optionsOrPredicate` [function] | [Object] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-event-option-options-or-predicate"/><a href="#page-wait-for-event-option-options-or-predicate" class="list-anchor">#</a>
   - `predicate` [function]
     
     Получает данные события и разрешается в истинное значение, когда ожидание должно завершиться.
-  - `timeout` [number] *(optional)*
+  - `timeout` [number] *(опционально)*
     
     Максимальное время ожидания в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
   
   Либо предикат, который получает событие, либо объект с опциями. Необязательно.
-- `options` [Object] *(optional)*
-  - `predicate` [function] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-event-option-predicate"/><a href="#page-wait-for-event-option-predicate" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `predicate` [function] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-event-option-predicate"/><a href="#page-wait-for-event-option-predicate" class="list-anchor">#</a>
     
     Получает данные события и разрешается в истинное значение, когда ожидание должно завершиться.
 
@@ -2120,14 +2178,14 @@ await page.waitForFunction(selector => !!document.querySelector(selector), selec
 - `pageFunction` [function] | [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-function-option-expression"/><a href="#page-wait-for-function-option-expression" class="list-anchor">#</a>
   
   Функция, которая будет выполнена в контексте страницы.
-- `arg` [EvaluationArgument] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-function-option-arg"/><a href="#page-wait-for-function-option-arg" class="list-anchor">#</a>
+- `arg` [EvaluationArgument] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-function-option-arg"/><a href="#page-wait-for-function-option-arg" class="list-anchor">#</a>
   
   Необязательный аргумент для передачи в [pageFunction](/api/class-page.mdx#page-wait-for-function-option-expression).
-- `options` [Object] *(optional)*
-  - `polling` [number] | "raf" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-function-option-polling"/><a href="#page-wait-for-function-option-polling" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `polling` [number] | "raf" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-function-option-polling"/><a href="#page-wait-for-function-option-polling" class="list-anchor">#</a>
     
     Если [polling](/api/class-page.mdx#page-wait-for-function-option-polling) равно `'raf'`, то [pageFunction](/api/class-page.mdx#page-wait-for-function-option-expression) постоянно выполняется в `requestAnimationFrame` callback. Если [polling](/api/class-page.mdx#page-wait-for-function-option-polling) является числом, то оно рассматривается как интервал в миллисекундах, с которым функция будет выполняться. По умолчанию `raf`.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-function-option-timeout"/><a href="#page-wait-for-function-option-timeout" class="list-anchor">#</a>
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-function-option-timeout"/><a href="#page-wait-for-function-option-timeout" class="list-anchor">#</a>
     
     Максимальное время ожидания в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -2165,14 +2223,14 @@ console.log(await popup.title()); // Всплывающее окно готов�
 ```
 
 **Аргументы**
-- `state` "load" | "domcontentloaded" | "networkidle" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-load-state-option-state"/><a href="#page-wait-for-load-state-option-state" class="list-anchor">#</a>
+- `state` "load" | "domcontentloaded" | "networkidle" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-load-state-option-state"/><a href="#page-wait-for-load-state-option-state" class="list-anchor">#</a>
   
   Необязательное состояние загрузки для ожидания, по умолчанию `load`. Если состояние уже достигнуто при загрузке текущего документа, метод разрешается немедленно. Может быть одним из:
   * `'load'` - ожидание, когда событие `load` будет вызвано.
   * `'domcontentloaded'` - ожидание, когда событие `DOMContentLoaded` будет вызвано.
   * `'networkidle'` - **НЕ РЕКОМЕНДУЕТСЯ** ожидание, пока не будет сетевых соединений в течение как минимум `500` мс. Не используйте этот метод для тестирования, полагайтесь на веб-утверждения для оценки готовности.
-- `options` [Object] *(optional)*
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-load-state-option-timeout"/><a href="#page-wait-for-load-state-option-timeout" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-load-state-option-timeout"/><a href="#page-wait-for-load-state-option-timeout" class="list-anchor">#</a>
     
     Максимальное время операции в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `navigationTimeout` в конфигурации или с помощью методов [browserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -2897,11 +2955,11 @@ const preloadHrefTS = await page.$eval('link[rel=preload]', (el: HTMLLinkElement
 - `pageFunction` [function]\([Element]\) | [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-eval-on-selector-option-expression"/><a href="#page-eval-on-selector-option-expression" class="list-anchor">#</a>
   
   Функция для выполнения в контексте страницы.
-- `arg` [EvaluationArgument] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-eval-on-selector-option-arg"/><a href="#page-eval-on-selector-option-arg" class="list-anchor">#</a>
+- `arg` [EvaluationArgument] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-eval-on-selector-option-arg"/><a href="#page-eval-on-selector-option-arg" class="list-anchor">#</a>
   
   Необязательный аргумент для передачи в [pageFunction](/api/class-page.mdx#page-eval-on-selector-option-expression).
-- `options` [Object] *(optional)*
-  - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-eval-on-selector-option-strict"/><a href="#page-eval-on-selector-option-strict" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `strict` [boolean] *(опционально)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-eval-on-selector-option-strict"/><a href="#page-eval-on-selector-option-strict" class="list-anchor">#</a>
     
     Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов выбрасывает исключение.
 
@@ -2937,33 +2995,12 @@ const divCounts = await page.$$eval('div', (divs, min) => divs.length >= min, 10
 - `pageFunction` [function]\([Array]&lt;[Element]&gt;\) | [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-eval-on-selector-all-option-expression"/><a href="#page-eval-on-selector-all-option-expression" class="list-anchor">#</a>
   
   Функция для выполнения в контексте страницы.
-- `arg` [EvaluationArgument] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-eval-on-selector-all-option-arg"/><a href="#page-eval-on-selector-all-option-arg" class="list-anchor">#</a>
+- `arg` [EvaluationArgument] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-eval-on-selector-all-option-arg"/><a href="#page-eval-on-selector-all-option-arg" class="list-anchor">#</a>
   
   Необязательный аргумент для передачи в [pageFunction](/api/class-page.mdx#page-eval-on-selector-all-option-expression).
 
 **Возвращает**
 - [Promise]&lt;[Serializable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-eval-on-selector-all-return"/><a href="#page-eval-on-selector-all-return" class="list-anchor">#</a>
-
----
-
-### accessibility {#page-accessibility}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.accessibility</x-search>
-
-:::warning Deprecated
-
-This property is discouraged. Please use other libraries such as [Axe](https://www.deque.com/axe/) if you need to test page accessibility. See our Node.js [guide](https://playwright.dev/docs/accessibility-testing) for integration with Axe.
-
-:::
-
-**Использование**
-
-```js
-page.accessibility
-```
-
-**Тип**
-- [Accessibility]
 
 ---
 
@@ -3279,21 +3316,21 @@ await page.fill(selector, value, options);
 - `value` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-fill-option-value"/><a href="#page-fill-option-value" class="list-anchor">#</a>
   
   Значение для заполнения элемента `<input>`, `<textarea>` или `[contenteditable]`.
-- `options` [Object] *(optional)*
-  - `force` [boolean] *(optional)* <font size="2">Added in: v1.13</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-fill-option-force"/><a href="#page-fill-option-force" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `force` [boolean] *(опционально)* <font size="2">Added in: v1.13</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-fill-option-force"/><a href="#page-fill-option-force" class="list-anchor">#</a>
     
     Нужно ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
-  - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-fill-option-no-wait-after"/><a href="#page-fill-option-no-wait-after" class="list-anchor">#</a>
+  - `noWaitAfter` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-fill-option-no-wait-after"/><a href="#page-fill-option-no-wait-after" class="list-anchor">#</a>
     
     :::warning[Deprecated]
     Этот параметр не имеет эффекта.
     :::
     
     Этот параметр не имеет эффекта.
-  - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-fill-option-strict"/><a href="#page-fill-option-strict" class="list-anchor">#</a>
+  - `strict` [boolean] *(опционально)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-fill-option-strict"/><a href="#page-fill-option-strict" class="list-anchor">#</a>
     
     Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов вызывает исключение.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-fill-option-timeout"/><a href="#page-fill-option-timeout" class="list-anchor">#</a>
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-fill-option-timeout"/><a href="#page-fill-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью параметра `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -3325,11 +3362,11 @@ await page.focus(selector, options);
 - `selector` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-focus-option-selector"/><a href="#page-focus-option-selector" class="list-anchor">#</a>
   
   Селектор для поиска элемента. Если несколько элементов удовлетворяют селектору, будет использован первый.
-- `options` [Object] *(optional)*
-  - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-focus-option-strict"/><a href="#page-focus-option-strict" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `strict` [boolean] *(опционально)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-focus-option-strict"/><a href="#page-focus-option-strict" class="list-anchor">#</a>
     
     Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов вызывает исключение.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-focus-option-timeout"/><a href="#page-focus-option-timeout" class="list-anchor">#</a>
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-focus-option-timeout"/><a href="#page-focus-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью параметра `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -3364,11 +3401,11 @@ await page.getAttribute(selector, name, options);
 - `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-get-attribute-option-name"/><a href="#page-get-attribute-option-name" class="list-anchor">#</a>
   
   Имя атрибута, чтобы получить его значение.
-- `options` [Object] *(optional)*
-  - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-get-attribute-option-strict"/><a href="#page-get-attribute-option-strict" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `strict` [boolean] *(опционально)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-get-attribute-option-strict"/><a href="#page-get-attribute-option-strict" class="list-anchor">#</a>
     
     Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов вызывает исключение.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-get-attribute-option-timeout"/><a href="#page-get-attribute-option-timeout" class="list-anchor">#</a>
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-get-attribute-option-timeout"/><a href="#page-get-attribute-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью параметра `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -3406,14 +3443,14 @@ await page.hover(selector, options);
 - `selector` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-selector"/><a href="#page-hover-option-selector" class="list-anchor">#</a>
   
   Селектор для поиска элемента. Если несколько элементов удовлетворяют селектору, будет использован первый.
-- `options` [Object] *(optional)*
-  - `force` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-force"/><a href="#page-hover-option-force" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `force` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-force"/><a href="#page-hover-option-force" class="list-anchor">#</a>
     
     Следует ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
-  - `modifiers` [Array]&lt;"Alt" | "Control" | "ControlOrMeta" | "Meta" | "Shift"&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-modifiers"/><a href="#page-hover-option-modifiers" class="list-anchor">#</a>
+  - `modifiers` [Array]&lt;"Alt" | "Control" | "ControlOrMeta" | "Meta" | "Shift"&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-modifiers"/><a href="#page-hover-option-modifiers" class="list-anchor">#</a>
     
     Модификаторные клавиши для нажатия. Гарантирует, что только эти модификаторы будут нажаты во время операции, а затем восстанавливает текущие модификаторы. Если не указано, используются текущие нажатые модификаторы. "ControlOrMeta" разрешается как "Control" на Windows и Linux и как "Meta" на macOS.
-  - `noWaitAfter` [boolean] *(optional)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-no-wait-after"/><a href="#page-hover-option-no-wait-after" class="list-anchor">#</a>
+  - `noWaitAfter` [boolean] *(опционально)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-no-wait-after"/><a href="#page-hover-option-no-wait-after" class="list-anchor">#</a>
     
     :::warning[Deprecated]
     Этот параметр не имеет эффекта.
@@ -3421,7 +3458,7 @@ await page.hover(selector, options);
     
     
     Этот параметр не имеет эффекта.
-  - `position` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-position"/><a href="#page-hover-option-position" class="list-anchor">#</a>
+  - `position` [Object] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-position"/><a href="#page-hover-option-position" class="list-anchor">#</a>
     - `x` [number]
       
       
@@ -3429,13 +3466,13 @@ await page.hover(selector, options);
       
       
     Точка, используемая относительно верхнего левого угла рамки отступов элемента. Если не указано, используется видимая точка элемента.
-  - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-strict"/><a href="#page-hover-option-strict" class="list-anchor">#</a>
+  - `strict` [boolean] *(опционально)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-strict"/><a href="#page-hover-option-strict" class="list-anchor">#</a>
     
     Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов вызывает исключение.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-timeout"/><a href="#page-hover-option-timeout" class="list-anchor">#</a>
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-timeout"/><a href="#page-hover-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
-  - `trial` [boolean] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-trial"/><a href="#page-hover-option-trial" class="list-anchor">#</a>
+  - `trial` [boolean] *(опционально)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-trial"/><a href="#page-hover-option-trial" class="list-anchor">#</a>
     
     Если установлено, этот метод выполняет только проверки [actionability](../actionability.mdx) и пропускает действие. По умолчанию `false`. Полезно для ожидания, пока элемент будет готов к действию без его выполнения. Обратите внимание, что клавиатурные `modifiers` будут нажаты независимо от `trial`, чтобы позволить тестировать элементы, которые видны только при нажатии этих клавиш.
 
@@ -3467,11 +3504,11 @@ await page.innerHTML(selector, options);
 - `selector` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-inner-html-option-selector"/><a href="#page-inner-html-option-selector" class="list-anchor">#</a>
   
   Селектор для поиска элемента. Если несколько элементов удовлетворяют селектору, будет использован первый.
-- `options` [Object] *(optional)*
-  - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-inner-html-option-strict"/><a href="#page-inner-html-option-strict" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `strict` [boolean] *(опционально)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-inner-html-option-strict"/><a href="#page-inner-html-option-strict" class="list-anchor">#</a>
     
     Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов вызывает исключение.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-inner-html-option-timeout"/><a href="#page-inner-html-option-timeout" class="list-anchor">#</a>
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-inner-html-option-timeout"/><a href="#page-inner-html-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -3503,11 +3540,11 @@ await page.innerText(selector, options);
 - `selector` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-inner-text-option-selector"/><a href="#page-inner-text-option-selector" class="list-anchor">#</a>
   
   Селектор для поиска элемента. Если несколько элементов удовлетворяют селектору, будет использован первый.
-- `options` [Object] *(optional)*
-  - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-inner-text-option-strict"/><a href="#page-inner-text-option-strict" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `strict` [boolean] *(опционально)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-inner-text-option-strict"/><a href="#page-inner-text-option-strict" class="list-anchor">#</a>
     
     Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов вызывает исключение.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-inner-text-option-timeout"/><a href="#page-inner-text-option-timeout" class="list-anchor">#</a>
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-inner-text-option-timeout"/><a href="#page-inner-text-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -3685,11 +3722,11 @@ await page.isEnabled(selector, options);
 - `selector` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-is-enabled-option-selector"/><a href="#page-is-enabled-option-selector" class="list-anchor">#</a>
   
   Селектор для поиска элемента. Если несколько элементов удовлетворяют селектору, будет использован первый.
-- `options` [Object] *(optional)*
-  - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-is-enabled-option-strict"/><a href="#page-is-enabled-option-strict" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `strict` [boolean] *(опционально)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-is-enabled-option-strict"/><a href="#page-is-enabled-option-strict" class="list-anchor">#</a>
     
     Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов выбрасывает исключение.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-is-enabled-option-timeout"/><a href="#page-is-enabled-option-timeout" class="list-anchor">#</a>
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-is-enabled-option-timeout"/><a href="#page-is-enabled-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить через опцию `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -3721,11 +3758,11 @@ await page.isHidden(selector, options);
 - `selector` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-is-hidden-option-selector"/><a href="#page-is-hidden-option-selector" class="list-anchor">#</a>
   
   Селектор для поиска элемента. Если несколько элементов удовлетворяют селектору, будет использован первый.
-- `options` [Object] *(optional)*
-  - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-is-hidden-option-strict"/><a href="#page-is-hidden-option-strict" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `strict` [boolean] *(опционально)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-is-hidden-option-strict"/><a href="#page-is-hidden-option-strict" class="list-anchor">#</a>
     
     Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов выбрасывает исключение.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-is-hidden-option-timeout"/><a href="#page-is-hidden-option-timeout" class="list-anchor">#</a>
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-is-hidden-option-timeout"/><a href="#page-is-hidden-option-timeout" class="list-anchor">#</a>
     
     :::warning[Deprecated]
     Эта опция игнорируется. [page.isHidden()](/api/class-page.mdx#page-is-hidden) не ждет, пока элемент станет скрытым, и возвращается немедленно.
@@ -3760,11 +3797,11 @@ await page.isVisible(selector, options);
 - `selector` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-is-visible-option-selector"/><a href="#page-is-visible-option-selector" class="list-anchor">#</a>
   
   Селектор для поиска элемента. Если несколько элементов удовлетворяют селектору, будет использован первый.
-- `options` [Object] *(optional)*
-  - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-is-visible-option-strict"/><a href="#page-is-visible-option-strict" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `strict` [boolean] *(опционально)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-is-visible-option-strict"/><a href="#page-is-visible-option-strict" class="list-anchor">#</a>
     
     Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов выбрасывает исключение.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-is-visible-option-timeout"/><a href="#page-is-visible-option-timeout" class="list-anchor">#</a>
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-is-visible-option-timeout"/><a href="#page-is-visible-option-timeout" class="list-anchor">#</a>
     
     :::warning[Deprecated]
     Эта опция игнорируется. [page.isVisible()](/api/class-page.mdx#page-is-visible) не ждет, пока элемент станет видимым, и возвращается немедленно.
@@ -3949,11 +3986,11 @@ await page.setChecked(selector, checked, options);
 - `checked` [boolean]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-checked-option-checked"/><a href="#page-set-checked-option-checked" class="list-anchor">#</a>
   
   Указывает, следует ли установить или снять флажок.
-- `options` [Object] *(optional)*
-  - `force` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-checked-option-force"/><a href="#page-set-checked-option-force" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `force` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-checked-option-force"/><a href="#page-set-checked-option-force" class="list-anchor">#</a>
     
     Указывает, следует ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
-  - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-checked-option-no-wait-after"/><a href="#page-set-checked-option-no-wait-after" class="list-anchor">#</a>
+  - `noWaitAfter` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-checked-option-no-wait-after"/><a href="#page-set-checked-option-no-wait-after" class="list-anchor">#</a>
     
     :::warning[Deprecated]
     Эта опция не имеет эффекта.
@@ -3961,7 +3998,7 @@ await page.setChecked(selector, checked, options);
     
     
     Эта опция не имеет эффекта.
-  - `position` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-checked-option-position"/><a href="#page-set-checked-option-position" class="list-anchor">#</a>
+  - `position` [Object] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-checked-option-position"/><a href="#page-set-checked-option-position" class="list-anchor">#</a>
     - `x` [number]
       
       
@@ -3969,13 +4006,13 @@ await page.setChecked(selector, checked, options);
       
       
     Точка, используемая относительно верхнего левого угла рамки элемента. Если не указано, используется видимая точка элемента.
-  - `strict` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-checked-option-strict"/><a href="#page-set-checked-option-strict" class="list-anchor">#</a>
+  - `strict` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-checked-option-strict"/><a href="#page-set-checked-option-strict" class="list-anchor">#</a>
     
     Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов вызывает исключение.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-checked-option-timeout"/><a href="#page-set-checked-option-timeout" class="list-anchor">#</a>
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-checked-option-timeout"/><a href="#page-set-checked-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
-  - `trial` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-checked-option-trial"/><a href="#page-set-checked-option-trial" class="list-anchor">#</a>
+  - `trial` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-checked-option-trial"/><a href="#page-set-checked-option-trial" class="list-anchor">#</a>
     
     Если установлено, этот метод выполняет только проверки [actionability](../actionability.mdx) и пропускает действие. По умолчанию `false`. Полезно для ожидания, пока элемент будет готов к действию, без его выполнения.
 
@@ -4019,8 +4056,8 @@ await page.setInputFiles(selector, files, options);
   - `buffer` [Buffer]
     
     Содержимое файла
-- `options` [Object] *(optional)*
-  - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-input-files-option-no-wait-after"/><a href="#page-set-input-files-option-no-wait-after" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `noWaitAfter` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-input-files-option-no-wait-after"/><a href="#page-set-input-files-option-no-wait-after" class="list-anchor">#</a>
     
     :::warning[Deprecated]
     Эта опция не имеет эффекта.
@@ -4028,10 +4065,10 @@ await page.setInputFiles(selector, files, options);
     
     
     Эта опция не имеет эффекта.
-  - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-input-files-option-strict"/><a href="#page-set-input-files-option-strict" class="list-anchor">#</a>
+  - `strict` [boolean] *(опционально)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-input-files-option-strict"/><a href="#page-set-input-files-option-strict" class="list-anchor">#</a>
     
     Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов вызывает исключение.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-input-files-option-timeout"/><a href="#page-set-input-files-option-timeout" class="list-anchor">#</a>
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-input-files-option-timeout"/><a href="#page-set-input-files-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -4074,14 +4111,14 @@ await page.tap(selector, options);
 - `selector` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-selector"/><a href="#page-tap-option-selector" class="list-anchor">#</a>
   
   Селектор для поиска элемента. Если несколько элементов удовлетворяют селектору, будет использован первый.
-- `options` [Object] *(optional)*
-  - `force` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-force"/><a href="#page-tap-option-force" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `force` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-force"/><a href="#page-tap-option-force" class="list-anchor">#</a>
     
     Следует ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
-  - `modifiers` [Array]&lt;"Alt" | "Control" | "ControlOrMeta" | "Meta" | "Shift"&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-modifiers"/><a href="#page-tap-option-modifiers" class="list-anchor">#</a>
+  - `modifiers` [Array]&lt;"Alt" | "Control" | "ControlOrMeta" | "Meta" | "Shift"&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-modifiers"/><a href="#page-tap-option-modifiers" class="list-anchor">#</a>
     
     Модификаторные клавиши для нажатия. Гарантирует, что только эти модификаторы будут нажаты во время операции, а затем восстанавливает текущие модификаторы. Если не указано, используются текущие нажатые модификаторы. "ControlOrMeta" разрешается в "Control" на Windows и Linux и в "Meta" на macOS.
-  - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-no-wait-after"/><a href="#page-tap-option-no-wait-after" class="list-anchor">#</a>
+  - `noWaitAfter` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-no-wait-after"/><a href="#page-tap-option-no-wait-after" class="list-anchor">#</a>
     
     :::warning[Deprecated]
     Эта опция не имеет эффекта.
@@ -4089,7 +4126,7 @@ await page.tap(selector, options);
     
     
     Эта опция не имеет эффекта.
-  - `position` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-position"/><a href="#page-tap-option-position" class="list-anchor">#</a>
+  - `position` [Object] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-position"/><a href="#page-tap-option-position" class="list-anchor">#</a>
     - `x` [number]
       
       
@@ -4097,13 +4134,13 @@ await page.tap(selector, options);
       
       
     Точка для использования относительно верхнего левого угла рамки элемента. Если не указано, используется видимая точка элемента.
-  - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-strict"/><a href="#page-tap-option-strict" class="list-anchor">#</a>
+  - `strict` [boolean] *(опционально)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-strict"/><a href="#page-tap-option-strict" class="list-anchor">#</a>
     
     Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов выбрасывает исключение.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-timeout"/><a href="#page-tap-option-timeout" class="list-anchor">#</a>
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-timeout"/><a href="#page-tap-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
-  - `trial` [boolean] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-trial"/><a href="#page-tap-option-trial" class="list-anchor">#</a>
+  - `trial` [boolean] *(опционально)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-trial"/><a href="#page-tap-option-trial" class="list-anchor">#</a>
     
     Если установлено, этот метод выполняет только проверки [actionability](../actionability.mdx) и пропускает действие. По умолчанию `false`. Полезно для ожидания, пока элемент будет готов к действию без его выполнения. Обратите внимание, что клавиатурные `modifiers` будут нажаты независимо от `trial`, чтобы позволить тестировать элементы, которые видны только при нажатии этих клавиш.
 
@@ -4135,11 +4172,11 @@ await page.textContent(selector, options);
 - `selector` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-text-content-option-selector"/><a href="#page-text-content-option-selector" class="list-anchor">#</a>
   
   Селектор для поиска элемента. Если несколько элементов удовлетворяют селектору, будет использован первый.
-- `options` [Object] *(optional)*
-  - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-text-content-option-strict"/><a href="#page-text-content-option-strict" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `strict` [boolean] *(опционально)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-text-content-option-strict"/><a href="#page-text-content-option-strict" class="list-anchor">#</a>
     
     Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов выбрасывает исключение.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-text-content-option-timeout"/><a href="#page-text-content-option-timeout" class="list-anchor">#</a>
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-text-content-option-timeout"/><a href="#page-text-content-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -4171,11 +4208,11 @@ In most cases, you should use [locator.fill()](/api/class-locator.mdx#locator-fi
 - `text` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-type-option-text"/><a href="#page-type-option-text" class="list-anchor">#</a>
   
   Текст для ввода в фокусированный элемент.
-- `options` [Object] *(optional)*
-  - `delay` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-type-option-delay"/><a href="#page-type-option-delay" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `delay` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-type-option-delay"/><a href="#page-type-option-delay" class="list-anchor">#</a>
     
     Время ожидания между нажатиями клавиш в миллисекундах. По умолчанию 0.
-  - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-type-option-no-wait-after"/><a href="#page-type-option-no-wait-after" class="list-anchor">#</a>
+  - `noWaitAfter` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-type-option-no-wait-after"/><a href="#page-type-option-no-wait-after" class="list-anchor">#</a>
     
     :::warning[Deprecated]
     Эта опция не имеет эффекта.
@@ -4183,10 +4220,10 @@ In most cases, you should use [locator.fill()](/api/class-locator.mdx#locator-fi
     
     
     Эта опция не имеет эффекта.
-  - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-type-option-strict"/><a href="#page-type-option-strict" class="list-anchor">#</a>
+  - `strict` [boolean] *(опционально)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-type-option-strict"/><a href="#page-type-option-strict" class="list-anchor">#</a>
     
     Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов выбрасывает исключение.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-type-option-timeout"/><a href="#page-type-option-timeout" class="list-anchor">#</a>
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-type-option-timeout"/><a href="#page-type-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -4226,11 +4263,11 @@ await page.uncheck(selector, options);
 - `selector` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-uncheck-option-selector"/><a href="#page-uncheck-option-selector" class="list-anchor">#</a>
   
   Селектор для поиска элемента. Если несколько элементов удовлетворяют селектору, будет использован первый.
-- `options` [Object] *(optional)*
-  - `force` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-uncheck-option-force"/><a href="#page-uncheck-option-force" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `force` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-uncheck-option-force"/><a href="#page-uncheck-option-force" class="list-anchor">#</a>
     
     Следует ли обходить проверки [actionability](../actionability.mdx). По умолчанию `false`.
-  - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-uncheck-option-no-wait-after"/><a href="#page-uncheck-option-no-wait-after" class="list-anchor">#</a>
+  - `noWaitAfter` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-uncheck-option-no-wait-after"/><a href="#page-uncheck-option-no-wait-after" class="list-anchor">#</a>
     
     :::warning[Deprecated]
     Этот параметр не имеет эффекта.
@@ -4238,7 +4275,7 @@ await page.uncheck(selector, options);
     
     
     Этот параметр не имеет эффекта.
-  - `position` [Object] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-uncheck-option-position"/><a href="#page-uncheck-option-position" class="list-anchor">#</a>
+  - `position` [Object] *(опционально)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-uncheck-option-position"/><a href="#page-uncheck-option-position" class="list-anchor">#</a>
     - `x` [number]
       
       
@@ -4246,13 +4283,13 @@ await page.uncheck(selector, options);
       
       
     Точка, используемая относительно верхнего левого угла рамки отступов элемента. Если не указано, используется видимая точка элемента.
-  - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-uncheck-option-strict"/><a href="#page-uncheck-option-strict" class="list-anchor">#</a>
+  - `strict` [boolean] *(опционально)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-uncheck-option-strict"/><a href="#page-uncheck-option-strict" class="list-anchor">#</a>
     
     Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов вызывает исключение.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-uncheck-option-timeout"/><a href="#page-uncheck-option-timeout" class="list-anchor">#</a>
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-uncheck-option-timeout"/><a href="#page-uncheck-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `actionTimeout` в конфигурации или с помощью методов [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
-  - `trial` [boolean] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-uncheck-option-trial"/><a href="#page-uncheck-option-trial" class="list-anchor">#</a>
+  - `trial` [boolean] *(опционально)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-uncheck-option-trial"/><a href="#page-uncheck-option-trial" class="list-anchor">#</a>
     
     Если установлено, этот метод выполняет только проверки [actionability](../actionability.mdx) и пропускает действие. По умолчанию `false`. Полезно для ожидания, пока элемент будет готов к действию без его выполнения.
 
@@ -4289,14 +4326,14 @@ await navigationPromise;
 :::
 
 **Аргументы**
-- `options` [Object] *(optional)*
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-timeout"/><a href="#page-wait-for-navigation-option-timeout" class="list-anchor">#</a>
+- `options` [Object] *(опционально)*
+  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-timeout"/><a href="#page-wait-for-navigation-option-timeout" class="list-anchor">#</a>
     
     Максимальное время операции в миллисекундах. По умолчанию `0` - без таймаута. Значение по умолчанию можно изменить с помощью опции `navigationTimeout` в конфигурации или с помощью методов [browserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
-  - `url` [string] | [RegExp] | [function]\([URL]\):[boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-url"/><a href="#page-wait-for-navigation-option-url" class="list-anchor">#</a>
+  - `url` [string] | [RegExp] | [function]\([URL]\):[boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-url"/><a href="#page-wait-for-navigation-option-url" class="list-anchor">#</a>
     
     Глобальный шаблон, регулярное выражение или предикат, получающий [URL] для совпадения при ожидании навигации. Обратите внимание, что если параметр является строкой без символов подстановки, метод будет ожидать навигации к URL, который точно равен строке.
-  - `waitUntil` "load" | "domcontentloaded" | "networkidle" | "commit" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-wait-until"/><a href="#page-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
+  - `waitUntil` "load" | "domcontentloaded" | "networkidle" | "commit" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-wait-until"/><a href="#page-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
     
     Когда считать операцию успешной, по умолчанию `load`. События могут быть:
     * `'domcontentloaded'` - считать операцию завершенной, когда событие `DOMContentLoaded` будет вызвано.
@@ -4400,7 +4437,6 @@ await page.waitForTimeout(1000);
 **Возвращает**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-timeout-return"/><a href="#page-wait-for-timeout-return" class="list-anchor">#</a>
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

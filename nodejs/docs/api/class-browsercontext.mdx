@@ -50,13 +50,13 @@ await browserContext.addCookies([cookieObject1, cookieObject2]);
     
   - `url` [string] *(optional)*
     
-    Either url or domain / path are required. Optional.
+    Either `url` or both `domain` and `path` are required. Optional.
   - `domain` [string] *(optional)*
     
-    For the cookie to apply to all subdomains as well, prefix domain with a dot, like this: ".example.com". Either url or domain / path are required. Optional.
+    For the cookie to apply to all subdomains as well, prefix domain with a dot, like this: ".example.com". Either `url` or both `domain` and `path` are required. Optional.
   - `path` [string] *(optional)*
     
-    Either url or domain / path are required Optional.
+    Either `url` or both `domain` and `path` are required. Optional.
   - `expires` [number] *(optional)*
     
     Unix time in seconds. Optional.
@@ -69,6 +69,9 @@ await browserContext.addCookies([cookieObject1, cookieObject2]);
   - `sameSite` "Strict" | "Lax" | "None" *(optional)*
     
     Optional.
+  - `partitionKey` [string] *(optional)*
+    
+    For partitioned third-party cookies (aka [CHIPS](https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Privacy_sandbox/Partitioned_cookies)), the partition key. Optional.
 
 **Returns**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-add-cookies-return"/><a href="#browser-context-add-cookies-return" class="list-anchor">#</a>
@@ -124,33 +127,11 @@ The order of evaluation of multiple scripts installed via [browserContext.addIni
 
 ---
 
-### backgroundPages {#browser-context-background-pages}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.backgroundPages</x-search>
-
-:::note
-
-Background pages are only supported on Chromium-based browsers.
-:::
-
-All existing background pages in the context.
-
-**Usage**
-
-```js
-browserContext.backgroundPages();
-```
-
-**Returns**
-- [Array]&lt;[Page]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-background-pages-return"/><a href="#browser-context-background-pages-return" class="list-anchor">#</a>
-
----
-
 ### browser {#browser-context-browser}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.browser</x-search>
 
-Returns the browser instance of the context. If it was launched as a persistent context null gets returned.
+Gets the browser instance that owns the context. Returns `null` if the context is created outside of normal browser, e.g. Android or Electron.
 
 **Usage**
 
@@ -288,6 +269,9 @@ await browserContext.cookies(urls);
     
     
   - `sameSite` "Strict" | "Lax" | "None"
+    
+    
+  - `partitionKey` [string] *(optional)*
     
     
 ---
@@ -432,6 +416,8 @@ await browserContext.grantPermissions(permissions, options);
   * `'clipboard-write'`
   * `'geolocation'`
   * `'gyroscope'`
+  * `'local-fonts'`
+  * `'local-network-access'`
   * `'magnetometer'`
   * `'microphone'`
   * `'midi-sysex'` (system-exclusive midi)
@@ -861,12 +847,6 @@ await browserContext.storageState(options);
   - `indexedDB` [boolean] *(optional)* <font size="2">Added in: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-indexed-db"/><a href="#browser-context-storage-state-option-indexed-db" class="list-anchor">#</a>
     
     Set to `true` to include [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) in the storage state snapshot. If your application uses IndexedDB to store authentication tokens, like Firebase Authentication, enable this.
-    
-    :::note
-    
-    IndexedDBs with typed arrays are currently not supported.
-    :::
-    
   - `path` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-path"/><a href="#browser-context-storage-state-option-path" class="list-anchor">#</a>
     
     The file path to save the storage state to. If [path](/api/class-browsercontext.mdx#browser-context-storage-state-option-path) is a relative path, then it is resolved relative to current working directory. If no path is provided, storage state is still returned, but won't be saved to the disk.
@@ -1056,32 +1036,6 @@ browserContext.tracing
 ---
 
 ## Events
-
-### on('backgroundpage') {#browser-context-event-background-page}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.on('backgroundpage')</x-search>
-
-:::note
-
-Only works with Chromium browser's persistent context.
-:::
-
-Emitted when new background page is created in the context.
-
-```js
-const backgroundPage = await context.waitForEvent('backgroundpage');
-```
-
-**Usage**
-
-```js
-browserContext.on('backgroundpage', data => {});
-```
-
-**Event data**
-- [Page]
-
----
 
 ### on('close') {#browser-context-event-close}
 
@@ -1297,6 +1251,54 @@ browserContext.on('weberror', data => {});
 
 ## Deprecated
 
+### on('backgroundpage') {#browser-context-event-background-page}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.on('backgroundpage')</x-search>
+
+:::warning Deprecated
+
+Background pages have been removed from Chromium together with Manifest V2 extensions.
+
+:::
+
+
+This event is not emitted.
+
+**Usage**
+
+```js
+browserContext.on('backgroundpage', data => {});
+```
+
+**Event data**
+- [Page]
+
+---
+
+### backgroundPages {#browser-context-background-pages}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.backgroundPages</x-search>
+
+:::warning Deprecated
+
+Background pages have been removed from Chromium together with Manifest V2 extensions.
+
+:::
+
+
+Returns an empty list.
+
+**Usage**
+
+```js
+browserContext.backgroundPages();
+```
+
+**Returns**
+- [Array]&lt;[Page]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-background-pages-return"/><a href="#browser-context-background-pages-return" class="list-anchor">#</a>
+
+---
+
 ### setHTTPCredentials {#browser-context-set-http-credentials}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.setHTTPCredentials</x-search>
@@ -1326,7 +1328,6 @@ await browserContext.setHTTPCredentials(httpCredentials);
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-http-credentials-return"/><a href="#browser-context-set-http-credentials-return" class="list-anchor">#</a>
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

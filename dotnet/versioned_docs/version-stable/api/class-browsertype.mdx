@@ -204,8 +204,10 @@ var browser = await playwright.Chromium.LaunchAsync(new() {
     Путь к исполняемому файлу браузера, который будет запущен вместо встроенного. Если [ExecutablePath](/api/class-browsertype.mdx#browser-type-launch-option-executable-path) является относительным путем, то он разрешается относительно текущего рабочего каталога. Обратите внимание, что Playwright работает только с встроенными Chromium, Firefox или WebKit, используйте на свой страх и риск.
   - `FirefoxUserPrefs` [IDictionary]?&lt;[string], [object]&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-firefox-user-prefs"/><a href="#browser-type-launch-option-firefox-user-prefs" class="list-anchor">#</a>
     
-    Пользовательские настройки Firefox. Узнайте больше о пользовательских настройках Firefox на [`about:config`](https://support.mozilla.org/en-US/kb/about-config-editor-firefox).
-  - `HandleSIGHUP` [bool]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-handle-sighup"/><a href="#browser-type-launch-option-handle-sighup" class="list-anchor">#</a>
+    Firefox user preferences. Learn more about the Firefox user preferences at [`about:config`](https://support.mozilla.org/en-US/kb/about-config-editor-firefox).
+    
+    You can also provide a path to a custom [`policies.json` file](https://mozilla.github.io/policy-templates/) via `PLAYWRIGHT_FIREFOX_POLICIES_JSON` environment variable.
+  - `HandleSIGHUP` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-handle-sighup"/><a href="#browser-type-launch-option-handle-sighup" class="list-anchor">#</a>
     
     Закрыть процесс браузера при SIGHUP. По умолчанию `true`.
   - `HandleSIGINT` [bool]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-handle-sigint"/><a href="#browser-type-launch-option-handle-sigint" class="list-anchor">#</a>
@@ -216,8 +218,8 @@ var browser = await playwright.Chromium.LaunchAsync(new() {
     Закрыть процесс браузера при SIGTERM. По умолчанию `true`.
   - `Headless` [bool]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-headless"/><a href="#browser-type-launch-option-headless" class="list-anchor">#</a>
     
-    Запускать браузер в режиме без головы. Подробнее для [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) и [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode). По умолчанию `true`, если опция [Devtools](/api/class-browsertype.mdx#browser-type-launch-option-devtools) не установлена в `true`.
-  - `IgnoreAllDefaultArgs` [bool]? *(опционально)* <font size="2">Добавлено в: v1.9</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-ignore-all-default-args"/><a href="#browser-type-launch-option-ignore-all-default-args" class="list-anchor">#</a>
+    Whether to run browser in headless mode. More details for [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and [Firefox](https://hacks.mozilla.org/2017/12/using-headless-mode-in-firefox/). Defaults to `true` unless the [Devtools](/api/class-browsertype.mdx#browser-type-launch-option-devtools) option is `true`.
+  - `IgnoreAllDefaultArgs` [bool]? *(optional)* <font size="2">Added in: v1.9</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-ignore-all-default-args"/><a href="#browser-type-launch-option-ignore-all-default-args" class="list-anchor">#</a>
     
     Если `true`, Playwright не передает свои собственные аргументы конфигурации и использует только те, что указаны в [Args](/api/class-browsertype.mdx#browser-type-launch-option-args). Опасная опция; используйте с осторожностью. По умолчанию `false`.
   - `IgnoreDefaultArgs` [IEnumerable]?&lt;[string]&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-ignore-default-args"/><a href="#browser-type-launch-option-ignore-default-args" class="list-anchor">#</a>
@@ -270,9 +272,19 @@ await BrowserType.LaunchPersistentContextAsync(userDataDir, options);
 **Аргументы**
 - `userDataDir` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-user-data-dir"/><a href="#browser-type-launch-persistent-context-option-user-data-dir" class="list-anchor">#</a>
   
-  Путь к каталогу пользовательских данных, который хранит данные сессии браузера, такие как куки и локальное хранилище. Подробнее для [Chromium](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md#introduction) и [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Command_Line_Options#User_Profile). Обратите внимание, что каталог пользовательских данных Chromium является **родительским** каталогом "Profile Path", который можно увидеть на `chrome://version`. Передайте пустую строку, чтобы использовать временный каталог.
-- `options` `BrowserTypeLaunchPersistentContextOptions?` *(опционально)*
-  - `AcceptDownloads` [bool]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-accept-downloads"/><a href="#browser-type-launch-persistent-context-option-accept-downloads" class="list-anchor">#</a>
+  Path to a User Data Directory, which stores browser session data like cookies and local storage. Pass an empty string to create a temporary directory.
+  
+  More details for [Chromium](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md#introduction) and [Firefox](https://wiki.mozilla.org/Firefox/CommandLineOptions#User_profile). Chromium's user data directory is the **parent** directory of the "Profile Path" seen at `chrome://version`.
+  
+  Note that browsers do not allow launching multiple instances with the same User Data Directory.
+  
+  :::warning
+  
+  Chromium/Chrome: Due to recent Chrome policy changes, automating the default Chrome user profile is not supported. Pointing `userDataDir` to Chrome's main "User Data" directory (the profile used for your regular browsing) may result in pages not loading or the browser exiting. Create and use a separate directory (for example, an empty folder) as your automation profile instead. See https://developer.chrome.com/blog/remote-debugging-port for details.
+  :::
+  
+- `options` `BrowserTypeLaunchPersistentContextOptions?` *(optional)*
+  - `AcceptDownloads` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-accept-downloads"/><a href="#browser-type-launch-persistent-context-option-accept-downloads" class="list-anchor">#</a>
     
     Автоматически загружать все вложения. По умолчанию `true`, где все загрузки принимаются.
   - `Args` [IEnumerable]?&lt;[string]&gt; *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-args"/><a href="#browser-type-launch-persistent-context-option-args" class="list-anchor">#</a>
@@ -334,6 +346,8 @@ await BrowserType.LaunchPersistentContextAsync(userDataDir, options);
     
     Массив клиентских сертификатов для использования. Каждый объект сертификата должен иметь либо оба `certPath` и `keyPath`, либо один `pfxPath`, или их соответствующие прямые значения (`cert` и `key`, или `pfx`). Опционально, свойство `passphrase` должно быть предоставлено, если сертификат зашифрован. Свойство `origin` должно быть предоставлено с точным совпадением с источником запроса, для которого сертификат действителен.
     
+    Client certificate authentication is only active when at least one client certificate is provided. If you want to reject all client certificates sent by the server, you need to provide a client certificate with an `origin` that does not match any of the domains you plan to visit.
+    
     :::note
     
     При использовании WebKit на macOS доступ к `localhost` не будет использовать клиентские сертификаты. Вы можете сделать это, заменив `localhost` на `local.playwright`.
@@ -370,8 +384,10 @@ await BrowserType.LaunchPersistentContextAsync(userDataDir, options);
     Объект, содержащий дополнительные HTTP-заголовки, которые будут отправлены с каждым запросом. По умолчанию отсутствуют.
   - `FirefoxUserPrefs` [IDictionary]?&lt;[string], [object]&gt; *(опционально)* <font size="2">Добавлено в: v1.40</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-firefox-user-prefs"/><a href="#browser-type-launch-persistent-context-option-firefox-user-prefs" class="list-anchor">#</a>
     
-    Пользовательские настройки Firefox. Узнайте больше о пользовательских настройках Firefox на [`about:config`](https://support.mozilla.org/en-US/kb/about-config-editor-firefox).
-  - `ForcedColors` `enum ForcedColors { Active, None, Null }?` *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-forced-colors"/><a href="#browser-type-launch-persistent-context-option-forced-colors" class="list-anchor">#</a>
+    Firefox user preferences. Learn more about the Firefox user preferences at [`about:config`](https://support.mozilla.org/en-US/kb/about-config-editor-firefox).
+    
+    You can also provide a path to a custom [`policies.json` file](https://mozilla.github.io/policy-templates/) via `PLAYWRIGHT_FIREFOX_POLICIES_JSON` environment variable.
+  - `ForcedColors` `enum ForcedColors { Active, None, Null }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-forced-colors"/><a href="#browser-type-launch-persistent-context-option-forced-colors" class="list-anchor">#</a>
     
     Эмулирует медиа-функцию `'forced-colors'`, поддерживаемые значения: `'active'`, `'none'`. См. [Page.EmulateMediaAsync()](/api/class-page.mdx#page-emulate-media) для получения дополнительной информации. Передача `'null'` сбрасывает эмуляцию на системные настройки по умолчанию. По умолчанию `'none'`.
   - `Geolocation` Geolocation? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-geolocation"/><a href="#browser-type-launch-persistent-context-option-geolocation" class="list-anchor">#</a>
@@ -398,8 +414,8 @@ await BrowserType.LaunchPersistentContextAsync(userDataDir, options);
     Указывает, поддерживает ли видовая область сенсорные события. По умолчанию false. Узнайте больше о [мобильной эмуляции](../emulation.mdx#devices).
   - `Headless` [bool]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-headless"/><a href="#browser-type-launch-persistent-context-option-headless" class="list-anchor">#</a>
     
-    Запускать браузер в режиме без головы. Подробнее для [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) и [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode). По умолчанию `true`, если опция [Devtools](/api/class-browsertype.mdx#browser-type-launch-option-devtools) не установлена в `true`.
-  - `HttpCredentials` HttpCredentials? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-http-credentials"/><a href="#browser-type-launch-persistent-context-option-http-credentials" class="list-anchor">#</a>
+    Whether to run browser in headless mode. More details for [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and [Firefox](https://hacks.mozilla.org/2017/12/using-headless-mode-in-firefox/). Defaults to `true` unless the [Devtools](/api/class-browsertype.mdx#browser-type-launch-option-devtools) option is `true`.
+  - `HttpCredentials` HttpCredentials? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-http-credentials"/><a href="#browser-type-launch-persistent-context-option-http-credentials" class="list-anchor">#</a>
     - `Username` [string]
       
       
@@ -549,7 +565,6 @@ BrowserType.Name
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-name-return"/><a href="#browser-type-name-return" class="list-anchor">#</a>
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -615,6 +630,7 @@ BrowserType.Name
 [Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1 "Action"
 [Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2 "Func"
 [IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable "IEnumerable"
+[IReadOnlyList]: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1?view=net-9.0 "IReadOnlyList"
 [IDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary "IDictionary"
 [Task]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-5.0 "Task"
 [IReadOnlyDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2 "IReadOnlyDictionary"

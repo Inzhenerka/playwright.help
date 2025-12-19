@@ -10,12 +10,12 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 :::note
 
-Расширения работают только в Chrome / Chromium, запущенном с постоянным контекстом. Используйте пользовательские аргументы браузера на свой страх и риск, так как некоторые из них могут нарушить функциональность Playwright.
+Расширения работают в Chromium только при запуске с постоянным контекстом (persistent context). Используйте пользовательские аргументы браузера на свой риск, так как некоторые из них могут нарушить работу Playwright.
+
+Google Chrome и Microsoft Edge [удалили флаги командной строки, необходимые для сайдлоада расширений](https://groups.google.com/a/chromium.org/g/chromium-extensions/c/FxMU1TvxWWg/m/daZVTYNlBQAJ), поэтому используйте Chromium, который поставляется вместе с Playwright.
 :::
 
-Пример ниже извлекает [background page](https://developer.chrome.com/extensions/background_pages) расширения [Manifest v2](https://developer.chrome.com/docs/extensions/mv2/), исходный код которого находится в `./my-extension`.
-
-Обратите внимание на использование канала `chromium`, который позволяет запускать расширения в безголовом режиме. В качестве альтернативы, вы можете запустить браузер в режиме с интерфейсом.
+Фрагмент ниже получает [service worker](https://developer.chrome.com/docs/extensions/develop/concepts/service-workers) расширения [Manifest v3](https://developer.chrome.com/docs/extensions/develop/migrate), исходники которого находятся в `./my-extension`.
 
 <Tabs
   groupId="python-flavor"
@@ -43,12 +43,12 @@ def run(playwright: Playwright):
             f"--load-extension={path_to_extension}",
         ],
     )
-    if len(context.background_pages) == 0:
-        background_page = context.wait_for_event('backgroundpage')
+    if len(context.service_workers) == 0:
+        service_worker = context.wait_for_event('serviceworker')
     else:
-        background_page = context.background_pages[0]
+        service_worker = context.service_workers[0]
 
-    # Тестируйте background page так же, как и любую другую страницу.
+    # Тестируйте service worker так же, как и любой другой worker.
     context.close()
 
 
@@ -77,12 +77,12 @@ async def run(playwright: Playwright):
         ],
     )
 
-    if len(context.background_pages) == 0:
-        background_page = await context.wait_for_event('backgroundpage')
+    if len(context.service_workers) == 0:
+        service_worker = await context.wait_for_event('serviceworker')
     else:
-        background_page = context.background_pages[0]
+        service_worker = context.service_workers[0]
 
-    # Тестируйте background page так же, как и любую другую страницу.
+    # Тестируйте service worker так же, как и любой другой worker.
     await context.close()
 
 
@@ -129,17 +129,12 @@ def context(playwright: Playwright) -> Generator[BrowserContext, None, None]:
 
 @pytest.fixture()
 def extension_id(context) -> Generator[str, None, None]:
-    # для manifest v2:
-    # background = context.background_pages[0]
-    # if not background:
-    #     background = context.wait_for_event("backgroundpage")
-
     # для manifest v3:
-    background = context.service_workers[0]
-    if not background:
-        background = context.wait_for_event("serviceworker")
+    service_worker = context.service_workers[0]
+    if not service_worker:
+        service_worker = context.wait_for_event("serviceworker")
 
-    extension_id = background.url.split("/")[2]
+    extension_id = service_worker.url.split("/")[2]
     yield extension_id
 
 ```
@@ -161,7 +156,6 @@ def test_popup_page(page: Page, extension_id: str) -> None:
 ```
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"

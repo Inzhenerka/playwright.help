@@ -174,6 +174,29 @@ export default defineConfig({
 
 ---
 
+### failOnFlakyTests {#test-config-fail-on-flaky-tests}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.52</font><x-search>testConfig.failOnFlakyTests</x-search>
+
+Whether to exit with an error if any tests are marked as flaky. Useful on CI.
+
+Also available in the [command line](../test-cli.mdx) with the `--fail-on-flaky-tests` option.
+
+**Usage**
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  failOnFlakyTests: !!process.env.CI,
+});
+```
+
+**Type**
+- [boolean]
+
+---
+
 ### forbidOnly {#test-config-forbid-only}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testConfig.forbidOnly</x-search>
@@ -379,7 +402,7 @@ export default defineConfig({
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testConfig.metadata</x-search>
 
-Метаданные содержат пары ключ-значение, которые будут включены в отчёт. Например, HTML-отчёт отобразит их как пары ключ-значение, а JSON-отчёт включит метаданные, сериализованные как json.
+Метаданные содержат пары ключ–значение, которые будут включены в отчёт. Например, JSON-отчёт будет содержать метаданные, сериализованные в JSON.
 
 **Использование**
 
@@ -583,7 +606,7 @@ export default defineConfig({
 * Имя модуля, например, `'my-awesome-reporter'`.
 * Относительный путь к репортёру, например, `'./reporters/my-awesome-reporter.js'`.
 
-Вы можете передать опции репортёру в виде кортежа, например, `['json', { outputFile: './report.json' }]`.
+Вы можете передать опции репортеру в виде кортежа, например `['json', { outputFile: './report.json' }]`. Если свойство не указано, Playwright использует репортёр `'dot'`, когда установлена переменная окружения CI, и репортёр `'list'` — в противном случае.
 
 Узнайте больше в [руководстве по репортёрам](../test-reporters.mdx).
 
@@ -780,6 +803,29 @@ export default defineConfig({
 
 ---
 
+### tag {#test-config-tag}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.57</font><x-search>testConfig.tag</x-search>
+
+Tag or tags prepended to each test in the report. Useful for tagging your test run to differentiate between [CI environments](../test-sharding.mdx#merging-reports-from-multiple-environments).
+
+Note that each tag must start with `@` symbol. Learn more about [tagging](../test-annotations.mdx#tag-tests).
+
+**Usage**
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  tag: process.env.CI_ENVIRONMENT_NAME,  // for example "@APIv2"
+});
+```
+
+**Type**
+- [string] | [Array]&lt;[string]&gt;
+
+---
+
 ### testDir {#test-config-test-dir}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testConfig.testDir</x-search>
@@ -895,11 +941,11 @@ export default defineConfig({
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testConfig.updateSnapshots</x-search>
 
-Обновлять ли ожидаемые снимки с фактическими результатами, полученными в ходе выполнения теста. По умолчанию `'missing'`.
-* `'all'` - Все выполненные тесты обновят снимки.
-* `'changed'` - Все выполненные тесты обновят снимки, которые не совпали. Совпадающие снимки не будут обновлены.
-* `'missing'` - Создаются отсутствующие снимки, например, при создании нового теста и его первом запуске. Это значение по умолчанию.
-* `'none'` - Снимки не обновляются.
+Обновлять ли ожидаемые снимки (snapshots) фактическими результатами, полученными при запуске тестов. По умолчанию `'missing'`.
+* `'all'` — все выполненные тесты обновят снимки.
+* `'changed'` — все выполненные тесты обновят снимки, которые не совпали. Совпавшие снимки обновляться не будут. Также создаются отсутствующие снимки.
+* `'missing'` — создаются отсутствующие снимки, например при написании нового теста и его первом запуске. Это значение по умолчанию.
+* `'none'` — снимки не обновляются.
 
 Узнайте больше о [снимках](../test-snapshots.mdx).
 
@@ -1004,12 +1050,14 @@ export default defineConfig({
     {
       command: 'npm run start',
       url: 'http://localhost:3000',
+      name: 'Frontend',
       timeout: 120 * 1000,
       reuseExistingServer: !process.env.CI,
     },
     {
       command: 'npm run backend',
       url: 'http://localhost:3333',
+      name: 'Backend',
       timeout: 120 * 1000,
       reuseExistingServer: !process.env.CI,
     }
@@ -1017,6 +1065,31 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:3000',
   },
+});
+```
+
+Если ваш веб-сервер запускается на разных портах, используйте `wait`, чтобы определить порт:
+
+```js
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  webServer: {
+    command: 'npm run start',
+    wait: {
+      stdout: '/Listening on port (?<my_server_port>\\d+)/'
+    },
+  },
+});
+```
+
+```js
+import { test, expect } from '@playwright/test';
+
+test.use({ baseUrl: `http://localhost:${process.env.MY_SERVER_PORT ?? 3000}` });
+
+test('homepage', async ({ page }) => {
+  await page.goto('/');
 });
 ```
 
@@ -1030,25 +1103,7 @@ export default defineConfig({
     Текущая рабочая директория порождённого процесса, по умолчанию директория файла конфигурации.
   - `env` [Object]&lt;[string], [string]&gt; *(опционально)*
     
-    Переменные окружения для установки команды, по умолчанию `process.env`.
-  - `ignoreHTTPSErrors` [boolean] *(опционально)*
-    
-    Игнорировать ли ошибки HTTPS при получении `url`. По умолчанию `false`.
-  - `port` [number] *(опционально)*
-    
-    Порт, на котором ожидается появление вашего http-сервера. Он ждёт, пока не начнёт принимать соединения. Должен быть указан либо `port`, либо `url`.
-  - `reuseExistingServer` [boolean] *(опционально)*
-    
-    Если true, он будет повторно использовать существующий сервер на `port` или `url`, если он доступен. Если на этом `port` или `url` не запущен сервер, он выполнит команду для запуска нового сервера. Если `false`, он выдаст ошибку, если существующий процесс слушает на `port` или `url`. Это обычно следует устанавливать в `!process.env.CI`, чтобы разрешить локальный сервер разработки при запуске тестов локально.
-  - `stdout` "pipe" | "ignore" *(опционально)*
-    
-    Если `"pipe"`, он будет перенаправлять stdout команды в stdout процесса. Если `"ignore"`, он будет игнорировать stdout команды. По умолчанию `"ignore"`.
-  - `stderr` "pipe" | "ignore" *(опционально)*
-    
-    Перенаправлять ли stderr команды в stderr процесса или игнорировать его. По умолчанию `"pipe"`.
-  - `timeout` [number] *(опционально)*
-    
-    Как долго ждать запуска процесса и его доступности в миллисекундах. По умолчанию 60000.
+    Переменные окружения, которые нужно установить для команды; по умолчанию — `process.env`.
   - `gracefulShutdown` [Object] *(опционально)*
     - `signal` "SIGINT" | "SIGTERM"
       
@@ -1056,7 +1111,37 @@ export default defineConfig({
     - `timeout` [number]
       
       
-    Как завершить процесс. Если не указано, группа процессов будет принудительно завершена с помощью `SIGKILL`. Если установлено в `{ signal: 'SIGTERM', timeout: 500 }`, группе процессов будет отправлен сигнал `SIGTERM`, за которым последует `SIGKILL`, если она не завершится в течение 500 мс. Вы также можете использовать `SIGINT` в качестве сигнала. Таймаут `0` означает, что `SIGKILL` не будет отправлен. Windows не поддерживает сигналы `SIGTERM` и `SIGINT`, поэтому эта опция игнорируется на Windows. Обратите внимание, что для завершения контейнера Docker требуется `SIGTERM`.
+    Как завершать процесс. Если не указано, группа процессов принудительно завершается с помощью `SIGKILL`. Если задано `{ signal: 'SIGTERM', timeout: 500 }`, группе процессов отправляется сигнал `SIGTERM`, а затем — `SIGKILL`, если она не завершится в течение 500 мс. В качестве сигнала также можно использовать `SIGINT`. Таймаут `0` означает, что `SIGKILL` отправлен не будет. Windows не поддерживает сигналы `SIGTERM` и `SIGINT`, поэтому на Windows эта опция игнорируется. Обратите внимание: для остановки Docker-контейнера требуется `SIGTERM`.
+  - `ignoreHTTPSErrors` [boolean] *(опционально)*
+    
+    Игнорировать ли ошибки HTTPS при обращении к `url`. По умолчанию `false`.
+  - `name` [string] *(опционально)*
+    
+    Задаёт пользовательское имя для веб-сервера. Это имя будет добавляться в начало сообщений логов. По умолчанию `[WebServer]`.
+  - `port` [number] *(опционально)*
+    
+    Порт, на котором ожидается HTTP-сервер. Playwright будет ждать, пока сервер начнёт принимать подключения. Нужно указать либо `port`, либо `url`.
+  - `reuseExistingServer` [boolean] *(опционально)*
+    
+    Если `true`, будет переиспользован уже запущенный сервер на `port` или `url`, если он доступен. Если на `port` или `url` ничего не запущено, будет выполнена команда для старта нового сервера. Если `false`, будет выброшена ошибка, если какой‑то процесс уже слушает `port` или `url`. Обычно это задают как `!process.env.CI`, чтобы при локальном запуске тестов можно было использовать локальный dev-сервер.
+  - `stderr` "pipe" | "ignore" *(опционально)*
+    
+    Пробрасывать ли stderr команды в stderr процесса или игнорировать его. По умолчанию `"pipe"`.
+  - `stdout` "pipe" | "ignore" *(опционально)*
+    
+    Если `"pipe"`, stdout команды будет пробрасываться в stdout процесса. Если `"ignore"`, stdout команды будет игнорироваться. По умолчанию `"ignore"`.
+  - `wait` [Object] *(опционально)*
+    - `stdout` [RegExp] *(опционально)*
+      
+      Регулярное выражение, которого нужно дождаться в `stdout` вывода команды. Именованные группы захвата сохраняются в переменные окружения; например, `/Listening on port (?<my_server_port>\\d+)/` сохранит номер порта в `process.env['MY_SERVER_PORT']`.
+    - `stderr` [RegExp] *(опционально)*
+      
+      Регулярное выражение, которого нужно дождаться в `stderr` вывода команды. Именованные группы захвата сохраняются в переменные окружения; например, `/Listening on port (?<my_server_port>\\d+)/` сохранит номер порта в `process.env['MY_SERVER_PORT']`.
+    
+    Считать команду запущенной только после того, как появится указанный вывод.
+  - `timeout` [number] *(опционально)*
+    
+    Сколько времени ждать запуска процесса и его доступности, в миллисекундах. По умолчанию 60000.
   - `url` [string] *(опционально)*
     
     URL на вашем http-сервере, который должен вернуть статус-код 2xx, 3xx, 400, 401, 402 или 403, когда сервер готов принимать соединения. Перенаправления (статус-коды 3xx) следуются, и новое местоположение проверяется. Должен быть указан либо `port`, либо `url`.
@@ -1135,7 +1220,6 @@ export default defineConfig({
 Этот путь будет служить базовой директорией для директории снимков каждого тестового файла. Установив `snapshotDir` в `'snapshots'`, [testInfo.snapshotDir](/api/class-testinfo.mdx#test-info-snapshot-dir) будет разрешён в `snapshots/a.spec.js-snapshots`.
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

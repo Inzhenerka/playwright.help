@@ -50,13 +50,13 @@ browserContext.addCookies(Arrays.asList(cookieObject1, cookieObject2));
     
   - `setUrl` [String] *(optional)*
     
-    Either url or domain / path are required. Optional.
+    Either `url` or both `domain` and `path` are required. Optional.
   - `setDomain` [String] *(optional)*
     
-    For the cookie to apply to all subdomains as well, prefix domain with a dot, like this: ".example.com". Either url or domain / path are required. Optional.
+    For the cookie to apply to all subdomains as well, prefix domain with a dot, like this: ".example.com". Either `url` or both `domain` and `path` are required. Optional.
   - `setPath` [String] *(optional)*
     
-    Either url or domain / path are required Optional.
+    Either `url` or both `domain` and `path` are required. Optional.
   - `setExpires` [double] *(optional)*
     
     Unix time in seconds. Optional.
@@ -69,6 +69,9 @@ browserContext.addCookies(Arrays.asList(cookieObject1, cookieObject2));
   - `setSameSite` `enum SameSiteAttribute { STRICT, LAX, NONE }` *(optional)*
     
     Optional.
+  - `setPartitionKey` [String] *(optional)*
+    
+    For partitioned third-party cookies (aka [CHIPS](https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Privacy_sandbox/Partitioned_cookies)), the partition key. Optional.
 
 **Returns**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-add-cookies-return"/><a href="#browser-context-add-cookies-return" class="list-anchor">#</a>
@@ -113,33 +116,11 @@ The order of evaluation of multiple scripts installed via [BrowserContext.addIni
 
 ---
 
-### backgroundPages {#browser-context-background-pages}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.backgroundPages</x-search>
-
-:::note
-
-Background pages are only supported on Chromium-based browsers.
-:::
-
-All existing background pages in the context.
-
-**Usage**
-
-```java
-BrowserContext.backgroundPages();
-```
-
-**Returns**
-- [List]&lt;[Page]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-background-pages-return"/><a href="#browser-context-background-pages-return" class="list-anchor">#</a>
-
----
-
 ### browser {#browser-context-browser}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.browser</x-search>
 
-Returns the browser instance of the context. If it was launched as a persistent context null gets returned.
+Gets the browser instance that owns the context. Returns `null` if the context is created outside of normal browser, e.g. Android or Electron.
 
 **Usage**
 
@@ -278,6 +259,9 @@ BrowserContext.cookies(urls);
     
     
   - `sameSite` `enum SameSiteAttribute { STRICT, LAX, NONE }`
+    
+    
+  - `partitionKey` [String] *(optional)*
     
     
 ---
@@ -440,6 +424,8 @@ BrowserContext.grantPermissions(permissions, options);
   * `'clipboard-write'`
   * `'geolocation'`
   * `'gyroscope'`
+  * `'local-fonts'`
+  * `'local-network-access'`
   * `'magnetometer'`
   * `'microphone'`
   * `'midi-sysex'` (system-exclusive midi)
@@ -819,12 +805,6 @@ BrowserContext.storageState(options);
   - `setIndexedDB` [boolean] *(optional)* <font size="2">Added in: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-indexed-db"/><a href="#browser-context-storage-state-option-indexed-db" class="list-anchor">#</a>
     
     Set to `true` to include [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) in the storage state snapshot. If your application uses IndexedDB to store authentication tokens, like Firebase Authentication, enable this.
-    
-    :::note
-    
-    IndexedDBs with typed arrays are currently not supported.
-    :::
-    
   - `setPath` [Path] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-path"/><a href="#browser-context-storage-state-option-path" class="list-anchor">#</a>
     
     The file path to save the storage state to. If [setPath](/api/class-browsercontext.mdx#browser-context-storage-state-option-path) is a relative path, then it is resolved relative to current working directory. If no path is provided, storage state is still returned, but won't be saved to the disk.
@@ -1026,34 +1006,6 @@ BrowserContext.tracing()
 
 ## Events
 
-### onBackgroundPage(handler) {#browser-context-event-background-page}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.onBackgroundPage(handler)</x-search>
-
-:::note
-
-Only works with Chromium browser's persistent context.
-:::
-
-Emitted when new background page is created in the context.
-
-```java
-context.onBackgroundPage(backgroundPage -> {
-  System.out.println(backgroundPage.url());
-});
-```
-
-**Usage**
-
-```java
-BrowserContext.onBackgroundPage(handler)
-```
-
-**Event data**
-- [Page]
-
----
-
 ### onClose(handler) {#browser-context-event-close}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.onClose(handler)</x-search>
@@ -1239,6 +1191,56 @@ BrowserContext.onWebError(handler)
 
 **Event data**
 - [WebError]
+
+---
+
+## Deprecated
+
+### onBackgroundPage(handler) {#browser-context-event-background-page}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.onBackgroundPage(handler)</x-search>
+
+:::warning Deprecated
+
+Background pages have been removed from Chromium together with Manifest V2 extensions.
+
+:::
+
+
+This event is not emitted.
+
+**Usage**
+
+```java
+BrowserContext.onBackgroundPage(handler)
+```
+
+**Event data**
+- [Page]
+
+---
+
+### backgroundPages {#browser-context-background-pages}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.backgroundPages</x-search>
+
+:::warning Deprecated
+
+Background pages have been removed from Chromium together with Manifest V2 extensions.
+
+:::
+
+
+Returns an empty list.
+
+**Usage**
+
+```java
+BrowserContext.backgroundPages();
+```
+
+**Returns**
+- [List]&lt;[Page]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-background-pages-return"/><a href="#browser-context-background-pages-return" class="list-anchor">#</a>
 
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

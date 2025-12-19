@@ -29,7 +29,7 @@ const { generateTabGroups, renderHTMLCard } = require('./format_utils');
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
 /** @export @typedef {{ name: string, link: string, usages: string[], args: docs.Member[], signatures?: string[] }} FormattedMember */
 
-const commonSnippets = new Set(['txt', 'html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'bash', 'sh', 'ini', 'Dockerfile', 'css']);
+const commonSnippets = new Set(['txt', 'html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'bash', 'sh', 'ini', 'Dockerfile', 'css', 'markdown']);
 
 /** @typedef {"header"|"link"|"usage"} FormatMode */
 
@@ -147,6 +147,14 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 `});
+    if (clazz.deprecated) {
+      result.push({
+        type: 'text',
+        text: `:::warning[Deprecated]
+${this.documentation.renderLinksInText(clazz.deprecated)}
+:::
+`      });
+    }
     result.push(...this.formatComment(clazz.spec));
     result.push({
       type: 'text',
@@ -415,8 +423,17 @@ ${this.documentation.renderLinksInText(member.discouraged)}
    */
   generateDoc(name, outName) {
     const content = fs.readFileSync(path.join(this.srcDir, name)).toString();
-    let nodes = this.filterForLanguage(md.parse(content));
+    let nodes = this.filterForLanguage(md.parse(this.rewriteImageLinks(content)));
     return this.generateDocFromMd(nodes, outName);
+  }
+
+  /**
+   * @param {string} content 
+   */
+  rewriteImageLinks(content) {
+    return content.replaceAll(/!\[(.*)\]\((\.\/images\/.*)\)/g, (match, alt, link) => {
+      return `![${alt}](${path.join('..', link)})`;
+    });
   }
 
   generateDocFromMd(nodes, outName) {

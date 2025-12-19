@@ -52,14 +52,14 @@ npx playwright test --shard=4/4
 
 Начните с добавления `blob` репортера в конфигурацию при запуске на CI:
 
-```ts title="playwright.config.ts"
+```js title="playwright.config.ts"
 export default defineConfig({
   testDir: './tests',
   reporter: process.env.CI ? 'blob' : 'html',
 });
 ```
 
-Blob-отчет содержит информацию обо всех выполненных тестах и их результатах, а также все вложения тестов, такие как трассировки и различия в скриншотах. Blob-отчеты можно объединять и преобразовывать в любой другой отчет Playwright. По умолчанию blob-отчет будет сгенерирован в директорию `blob-report`.
+Blob-отчёт содержит информацию обо всех запущенных тестах и их результатах, а также все вложения тестов — например, трассы и диффы скриншотов. Blob-отчёты можно объединять и конвертировать в любой другой отчёт Playwright. По умолчанию blob-отчёт будет сгенерирован в директорию `blob-report`. Подробнее об опциях blob-отчёта см. [здесь](./test-reporters.mdx#blob-reporter).
 
 Чтобы объединить отчеты из нескольких шардов, поместите файлы blob-отчетов в одну директорию, например `all-blob-reports`. Имена blob-отчетов содержат номер шарда, поэтому они не будут конфликтовать.
 
@@ -97,8 +97,8 @@ jobs:
         shardIndex: [1, 2, 3, 4]
         shardTotal: [4]
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - uses: actions/checkout@v5
+    - uses: actions/setup-node@v5
       with:
         node-version: lts/*
     - name: Install dependencies
@@ -130,15 +130,15 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - uses: actions/checkout@v5
+    - uses: actions/setup-node@v5
       with:
         node-version: lts/*
     - name: Install dependencies
       run: npm ci
 
     - name: Download blob reports from GitHub Actions Artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v5
       with:
         path: all-blob-reports
         pattern: blob-report-*
@@ -158,6 +158,21 @@ jobs:
 Теперь вы можете увидеть, что отчеты были объединены, и объединенный HTML-отчет доступен на вкладке артефактов GitHub Actions.
 
 <img width="875" alt="image" src="https://github.com/microsoft/playwright/assets/9798949/b69dac59-fc19-4b98-8f49-814b1c29ca02" />
+
+## Объединение отчётов из разных окружений
+
+Если вы хотите запускать одни и те же тесты в нескольких окружениях (а не шардить тесты между несколькими машинами), эти окружения нужно различать.
+
+В этом случае полезно задать свойство [testConfig.tag](/api/class-testconfig.mdx#test-config-tag), чтобы пометить все тесты именем окружения. Этот тег будет автоматически подхвачен blob-отчётом, а затем и инструментом объединения.
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  reporter: process.env.CI ? 'blob' : 'html',
+  tag: process.env.CI_ENVIRONMENT_NAME,  // for example "@APIv2"
+});
+```
 
 ## CLI для объединения отчетов
 
@@ -186,7 +201,7 @@ jobs:
   npx playwright merge-reports --config=merge.config.ts ./blob-reports
   ```
   
-  ```ts title="merge.config.ts"
+  ```js title="merge.config.ts"
   export default {
     testDir: 'e2e',
     reporter: [['html', { open: 'never' }]],
@@ -195,7 +210,6 @@ jobs:
   
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

@@ -8,7 +8,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Введение
 
-Тесты Playwright могут выполняться на любом провайдере CI. В этом разделе мы рассмотрим запуск тестов на GitHub с использованием GitHub Actions. Если вы хотите узнать, как настроить других провайдеров CI, ознакомьтесь с нашей подробной документацией по непрерывной интеграции.
+Тесты Playwright можно запускать в любом CI-провайдере. В этом разделе мы рассматриваем запуск тестов на GitHub с использованием GitHub Actions. Если вы хотите посмотреть, как настроить другие CI-провайдеры, загляните в подробную [документацию по Continuous Integration](./ci.mdx).
 
 #### Вы узнаете
 - [Как настроить GitHub Actions](/ci-intro.mdx#setting-up-github-actions)
@@ -17,7 +17,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Настройка GitHub Actions
 
-Чтобы добавить файл [GitHub Actions](https://docs.github.com/en/actions), сначала создайте папку `.github/workflows` и внутри нее добавьте файл `playwright.yml`, содержащий пример кода ниже, чтобы ваши тесты выполнялись при каждом push и pull request для основной/мастер-ветки.
+Чтобы добавить файл [GitHub Actions](https://docs.github.com/en/actions), сначала создайте папку `.github/workflows`, а затем добавьте в неё файл `playwright.yml` с примером кода ниже, чтобы ваши тесты запускались при каждом push и pull request в ветку main/master.
 
 ```yml title=".github/workflows/playwright.yml"
 name: Playwright Tests
@@ -31,11 +31,11 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-java@v3
+    - uses: actions/checkout@v5
+    - uses: actions/setup-java@v5
       with:
         distribution: 'temurin'
-        java-version: '17'
+        java-version: '25'
     - name: Build & Install
       run: mvn -B install -D skipTests --no-transfer-progress
     - name: Ensure browsers are installed
@@ -46,26 +46,30 @@ jobs:
 
 Чтобы узнать больше об этом, см. ["Понимание GitHub Actions"](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions).
 
-Рассматривая список шагов в `jobs.test.steps`, вы можете увидеть, что рабочий процесс выполняет следующие шаги:
-1. Клонирование вашего репозитория 2. Установка зависимостей языка 3. Установка зависимостей проекта и сборка 4. Установка браузеров Playwright 5. Запуск тестов
+Если посмотреть на список шагов в `jobs.test.steps`, видно, что workflow выполняет следующие действия:
+1. Клонирует ваш репозиторий
+1. Устанавливает зависимости языка
+1. Устанавливает зависимости проекта и выполняет сборку (build)
+1. Устанавливает браузеры Playwright
+1. Запускает тесты
 
 ## Создание репозитория и отправка на GitHub
 
-После того как вы настроили [GitHub actions workflow](#setting-up-github-actions), все, что вам нужно сделать, это [создать репозиторий на GitHub](https://docs.github.com/en/get-started/quickstart/create-a-repo) или отправить ваш код в существующий репозиторий. Следуйте инструкциям на GitHub и не забудьте [инициализировать git-репозиторий](https://github.com/git-guides/git-init) с помощью команды `git init`, чтобы вы могли [добавить](https://github.com/git-guides/git-add), [зафиксировать](https://github.com/git-guides/git-commit) и [отправить](https://github.com/git-guides/git-push) ваш код.
+После того как вы настроили [workflow GitHub Actions](#setting-up-github-actions), вам остаётся только [создать репозиторий на GitHub](https://docs.github.com/en/get-started/quickstart/create-a-repo) или запушить код в уже существующий репозиторий. Следуйте инструкциям на GitHub и не забудьте [инициализировать git-репозиторий](https://github.com/git-guides/git-init) командой `git init`, чтобы вы могли [добавлять](https://github.com/git-guides/git-add), [коммитить](https://github.com/git-guides/git-commit) и [пушить](https://github.com/git-guides/git-push) свой код.
 
 ###### 
 <img width="861" alt="Create a Repo and Push to GitHub" src="https://user-images.githubusercontent.com/13063165/183423254-d2735278-a2ab-4d63-bb99-48d8e5e447bc.png"/>
 
 ## Открытие рабочих процессов
 
-Нажмите на вкладку **Actions**, чтобы увидеть рабочие процессы. Здесь вы увидите, прошли ли ваши тесты или нет.
+Перейдите на вкладку **Actions**, чтобы увидеть workflows (рабочие процессы). Там вы сможете посмотреть, прошли ваши тесты или упали.
 
 ###### 
 ![opening the workflow](https://user-images.githubusercontent.com/13063165/183423783-58bf2008-514e-4f96-9c12-c9a55703960c.png)
 
 ## Просмотр журналов тестов
 
-Нажатие на выполнение рабочего процесса покажет вам все действия, которые GitHub выполнил, а нажатие на **Run Playwright tests** покажет сообщения об ошибках, что ожидалось и что было получено, а также журнал вызовов.
+Клик по запуску workflow показывает все действия, которые выполнил GitHub, а клик по **Run Playwright tests** — сообщения об ошибках, ожидаемый результат, фактически полученный результат, а также лог вызовов.
 
 ###### 
 ![Viewing Test Logs](https://user-images.githubusercontent.com/13063165/183423783-58bf2008-514e-4f96-9c12-c9a55703960c.png)
@@ -74,7 +78,11 @@ jobs:
 
 [trace.playwright.dev](https://trace.playwright.dev) — это статически размещенный вариант Trace Viewer. Вы можете загружать файлы трассировки, используя перетаскивание.
 
-![playwright trace viewer](https://github.com/microsoft/playwright/assets/13063165/6d5885dc-d511-4c20-b728-040a7ef6cea4)
+![playwright trace viewer](../images/getting-started/trace-viewer-failed-test.png)
+
+## Properly handling Secrets
+
+Artifacts like trace files or console logs contain information about your test execution. They can contain sensitive data like user credentials for a test user, access tokens to a staging backend, testing source code, or sometimes even your application source code. Treat these files just as carefully as you treat that sensitive data. If you upload reports and traces as part of your CI workflow, make sure that you only upload them to trusted artifact stores, or that you encrypt the files before upload. The same is true for sharing artifacts with team members: Use a trusted file share or encrypt the files before sharing.
 
 ## Что дальше
 - [Узнайте, как использовать локаторы](./locators.mdx)

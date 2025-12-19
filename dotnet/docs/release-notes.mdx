@@ -7,6 +7,155 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+## Version 1.57
+
+### Chrome for Testing
+
+Starting with this release, Playwright switches from Chromium, to using [Chrome for Testing](https://developer.chrome.com/blog/chrome-for-testing/) builds. Both headed and headless browsers are subject to this. Your tests should still be passing after upgrading to Playwright 1.57.
+
+We're expecting no functional changes to come from this switch. The biggest change is the new icon and title in your toolbar.
+
+![new and old logo](../images/cft-logo-change.png)
+
+If you still see an unexpected behaviour change, please [file an issue](https://github.com/microsoft/playwright/issues/new).
+
+On Arm64 Linux, Playwright continues to use Chromium.
+
+### Breaking Change
+
+After 3 years of being deprecated, we removed `Page.Accessibility` from our API. Please use other libraries such as [Axe](https://www.deque.com/axe/) if you need to test page accessibility. See our Node.js [guide](https://playwright.dev/docs/accessibility-testing) for integration with Axe.
+
+### New APIs
+- [Worker.Console](/api/class-worker.mdx#worker-event-console) event is emitted when JavaScript within the worker calls one of console API methods, e.g. console.log or console.dir.
+- [Locator.Description](/api/class-locator.mdx#locator-description) returns locator description previously set with [Locator.Describe()](/api/class-locator.mdx#locator-describe).
+- New option [Steps](/api/class-locator.mdx#locator-click-option-steps) in [Locator.ClickAsync()](/api/class-locator.mdx#locator-click) and [Locator.DragToAsync()](/api/class-locator.mdx#locator-drag-to) that configures the number of `mousemove` events emitted while moving the mouse pointer to the target element.
+
+### Browser Versions
+- Chromium 143.0.7499.4
+- Mozilla Firefox 144.0.2
+- WebKit 26.0
+
+## Version 1.56
+
+### New APIs
+- New methods [Page.ConsoleMessagesAsync()](/api/class-page.mdx#page-console-messages) and [Page.PageErrorsAsync()](/api/class-page.mdx#page-page-errors) for retrieving the most recent console messages from the page
+- New method [Page.RequestsAsync()](/api/class-page.mdx#page-requests) for retrieving the most recent network requests from the page
+
+### Breaking Changes
+- Event [BrowserContext.BackgroundPage](/api/class-browsercontext.mdx#browser-context-event-background-page) has been deprecated and will not be emitted. Method [BrowserContext.BackgroundPages](/api/class-browsercontext.mdx#browser-context-background-pages) will return an empty list
+
+### Miscellaneous
+- Aria snapshots render and compare `input` `placeholder`
+
+### Browser Versions
+- Chromium 141.0.7390.37
+- Mozilla Firefox 142.0.1
+- WebKit 26.0
+
+## Version 1.55
+
+### Codegen
+- Automatic `ToBeVisibleAsync()` assertions: Codegen can now generate automatic `ToBeVisibleAsync()` assertions for common UI interactions. This feature can be enabled in the Codegen settings UI.
+
+### Breaking Changes
+- ⚠️ Dropped support for Chromium extension manifest v2.
+
+### Miscellaneous
+- Added support for Debian 13 "Trixie".
+- Added support for Xunit v3 as part of [`Microsoft.Playwright.Xunit.v3`](https://www.nuget.org/packages/Microsoft.Playwright.Xunit.v3)
+- Added support for MSTest v4 as part of [`Microsoft.Playwright.MSTest.v4`](https://www.nuget.org/packages/Microsoft.Playwright.MSTest.v4)
+
+### Browser Versions
+- Chromium 140.0.7339.16
+- Mozilla Firefox 141.0
+- WebKit 26.0
+
+This version was also tested against the following stable channels:
+- Google Chrome 139
+- Microsoft Edge 139
+
+## Version 1.54
+
+### Highlights
+- New cookie property `PartitionKey` in [BrowserContext.CookiesAsync()](/api/class-browsercontext.mdx#browser-context-cookies) and [BrowserContext.AddCookiesAsync()](/api/class-browsercontext.mdx#browser-context-add-cookies). This property allows to save and restore partitioned cookies. See [CHIPS MDN article](https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Privacy_sandbox/Partitioned_cookies) for more information. Note that browsers have different support and defaults for cookie partitioning.
+- New option `--user-data-dir` in multiple commands. You can specify the same user data dir to reuse browsing state, like authentication, between sessions.
+  
+  ```bash
+  pwsh bin/Debug/netX/playwright.ps1 codegen --user-data-dir=./user-data
+  ```
+  
+- `pwsh bin/Debug/netX/playwright.ps1 open` does not open the test recorder anymore. Use `pwsh bin/Debug/netX/playwright.ps1 codegen` instead.
+
+### Browser Versions
+- Chromium 139.0.7258.5
+- Mozilla Firefox 140.0.2
+- WebKit 26.0
+
+This version was also tested against the following stable channels:
+- Google Chrome 140
+- Microsoft Edge 140
+
+## Version 1.53
+
+### Trace Viewer and HTML Reporter Updates
+- New Steps in Trace Viewer: ![New Trace Viewer Steps](https://github.com/user-attachments/assets/1963ff7d-4070-41be-a79b-4333176921a2)
+- New method [Locator.Describe()](/api/class-locator.mdx#locator-describe) to describe a locator. Used for trace viewer.
+  
+  ```csharp
+  var button = Page.GetByTestId("btn-sub").Describe("Subscribe button");
+  await button.ClickAsync();
+  ```
+  
+- `pwsh bin/Debug/netX/playwright.ps1 install --list` will now list all installed browsers, versions and locations.
+
+### Browser Versions
+- Chromium 138.0.7204.4
+- Mozilla Firefox 139.0
+- WebKit 18.5
+
+This version was also tested against the following stable channels:
+- Google Chrome 137
+- Microsoft Edge 137
+
+## Version 1.52
+
+### Highlights
+- New method [Expect(Locator).ToContainClassAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-contain-class) to ergonomically assert individual class names on the element.
+  
+  ```csharp
+    await Expect(Page.GetByRole(AriaRole.Listitem, new() { Name = "Ship v1.52" })).ToContainClassAsync("done");
+  ```
+  
+- [Aria Snapshots](./aria-snapshots.mdx) got two new properties: [`/children`](./aria-snapshots.mdx#strict-matching) for strict matching and `/url` for links.
+  
+  ```csharp
+  await Expect(locator).ToMatchAriaSnapshotAsync(@"
+    - list
+      - /children: equal
+      - listitem: Feature A
+      - listitem:
+        - link ""Feature B"":
+          - /url: ""https://playwright.dev""
+  ");
+  ```
+  
+### Miscellaneous
+- New option [MaxRedirects](/api/class-apirequest.mdx#api-request-new-context-option-max-redirects) in [ApiRequest.NewContextAsync()](/api/class-apirequest.mdx#api-request-new-context) to control the maximum number of redirects.
+
+### Breaking Changes
+- Glob URL patterns in methods like [Page.RouteAsync()](/api/class-page.mdx#page-route) do not support `?` and `[]` anymore. We recommend using regular expressions instead.
+- Method [Route.ContinueAsync()](/api/class-route.mdx#route-continue) does not allow to override the `Cookie` header anymore. If a `Cookie` header is provided, it will be ignored, and the cookie will be loaded from the browser's cookie store. To set custom cookies, use [BrowserContext.AddCookiesAsync()](/api/class-browsercontext.mdx#browser-context-add-cookies).
+- macOS 13 is now deprecated and will no longer receive WebKit updates. Please upgrade to a more recent macOS version to continue benefiting from the latest WebKit improvements.
+
+### Browser Versions
+- Chromium 136.0.7103.25
+- Mozilla Firefox 137.0
+- WebKit 18.4
+
+This version was also tested against the following stable channels:
+- Google Chrome 135
+- Microsoft Edge 135
+
 ## Version 1.51
 
 ### Highlights
@@ -1438,7 +1587,6 @@ This version of Playwright was also tested against the following stable channels
 - Microsoft Edge 91
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -1504,6 +1652,7 @@ This version of Playwright was also tested against the following stable channels
 [Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1 "Action"
 [Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2 "Func"
 [IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable "IEnumerable"
+[IReadOnlyList]: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1?view=net-9.0 "IReadOnlyList"
 [IDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary "IDictionary"
 [Task]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-5.0 "Task"
 [IReadOnlyDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2 "IReadOnlyDictionary"

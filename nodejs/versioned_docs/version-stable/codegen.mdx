@@ -56,9 +56,9 @@ Playwright запишет ваши действия и сгенерирует к
 ### Генерация локаторов
 
 Вы можете генерировать локаторы с помощью генератора тестов.
-- Нажмите кнопку **Pick locator** на боковой панели тестирования, а затем наведите курсор на элементы в окне браузера, чтобы увидеть [локатор](./locators.mdx), выделенный под каждым элементом.
-- Нажмите на нужный элемент, и он появится в поле **Pick locator** в VS Code.
-- Нажмите <kbd>Enter</kbd> на клавиатуре, чтобы скопировать локатор в буфер обмена, а затем вставьте его в код. Или нажмите 'escape', если хотите отменить.
+- Нажмите кнопку **Pick locator** на боковой панели тестирования, затем наведите курсор на элементы в окне браузера, чтобы увидеть [локатор](./locators.mdx), подсвеченный под каждым элементом.
+- Нажмите на нужный элемент — и он появится в поле **Pick locator** в VS Code.
+- Нажмите <kbd>Enter</kbd>, чтобы скопировать локатор в буфер обмена, а затем вставьте его в нужное место в коде. Или нажмите 'escape', если хотите отменить.
 
 <img width="1641" alt="Pick locators in VS code" src="https://user-images.githubusercontent.com/13063165/220958368-95b03620-3c9b-40a8-be74-01c96ba03cad.png" />
 
@@ -184,6 +184,19 @@ npx playwright codegen --load-storage=auth.json github.com/microsoft/playwright
 ###### 
 <img width="1394" alt="github signed in showing use of load storage js" src="https://user-images.githubusercontent.com/13063165/220927873-9e55fdda-2def-45c1-9a1b-bcc851885f96.png" />
 
+#### Использовать существующий userDataDir
+
+Запустите `codegen` с `--user-data-dir`, чтобы задать фиксированный [каталог пользовательских данных](https://playwright.dev/docs/api/class-browsertype#browser-type-launch-persistent-context-option-user-data-dir) для сессии браузера. Если вы создадите собственный каталог пользовательских данных браузера, codegen будет использовать этот существующий профиль браузера и получит доступ к любому состоянию аутентификации, которое есть в этом профиле.
+
+:::warning
+
+[Начиная с Chrome 136, доступ к каталогу пользовательских данных по умолчанию невозможен через инструменты автоматизации](https://developer.chrome.com/blog/remote-debugging-port), такие как Playwright. Для тестирования необходимо создать отдельный каталог пользовательских данных.
+:::
+
+```bash
+npx playwright codegen --user-data-dir=/path/to/your/browser/data/ github.com/microsoft/playwright
+```
+
 ## Запись с использованием нестандартной настройки
 
 Если вы хотите использовать codegen в какой-то нестандартной настройке (например, использовать [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route)), можно вызвать [page.pause()](/api/class-page.mdx#page-pause), который откроет отдельное окно с элементами управления codegen.
@@ -205,7 +218,6 @@ const { chromium } = require('@playwright/test');
 })();
 ```
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

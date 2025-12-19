@@ -47,9 +47,9 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Setup dotnet
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: 8.0.x
     - name: Build & Install
@@ -76,12 +76,12 @@ jobs:
     name: 'Playwright Tests'
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright/dotnet:v1.50.0-noble
+      image: mcr.microsoft.com/playwright/dotnet:v1.56.0-noble
       options: --user 1001
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.0.x
       - run: dotnet build
@@ -103,9 +103,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.deployment_status.state == 'success'
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Setup dotnet
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: 8.0.x
     - run: dotnet build
@@ -120,12 +120,7 @@ jobs:
 
 ### Docker
 
-У нас есть [предварительно собранный Docker-образ](./docker.mdx), который можно использовать напрямую или в качестве примера для обновления ваших существующих Docker-определений.
-
-Рекомендуемая конфигурация:
-1. Использование `--ipc=host` также рекомендуется при использовании Chromium. Без этого Chromium может исчерпать память и завершиться с ошибкой. Узнайте больше об этой опции в [документации Docker](https://docs.docker.com/reference/cli/docker/container/run/#ipc).
-1. Видите другие странные ошибки при запуске Chromium? Попробуйте запустить ваш контейнер с `docker run --cap-add=SYS_ADMIN` при локальной разработке.
-1. Использование флага Docker `--init` или [dumb-init](https://github.com/Yelp/dumb-init) рекомендуется, чтобы избежать специального обращения с процессами с PID=1. Это частая причина появления зомби-процессов.
+У нас есть [готовый Docker-образ](./docker.mdx), который можно использовать напрямую или взять как ориентир, чтобы обновить ваши существующие Docker-определения. Обязательно следуйте [рекомендуемой конфигурации Docker](./docker.mdx#recommended-docker-configuration), чтобы обеспечить лучшую производительность.
 
 ### Azure Pipelines
 
@@ -164,7 +159,7 @@ trigger:
 
 pool:
   vmImage: ubuntu-latest
-container: mcr.microsoft.com/playwright/dotnet:v1.50.0-noble
+container: mcr.microsoft.com/playwright/dotnet:v1.56.0-noble
 
 steps:
 - task: UseDotNet@2
@@ -187,7 +182,7 @@ steps:
 executors:
   pw-noble-development:
     docker:
-      - image: mcr.microsoft.com/playwright/dotnet:v1.50.0-noble
+      - image: mcr.microsoft.com/playwright/dotnet:v1.56.0-noble
 ```
 
 Примечание: При использовании определения агента docker вы указываете класс ресурсов, где Playwright запускается на уровне 'medium' [здесь](https://circleci.com/docs/configuration-reference?#docker-execution-environment). Поведение Playwright по умолчанию - устанавливать количество рабочих процессов в соответствии с обнаруженным количеством ядер (2 в случае уровня medium). Переопределение количества рабочих процессов на большее значение приведет к ненужным тайм-аутам и сбоям.
@@ -198,7 +193,7 @@ Jenkins поддерживает Docker-агенты для конвейеров
 
 ```groovy
 pipeline {
-   agent { docker { image 'mcr.microsoft.com/playwright/dotnet:v1.50.0-noble' } }
+   agent { docker { image 'mcr.microsoft.com/playwright/dotnet:v1.56.0-noble' } }
    stages {
       stage('e2e-tests') {
          steps {
@@ -215,7 +210,7 @@ pipeline {
 Bitbucket Pipelines может использовать публичные [Docker-образы как среды сборки](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). Чтобы запустить тесты Playwright на Bitbucket, используйте наш публичный Docker-образ ([см. Dockerfile](./docker.mdx)).
 
 ```yml
-image: mcr.microsoft.com/playwright/dotnet:v1.50.0-noble
+image: mcr.microsoft.com/playwright/dotnet:v1.56.0-noble
 ```
 
 ### GitLab CI
@@ -247,7 +242,6 @@ xvfb-run dotnet test
 ```
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -313,6 +307,7 @@ xvfb-run dotnet test
 [Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1 "Action"
 [Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2 "Func"
 [IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable "IEnumerable"
+[IReadOnlyList]: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1?view=net-9.0 "IReadOnlyList"
 [IDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary "IDictionary"
 [Task]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-5.0 "Task"
 [IReadOnlyDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2 "IReadOnlyDictionary"

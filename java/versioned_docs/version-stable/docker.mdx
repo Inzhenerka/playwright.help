@@ -22,7 +22,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 ### Загрузка образа
 
 ```bash
-docker pull mcr.microsoft.com/playwright/java:v1.50.0-noble
+docker pull mcr.microsoft.com/playwright/java:v1.56.0-noble
 ```
 
 ### Запуск образа
@@ -34,7 +34,7 @@ docker pull mcr.microsoft.com/playwright/java:v1.50.0-noble
 На доверенных веб-сайтах вы можете избежать создания отдельного пользователя и использовать root, так как вы доверяете коду, который будет выполняться в браузерах.
 
 ```bash
-docker run -it --rm --ipc=host mcr.microsoft.com/playwright/java:v1.50.0-noble /bin/bash
+docker run -it --rm --ipc=host mcr.microsoft.com/playwright/java:v1.56.0-noble /bin/bash
 ```
 
 #### Обход и скрейпинг
@@ -42,7 +42,7 @@ docker run -it --rm --ipc=host mcr.microsoft.com/playwright/java:v1.50.0-noble /
 На ненадежных веб-сайтах рекомендуется использовать отдельного пользователя для запуска браузеров в сочетании с профилем seccomp. Внутри контейнера или если вы используете Docker-образ как базовый образ, вам нужно использовать `adduser` для этого.
 
 ```bash
-docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_profile.json mcr.microsoft.com/playwright/java:v1.50.0-noble /bin/bash
+docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_profile.json mcr.microsoft.com/playwright/java:v1.56.0-noble /bin/bash
 ```
 
 [`seccomp_profile.json`](https://github.com/microsoft/playwright/blob/main/utils/docker/seccomp_profile.json) необходим для запуска Chromium с песочницей. Это [профиль seccomp по умолчанию для Docker](https://github.com/docker/engine/blob/d0d99b04cf6e00ed3fc27e81fc3d94e7eda70af3/profiles/seccomp/default.json) с дополнительными разрешениями на клонирование пространства имен пользователя:
@@ -62,9 +62,12 @@ docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_prof
 }
 ```
 
-:::note
-Использование `--ipc=host` рекомендуется при использовании Chrome ([документация Docker](https://docs.docker.com/engine/reference/run/#ipc-settings---ipc)). Chrome может исчерпать память без этого флага.
-:::
+### Рекомендуемая конфигурация Docker
+
+При запуске Playwright в Docker рекомендуется следующая конфигурация:
+1. **Использовать флаг Docker [`--init`](https://docs.docker.com/reference/cli/docker/container/run/#init)** — он помогает избежать особой обработки процессов с PID=1, что является частой причиной появления зомби-процессов.
+1. **Использовать `--ipc=host`** при работе с Chromium. Без этого параметра Chromium может столкнуться с нехваткой памяти и аварийно завершиться. Подробнее об этом параметре — в [документации Docker](https://docs.docker.com/reference/cli/docker/container/run/#ipc).
+1. **Если при запуске Chromium возникают странные ошибки**, попробуйте при локальной разработке запускать контейнер с параметром `docker run --cap-add=SYS_ADMIN`.
 
 ### Использование на CI
 
@@ -79,7 +82,7 @@ docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_prof
 Запустите Playwright Server в Docker:
 
 ```bash
-docker run -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.50.0-noble /bin/sh -c "npx -y playwright@1.50.0 run-server --port 3000 --host 0.0.0.0"
+docker run -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.56.0-noble /bin/sh -c "npx -y playwright@1.56.0 run-server --port 3000 --host 0.0.0.0"
 ```
 
 #### Подключение к серверу
@@ -104,7 +107,7 @@ public class App {
 Если вам нужно получить доступ к локальным серверам из контейнера Docker:
 
 ```bash
-docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.50.0-noble /bin/sh -c "npx -y playwright@1.50.0 run-server --port 3000 --host 0.0.0.0"
+docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.56.0-noble /bin/sh -c "npx -y playwright@1.56.0 run-server --port 3000 --host 0.0.0.0"
 ```
 
 Это делает `hostmachine` указывающим на localhost хоста. Ваши тесты должны использовать `hostmachine` вместо `localhost` при доступе к локальным серверам.
@@ -119,9 +122,9 @@ docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --wo
 Смотрите [все доступные теги образов].
 
 В настоящее время мы публикуем образы со следующими тегами:
-- `:v1.50.0` - Docker-образ релиза Playwright v1.50.0 на основе Ubuntu 24.04 LTS (Noble Numbat).
-- `:v1.50.0-noble` - Docker-образ релиза Playwright v1.50.0 на основе Ubuntu 24.04 LTS (Noble Numbat).
-- `:v1.50.0-jammy` - Docker-образ релиза Playwright v1.50.0 на основе Ubuntu 22.04 LTS (Jammy Jellyfish).
+- `:v1.56.0` — Docker-образ релиза Playwright v1.56.0 на базе Ubuntu 24.04 LTS (Noble Numbat).
+- `:v1.56.0-noble` — Docker-образ релиза Playwright v1.56.0 на базе Ubuntu 24.04 LTS (Noble Numbat).
+- `:v1.56.0-jammy` — Docker-образ релиза Playwright v1.56.0 на базе Ubuntu 22.04 LTS (Jammy Jellyfish).
 
 :::note
 

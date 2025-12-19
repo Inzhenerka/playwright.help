@@ -37,7 +37,7 @@ foreach (var li in await page.GetByRole("listitem").AllAsync())
 ```
 
 **Возвращает**
-- [IEnumerable]&lt;[Locator]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-all-return"/><a href="#locator-all-return" class="list-anchor">#</a>
+- [IReadOnlyList]&lt;[Locator]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-all-return"/><a href="#locator-all-return" class="list-anchor">#</a>
 
 ---
 
@@ -59,7 +59,7 @@ var texts = await page.GetByRole(AriaRole.Link).AllInnerTextsAsync();
 ```
 
 **Возвращает**
-- [IEnumerable]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-all-inner-texts-return"/><a href="#locator-all-inner-texts-return" class="list-anchor">#</a>
+- [IReadOnlyList]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-all-inner-texts-return"/><a href="#locator-all-inner-texts-return" class="list-anchor">#</a>
 
 ---
 
@@ -81,7 +81,7 @@ var texts = await page.GetByRole(AriaRole.Link).AllTextContentsAsync();
 ```
 
 **Возвращает**
-- [IEnumerable]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-all-text-contents-return"/><a href="#locator-all-text-contents-return" class="list-anchor">#</a>
+- [IReadOnlyList]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-all-text-contents-return"/><a href="#locator-all-text-contents-return" class="list-anchor">#</a>
 
 ---
 
@@ -379,8 +379,11 @@ await page.Locator("canvas").ClickAsync(new() {
     - `Y` [float]
       
       
-    Точка для использования относительно верхнего левого угла элемента. Если не указано, используется видимая точка элемента.
-  - `Timeout` [float]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-click-option-timeout"/><a href="#locator-click-option-timeout" class="list-anchor">#</a>
+    A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `Steps` [int]? *(optional)* <font size="2">Added in: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-click-option-steps"/><a href="#locator-click-option-steps" class="list-anchor">#</a>
+    
+    Defaults to 1. Sends `n` interpolated `mousemove` events to represent travel between Playwright's current cursor position and the provided destination. When set to 1, emits a single `mousemove` event at the destination location.
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-click-option-timeout"/><a href="#locator-click-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить с помощью методов [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
   - `Trial` [bool]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-click-option-trial"/><a href="#locator-click-option-trial" class="list-anchor">#</a>
@@ -491,8 +494,11 @@ await Locator.DblClickAsync(options);
     - `Y` [float]
       
       
-    Точка для использования относительно верхнего левого угла элемента. Если не указано, используется видимая точка элемента.
-  - `Timeout` [float]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-dblclick-option-timeout"/><a href="#locator-dblclick-option-timeout" class="list-anchor">#</a>
+    A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `Steps` [int]? *(optional)* <font size="2">Added in: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-dblclick-option-steps"/><a href="#locator-dblclick-option-steps" class="list-anchor">#</a>
+    
+    Defaults to 1. Sends `n` interpolated `mousemove` events to represent travel between Playwright's current cursor position and the provided destination. When set to 1, emits a single `mousemove` event at the destination location.
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-dblclick-option-timeout"/><a href="#locator-dblclick-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить с помощью методов [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
   - `Trial` [bool]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-dblclick-option-trial"/><a href="#locator-dblclick-option-trial" class="list-anchor">#</a>
@@ -517,6 +523,50 @@ await Locator.DblClickAsync(options);
 
 `element.dblclick()` генерирует два события `click` и одно событие `dblclick`.
 :::
+
+---
+
+### Describe {#locator-describe}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.53</font><x-search>locator.Describe</x-search>
+
+Describes the locator, description is used in the trace viewer and reports. Returns the locator pointing to the same element.
+
+**Usage**
+
+```csharp
+var button = Page.GetByTestId("btn-sub").Describe("Subscribe button");
+await button.ClickAsync();
+```
+
+**Arguments**
+- `description` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-describe-option-description"/><a href="#locator-describe-option-description" class="list-anchor">#</a>
+  
+  Locator description.
+
+**Returns**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-describe-return"/><a href="#locator-describe-return" class="list-anchor">#</a>
+
+---
+
+### Description {#locator-description}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.57</font><x-search>locator.Description</x-search>
+
+Returns locator description previously set with [Locator.Describe()](/api/class-locator.mdx#locator-describe). Returns `null` if no custom description has been set. Prefer `Locator.toString()` for a human-readable representation, as it uses the description when available.
+
+**Usage**
+
+```csharp
+var button = Page.GetByRole(AriaRole.Button).Describe("Subscribe button");
+Console.WriteLine(button.Description()); // "Subscribe button"
+
+var input = Page.GetByRole(AriaRole.Textbox);
+Console.WriteLine(input.Description()); // null
+```
+
+**Returns**
+- [string]?<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-description-return"/><a href="#locator-description-return" class="list-anchor">#</a>
 
 ---
 
@@ -621,8 +671,11 @@ await source.DragToAsync(target, new()
     - `Y` [float]
       
       
-    Кликает на исходный элемент в этой точке относительно верхнего левого угла рамки элемента. Если не указано, используется видимая точка элемента.
-  - `TargetPosition` TargetPosition? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drag-to-option-target-position"/><a href="#locator-drag-to-option-target-position" class="list-anchor">#</a>
+    Clicks on the source element at this point relative to the top-left corner of the element's padding box. If not specified, some visible point of the element is used.
+  - `Steps` [int]? *(optional)* <font size="2">Added in: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drag-to-option-steps"/><a href="#locator-drag-to-option-steps" class="list-anchor">#</a>
+    
+    Defaults to 1. Sends `n` interpolated `mousemove` events to represent travel between the `mousedown` and `mouseup` of the drag. When set to 1, emits a single `mousemove` event at the destination location.
+  - `TargetPosition` TargetPosition? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drag-to-option-target-position"/><a href="#locator-drag-to-option-target-position" class="list-anchor">#</a>
     - `X` [float]
       
       
@@ -654,6 +707,13 @@ await source.DragToAsync(target, new()
 
 **Использование**
 
+Passing argument to [expression](/api/class-locator.mdx#locator-evaluate-option-expression):
+
+```csharp
+var result = await page.GetByTestId("myId").EvaluateAsync<string>("(element, [x, y]) => element.textContent + ' ' + x * y)", new[] { 7, 8 });
+Console.WriteLine(result); // prints "myId text 56"
+```
+
 **Аргументы**
 - `expression` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-option-expression"/><a href="#locator-evaluate-option-expression" class="list-anchor">#</a>
   
@@ -664,7 +724,7 @@ await source.DragToAsync(target, new()
 - `options` `LocatorEvaluateOptions?` *(опционально)*
   - `Timeout` [float]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-option-timeout"/><a href="#locator-evaluate-option-timeout" class="list-anchor">#</a>
     
-    Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Установите `0`, чтобы отключить таймаут. Значение по умолчанию можно изменить, используя методы [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+    Максимальное время ожидания локатора перед выполнением вычисления (evaluation), в миллисекундах. Обратите внимание: после того как локатор будет найден, само вычисление таймаутом не ограничивается. Значение по умолчанию — `30000` (30 секунд). Укажите `0`, чтобы отключить таймаут.
 
 **Возвращает**
 - [object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-return"/><a href="#locator-evaluate-return" class="list-anchor">#</a>
@@ -735,7 +795,7 @@ await Locator.EvaluateHandleAsync(expression, arg, options);
 - `options` `LocatorEvaluateHandleOptions?` *(опционально)*
   - `Timeout` [float]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-handle-option-timeout"/><a href="#locator-evaluate-handle-option-timeout" class="list-anchor">#</a>
     
-    Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Установите `0`, чтобы отключить таймаут. Значение по умолчанию можно изменить, используя методы [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+    Максимальное время ожидания локатора перед выполнением вычисления (evaluation), в миллисекундах. Обратите внимание: после того как локатор будет найден, само вычисление таймаутом не ограничивается. Значение по умолчанию — `30000` (30 секунд). Укажите `0`, чтобы отключить таймаут.
 
 **Возвращает**
 - [JSHandle]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-handle-return"/><a href="#locator-evaluate-handle-return" class="list-anchor">#</a>
@@ -1997,7 +2057,7 @@ await element.SelectOptionAsync(new[] { "red", "green", "blue" });
     Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Установите `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
 **Возвращает**
-- [IEnumerable]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-option-return"/><a href="#locator-select-option-return" class="list-anchor">#</a>
+- [IReadOnlyList]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-option-return"/><a href="#locator-select-option-return" class="list-anchor">#</a>
 
 **Детали**
 
@@ -2399,7 +2459,7 @@ await Locator.ElementHandlesAsync();
 ```
 
 **Возвращает**
-- [IEnumerable]&lt;[ElementHandle]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-element-handles-return"/><a href="#locator-element-handles-return" class="list-anchor">#</a>
+- [IReadOnlyList]&lt;[ElementHandle]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-element-handles-return"/><a href="#locator-element-handles-return" class="list-anchor">#</a>
 
 ---
 
@@ -2444,7 +2504,6 @@ await Locator.ElementHandlesAsync();
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-type-return"/><a href="#locator-type-return" class="list-anchor">#</a>
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -2510,6 +2569,7 @@ await Locator.ElementHandlesAsync();
 [Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1 "Action"
 [Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2 "Func"
 [IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable "IEnumerable"
+[IReadOnlyList]: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1?view=net-9.0 "IReadOnlyList"
 [IDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary "IDictionary"
 [Task]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-5.0 "Task"
 [IReadOnlyDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2 "IReadOnlyDictionary"

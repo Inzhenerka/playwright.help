@@ -8,7 +8,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Введение
 
-Тесты Playwright могут выполняться на любом провайдере CI. В этом разделе мы рассмотрим запуск тестов на GitHub с использованием GitHub Actions. Если вы хотите узнать, как настроить других провайдеров CI, ознакомьтесь с нашей подробной документацией по непрерывной интеграции.
+Тесты Playwright можно запускать у любого CI-провайдера. В этом разделе мы рассмотрим запуск тестов на GitHub с помощью GitHub Actions. Если вы хотите узнать, как настроить других CI-провайдеров, посмотрите нашу подробную [документацию по Continuous Integration](./ci.mdx).
 
 #### Вы узнаете
 - [Как настроить GitHub Actions](/ci-intro.mdx#setting-up-github-actions)
@@ -17,7 +17,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Настройка GitHub Actions
 
-Чтобы добавить файл [GitHub Actions](https://docs.github.com/en/actions), сначала создайте папку `.github/workflows` и внутри нее добавьте файл `playwright.yml`, содержащий пример кода ниже, чтобы ваши тесты запускались при каждом push и pull request для основной/мастер-ветки.
+Чтобы добавить файл для [GitHub Actions](https://docs.github.com/en/actions), сначала создайте папку `.github/workflows`, а затем добавьте в неё файл `playwright.yml` с примером кода ниже, чтобы ваши тесты запускались при каждом push и pull request в ветку main/master.
 
 ```yml title=".github/workflows/playwright.yml"
 name: Playwright Tests
@@ -31,11 +31,11 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v6
       with:
-        python-version: '3.11'
+        python-version: '3.13'
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -53,35 +53,43 @@ jobs:
 
 Чтобы узнать больше об этом, см. ["Понимание GitHub Actions"](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions).
 
-Рассматривая список шагов в `jobs.test.steps`, вы можете увидеть, что рабочий процесс выполняет следующие шаги:
-1. Клонирование вашего репозитория 2. Установка зависимостей языка 3. Установка зависимостей проекта и сборка 4. Установка браузеров Playwright 5. Запуск тестов
+Посмотрев на список шагов в `jobs.test.steps`, можно увидеть, что workflow выполняет следующие шаги:
+1. Клонирует ваш репозиторий
+1. Устанавливает зависимости языка
+1. Устанавливает зависимости проекта и выполняет сборку
+1. Устанавливает браузеры Playwright
+1. Запускает тесты
 
 ## Создание репозитория и отправка на GitHub
 
-После того как вы настроили [GitHub actions workflow](#setting-up-github-actions), все, что вам нужно сделать, это [создать репозиторий на GitHub](https://docs.github.com/en/get-started/quickstart/create-a-repo) или отправить ваш код в существующий репозиторий. Следуйте инструкциям на GitHub и не забудьте [инициализировать git-репозиторий](https://github.com/git-guides/git-init) с помощью команды `git init`, чтобы вы могли [добавить](https://github.com/git-guides/git-add), [зафиксировать](https://github.com/git-guides/git-commit) и [отправить](https://github.com/git-guides/git-push) ваш код.
+После того как вы настроите [workflow GitHub Actions](#setting-up-github-actions), останется только [создать репозиторий на GitHub](https://docs.github.com/en/get-started/quickstart/create-a-repo) или отправить код в уже существующий репозиторий. Следуйте инструкциям GitHub и не забудьте [инициализировать git-репозиторий](https://github.com/git-guides/git-init) командой `git init`, чтобы затем вы могли [добавлять](https://github.com/git-guides/git-add), [коммитить](https://github.com/git-guides/git-commit) и [пушить](https://github.com/git-guides/git-push) свой код.
 
 ###### 
 <img width="861" alt="Создание репозитория и отправка на GitHub" src="https://user-images.githubusercontent.com/13063165/183423254-d2735278-a2ab-4d63-bb99-48d8e5e447bc.png"/>
 
 ## Открытие рабочих процессов
 
-Нажмите на вкладку **Actions**, чтобы увидеть рабочие процессы. Здесь вы увидите, прошли ли ваши тесты или нет.
+Перейдите на вкладку **Actions**, чтобы увидеть workflow. Там вы увидите, прошли ли ваши тесты или упали.
 
 ###### 
 ![открытие рабочего процесса](https://user-images.githubusercontent.com/13063165/183423783-58bf2008-514e-4f96-9c12-c9a55703960c.png)
 
 ## Просмотр логов тестов
 
-Нажатие на выполнение рабочего процесса покажет вам все действия, которые GitHub выполнил, а нажатие на **Run Playwright tests** покажет сообщения об ошибках, что ожидалось и что было получено, а также журнал вызовов.
+Клик по запуску workflow покажет все действия, которые выполнил GitHub, а клик по **Run Playwright tests** — сообщения об ошибках, что ожидалось и что было получено, а также лог вызовов.
 
 ###### 
 ![Просмотр логов тестов](https://user-images.githubusercontent.com/13063165/183423783-58bf2008-514e-4f96-9c12-c9a55703960c.png)
 
 ## Просмотр трассировки
 
-[trace.playwright.dev](https://trace.playwright.dev) - это статически размещенный вариант Trace Viewer. Вы можете загружать файлы трассировки, используя перетаскивание.
+[trace.playwright.dev](https://trace.playwright.dev) — это статически размещённый вариант Trace Viewer. Вы можете загружать файлы трассировки, используя перетаскивание.
 
-![просмотр трассировки playwright](https://github.com/microsoft/playwright/assets/13063165/6d5885dc-d511-4c20-b728-040a7ef6cea4)
+![playwright trace viewer](../images/getting-started/trace-viewer-failed-test.png)
+
+## Правильная работа с секретами
+
+Артефакты вроде файлов трассировки или логов консоли содержат информацию о выполнении ваших тестов. Они могут содержать чувствительные данные: учётные данные тестового пользователя, токены доступа к staging-бэкенду, исходники тестов, а иногда даже исходный код вашего приложения. Обращайтесь с этими файлами так же осторожно, как и с этими чувствительными данными. Если вы загружаете отчёты и трассы как часть CI-workflow, убедитесь, что вы загружаете их только в доверенные хранилища артефактов или шифруете файлы перед загрузкой. То же касается обмена артефактами с коллегами: используйте доверенный файлообменник или шифруйте файлы перед отправкой.
 
 ## Что дальше
 - [Узнайте, как использовать локаторы](./locators.mdx)
@@ -92,7 +100,6 @@ jobs:
 - [Узнайте больше о запуске тестов на других провайдерах CI](/ci.mdx)
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"

@@ -10,10 +10,12 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 :::note
 
-Расширения работают только в Chrome / Chromium, запущенном с постоянным контекстом. Используйте пользовательские аргументы браузера на свой страх и риск, так как некоторые из них могут нарушить функциональность Playwright.
+Расширения работают в Chromium только при запуске с постоянным контекстом (persistent context). Используйте пользовательские аргументы браузера на свой риск, так как некоторые из них могут нарушить работу Playwright.
+
+Google Chrome и Microsoft Edge [удалили флаги командной строки, необходимые для сайдлоада расширений](https://groups.google.com/a/chromium.org/g/chromium-extensions/c/FxMU1TvxWWg/m/daZVTYNlBQAJ), поэтому используйте Chromium, который поставляется вместе с Playwright.
 :::
 
-Пример ниже извлекает [фоновую страницу](https://developer.chrome.com/extensions/background_pages) расширения [Manifest v2](https://developer.chrome.com/docs/extensions/mv2/), исходный код которого находится в `./my-extension`.
+Фрагмент ниже получает [service worker](https://developer.chrome.com/docs/extensions/develop/concepts/service-workers) расширения [Manifest v3](https://developer.chrome.com/docs/extensions/develop/migrate), исходники которого находятся в `./my-extension`.
 
 Обратите внимание на использование канала `chromium`, который позволяет запускать расширения в безголовом режиме. В качестве альтернативы, вы можете запустить браузер в обычном режиме.
 
@@ -30,11 +32,11 @@ const { chromium } = require('playwright');
       `--load-extension=${pathToExtension}`
     ]
   });
-  let [backgroundPage] = browserContext.backgroundPages();
-  if (!backgroundPage)
-    backgroundPage = await browserContext.waitForEvent('backgroundpage');
+  let [serviceWorker] = browserContext.serviceWorkers();
+  if (!serviceWorker)
+    serviceWorker = await browserContext.waitForEvent('serviceworker');
 
-  // Тестируйте фоновую страницу так же, как и любую другую страницу.
+  // Тестируйте service worker так же, как и любой другой worker.
   await browserContext.close();
 })();
 ```
@@ -68,19 +70,12 @@ export const test = base.extend<{
     await context.close();
   },
   extensionId: async ({ context }, use) => {
-    /*
-    // для manifest v2:
-    let [background] = context.backgroundPages()
-    if (!background)
-      background = await context.waitForEvent('backgroundpage')
-    */
-
     // для manifest v3:
-    let [background] = context.serviceWorkers();
-    if (!background)
-      background = await context.waitForEvent('serviceworker');
+    let [serviceWorker] = context.serviceWorkers();
+    if (!serviceWorker)
+      serviceWorker = await context.waitForEvent('serviceworker');
 
-    const extensionId = background.url().split('/')[2];
+    const extensionId = serviceWorker.url().split('/')[2];
     await use(extensionId);
   },
 });
@@ -104,7 +99,6 @@ test('popup page', async ({ page, extensionId }) => {
 ```
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

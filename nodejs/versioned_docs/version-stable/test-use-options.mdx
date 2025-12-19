@@ -1,6 +1,6 @@
 ---
 id: test-use-options
-title: "Опции использования тестов"
+title: "Конфигурация (use)"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -192,7 +192,7 @@ export default defineConfig({
 
 ### Дополнительные опции браузера и контекста
 
-Любые опции, принимаемые [browserType.launch()](/api/class-browsertype.mdx#browser-type-launch) или [browser.newContext()](/api/class-browser.mdx#browser-new-context), могут быть помещены в `launchOptions` или `contextOptions` соответственно в разделе `use`.
+Любые опции, поддерживаемые [browserType.launch()](/api/class-browsertype.mdx#browser-type-launch), [browser.newContext()](/api/class-browser.mdx#browser-new-context) или [browserType.connect()](/api/class-browsertype.mdx#browser-type-connect), можно указать в секции `use` — соответственно в `launchOptions`, `contextOptions` или `connectOptions`.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -296,8 +296,58 @@ test.describe('french language block', () => {
 });
 ```
 
+### Reset an option
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+You can reset an option to the value defined in the config file. Consider the following config that sets a `baseURL`:
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    baseURL: 'https://playwright.dev',
+  },
+});
+```
+
+You can now configure `baseURL` for a file, and also opt-out for a single test.
+
+```js title="intro.spec.ts"
+import { test } from '@playwright/test';
+
+// Configure baseURL for this file.
+test.use({ baseURL: 'https://playwright.dev/docs/intro' });
+
+test('check intro contents', async ({ page }) => {
+  // This test will use "https://playwright.dev/docs/intro" base url as defined above.
+});
+
+test.describe(() => {
+  // Reset the value to a config-defined one.
+  test.use({ baseURL: undefined });
+
+  test('can navigate to intro from the home page', async ({ page }) => {
+    // This test will use "https://playwright.dev" base url as defined in the config.
+  });
+});
+```
+
+If you would like to completely reset the value to `undefined`, use a long-form fixture notation.
+
+```js title="intro.spec.ts"
+import { test } from '@playwright/test';
+
+// Completely unset baseURL for this file.
+test.use({
+  baseURL: [async ({}, use) => use(undefined), { scope: 'test' }],
+});
+
+test('no base url', async ({ page }) => {
+  // This test will not have a base url.
+});
+```
+
+
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

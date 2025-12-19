@@ -63,8 +63,8 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - uses: actions/checkout@v5
+    - uses: actions/setup-node@v6
       with:
         node-version: lts/*
     - name: Install dependencies
@@ -73,7 +73,7 @@ jobs:
       run: npx playwright install --with-deps
     - name: Run Playwright tests
       run: npx playwright test
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       if: ${{ !cancelled() }}
       with:
         name: playwright-report
@@ -101,11 +101,11 @@ jobs:
     name: 'Playwright Tests'
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.51.0-noble
+      image: mcr.microsoft.com/playwright:v1.57.0-noble
       options: --user 1001
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: lts/*
       - name: Install dependencies
@@ -128,8 +128,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.deployment_status.state == 'success'
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - uses: actions/checkout@v5
+    - uses: actions/setup-node@v6
       with:
         node-version: lts/*
     - name: Install dependencies
@@ -158,12 +158,12 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         # Принудительно выполнить полную проверку, чтобы мы могли ссылаться на $GITHUB_BASE_REF.
         # Подробнее см. на https://github.com/actions/checkout.
         fetch-depth: 0
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v6
       with:
         node-version: lts/*
     - name: Install dependencies
@@ -175,7 +175,7 @@ jobs:
       if: github.event_name == 'pull_request'
     - name: Run Playwright tests
       run: npx playwright test
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       if: ${{ !cancelled() }}
       with:
         name: playwright-report
@@ -185,12 +185,7 @@ jobs:
 
 ### Docker
 
-У нас есть [предварительно собранный Docker-образ](./docker.mdx), который можно использовать напрямую или в качестве примера для обновления ваших существующих определений Docker.
-
-Рекомендуемая конфигурация
-1. Использование `--ipc=host` также рекомендуется при использовании Chromium. Без этого Chromium может закончиться память и он может аварийно завершиться. Узнайте больше об этой опции в [документации Docker](https://docs.docker.com/reference/cli/docker/container/run/#ipc).
-1. Видите другие странные ошибки при запуске Chromium? Попробуйте запустить ваш контейнер с `docker run --cap-add=SYS_ADMIN` при локальной разработке.
-1. Использование флага Docker `--init` или [dumb-init](https://github.com/Yelp/dumb-init) рекомендуется для избежания специального обращения с процессами с PID=1. Это частая причина появления зомби-процессов.
+У нас есть [готовый Docker-образ](./docker.mdx), который можно использовать напрямую или как ориентир при обновлении ваших текущих Docker-конфигураций. Обязательно следуйте [рекомендуемой конфигурации Docker](./docker.mdx#recommended-docker-configuration), чтобы обеспечить наилучшую производительность.
 
 ### Azure Pipelines
 
@@ -208,9 +203,9 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- task: NodeTool@0
+- task: UseNode@1
   inputs:
-    versionSpec: '18'
+    version: '22'
   displayName: 'Install Node.js'
 - script: npm ci
   displayName: 'npm ci'
@@ -234,9 +229,9 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- task: NodeTool@0
+- task: UseNode@1
   inputs:
-    versionSpec: '18'
+    version: '22'
   displayName: 'Install Node.js'
 
 - script: npm ci
@@ -317,9 +312,9 @@ strategy:
       project: webkit
       shard: 3/3
 steps:
-- task: NodeTool@0
+- task: UseNode@1
   inputs:
-    versionSpec: '18'
+    version: '22'
   displayName: 'Install Node.js'
 
 - script: npm ci
@@ -340,12 +335,12 @@ trigger:
 
 pool:
   vmImage: ubuntu-latest
-container: mcr.microsoft.com/playwright:v1.51.0-noble
+container: mcr.microsoft.com/playwright:v1.57.0-noble
 
 steps:
-- task: NodeTool@0
+- task: UseNode@1
   inputs:
-    versionSpec: '18'
+    version: '22'
   displayName: 'Install Node.js'
 
 - script: npm ci
@@ -364,7 +359,7 @@ steps:
 executors:
   pw-noble-development:
     docker:
-      - image: mcr.microsoft.com/playwright:v1.51.0-noble
+      - image: mcr.microsoft.com/playwright:v1.57.0-noble
 ```
 
 Примечание: При использовании определения агента docker вы указываете класс ресурсов, где playwright запускается на уровне 'medium' [здесь](https://circleci.com/docs/configuration-reference?#docker-execution-environment). Поведение Playwright по умолчанию - устанавливать количество рабочих процессов в соответствии с обнаруженным количеством ядер (2 в случае уровня medium). Переопределение количества рабочих процессов на большее значение приведёт к ненужным тайм-аутам и сбоям.
@@ -387,7 +382,7 @@ Jenkins поддерживает Docker-агенты для конвейеров
 
 ```groovy
 pipeline {
-   agent { docker { image 'mcr.microsoft.com/playwright:v1.51.0-noble' } }
+   agent { docker { image 'mcr.microsoft.com/playwright:v1.57.0-noble' } }
    stages {
       stage('e2e-tests') {
          steps {
@@ -404,7 +399,7 @@ pipeline {
 Bitbucket Pipelines может использовать публичные [Docker-образы как среды сборки](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). Чтобы запустить тесты Playwright на Bitbucket, используйте наш публичный Docker-образ ([см. Dockerfile](./docker.mdx)).
 
 ```yml
-image: mcr.microsoft.com/playwright:v1.51.0-noble
+image: mcr.microsoft.com/playwright:v1.57.0-noble
 ```
 
 ### GitLab CI
@@ -417,7 +412,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.51.0-noble
+  image: mcr.microsoft.com/playwright:v1.57.0-noble
   script:
   ...
 ```
@@ -432,7 +427,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.51.0-noble
+  image: mcr.microsoft.com/playwright:v1.57.0-noble
   parallel: 7
   script:
     - npm ci
@@ -447,7 +442,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.51.0-noble
+  image: mcr.microsoft.com/playwright:v1.57.0-noble
   parallel:
     matrix:
       - PROJECT: ['chromium', 'webkit']
@@ -463,7 +458,7 @@ tests:
 
 ```yml
 steps:
-- name: mcr.microsoft.com/playwright:v1.51.0-noble
+- name: mcr.microsoft.com/playwright:v1.57.0-noble
   script: 
   ...
   env:
@@ -481,7 +476,7 @@ type: docker
 
 steps:
   - name: test
-    image: mcr.microsoft.com/playwright:v1.51.0-noble
+    image: mcr.microsoft.com/playwright:v1.57.0-noble
     commands:
       - npx playwright test
 ```
@@ -511,7 +506,6 @@ xvfb-run npx playwright test
 ```
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

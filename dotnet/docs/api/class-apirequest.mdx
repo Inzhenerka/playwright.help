@@ -66,6 +66,8 @@ await ApiRequest.NewContextAsync(options);
     
     An array of client certificates to be used. Each certificate object must have either both `certPath` and `keyPath`, a single `pfxPath`, or their corresponding direct value equivalents (`cert` and `key`, or `pfx`). Optionally, `passphrase` property should be provided if the certificate is encrypted. The `origin` property should be provided with an exact match to the request origin that the certificate is valid for.
     
+    Client certificate authentication is only active when at least one client certificate is provided. If you want to reject all client certificates sent by the server, you need to provide a client certificate with an `origin` that does not match any of the domains you plan to visit.
+    
     :::note
     
     When using WebKit on macOS, accessing `localhost` will not pick up client certificates. You can make it work by replacing `localhost` with `local.playwright`.
@@ -95,6 +97,9 @@ await ApiRequest.NewContextAsync(options);
   - `IgnoreHTTPSErrors` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-ignore-https-errors"/><a href="#api-request-new-context-option-ignore-https-errors" class="list-anchor">#</a>
     
     Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
+  - `MaxRedirects` [int]? *(optional)* <font size="2">Added in: v1.52</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-max-redirects"/><a href="#api-request-new-context-option-max-redirects" class="list-anchor">#</a>
+    
+    Maximum number of request redirects that will be followed automatically. An error will be thrown if the number is exceeded. Defaults to `20`. Pass `0` to not follow redirects. This can be overwritten for each request individually.
   - `Proxy` Proxy? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-proxy"/><a href="#api-request-new-context-option-proxy" class="list-anchor">#</a>
     - `Server` [string]
       
@@ -127,7 +132,6 @@ await ApiRequest.NewContextAsync(options);
 - [APIRequestContext]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-return"/><a href="#api-request-new-context-return" class="list-anchor">#</a>
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -193,6 +197,7 @@ await ApiRequest.NewContextAsync(options);
 [Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1 "Action"
 [Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2 "Func"
 [IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable "IEnumerable"
+[IReadOnlyList]: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1?view=net-9.0 "IReadOnlyList"
 [IDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary "IDictionary"
 [Task]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-5.0 "Task"
 [IReadOnlyDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2 "IReadOnlyDictionary"

@@ -292,6 +292,23 @@ await Page.CloseAsync(options);
 
 ---
 
+### ConsoleMessagesAsync {#page-console-messages}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.56</font><x-search>page.ConsoleMessagesAsync</x-search>
+
+Returns up to (currently) 200 last console messages from this page. See [Page.Console](/api/class-page.mdx#page-event-console) for more details.
+
+**Usage**
+
+```csharp
+await Page.ConsoleMessagesAsync();
+```
+
+**Returns**
+- [IReadOnlyList]&lt;[ConsoleMessage]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-console-messages-return"/><a href="#page-console-messages-return" class="list-anchor">#</a>
+
+---
+
 ### ContentAsync {#page-content}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>page.ContentAsync</x-search>
@@ -370,8 +387,11 @@ await Page.DragAndDropAsync("#source", "#target", new()
     - `Y` [float]
       
       
-    Кликает на исходный элемент в этой точке относительно верхнего левого угла рамки элемента. Если не указано, используется видимая точка элемента.
-  - `Strict` [bool]? *(опционально)* <font size="2">Добавлено в: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-drag-and-drop-option-strict"/><a href="#page-drag-and-drop-option-strict" class="list-anchor">#</a>
+    Clicks on the source element at this point relative to the top-left corner of the element's padding box. If not specified, some visible point of the element is used.
+  - `Steps` [int]? *(optional)* <font size="2">Added in: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-drag-and-drop-option-steps"/><a href="#page-drag-and-drop-option-steps" class="list-anchor">#</a>
+    
+    Defaults to 1. Sends `n` interpolated `mousemove` events to represent travel between the `mousedown` and `mouseup` of the drag. When set to 1, emits a single `mousemove` event at the destination location.
+  - `Strict` [bool]? *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-drag-and-drop-option-strict"/><a href="#page-drag-and-drop-option-strict" class="list-anchor">#</a>
     
     Если true, вызов требует, чтобы селектор разрешался в один элемент. Если данный селектор разрешается в более чем один элемент, вызов выбрасывает исключение.
   - `TargetPosition` TargetPosition? *(опционально)* <font size="2">Добавлено в: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-drag-and-drop-option-target-position"/><a href="#page-drag-and-drop-option-target-position" class="list-anchor">#</a>
@@ -763,7 +783,7 @@ Page.Frames
 ```
 
 **Возвращает**
-- [IEnumerable]&lt;[Frame]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-frames-return"/><a href="#page-frames-return" class="list-anchor">#</a>
+- [IReadOnlyList]&lt;[Frame]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-frames-return"/><a href="#page-frames-return" class="list-anchor">#</a>
 
 ---
 
@@ -1307,11 +1327,28 @@ await Page.OpenerAsync();
 
 ---
 
+### PageErrorsAsync {#page-page-errors}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.56</font><x-search>page.PageErrorsAsync</x-search>
+
+Returns up to (currently) 200 last page errors from this page. See [Page.PageError](/api/class-page.mdx#page-event-page-error) for more details.
+
+**Usage**
+
+```csharp
+await Page.PageErrorsAsync();
+```
+
+**Returns**
+- [IReadOnlyList]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-page-errors-return"/><a href="#page-page-errors-return" class="list-anchor">#</a>
+
+---
+
 ### PauseAsync {#page-pause}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>page.PauseAsync</x-search>
 
-Приостанавливает выполнение скрипта. Playwright остановит выполнение скрипта и будет ждать, пока пользователь не нажмет кнопку 'Resume' в оверлее страницы или не вызовет `playwright.resume()` в консоли DevTools.
+Приостанавливает выполнение скрипта. Playwright перестанет выполнять скрипт и будет ждать, пока пользователь либо нажмёт кнопку **Resume** в оверлее страницы, либо вызовет `playwright.resume()` в консоли DevTools.
 
 Пользователь может исследовать селекторы или выполнять ручные действия во время паузы. Возобновление продолжит выполнение оригинального скрипта с того места, где он был приостановлен.
 
@@ -1533,6 +1570,27 @@ await Page.RequestGCAsync();
 
 ---
 
+### RequestsAsync {#page-requests}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.56</font><x-search>page.RequestsAsync</x-search>
+
+Returns up to (currently) 100 last network request from this page. See [Page.Request](/api/class-page.mdx#page-event-request) for more details.
+
+Returned requests should be accessed immediately, otherwise they might be collected to prevent unbounded memory growth as new requests come in. Once collected, retrieving most information about the request is impossible.
+
+Note that requests reported through the [Page.Request](/api/class-page.mdx#page-event-request) request are not collected, so there is a trade off between efficient memory usage with [Page.RequestsAsync()](/api/class-page.mdx#page-requests) and the amount of available information reported through [Page.Request](/api/class-page.mdx#page-event-request).
+
+**Usage**
+
+```csharp
+await Page.RequestsAsync();
+```
+
+**Returns**
+- [IReadOnlyList]&lt;[Request]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-requests-return"/><a href="#page-requests-return" class="list-anchor">#</a>
+
+---
+
 ### RouteAsync {#page-route}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>page.RouteAsync</x-search>
@@ -1596,7 +1654,7 @@ await page.RouteAsync("/api/**", async r =>
 **Аргументы**
 - `url` [string] | [Regex] | [Func]&lt;[string], bool&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-option-url"/><a href="#page-route-option-url" class="list-anchor">#</a>
   
-  Глобальный шаблон, шаблон регулярного выражения или предикат, получающий [URL] для сопоставления при маршрутизации. Когда [BaseURL](/api/class-browser.mdx#browser-new-context-option-base-url) был предоставлен через параметры контекста и переданный URL является путем, он объединяется с помощью конструктора [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL).
+  Шаблон glob, регулярное выражение или предикат, который получает [URL] для сопоставления при маршрутизации. Если в параметрах контекста задан [BaseURL](/api/class-browser.mdx#browser-new-context-option-base-url) и переданный URL является строкой, не начинающейся с `*`, он будет разрешён с помощью конструктора [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL).
 - `handler` [Action]&lt;[Route]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-option-handler"/><a href="#page-route-option-handler" class="list-anchor">#</a>
   
   функция обработчика для маршрутизации запроса.
@@ -2716,7 +2774,7 @@ Page.Workers
 ```
 
 **Возвращает**
-- [IEnumerable]&lt;[Worker]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-workers-return"/><a href="#page-workers-return" class="list-anchor">#</a>
+- [IReadOnlyList]&lt;[Worker]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-workers-return"/><a href="#page-workers-return" class="list-anchor">#</a>
 
 ---
 
@@ -3189,27 +3247,6 @@ Page.Worker += async (_, worker) => {};
 ---
 
 ## Устаревшие
-
-### Accessibility {#page-accessibility}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>page.Accessibility</x-search>
-
-:::warning Устарело
-
-Это свойство не рекомендуется использовать. Пожалуйста, используйте другие библиотеки, такие как [Axe](https://www.deque.com/axe/), если вам нужно тестировать доступность страницы. См. наш [руководство](https://playwright.dev/docs/accessibility-testing) по интеграции с Axe для Node.js.
-
-:::
-
-**Использование**
-
-```csharp
-Page.Accessibility
-```
-
-**Тип**
-- [Accessibility]
-
----
 
 ### CheckAsync {#page-check}
 
@@ -4200,7 +4237,7 @@ await Page.QuerySelectorAllAsync(selector);
   Селектор для запроса.
 
 **Возвращает**
-- [IEnumerable]&lt;[ElementHandle]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-query-selector-all-return"/><a href="#page-query-selector-all-return" class="list-anchor">#</a>
+- [IReadOnlyList]&lt;[ElementHandle]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-query-selector-all-return"/><a href="#page-query-selector-all-return" class="list-anchor">#</a>
 
 ---
 
@@ -4374,7 +4411,7 @@ await page.SelectOptionAsync("select#colors", new[] { "red", "green", "blue" });
     Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
 **Возвращает**
-- [IEnumerable]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-select-option-return"/><a href="#page-select-option-return" class="list-anchor">#</a>
+- [IReadOnlyList]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-select-option-return"/><a href="#page-select-option-return" class="list-anchor">#</a>
 
 ---
 
@@ -4820,7 +4857,6 @@ await page.WaitForTimeoutAsync(1000);
 **Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-timeout-return"/><a href="#page-wait-for-timeout-return" class="list-anchor">#</a>
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -4886,6 +4922,7 @@ await page.WaitForTimeoutAsync(1000);
 [Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1 "Action"
 [Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2 "Func"
 [IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable "IEnumerable"
+[IReadOnlyList]: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1?view=net-9.0 "IReadOnlyList"
 [IDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary "IDictionary"
 [Task]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-5.0 "Task"
 [IReadOnlyDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2 "IReadOnlyDictionary"

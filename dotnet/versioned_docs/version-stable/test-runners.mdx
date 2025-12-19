@@ -8,11 +8,11 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Введение
 
-Хотя Playwright для .NET не привязан к какому-либо конкретному тестовому фреймворку или среде выполнения тестов, по нашему опыту, самый простой способ начать — это использовать базовые классы, которые мы предоставляем для MSTest, NUnit или xUnit. Эти классы поддерживают запуск тестов на нескольких движках браузеров, настройку параметров запуска/контекста и получение экземпляра [Page]/[BrowserContext] для каждого теста из коробки.
+Хотя Playwright для .NET не привязан к конкретному тестовому раннеру или фреймворку, по нашему опыту проще всего начать с базовых классов, которые мы предоставляем для MSTest, NUnit, xUnit или xUnit v3. Эти классы поддерживают запуск тестов на нескольких движках браузера, настройку параметров запуска/контекста и «из коробки» предоставляют экземпляр [Page]/[BrowserContext] для каждого теста.
 
 Экземпляры Playwright и Browser будут повторно использоваться между тестами для повышения производительности. Мы рекомендуем запускать каждый тестовый случай в новом BrowserContext, чтобы состояние браузера было изолировано между тестами.
 
-<Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, ] }>
+<Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, {label: 'xUnit v3', value: 'xunit-v3'}, ] }>
 
 <TabItem value="nunit">
 
@@ -32,13 +32,19 @@ Playwright предоставляет базовые классы для нап�
 
 </TabItem>
 
+<TabItem value="xunit-v3">
+
+Playwright provides base classes to write tests with xUnit v3 via the [`Microsoft.Playwright.Xunit.v3`](https://www.nuget.org/packages/Microsoft.Playwright.Xunit.v3) package.
+
+</TabItem>
+
 </Tabs>
 
 Ознакомьтесь с [руководством по установке](./intro.mdx), чтобы начать.
 
 ## Запуск тестов в параллельном режиме
 
-<Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, ] }>
+<Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, {label: 'xUnit v3', value: 'xunit-v3'}, ] }>
 
 <TabItem value="nunit">
 
@@ -76,15 +82,29 @@ dotnet test -- xUnit.MaxParallelThreads=5
 
 </TabItem>
 
+<TabItem value="xunit-v3">
+
+By default xUnit v3 will run all classes in parallel, while running tests inside each class sequentially. It will create by default as many processes as there are cores on the system. You can adjust this behavior by using the following CLI parameter or using a `.runsettings` file, see below.
+
+```bash
+dotnet test -- xUnit.MaxParallelThreads=5
+```
+
+:::note
+xUnit v3 uses the [`conservative` parallelism algorithm](https://xunit.net/docs/running-tests-in-parallel.html#algorithms) by default.
+:::
+
+</TabItem>
+
 </Tabs>
 
 ## Настройка параметров [BrowserContext]
 
-<Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, ] }>
+<Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, {label: 'xUnit v3', value: 'xunit-v3'}, ] }>
 
 <TabItem value="nunit">
 
-Чтобы настроить параметры контекста, вы можете переопределить метод `ContextOptions` вашего тестового класса, производного от `Microsoft.Playwright.MSTest.PageTest` или `Microsoft.Playwright.MSTest.ContextTest`. См. следующий пример:
+Чтобы настроить параметры контекста, вы можете переопределить метод `ContextOptions` в вашем тестовом классе, унаследованном от `Microsoft.Playwright.NUnit.PageTest` или `Microsoft.Playwright.NUnit.ContextTest`. См. следующий пример:
 
 ```csharp
 using Microsoft.Playwright.NUnit;
@@ -197,6 +217,42 @@ public class UnitTest1 : PageTest
 
 </TabItem>
 
+<TabItem value="xunit-v3">
+
+To customize context options, you can override the `ContextOptions` method of your test class derived from `Microsoft.Playwright.Xunit.v3.PageTest` or `Microsoft.Playwright.Xunit.v3.ContextTest`. See the following example:
+
+```csharp
+using Microsoft.Playwright;
+using Microsoft.Playwright.Xunit.v3;
+
+namespace PlaywrightTests;
+
+public class UnitTest1 : PageTest
+{
+    [Fact]
+    public async Task TestWithCustomContextOptions()
+    {
+        // The following Page (and BrowserContext) instance has the custom colorScheme, viewport and baseURL set:
+        await Page.GotoAsync("/login");
+    }
+    public override BrowserNewContextOptions ContextOptions()
+    {
+        return new BrowserNewContextOptions()
+        {
+            ColorScheme = ColorScheme.Light,
+            ViewportSize = new()
+            {
+                Width = 1920,
+                Height = 1080
+            },
+            BaseURL = "https://github.com",
+        };
+    }
+}
+```
+
+</TabItem>
+
 </Tabs>
 
 ## Настройка параметров запуска [Browser]
@@ -228,7 +284,7 @@ dotnet test -- Playwright.BrowserName=chromium Playwright.LaunchOptions.Headless
 
 При запуске тестов из Visual Studio вы можете воспользоваться файлом `.runsettings`. Ниже приведена ссылка на поддерживаемые значения.
 
-<Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, ] }>
+<Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, {label: 'xUnit v3', value: 'xunit-v3'}, ] }>
 
 <TabItem value="nunit">
 
@@ -328,11 +384,43 @@ dotnet test -- Playwright.BrowserName=chromium Playwright.LaunchOptions.Headless
 
 </TabItem>
 
+<TabItem value="xunit-v3">
+
+For example, to specify the number of workers, you can use `xUnit.MaxParallelThreads`. You can also enable `DEBUG` logs using `RunConfiguration.EnvironmentVariables`.
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <!-- See https://xunit.net/docs/runsettings -->
+  <xUnit>
+    <MaxParallelThreads>1</MaxParallelThreads>
+  </xUnit>
+  <!-- General run configuration -->
+  <RunConfiguration>
+    <EnvironmentVariables>
+      <!-- For debugging selectors, it's recommend to set the following environment variable -->
+      <DEBUG>pw:api</DEBUG>
+    </EnvironmentVariables>
+  </RunConfiguration>
+  <!-- Playwright -->  
+  <Playwright>
+    <BrowserName>chromium</BrowserName>
+    <ExpectTimeout>5000</ExpectTimeout>
+    <LaunchOptions>
+      <Headless>false</Headless>
+      <Channel>msedge</Channel>
+    </LaunchOptions>
+  </Playwright>
+</RunSettings>
+```
+
+</TabItem>
+
 </Tabs>
 
 ## Базовые классы для Playwright
 
-<Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, ] }>
+<Tabs groupId="test-runners" defaultValue="mstest" values={[ {label: 'MSTest', value: 'mstest'}, {label: 'NUnit', value: 'nunit'}, {label: 'xUnit', value: 'xunit'}, {label: 'xUnit v3', value: 'xunit-v3'}, ] }>
 
 <TabItem value="nunit">
 
@@ -352,6 +440,12 @@ dotnet test -- Playwright.BrowserName=chromium Playwright.LaunchOptions.Headless
 
 </TabItem>
 
+<TabItem value="xunit-v3">
+
+There are a few base classes available to you in `Microsoft.Playwright.Xunit.v3` namespace:
+
+</TabItem>
+
 </Tabs>
 
 |Тест          |Описание|
@@ -361,7 +455,6 @@ dotnet test -- Playwright.BrowserName=chromium Playwright.LaunchOptions.Headless
 |BrowserTest   |Каждый тест получит браузер и может создать столько контекстов, сколько захочет. Каждый тест несет ответственность за очистку всех созданных им контекстов.|
 |PlaywrightTest|Это дает каждому тесту объект Playwright, чтобы тест мог запускать и останавливать столько браузеров, сколько захочет.|
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -427,6 +520,7 @@ dotnet test -- Playwright.BrowserName=chromium Playwright.LaunchOptions.Headless
 [Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1 "Action"
 [Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2 "Func"
 [IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable "IEnumerable"
+[IReadOnlyList]: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1?view=net-9.0 "IReadOnlyList"
 [IDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary "IDictionary"
 [Task]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-5.0 "Task"
 [IReadOnlyDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2 "IReadOnlyDictionary"

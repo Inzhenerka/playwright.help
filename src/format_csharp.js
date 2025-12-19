@@ -100,8 +100,8 @@ class CSharpFormatter {
   formatFunction(args, ret, type) {
     if (type.args.length === 0 && type.returnType.name === 'Promise')
       return `[Func]<[Task]>`;
-    if (type.args.length === 2 && type.args[0].name === 'int?' && type.args[1].name === 'string' && !type.returnType)
-      return 'Action<int?, string>';
+    if (type.args.length === 2 && type.args[0].name === 'int?' && type.args[1].name === 'string?' && !type.returnType)
+      return 'Action<int?, string?>';
     if (type.args.length !== 1)
       throw new Error('Unsupported number of arguments in function: ' + JSON.stringify(type));
     if (!type.returnType)
@@ -128,7 +128,7 @@ class CSharpFormatter {
     switch (text) {
       case 'any': return `[object]${optionalSuffix}`;
       case 'unknown': return `[object]${optionalSuffix}`;
-      case 'Array': return `[IEnumerable]${optionalSuffix}`;
+      case 'Array': return direction === 'out' ? `[IReadOnlyList]${optionalSuffix}` : `[IEnumerable]${optionalSuffix}`;
       case 'float': return `[float]${optionalSuffix}`;
       case 'function': {
         switch (fullName(member)) {
@@ -152,7 +152,7 @@ class CSharpFormatter {
         }
         switch (fullName(member)) {
           case 'BrowserContext.addCookies.cookies': return '`Cookie`';
-          case 'BrowserContext.cookies': return '`Cookie`';
+          case 'BrowserContext.cookies': return '`BrowserContextCookiesResult`';
           case 'ElementHandle.selectOption.values': return '`SelectOption`';
           case 'Frame.selectOption.values': return '`SelectOption`';
           case 'Page.selectOption.values': return '`SelectOption`';

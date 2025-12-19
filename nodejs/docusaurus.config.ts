@@ -36,7 +36,18 @@ let plugins = [
   require.resolve("@docusaurus/plugin-content-pages"),
   ['docusaurus-plugin-yandex-metrica', {
     counterID: '100339848',
-  }]
+  }],
+  [
+    require.resolve('@docusaurus/plugin-ideal-image'),
+    {
+      // The plugin will take the min of this and the actual dimensions 
+      // https://github.com/slorber/responsive-loader/blob/master/src/index.js#L187C32-L187C46
+      max: Number.MAX_SAFE_INTEGER,
+      min: 640,
+      steps: 4,
+      disableInDev: false
+    }
+  ],
 ];
 
 if (isProd) {
@@ -54,7 +65,7 @@ export default {
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "throw",
   scripts: ["/js/redirection.js"],
-  favicon: "img/playwright-logo.svg",
+  favicon: "img/playwright-logo.ico",
   i18n: {
     defaultLocale: "ru",
     locales: ["ru"],
@@ -210,5 +221,6 @@ export default {
   trailingSlash: false,
   future: {
     experimental_faster: true,
+    v4: true,
   },
 } satisfies Config;

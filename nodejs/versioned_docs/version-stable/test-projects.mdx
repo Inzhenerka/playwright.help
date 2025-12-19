@@ -162,7 +162,7 @@ export default defineConfig({
 В этом примере проекты chromium, firefox и webkit зависят от проекта настройки.
 
 ```js title="playwright.config.ts"
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   projects: [
@@ -218,14 +218,15 @@ export default defineConfig({
 
 ### Фильтрация тестов
 
-Если используется опция `--grep/--grep-invert` или `--shard` [option](./test-cli.mdx#reference), фильтр имени файла теста указан в [командной строке](./test-cli.mdx) или используется [test.only()](./api/class-test.mdx#test-only), это будет применяться только к тестам из самых глубоких проектов в цепочке зависимостей проекта. Другими словами, если соответствующий тест принадлежит проекту, который имеет зависимости от других проектов, Playwright выполнит все тесты из зависимых проектов, игнорируя фильтры.
+Все опции фильтрации тестов, такие как `--grep`/`--grep-invert`, `--shard`, фильтрация напрямую по позиции (location) в командной строке или использование [`test.only()`](./api/class-test.mdx#test-only), напрямую выбирают основные тесты, которые будут запущены. Если эти тесты относятся к проекту с зависимостями, то будут запущены и все тесты из этих зависимостей.
+
+Вы можете передать опцию командной строки `--no-deps`, чтобы игнорировать все зависимости и teardown’ы. Тогда будут запущены только проекты, которые вы выбрали напрямую.
 
 ## Пользовательские параметры проекта
 
 Проекты также могут использоваться для параметризации тестов с вашей пользовательской конфигурацией - ознакомьтесь с [этим отдельным руководством](./test-parameterize.mdx#parameterized-projects).
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

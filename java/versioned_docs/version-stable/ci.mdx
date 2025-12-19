@@ -46,11 +46,11 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-java@v3
+    - uses: actions/checkout@v5
+    - uses: actions/setup-java@v5
       with:
         distribution: 'temurin'
-        java-version: '17'
+        java-version: '25'
     - name: Build & Install
       run: mvn -B install -D skipTests --no-transfer-progress
     - name: Ensure browsers are installed
@@ -75,14 +75,14 @@ jobs:
     name: 'Playwright Tests'
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright/java:v1.50.0-noble
+      image: mcr.microsoft.com/playwright/java:v1.56.0-noble
       options: --user 1001
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '25'
       - name: Build & Install
         run: mvn -B install -D skipTests --no-transfer-progress
       - name: Run tests
@@ -103,11 +103,11 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.deployment_status.state == 'success'
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-java@v3
+    - uses: actions/checkout@v5
+    - uses: actions/setup-java@v5
       with:
         distribution: 'temurin'
-        java-version: '17'
+        java-version: '25'
     - name: Build & Install
       run: mvn -B install -D skipTests --no-transfer-progress
     - name: Install Playwright
@@ -121,12 +121,7 @@ jobs:
 
 ### Docker
 
-У нас есть [предварительно собранный Docker-образ](./docker.mdx), который можно использовать напрямую или в качестве примера для обновления ваших существующих Docker-определений.
-
-Рекомендуемая конфигурация
-1. Использование `--ipc=host` также рекомендуется при использовании Chromium. Без этого Chromium может закончиться память и он может аварийно завершиться. Узнайте больше об этой опции в [документации Docker](https://docs.docker.com/reference/cli/docker/container/run/#ipc).
-1. Видите другие странные ошибки при запуске Chromium? Попробуйте запустить ваш контейнер с `docker run --cap-add=SYS_ADMIN` при локальной разработке.
-1. Использование флага Docker `--init` или [dumb-init](https://github.com/Yelp/dumb-init) рекомендуется, чтобы избежать специального обращения с процессами с PID=1. Это частая причина появления зомби-процессов.
+У нас есть [готовый Docker-образ](./docker.mdx), который можно использовать напрямую или взять за основу для обновления ваших существующих Docker-конфигураций. Обязательно следуйте [рекомендуемой конфигурации Docker](./docker.mdx#recommended-docker-configuration), чтобы обеспечить наилучшую производительность.
 
 ### Azure Pipelines
 
@@ -144,9 +139,9 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- task: JavaToolInstaller@0
+- task: JavaToolInstaller@1
   inputs:
-    versionSpec: '17'
+    versionSpec: '25'
     jdkArchitectureOption: 'x64'
     jdkSourceOption: AzureStorage
 - script: mvn -B install -D skipTests --no-transfer-progress
@@ -165,12 +160,12 @@ trigger:
 
 pool:
   vmImage: ubuntu-latest
-container: mcr.microsoft.com/playwright/java:v1.50.0-noble
+container: mcr.microsoft.com/playwright/java:v1.56.0-noble
 
 steps:
-- task: JavaToolInstaller@0
+- task: JavaToolInstaller@1
   inputs:
-    versionSpec: '17'
+    versionSpec: '25'
     jdkArchitectureOption: 'x64'
     jdkSourceOption: AzureStorage
 
@@ -188,7 +183,7 @@ steps:
 executors:
   pw-noble-development:
     docker:
-      - image: mcr.microsoft.com/playwright/java:v1.50.0-noble
+      - image: mcr.microsoft.com/playwright/java:v1.56.0-noble
 ```
 
 Примечание: При использовании определения агента docker вы указываете класс ресурсов, где Playwright запускается на уровне 'medium' [здесь](https://circleci.com/docs/configuration-reference?#docker-execution-environment). Поведение Playwright по умолчанию - устанавливать количество рабочих процессов в соответствии с обнаруженным количеством ядер (2 в случае уровня medium). Переопределение количества рабочих процессов на большее значение приведет к ненужным тайм-аутам и сбоям.
@@ -199,7 +194,7 @@ Jenkins поддерживает Docker-агенты для конвейеров
 
 ```groovy
 pipeline {
-   agent { docker { image 'mcr.microsoft.com/playwright/java:v1.50.0-noble' } }
+   agent { docker { image 'mcr.microsoft.com/playwright/java:v1.56.0-noble' } }
    stages {
       stage('e2e-tests') {
          steps {
@@ -216,7 +211,7 @@ pipeline {
 Bitbucket Pipelines может использовать публичные [Docker-образы как среды сборки](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). Чтобы запустить тесты Playwright на Bitbucket, используйте наш публичный Docker-образ ([см. Dockerfile](./docker.mdx)).
 
 ```yml
-image: mcr.microsoft.com/playwright/java:v1.50.0-noble
+image: mcr.microsoft.com/playwright/java:v1.56.0-noble
 ```
 
 ### GitLab CI
@@ -229,7 +224,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright/java:v1.50.0-noble
+  image: mcr.microsoft.com/playwright/java:v1.56.0-noble
   script:
   ...
 ```

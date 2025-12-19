@@ -106,7 +106,14 @@ export default defineConfig({
 
 Если ваш пользовательский репортер ничего не выводит в терминал, реализуйте [reporter.printsToStdio()](/api/class-reporter.mdx#reporter-prints-to-stdio) и верните `false`. Таким образом, Playwright будет использовать один из стандартных терминальных репортеров в дополнение к вашему пользовательскому репортеру для улучшения пользовательского опыта.
 
-**Заметки по API объединенного отчета**
+**Ошибки репортера**
+
+Playwright проглатывает любые ошибки, выброшенные в методах вашего пользовательского репортера. Если вам нужно обнаруживать ошибки репортера или падать из‑за них, оборачивайте и обрабатывайте их самостоятельно.
+
+**Примечания к API объединённого отчёта**
+
+При объединении нескольких отчётов [`blob`](../test-reporters#blob-reporter) с помощью CLI-команды [`merge-reports`](../test-sharding#merge-reports-cli) для формирования итоговых отчётов вызывается тот же API [Reporter], и все существующие репортеры должны работать без изменений. Однако есть некоторые тонкие различия, которые могут повлиять на некоторые пользовательские репортеры.
+* Проекты из разных шардов всегда сохраняются как отдельные объекты [TestProject]. Например, если проект «Desktop Chrome» был расшарден на 5 машин, то в конфигурации, переданной в [reporter.onBegin()](/api/class-reporter.mdx#reporter-on-begin), будет 5 экземпляров проектов с одинаковым именем.
 
 При объединении нескольких отчетов [`blob`](../test-reporters#blob-reporter) с помощью команды CLI [`merge-reports`](../test-sharding#merge-reports-cli), тот же API [Reporter] вызывается для создания окончательных отчетов, и все существующие репортеры должны работать без изменений. Однако есть некоторые тонкие различия, которые могут повлиять на некоторые пользовательские репортеры.
 * Проекты из разных шардов всегда сохраняются как отдельные объекты [TestProject]. Например, если проект 'Desktop Chrome' был разделен на 5 машин, то в конфигурации, переданной в [reporter.onBegin()](/api/class-reporter.mdx#reporter-on-begin), будет 5 экземпляров проектов с одинаковым именем.
@@ -370,7 +377,6 @@ reporter.printsToStdio();
 - [boolean]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-prints-to-stdio-return"/><a href="#reporter-prints-to-stdio-return" class="list-anchor">#</a>
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

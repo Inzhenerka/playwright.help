@@ -58,6 +58,17 @@ API [Clock] предоставляет следующие методы для у
 </script>
 ```
 
+```java
+SimpleDateFormat format = new SimpleDateFormat("yyy-MM-dd'T'HH:mm:ss");
+page.clock().setFixedTime(format.parse("2024-02-02T10:00:00"));
+page.navigate("http://localhost:3333");
+Locator locator = page.getByTestId("current-time");
+assertThat(locator).hasText("2/2/2024, 10:00:00 AM");
+page.clock().setFixedTime(format.parse("2024-02-02T10:30:00"));
+// We know that the page has a timer that updates the time every second.
+assertThat(locator).hasText("2/2/2024, 10:30:00 AM");
+```
+
 ## Последовательное время и таймеры
 
 Иногда ваши таймеры зависят от `Date.now` и сбиваются, когда значение `Date.now` не меняется со временем. В этом случае вы можете установить часы и перемотать вперед до интересующего времени при тестировании.

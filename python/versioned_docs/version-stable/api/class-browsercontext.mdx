@@ -94,13 +94,13 @@ await browser_context.add_cookies([cookie_object1, cookie_object2])
     
   - `url` [str] *(optional)*
     
-    Either url or domain / path are required. Optional.
+    Either `url` or both `domain` and `path` are required. Optional.
   - `domain` [str] *(optional)*
     
-    For the cookie to apply to all subdomains as well, prefix domain with a dot, like this: ".example.com". Either url or domain / path are required. Optional.
+    For the cookie to apply to all subdomains as well, prefix domain with a dot, like this: ".example.com". Either `url` or both `domain` and `path` are required. Optional.
   - `path` [str] *(optional)*
     
-    Either url or domain / path are required Optional.
+    Either `url` or both `domain` and `path` are required. Optional.
   - `expires` [float] *(optional)*
     
     Unix time in seconds. Optional.
@@ -113,6 +113,9 @@ await browser_context.add_cookies([cookie_object1, cookie_object2])
   - `sameSite` "Strict" | "Lax" | "None" *(optional)*
     
     Optional.
+  - `partitionKey` [str] *(optional)*
+    
+    For partitioned third-party cookies (aka [CHIPS](https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Privacy_sandbox/Partitioned_cookies)), the partition key. Optional.
 
 **Возвращает**
 - [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-add-cookies-return"/><a href="#browser-context-add-cookies-return" class="list-anchor">#</a>
@@ -351,6 +354,9 @@ browser_context.cookies(**kwargs)
     
     
   - `sameSite` "Strict" | "Lax" | "None"
+    
+    
+  - `partitionKey` [str] *(optional)*
     
     
 ---
@@ -700,6 +706,8 @@ browser_context.grant_permissions(permissions, **kwargs)
   * `'clipboard-write'`
   * `'geolocation'`
   * `'gyroscope'`
+  * `'local-fonts'`
+  * `'local-network-access'`
   * `'magnetometer'`
   * `'microphone'`
   * `'midi-sysex'` (системно-эксклюзивный midi)
@@ -892,7 +900,7 @@ await context.route("/api/**", handle_route)
 **Аргументы**
 - `url` [str] | [Pattern] | [Callable]\[[URL]\]:[bool]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-option-url"/><a href="#browser-context-route-option-url" class="list-anchor">#</a>
   
-  Глобальный шаблон, шаблон регулярного выражения или предикат, получающий [URL] для сопоставления при маршрутизации. Когда [base_url](/api/class-browser.mdx#browser-new-context-option-base-url) через параметры контекста был предоставлен и переданный URL является путем, он объединяется через [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) конструктор.
+  Глоб-шаблон, регулярное выражение или предикат, который получает [URL] для сопоставления при маршрутизации. Если в опциях контекста задан [base_url](/api/class-browser.mdx#browser-new-context-option-base-url) и переданный URL — строка, не начинающаяся с `*`, он будет разрешён с помощью конструктора [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL).
 - `handler` [Callable]\[[Route], [Request]\]:[Promise]\[[Any]\] | [Any]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-option-handler"/><a href="#browser-context-route-option-handler" class="list-anchor">#</a>
   
   функция-обработчик для маршрутизации запроса.
@@ -1185,15 +1193,9 @@ browser_context.storage_state(**kwargs)
 **Аргументы**
 - `indexed_db` [bool] *(опционально)* <font size="2">Added in: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-indexed-db"/><a href="#browser-context-storage-state-option-indexed-db" class="list-anchor">#</a>
   
-  Установите в `true`, чтобы включить [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) в снимок состояния хранилища. Если ваше приложение использует IndexedDB для хранения токенов аутентификации, таких как Firebase Authentication, включите это.
-  
-  :::note
-  
-  IndexedDB с типизированными массивами в настоящее время не поддерживаются.
-  :::
-  
-- `path` [Union]\[[str], [pathlib.Path]\] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-path"/><a href="#browser-context-storage-state-option-path" class="list-anchor">#</a>
-  
+  Установите `true`, чтобы включить [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) в снимок состояния хранилища. Если ваше приложение использует IndexedDB для хранения токенов аутентификации (например, Firebase Authentication), включите это.
+- `path` [Union]\[[str], [pathlib.Path]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-path"/><a href="#browser-context-storage-state-option-path" class="list-anchor">#</a>
+ 
   Путь к файлу для сохранения состояния хранилища. Если [path](/api/class-browsercontext.mdx#browser-context-storage-state-option-path) является относительным путем, то он разрешается относительно текущей рабочей директории. Если путь не указан, состояние хранилища все равно возвращается, но не будет сохранено на диск.
 
 **Возвращает**
@@ -1327,33 +1329,11 @@ browser_context.wait_for_event(event, **kwargs)
 
 ## Properties
 
-### background_pages {#browser-context-background-pages}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.background_pages</x-search>
-
-:::note
-
-Background pages are only supported on Chromium-based browsers.
-:::
-
-Все существующие фоновые страницы в контексте.
-
-**Использование**
-
-```python
-browser_context.background_pages
-```
-
-**Возвращает**
-- [List]\[[Page]\]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-background-pages-return"/><a href="#browser-context-background-pages-return" class="list-anchor">#</a>
-
----
-
 ### browser {#browser-context-browser}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.browser</x-search>
 
-Возвращает экземпляр браузера для данного контекста. Если он был запущен как постоянный контекст, возвращается null.
+Возвращает экземпляр браузера, которому принадлежит этот контекст. Возвращает `null`, если контекст создан вне обычного браузера, например в Android или Electron.
 
 **Использование**
 
@@ -1455,52 +1435,6 @@ browser_context.tracing
 ---
 
 ## Events
-
-### on("backgroundpage") {#browser-context-event-background-page}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.on("backgroundpage")</x-search>
-
-:::note
-
-Only works with Chromium browser's persistent context.
-:::
-
-Вызывается, когда в контексте создается новая фоновая страница.
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-background_page = context.wait_for_event("backgroundpage")
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-background_page = await context.wait_for_event("backgroundpage")
-```
-
-</TabItem>
-</Tabs>
-
-**Использование**
-
-```python
-browser_context.on("backgroundpage", handler)
-```
-
-**Данные события**
-- [Page]
-
----
 
 ### on("close") {#browser-context-event-close}
 
@@ -1760,8 +1694,57 @@ browser_context.on("weberror", handler)
 **Данные события**
 - [WebError]
 
+---
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+## Deprecated
+
+### on("backgroundpage") {#browser-context-event-background-page}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.on("backgroundpage")</x-search>
+
+:::warning Deprecated
+
+Background pages have been removed from Chromium together with Manifest V2 extensions.
+
+:::
+
+
+This event is not emitted.
+
+**Usage**
+
+```python
+browser_context.on("backgroundpage", handler)
+```
+
+**Event data**
+- [Page]
+
+---
+
+### background_pages {#browser-context-background-pages}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browserContext.background_pages</x-search>
+
+:::warning Deprecated
+
+Background pages have been removed from Chromium together with Manifest V2 extensions.
+
+:::
+
+
+Returns an empty list.
+
+**Usage**
+
+```python
+browser_context.background_pages
+```
+
+**Returns**
+- [List]\[[Page]\]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-background-pages-return"/><a href="#browser-context-background-pages-return" class="list-anchor">#</a>
+
+
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"

@@ -65,6 +65,8 @@ APIRequest.newContext(options);
     
     Массив клиентских сертификатов для использования. Каждый объект сертификата должен иметь либо оба `certPath` и `keyPath`, либо один `pfxPath`, или их соответствующие прямые значения (`cert` и `key`, или `pfx`). Опционально, свойство `passphrase` должно быть предоставлено, если сертификат зашифрован. Свойство `origin` должно быть предоставлено с точным соответствием источнику запроса, для которого сертификат действителен.
     
+    Client certificate authentication is only active when at least one client certificate is provided. If you want to reject all client certificates sent by the server, you need to provide a client certificate with an `origin` that does not match any of the domains you plan to visit.
+    
     :::note
     
     При использовании WebKit на macOS, доступ к `localhost` не будет использовать клиентские сертификаты. Вы можете сделать это, заменив `localhost` на `local.playwright`.
@@ -93,7 +95,10 @@ APIRequest.newContext(options);
     Учетные данные для [HTTP-аутентификации](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Если источник не указан, имя пользователя и пароль отправляются на любые серверы при получении неавторизованных ответов.
   - `setIgnoreHTTPSErrors` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-ignore-https-errors"/><a href="#api-request-new-context-option-ignore-https-errors" class="list-anchor">#</a>
     
-    Следует ли игнорировать ошибки HTTPS при отправке сетевых запросов. По умолчанию `false`.
+    Определяет, нужно ли игнорировать ошибки HTTPS при отправке сетевых запросов. По умолчанию — `false`.
+  - `setMaxRedirects` [int] *(опционально)* <font size="2">Added in: v1.52</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-max-redirects"/><a href="#api-request-new-context-option-max-redirects" class="list-anchor">#</a>
+    
+    Максимальное количество перенаправлений (redirects) запроса, которые будут автоматически обработаны. Если это число будет превышено, будет выброшена ошибка. Значение по умолчанию — `20`. Укажите `0`, чтобы не переходить по перенаправлениям. Это значение можно переопределить для каждого запроса отдельно.
   - `setProxy` Proxy *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-proxy"/><a href="#api-request-new-context-option-proxy" class="list-anchor">#</a>
     - `setServer` [String]
       

@@ -111,7 +111,7 @@ await expect(page.query_selector('banner')).to_match_aria_snapshot("""
 - **"name"**: Доступное имя элемента. Строки в кавычках указывают на точные значения, `/patterns/` используются для регулярных выражений.
 - **[attribute=value]**: Атрибуты и значения в квадратных скобках представляют конкретные ARIA атрибуты, такие как `checked`, `disabled`, `expanded`, `level`, `pressed` или `selected`.
 
-Эти значения получены из ARIA атрибутов или вычислены на основе HTML семантики. Чтобы исследовать структуру дерева доступности страницы, используйте [Chrome DevTools Accessibility Pane](https://developer.chrome.com/docs/devtools/accessibility/reference#pane).
+Эти значения берутся из атрибутов ARIA или вычисляются на основе HTML-семантики. Чтобы посмотреть структуру дерева доступности страницы, используйте [вкладку Accessibility в Chrome DevTools](https://developer.chrome.com/docs/devtools/accessibility/reference#tab).
 
 ## Сопоставление снимков
 
@@ -210,6 +210,47 @@ await expect(page.locator("body")).to_match_aria_snapshot("""
 ```
 
 Частичные сопоставления позволяют создавать гибкие тесты снимков, которые проверяют основную структуру страницы без навязывания конкретного содержимого или атрибутов.
+
+### Строгое сопоставление
+
+По умолчанию будет сопоставляться шаблон, содержащий подмножество дочерних элементов:
+
+```html
+<ul>
+  <li>Feature A</li>
+  <li>Feature B</li>
+  <li>Feature C</li>
+</ul>
+```
+
+*ARIA-снимок для частичного совпадения*
+
+```yaml
+- list
+  - listitem: Feature B
+```
+
+Свойство `/children` можно использовать, чтобы управлять тем, как сопоставляются дочерние элементы:
+- `contain` (по умолчанию): совпадает, если все указанные дочерние элементы присутствуют в указанном порядке
+- `equal`: совпадает, если дочерние элементы в точности соответствуют указанному списку в указанном порядке
+- `deep-equal`: совпадает, если дочерние элементы в точности соответствуют указанному списку в указанном порядке, включая вложенные дочерние элементы
+
+```html
+<ul>
+  <li>Feature A</li>
+  <li>Feature B</li>
+  <li>Feature C</li>
+</ul>
+```
+
+*ARIA-снимок упадёт, потому что Feature C отсутствует в шаблоне*
+
+```yaml
+- list
+  - /children: equal
+  - listitem: Feature A
+  - listitem: Feature B
+```
 
 ### Сопоставление с регулярными выражениями
 
@@ -408,7 +449,6 @@ print(snapshot)
 ```
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"

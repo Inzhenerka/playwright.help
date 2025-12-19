@@ -302,6 +302,54 @@ await Expect(
 
 ---
 
+### ToContainClassAsync {#locator-assertions-to-contain-class}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.52</font><x-search>locatorAssertions.ToContainClassAsync</x-search>
+
+Ensures the [Locator] points to an element with given CSS classes. All classes from the asserted value, separated by spaces, must be present in the [Element.classList](https://developer.mozilla.org/en-US/docs/Web/API/Element/classList) in any order.
+
+**Usage**
+
+```html
+<div class='middle selected row' id='component'></div>
+```
+
+```csharp
+var locator = Page.Locator("#component");
+await Expect(locator).ToContainClassAsync("middle selected row");
+await Expect(locator).ToContainClassAsync("selected");
+await Expect(locator).ToContainClassAsync("row middle");
+```
+
+When an array is passed, the method asserts that the list of elements located matches the corresponding list of expected class lists. Each element's class attribute is matched against the corresponding class in the array:
+
+```html
+<div class='list'>
+  <div class='component inactive'></div>
+  <div class='component active'></div>
+  <div class='component inactive'></div>
+</div>
+```
+
+```csharp
+var locator = Page.Locator(".list > .component");
+await Expect(locator).ToContainClassAsync(new string[]{"inactive", "active", "inactive"});
+```
+
+**Arguments**
+- `expected` [string] | [IEnumerable]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-contain-class-option-expected"/><a href="#locator-assertions-to-contain-class-option-expected" class="list-anchor">#</a>
+  
+  A string containing expected class names, separated by spaces, or a list of such strings to assert multiple elements.
+- `options` `LocatorAssertionsToContainClassOptions?` *(optional)*
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-contain-class-option-timeout"/><a href="#locator-assertions-to-contain-class-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for in milliseconds. Defaults to `5000`.
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-contain-class-return"/><a href="#locator-assertions-to-contain-class-return" class="list-anchor">#</a>
+
+---
+
 ### ToContainTextAsync {#locator-assertions-to-contain-text}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><x-search>locatorAssertions.ToContainTextAsync</x-search>
@@ -499,7 +547,7 @@ await Expect(locator).ToHaveAttributeAsync("type", "text");
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><x-search>locatorAssertions.ToHaveClassAsync</x-search>
 
-Ensures the [Locator] points to an element with given CSS classes. When a string is provided, it must fully match the element's `class` attribute. To match individual classes or perform partial matches, use a regular expression:
+Ensures the [Locator] points to an element with given CSS classes. When a string is provided, it must fully match the element's `class` attribute. To match individual classes use [Expect(Locator).ToContainClassAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-contain-class).
 
 **Usage**
 
@@ -509,14 +557,14 @@ Ensures the [Locator] points to an element with given CSS classes. When a string
 
 ```csharp
 var locator = Page.Locator("#component");
-await Expect(locator).ToHaveClassAsync(new Regex("(^|\\s)selected(\\s|$)"));
 await Expect(locator).ToHaveClassAsync("middle selected row");
+await Expect(locator).ToHaveClassAsync(new Regex("(^|\\s)selected(\\s|$)"));
 ```
 
 When an array is passed, the method asserts that the list of elements located matches the corresponding list of expected class values. Each element's class attribute is matched against the corresponding string or regular expression in the array:
 
 ```csharp
-var locator = Page.Locator("list > .component");
+var locator = Page.Locator(".list > .component");
 await Expect(locator).ToHaveClassAsync(new string[]{"component", "component selected", "component"});
 ```
 
@@ -861,7 +909,6 @@ Expect(Locator).Not
 - [LocatorAssertions]
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -927,6 +974,7 @@ Expect(Locator).Not
 [Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1 "Action"
 [Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2 "Func"
 [IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable "IEnumerable"
+[IReadOnlyList]: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1?view=net-9.0 "IReadOnlyList"
 [IDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary "IDictionary"
 [Task]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-5.0 "Task"
 [IReadOnlyDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2 "IReadOnlyDictionary"

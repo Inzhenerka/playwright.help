@@ -294,6 +294,23 @@ await Page.CloseAsync(options);
 
 ---
 
+### ConsoleMessagesAsync {#page-console-messages}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.56</font><x-search>page.ConsoleMessagesAsync</x-search>
+
+Returns up to (currently) 200 last console messages from this page. See [Page.Console](/api/class-page.mdx#page-event-console) for more details.
+
+**Usage**
+
+```csharp
+await Page.ConsoleMessagesAsync();
+```
+
+**Returns**
+- [IReadOnlyList]&lt;[ConsoleMessage]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-console-messages-return"/><a href="#page-console-messages-return" class="list-anchor">#</a>
+
+---
+
 ### ContentAsync {#page-content}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.ContentAsync</x-search>
@@ -373,6 +390,9 @@ await Page.DragAndDropAsync("#source", "#target", new()
       
       
     Clicks on the source element at this point relative to the top-left corner of the element's padding box. If not specified, some visible point of the element is used.
+  - `Steps` [int]? *(optional)* <font size="2">Added in: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-drag-and-drop-option-steps"/><a href="#page-drag-and-drop-option-steps" class="list-anchor">#</a>
+    
+    Defaults to 1. Sends `n` interpolated `mousemove` events to represent travel between the `mousedown` and `mouseup` of the drag. When set to 1, emits a single `mousemove` event at the destination location.
   - `Strict` [bool]? *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-drag-and-drop-option-strict"/><a href="#page-drag-and-drop-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -766,7 +786,7 @@ Page.Frames
 ```
 
 **Returns**
-- [IEnumerable]&lt;[Frame]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-frames-return"/><a href="#page-frames-return" class="list-anchor">#</a>
+- [IReadOnlyList]&lt;[Frame]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-frames-return"/><a href="#page-frames-return" class="list-anchor">#</a>
 
 ---
 
@@ -1310,11 +1330,28 @@ await Page.OpenerAsync();
 
 ---
 
+### PageErrorsAsync {#page-page-errors}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.56</font><x-search>page.PageErrorsAsync</x-search>
+
+Returns up to (currently) 200 last page errors from this page. See [Page.PageError](/api/class-page.mdx#page-event-page-error) for more details.
+
+**Usage**
+
+```csharp
+await Page.PageErrorsAsync();
+```
+
+**Returns**
+- [IReadOnlyList]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-page-errors-return"/><a href="#page-page-errors-return" class="list-anchor">#</a>
+
+---
+
 ### PauseAsync {#page-pause}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.PauseAsync</x-search>
 
-Pauses script execution. Playwright will stop executing the script and wait for the user to either press 'Resume' button in the page overlay or to call `playwright.resume()` in the DevTools console.
+Pauses script execution. Playwright will stop executing the script and wait for the user to either press the 'Resume' button in the page overlay or to call `playwright.resume()` in the DevTools console.
 
 User can inspect selectors or perform manual steps while paused. Resume will continue running the original script from the place it was paused.
 
@@ -1533,6 +1570,27 @@ await Page.RequestGCAsync();
 
 **Returns**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-request-gc-return"/><a href="#page-request-gc-return" class="list-anchor">#</a>
+
+---
+
+### RequestsAsync {#page-requests}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.56</font><x-search>page.RequestsAsync</x-search>
+
+Returns up to (currently) 100 last network request from this page. See [Page.Request](/api/class-page.mdx#page-event-request) for more details.
+
+Returned requests should be accessed immediately, otherwise they might be collected to prevent unbounded memory growth as new requests come in. Once collected, retrieving most information about the request is impossible.
+
+Note that requests reported through the [Page.Request](/api/class-page.mdx#page-event-request) request are not collected, so there is a trade off between efficient memory usage with [Page.RequestsAsync()](/api/class-page.mdx#page-requests) and the amount of available information reported through [Page.Request](/api/class-page.mdx#page-event-request).
+
+**Usage**
+
+```csharp
+await Page.RequestsAsync();
+```
+
+**Returns**
+- [IReadOnlyList]&lt;[Request]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-requests-return"/><a href="#page-requests-return" class="list-anchor">#</a>
 
 ---
 
@@ -2719,7 +2777,7 @@ Page.Workers
 ```
 
 **Returns**
-- [IEnumerable]&lt;[Worker]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-workers-return"/><a href="#page-workers-return" class="list-anchor">#</a>
+- [IReadOnlyList]&lt;[Worker]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-workers-return"/><a href="#page-workers-return" class="list-anchor">#</a>
 
 ---
 
@@ -3192,28 +3250,6 @@ Page.Worker += async (_, worker) => {};
 ---
 
 ## Deprecated
-
-### Accessibility {#page-accessibility}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.Accessibility</x-search>
-
-:::warning Deprecated
-
-This property is discouraged. Please use other libraries such as [Axe](https://www.deque.com/axe/) if you need to test page accessibility. See our Node.js [guide](https://playwright.dev/docs/accessibility-testing) for integration with Axe.
-
-:::
-
-
-**Usage**
-
-```csharp
-Page.Accessibility
-```
-
-**Type**
-- [Accessibility]
-
----
 
 ### CheckAsync {#page-check}
 
@@ -4234,7 +4270,7 @@ await Page.QuerySelectorAllAsync(selector);
   A selector to query for.
 
 **Returns**
-- [IEnumerable]&lt;[ElementHandle]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-query-selector-all-return"/><a href="#page-query-selector-all-return" class="list-anchor">#</a>
+- [IReadOnlyList]&lt;[ElementHandle]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-query-selector-all-return"/><a href="#page-query-selector-all-return" class="list-anchor">#</a>
 
 ---
 
@@ -4411,7 +4447,7 @@ await page.SelectOptionAsync("select#colors", new[] { "red", "green", "blue" });
     Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
-- [IEnumerable]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-select-option-return"/><a href="#page-select-option-return" class="list-anchor">#</a>
+- [IReadOnlyList]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-select-option-return"/><a href="#page-select-option-return" class="list-anchor">#</a>
 
 ---
 
@@ -4867,7 +4903,6 @@ await page.WaitForTimeoutAsync(1000);
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-timeout-return"/><a href="#page-wait-for-timeout-return" class="list-anchor">#</a>
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -4933,6 +4968,7 @@ await page.WaitForTimeoutAsync(1000);
 [Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1 "Action"
 [Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2 "Func"
 [IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable "IEnumerable"
+[IReadOnlyList]: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1?view=net-9.0 "IReadOnlyList"
 [IDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary "IDictionary"
 [Task]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-5.0 "Task"
 [IReadOnlyDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2 "IReadOnlyDictionary"

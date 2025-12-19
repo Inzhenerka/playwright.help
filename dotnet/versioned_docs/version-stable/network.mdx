@@ -182,21 +182,19 @@ await Page.RouteAsync("**/title.html", async route =>
 
 ## Шаблоны URL с глобальными символами
 
-Playwright использует упрощенные шаблоны с глобальными символами для сопоставления URL в методах перехвата сети, таких как [Page.RouteAsync()](/api/class-page.mdx#page-route) или [Page.RunAndWaitForResponseAsync()](/api/class-page.mdx#page-wait-for-response). Эти шаблоны поддерживают основные подстановочные знаки:
-1. Звездочки:
-   - Одиночная `*` соответствует любым символам, кроме `/`
-   - Двойная `**` соответствует любым символам, включая `/`
-1. Вопросительный знак `?` соответствует любому одиночному символу, кроме `/`
-1. Фигурные скобки `{}` могут использоваться для сопоставления списка опций, разделенных запятыми `,`
-1. Квадратные скобки `[]` могут использоваться для сопоставления набора символов
-1. Обратная косая черта `\` может использоваться для экранирования любых специальных символов (обратите внимание, что для экранирования самой обратной косой черты используйте `\\`)
+Playwright uses simplified glob patterns for URL matching in network interception methods like [Page.RouteAsync()](/api/class-page.mdx#page-route) or [Page.RunAndWaitForResponseAsync()](/api/class-page.mdx#page-wait-for-response). These patterns support basic wildcards:
+1. Asterisks:
+   - A single `*` matches any characters except `/`
+   - A double `**` matches any characters including `/`
+1. Question mark `?` matches only question mark `?`. If you want to match any character, use `*` instead.
+1. Curly braces `{}` can be used to match a list of options separated by commas `,`
+1. Backslash `\` can be used to escape any of special characters (note to escape backslash itself as `\\`)
 
-Примеры:
-- `https://example.com/*.js` соответствует `https://example.com/file.js`, но не `https://example.com/path/file.js`
-- `https://example.com/\\?page=1` соответствует `https://example.com/?page=1`, но не `https://example.com`
-- `**/v[0-9]*` соответствует `https://example.com/v1/`, но не `https://example.com/vote/`
-- `**/*.js` соответствует как `https://example.com/file.js`, так и `https://example.com/path/file.js`
-- `**/*.{png,jpg,jpeg}` соответствует всем запросам изображений
+Examples:
+- `https://example.com/*.js` matches `https://example.com/file.js` but not `https://example.com/path/file.js`
+- `https://example.com/?page=1` matches `https://example.com/?page=1` but not `https://example.com`
+- `**/*.js` matches both `https://example.com/file.js` and `https://example.com/path/file.js`
+- `**/*.{png,jpg,jpeg}` matches all image requests
 
 Важные замечания:
 - Шаблон с глобальными символами должен соответствовать всему URL, а не только его части.
@@ -221,13 +219,13 @@ page.WebSocket += (_, ws) =>
 
 ## Отсутствующие сетевые события и Service Workers
 
-Встроенные [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) и [Page.RouteAsync()](/api/class-page.mdx#page-route) Playwright позволяют вашим тестам нативно маршрутизировать запросы и выполнять мокирование и перехват.
-1. Если вы используете нативные [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) и [Page.RouteAsync()](/api/class-page.mdx#page-route) Playwright, и кажется, что сетевые события отсутствуют, отключите Service Workers, установив [ServiceWorkers](/api/class-browser.mdx#browser-new-context-option-service-workers) в `'block'`.
-1. Возможно, вы используете инструмент мокирования, такой как Mock Service Worker (MSW). Хотя этот инструмент работает из коробки для мокирования ответов, он добавляет свой собственный Service Worker, который перехватывает сетевые запросы, делая их невидимыми для [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) и [Page.RouteAsync()](/api/class-page.mdx#page-route). Если вас интересует как тестирование сети, так и мокирование, рассмотрите возможность использования встроенных [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) и [Page.RouteAsync()](/api/class-page.mdx#page-route) для [мокирования ответов](#handle-requests).
-1. Если вас интересует не только использование Service Workers для тестирования и мокирования сети, но и маршрутизация и прослушивание запросов, сделанных самими Service Workers, пожалуйста, ознакомьтесь с [этой экспериментальной функцией](https://github.com/microsoft/playwright/issues/15684).
+Встроенные методы Playwright — [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) и [Page.RouteAsync()](/api/class-page.mdx#page-route) — позволяют нативно маршрутизировать запросы в тестах и выполнять мокинг и перехват.
+
+Если вы используете нативные [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) и [Page.RouteAsync()](/api/class-page.mdx#page-route), и при этом кажется, что сетевые события пропадают, отключите Service Workers, установив [ServiceWorkers](/api/class-browser.mdx#browser-new-context-option-service-workers) в значение `'block'`.
+
+Возможно, вы используете инструмент для моков, например Mock Service Worker (MSW). Он работает «из коробки» для мокинга ответов, но добавляет собственный Service Worker, который перехватывает сетевые запросы, из-за чего они становятся невидимыми для [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) и [Page.RouteAsync()](/api/class-page.mdx#page-route). Если вам важны и сетевое тестирование, и мокинг, рассмотрите вариант использовать встроенные [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) и [Page.RouteAsync()](/api/class-page.mdx#page-route) для [мокинга ответов](#handle-requests).
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -293,6 +291,7 @@ page.WebSocket += (_, ws) =>
 [Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1 "Action"
 [Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2 "Func"
 [IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable "IEnumerable"
+[IReadOnlyList]: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1?view=net-9.0 "IReadOnlyList"
 [IDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary "IDictionary"
 [Task]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-5.0 "Task"
 [IReadOnlyDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2 "IReadOnlyDictionary"
