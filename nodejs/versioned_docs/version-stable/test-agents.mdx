@@ -1,6 +1,6 @@
 ---
 id: test-agents
-title: "Agents"
+title: "Агенты"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -8,22 +8,22 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
-# Playwright Test Agents
+# Агенты Playwright Test
 
-## Introduction
+## Введение
 
-Playwright comes with three Playwright Test Agents out of the box: **🎭 planner**, **🎭 generator** and **🎭 healer**.
+Playwright поставляется с тремя Playwright Test Agents «из коробки»: **🎭 planner**, **🎭 generator** и **🎭 healer**.
 
-These agents can be used independently, sequentially, or as the chained calls in the agentic loop. Using them sequentially will produce test coverage for your product.
-* **🎭 planner** explores the app and produces a Markdown test plan
-* **🎭 generator** transforms the Markdown plan into the Playwright Test files
-* **🎭 healer** executes the test suite and automatically repairs failing tests
+Эти агенты можно использовать независимо, последовательно или как цепочку вызовов в агентном цикле (agentic loop). Последовательное использование агентов позволяет получить тестовое покрытие для вашего продукта.
+* **🎭 planner** исследует приложение и создает Markdown‑план тестирования
+* **🎭 generator** преобразует Markdown‑план в файлы Playwright Test
+* **🎭 healer** выполняет тестовый набор и автоматически исправляет падающие тесты
 
 <LiteYouTube id="_AifxZGxwuk" title="Playwright 1.56 - Introducing Playwright Test Agents" />
 
-### Getting Started
+### Начало работы
 
-Start with adding Playwright Test Agent definitions to your project using the `init-agents` command. These definitions should be regenerated whenever Playwright is updated to pick up new tools and instructions.
+Начните с добавления определений Playwright Test Agent в ваш проект с помощью команды `init-agents`. Эти определения следует пересоздавать при каждом обновлении Playwright, чтобы получать новые инструменты и инструкции.
 
 <Tabs
   groupId="bash-flavor"
@@ -32,8 +32,8 @@ Start with adding Playwright Test Agent definitions to your project using the `i
     {label: 'VS Code', value: 'vscode'},
     {label: 'Claude Code', value: 'claude'},
     {label: 'OpenCode', value: 'opencode'}
-  ]
-}>
+  ]}
+>
 <TabItem value="vscode">
 
 ```bash
@@ -59,43 +59,43 @@ npx playwright init-agents --loop=opencode
 
 :::note
 
-VS Code v1.105 (released October 9, 2025) is needed for the agentic experience to function properly in VS Code.
+Для корректной работы агентного режима в VS Code требуется VS Code v1.105 (выпуск от 9 октября 2025 года).
 :::
 
-Once the agents have been generated, you can use your AI tool of choice to command these agents to build Playwright Tests. 
+После генерации агентов вы можете использовать любой удобный вам AI‑инструмент, чтобы управлять этими агентами и создавать Playwright‑тесты.
 
 ## 🎭 Planner
 
-Planner agent explores your app and produces a test plan for one or many scenarios and user flows.
+Агент Planner исследует ваше приложение и создает план тестирования для одного или нескольких сценариев и пользовательских потоков.
 
-**Input**
-* A clear request to the planner (e.g., “Generate a plan for guest checkout.”)
-* A `seed test` that sets up the environment necessary to interact with your app
-* *(optional)* A Product Requirement Document (PRD) for context
+**Входные данные**
+* Четкий запрос к planner (например, «Сгенерируй план для гостевого оформления заказа»)
+* `seed test`, который подготавливает окружение, необходимое для взаимодействия с приложением
+* *(необязательно)* Документ с требованиями к продукту (PRD) для дополнительного контекста
 
-**Prompt**
+**Промпт**
 
 <img src={require("../images/test-agents/planner-prompt.png").src} alt="planner prompt" width="472"/>
 
-> - Notice how the `seed.spec.ts` is included in the context of the planner.
-> - Planner will run this test to execute all the initialization necessary for your test including the global setup, project dependencies and all the necessary fixtures and hooks.
-> - Planner will also use this seed test as an example of all the generated tests. Alternatively, you can mention the file name in the prompt.
+> - Обратите внимание, что `seed.spec.ts` включен в контекст planner.
+> - Planner выполнит этот тест, чтобы произвести всю необходимую инициализацию для ваших тестов, включая глобальный setup, зависимости проектов и все необходимые фикстуры и хуки.
+> - Planner также использует этот seed‑тест как пример для всех сгенерированных тестов. В качестве альтернативы вы можете указать имя файла прямо в промпте.
 
 ```js title="Example: seed.spec.ts"
 import { test, expect } from './fixtures';
 
 test('seed', async ({ page }) => {
-  // this test uses custom fixtures from ./fixtures
+  // этот тест использует пользовательские фикстуры из ./fixtures
 });
 ```
 
-**Output**
-* A Markdown test plan saved as `specs/basic-operations.md`.
-* The plan is human-readable but precise enough for test generation.
+**Результат**
+* Markdown‑план тестирования, сохраненный как `specs/basic-operations.md`.
+* План человекочитаемый, но при этом достаточно точный для генерации тестов.
 
 <details>
 
-<summary>Example: <b>specs/basic-operations.md</b></summary>
+<summary>Пример: <b>specs/basic-operations.md</b></summary>
 
 ```markdown
 # TodoMVC Application - Basic Operations Test Plan
@@ -138,25 +138,25 @@ The TodoMVC application is a React-based todo list manager that demonstrates sta
 
 ## 🎭 Generator
 
-Generator agent uses the Markdown plan to produce executable Playwright Tests. It verifies selectors and assertions live as it performs the scenarios. Playwright supports generation hints and provides a catalog of assertions for efficient structural and behavioral validation.
+Агент Generator использует Markdown‑план для создания исполняемых Playwright‑тестов. Он проверяет селекторы и ассерты «на лету» по мере выполнения сценариев. Playwright поддерживает подсказки для генерации и предоставляет каталог утверждений (assertions) для эффективной структурной и поведенческой валидации.
 
-**Input**
-* Markdown plan from `specs/`
+**Входные данные**
+* Markdown‑план из каталога `specs/`
 
-**Prompt**
+**Промпт**
 
 <img src={require("../images/test-agents/generator-prompt.png").src} alt="generator prompt" width="472"/>
 
-> - Notice how the `basic-operations.md` is included in the context of the generator.
-> - This is how generator knows where to get the test plan from. Alternatively, you can mention the file name in the prompt.
+> - Обратите внимание, что `basic-operations.md` включен в контекст generator.
+> - Именно так generator понимает, откуда брать план тестирования. В качестве альтернативы вы можете указать имя файла прямо в промпте.
 
-**Output**
-* A test suite under `tests/`
-* Generated tests may include initial errors that can be healed automatically by the healer agent
+**Результат**
+* Набор тестов в каталоге `tests/`
+* Сгенерированные тесты могут содержать начальные ошибки, которые могут быть автоматически исправлены агентом healer
 
 <details>
 
-<summary>Example: <b>tests/add-valid-todo.spec.ts</b></summary>
+<summary>Пример: <b>tests/add-valid-todo.spec.ts</b></summary>
 
 ```ts
 // spec: specs/basic-operations.md
@@ -200,58 +200,58 @@ test.describe('Adding New Todos', () => {
 
 ## 🎭 Healer
 
-When the test fails, the healer agent:
-* Replays the failing steps
-* Inspects the current UI to locate equivalent elements or flows
-* Suggests a patch (e.g., locator update, wait adjustment, data fix)
-* Re-runs the test until it passes or until guardrails stop the loop
+Когда тест падает, агент healer:
+* Повторно воспроизводит шаги, приведшие к ошибке
+* Анализирует текущее состояние UI, чтобы найти эквивалентные элементы или потоки
+* Предлагает исправление (например, обновление локатора, корректировку ожиданий, исправление данных)
+* Перезапускает тест до тех пор, пока он не пройдет, либо пока защитные ограничения не остановят цикл
 
-**Input**
-* Failing test name
+**Входные данные**
+* Имя упавшего теста
 
-**Prompt**
+**Промпт**
 
 <img src={require("../images/test-agents/healer-prompt.png").src} alt="healer prompt" width="469"/>
 
-**Output**
-* A passing test, or a skipped test if the healer believes the that functionality is broken.
+**Результат**
+* Проходящий тест либо пропущенный тест, если healer считает, что соответствующая функциональность сломана.
 
-## Artifacts and Conventions
+## Артефакты и соглашения
 
-The static agent definitions and generated files follow a simple, auditable structure:
+Статические определения агентов и сгенерированные файлы следуют простой и проверяемой структуре:
 
 ```bash
 repo/
-  .github/                    # agent definitions
-  specs/                      # human-readable test plans
+  .github/                    # определения агентов
+  specs/                      # человекочитаемые планы тестирования
     basic-operations.md
-  tests/                      # generated Playwright tests
-    seed.spec.ts              # seed test for environment
+  tests/                      # сгенерированные Playwright‑тесты
+    seed.spec.ts              # seed‑тест для подготовки окружения
     tests/create/add-valid-todo.spec.ts
   playwright.config.ts
 ```
 
-### Agent Definitions
+### Определения агентов
 
-Under the hood, agent definitions are collections of instructions and MCP tools. They are provided by Playwright and should be regenerated whenever Playwright is updated.
+Внутри агентные определения представляют собой наборы инструкций и MCP‑инструментов. Они предоставляются Playwright и должны пересоздаваться при каждом обновлении Playwright.
 
-Example for Claude Code subagents:
+Пример для подагентов Claude Code:
 
 ```bash
 npx playwright init-agents --loop=vscode
 ```
 
-### Specs in `specs/`
+### Specs в `specs/`
 
-Specs are structured plans describing scenarios in human-readable terms. They include steps, expected outcomes, and data. Specs can start from scratch or extend a seed test.
+Specs — это структурированные планы, описывающие сценарии в человекочитаемой форме. Они включают шаги, ожидаемые результаты и данные. Specs могут начинаться с нуля или расширять seed‑тест.
 
-### Tests in `tests/`
+### Tests в `tests/`
 
-Generated Playwright tests, aligned one-to-one with specs wherever feasible.
+Сгенерированные Playwright‑тесты, по возможности соответствующие specs по принципу «один к одному».
 
-### Seed tests `seed.spec.ts`
+### Seed‑тесты `seed.spec.ts`
 
-Seed tests provide a ready-to-use `page` context to bootstrap execution.
+Seed‑тесты предоставляют готовый к использованию контекст `page` для инициализации выполнения.
 
 
 [Android]: /api/class-android.mdx "Android"

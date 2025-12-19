@@ -6,28 +6,28 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
+## Введение
 
 :::warning
 
-Service workers are only supported on Chromium-based browsers.
+Service Workers поддерживаются только в браузерах на базе Chromium.
 :::
 
 :::note
-If you're looking to do general network mocking, routing, and interception, please see the [Network Guide](./network.mdx) first. Playwright provides built-in APIs for this use case that don't require the information below. However, if you're interested in requests made by Service Workers themselves, please read below.
+Если вы ищете решение для общего мокинга сети, маршрутизации и перехвата запросов, сначала ознакомьтесь с [Network Guide](./network.mdx). Playwright предоставляет встроенные API для этого сценария, которые не требуют информации ниже. Однако, если вас интересуют запросы, выполняемые самими Service Workers, читайте дальше.
 :::
 
-[Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) provide a browser-native method of handling requests made by a page with the native [Fetch API (`fetch`)](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) along with other network-requested assets (like scripts, css, and images).
+[Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) предоставляют нативный для браузера способ обработки запросов, выполняемых страницей с помощью нативного [Fetch API (`fetch`)](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API), а также других сетевых ресурсов (таких как скрипты, CSS и изображения).
 
-They can act as a **network proxy** between the page and the external network to perform caching logic or can provide users with an offline experience if the Service Worker adds a [FetchEvent](https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent#examples) listener.
+Они могут выступать в роли **сетевого прокси** между страницей и внешней сетью для реализации логики кэширования или предоставлять пользователям офлайн‑режим, если Service Worker добавляет обработчик события [FetchEvent](https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent#examples).
 
-Many sites that use Service Workers simply use them as a transparent optimization technique. While users might notice a faster experience, the app's implementation is unaware of their existence. Running the app with or without Service Workers enabled appears functionally equivalent.
+Многие сайты, использующие Service Workers, применяют их лишь как прозрачную оптимизацию. Пользователи могут заметить более высокую скорость работы, однако сама реализация приложения «не знает» об их существовании. Запуск приложения с включёнными или отключёнными Service Workers выглядит функционально одинаково.
 
-## How to Disable Service Workers
+## Как отключить Service Workers
 
-Playwright allows to disable Service Workers during testing. This makes tests more predictable and performant. However, if your actual page uses a Service Worker, the behavior might be different.
+Playwright позволяет отключать Service Workers во время тестирования. Это делает тесты более предсказуемыми и производительными. Однако если ваша реальная страница использует Service Worker, поведение может отличаться.
 
-To disable service workers, set [testOptions.serviceWorkers](/api/class-testoptions.mdx#test-options-service-workers) to `'block'`.
+Чтобы отключить service workers, установите [testOptions.serviceWorkers](/api/class-testoptions.mdx#test-options-service-workers) в значение `'block'`.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -39,9 +39,9 @@ export default defineConfig({
 });
 ```
 
-## Accessing Service Workers and Waiting for Activation
+## Доступ к Service Workers и ожидание активации
 
-You can use [browserContext.serviceWorkers()](/api/class-browsercontext.mdx#browser-context-service-workers) to list the Service [Worker]s, or specifically watch for the Service [Worker] if you anticipate a page will trigger its [registration](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerContainer/register):
+Вы можете использовать [browserContext.serviceWorkers()](/api/class-browsercontext.mdx#browser-context-service-workers), чтобы получить список Service [Worker]’ов, или целенаправленно ожидать Service [Worker], если вы предполагаете, что страница инициирует его [регистрацию](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerContainer/register):
 
 ```js
 const serviceWorkerPromise = context.waitForEvent('serviceworker');
@@ -49,9 +49,9 @@ await page.goto('/example-with-a-service-worker.html');
 const serviceworker = await serviceWorkerPromise;
 ```
 
-[browserContext.on('serviceworker')](/api/class-browsercontext.mdx#browser-context-event-service-worker) event is fired ***before*** the Service Worker has taken control over the page, so ***before*** evaluating in the worker with [worker.evaluate()](/api/class-worker.mdx#worker-evaluate) you should wait on its activation.
+Событие [browserContext.on('serviceworker')](/api/class-browsercontext.mdx#browser-context-event-service-worker) срабатывает ***до того***, как Service Worker возьмёт контроль над страницей, поэтому ***перед*** выполнением кода в воркере с помощью [worker.evaluate()](/api/class-worker.mdx#worker-evaluate) необходимо дождаться его активации.
 
-There are more idiomatic methods of waiting for a Service Worker to be activated, but the following is an implementation agnostic method:
+Существуют более идиоматичные способы ожидания активации Service Worker, однако следующий вариант является независимым от конкретной реализации:
 
 ```js
 await page.evaluate(async () => {
@@ -64,22 +64,22 @@ await page.evaluate(async () => {
 });
 ```
 
-## Network Events and Routing
+## Сетевые события и маршрутизация
 
-Any network request made by the **Service Worker** is reported through the [BrowserContext] object:
-* [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request), [browserContext.on('requestfinished')](/api/class-browsercontext.mdx#browser-context-event-request-finished), [browserContext.on('response')](/api/class-browsercontext.mdx#browser-context-event-response) and [browserContext.on('requestfailed')](/api/class-browsercontext.mdx#browser-context-event-request-failed) are fired
-* [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route) sees the request
-* [request.serviceWorker()](/api/class-request.mdx#request-service-worker) will be set to the Service [Worker] instance, and [request.frame()](/api/class-request.mdx#request-frame) will **throw**
+Любой сетевой запрос, выполненный **Service Worker**, репортится через объект [BrowserContext]:
+* Срабатывают события [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request), [browserContext.on('requestfinished')](/api/class-browsercontext.mdx#browser-context-event-request-finished), [browserContext.on('response')](/api/class-browsercontext.mdx#browser-context-event-response) и [browserContext.on('requestfailed')](/api/class-browsercontext.mdx#browser-context-event-request-failed)
+* Метод [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route) «видит» этот запрос
+* У [request.serviceWorker()](/api/class-request.mdx#request-service-worker) будет установлено значение — экземпляр Service [Worker], а вызов [request.frame()](/api/class-request.mdx#request-frame) **выбросит исключение**
 
-Additionally, for any network request made by the **Page**, method [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) return `true` when the request was handled a Service Worker's fetch handler.
+Кроме того, для любого сетевого запроса, выполненного **Page**, метод [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) возвращает `true`, если запрос был обработан fetch‑обработчиком Service Worker.
 
-Consider a simple service worker that fetches every request made by the page:
+Рассмотрим простой service worker, который перехватывает и проксирует каждый запрос, сделанный страницей:
 
 ```js title="transparent-service-worker.js"
 self.addEventListener('fetch', event => {
-  // actually make the request
+  // фактически выполняем запрос
   const responsePromise = fetch(event.request);
-  // send it back to the page
+  // отправляем его обратно на страницу
   event.respondWith(responsePromise);
 });
 
@@ -88,7 +88,7 @@ self.addEventListener('activate', event => {
 });
 ```
 
-If `index.html` registers this service worker, and then fetches `data.json`, the following Request/Response events would be emitted (along with the corresponding network lifecycle events):
+Если `index.html` регистрирует этот service worker, а затем запрашивает `data.json`, будут сгенерированы следующие события Request/Response (вместе с соответствующими событиями жизненного цикла сети):
 
 | Event                             | Owner            | URL                            | Routed | [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) |
 | -                                 | -                | -                              | -      | -                                      |
@@ -99,21 +99,21 @@ If `index.html` registers this service worker, and then fetches `data.json`, the
 | [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | data.json                      |        | Yes                                    |
 | [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | data.json                      |        | Yes                                    |
 
-Since the example Service Worker just acts a basic transparent "proxy":
-* There's 2 [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) events for `data.json`; one [Frame]-owned, the other Service [Worker]-owned.
-* Only the Service [Worker]-owned request for the resource was routable via [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route); the [Frame]-owned events for `data.json` are not routeable, as they would not have even had the possibility to hit the external network since the Service Worker has a fetch handler registered.
+Поскольку в примере Service Worker выступает лишь в роли простого прозрачного «прокси»:
+* Для `data.json` существует 2 события [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request): одно принадлежит [Frame], другое — Service [Worker].
+* Только запрос, принадлежащий Service [Worker], может быть маршрутизирован через [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route); события, принадлежащие [Frame], для `data.json` не маршрутизируются, так как они даже не имели возможности попасть во внешнюю сеть — у Service Worker зарегистрирован обработчик fetch.
 
 :::caution
 
-It's important to note: calling [request.frame()](/api/class-request.mdx#request-frame) or [response.frame()](/api/class-response.mdx#response-frame) will **throw** an exception, if called on a [Request]/[Response] that has a non-null [request.serviceWorker()](/api/class-request.mdx#request-service-worker).
+Важно отметить: вызов [request.frame()](/api/class-request.mdx#request-frame) или [response.frame()](/api/class-response.mdx#response-frame) **выбросит исключение**, если он выполнен для [Request]/[Response], у которого [request.serviceWorker()](/api/class-request.mdx#request-service-worker) не равен null.
 :::
 
-## Routing Service Worker Requests Only
+## Маршрутизация только запросов Service Worker
 
 ```js
 await context.route('**', async route => {
   if (route.request().serviceWorker()) {
-    // NB: calling route.request().frame() here would THROW
+    // NB: вызов route.request().frame() здесь ВЫБРОСИТ исключение
     await route.fulfill({
       contentType: 'text/plain',
       status: 200,
@@ -125,9 +125,9 @@ await context.route('**', async route => {
 });
 ```
 
-## Known Limitations
+## Известные ограничения
 
-Requests for updated Service Worker main script code currently cannot be routed (https://github.com/microsoft/playwright/issues/14711).
+Запросы на обновление основного скрипта Service Worker в настоящее время не могут быть маршрутизированы (https://github.com/microsoft/playwright/issues/14711).
 
 
 [Android]: /api/class-android.mdx "Android"
