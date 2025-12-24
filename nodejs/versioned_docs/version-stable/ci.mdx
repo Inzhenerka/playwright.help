@@ -6,7 +6,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Введение
+## Введение {#introduction}
 
 Тесты Playwright могут выполняться в средах CI. Мы создали примеры конфигураций для распространённых провайдеров CI.
 
@@ -28,7 +28,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
    npx playwright test
    ```
    
-## Рабочие процессы
+## Рабочие процессы {#workers}
 
 Мы рекомендуем устанавливать [workers](./api/class-testconfig.mdx#test-config-workers) в значение "1" в средах CI для обеспечения стабильности и воспроизводимости. Последовательный запуск тестов гарантирует, что каждый тест получает все системные ресурсы, избегая потенциальных конфликтов. Однако, если у вас есть мощная самоуправляемая система CI, вы можете включить [параллельные](./test-parallel.mdx) тесты. Для более широкой параллелизации рассмотрите возможность [шардинга](./test-parallel.mdx#shard-tests-between-multiple-machines) - распределения тестов между несколькими заданиями CI.
 
@@ -41,13 +41,13 @@ export default defineConfig({
 });
 ```
 
-## Конфигурации CI
+## Конфигурации CI {#ci-configurations}
 
 [Командные инструменты](./browsers#install-system-dependencies) могут быть использованы для установки всех зависимостей операционной системы в CI.
 
-### GitHub Actions
+### GitHub Actions {#github-actions}
 
-#### При push/pull_request
+#### При push/pull_request {#on-pushpull_request}
 
 Тесты будут запускаться при push или pull request на ветках main/master. [Рабочий процесс](https://docs.github.com/en/actions/using-workflows/about-workflows) установит все зависимости, установит Playwright и затем запустит тесты. Он также создаст HTML-отчёт.
 
@@ -81,11 +81,11 @@ jobs:
         retention-days: 30
 ```
 
-#### При push/pull_request (с шардингом)
+#### При push/pull_request (с шардингом) {#on-pushpull_request-sharded}
 
 GitHub Actions поддерживает [шардинг тестов между несколькими заданиями](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs). Ознакомьтесь с нашим [документом о шардинге](./test-sharding), чтобы узнать больше о шардинге и увидеть [пример GitHub actions](./test-sharding.mdx#github-actions-example) о том, как настроить задание для запуска ваших тестов на нескольких машинах, а также как объединить HTML-отчёты.
 
-#### Через контейнеры
+#### Через контейнеры {#via-containers}
 
 GitHub Actions поддерживает [запуск заданий в контейнере](https://docs.github.com/en/actions/using-jobs/running-jobs-in-a-container) с использованием опции [`jobs.<job_id>.container`](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idcontainer). Это полезно, чтобы не загрязнять среду хоста зависимостями и иметь согласованную среду, например, для скриншотов/визуального тестирования регрессий на разных операционных системах.
 
@@ -114,7 +114,7 @@ jobs:
         run: npx playwright test
 ```
 
-#### При развертывании
+#### При развертывании {#on-deployment}
 
 Это запустит тесты после того, как [развертывание GitHub](https://developer.github.com/v3/repos/deployments/) перейдёт в состояние `success`. Сервисы, такие как Vercel, используют этот шаблон, чтобы вы могли запускать свои end-to-end тесты в их развернутой среде.
 
@@ -142,7 +142,7 @@ jobs:
         PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
 ```
 
-#### Быстрый отказ
+#### Быстрый отказ {#fail-fast}
 
 Большие наборы тестов могут выполняться очень долго. Выполнив предварительный запуск тестов с флагом `--only-changed`, вы можете сначала запустить тестовые файлы, которые, вероятно, не пройдут. Это обеспечит более быструю обратную связь и немного снизит потребление CI при работе над Pull Requests. Чтобы обнаружить тестовые файлы, затронутые вашим изменением, `--only-changed` анализирует граф зависимостей вашего набора тестов. Это эвристика и может пропустить тесты, поэтому важно всегда запускать полный набор тестов после предварительного запуска.
 
@@ -183,11 +183,11 @@ jobs:
         retention-days: 30
 ```
 
-### Docker
+### Docker {#docker}
 
 У нас есть [готовый Docker-образ](./docker.mdx), который можно использовать напрямую или как ориентир при обновлении ваших текущих Docker-конфигураций. Обязательно следуйте [рекомендуемой конфигурации Docker](./docker.mdx#recommended-docker-configuration), чтобы обеспечить наилучшую производительность.
 
-### Azure Pipelines
+### Azure Pipelines {#azure-pipelines}
 
 Для агентов Windows или macOS не требуется дополнительной конфигурации, просто установите Playwright и запустите ваши тесты.
 
@@ -217,7 +217,7 @@ steps:
     CI: 'true'
 ```
 
-#### Загрузка папки playwright-report с Azure Pipelines
+#### Загрузка папки playwright-report с Azure Pipelines {#uploading-playwright-report-folder-with-azure-pipelines}
 
 Это приведёт к сбою выполнения конвейера, если какой-либо из тестов playwright не пройдёт. Если вы также хотите интегрировать результаты тестов с Azure DevOps, используйте задачу `PublishTestResults` следующим образом:
 
@@ -273,7 +273,7 @@ export default defineConfig({
 
 в `playwright.config.ts`.
 
-#### Azure Pipelines (с шардингом)
+#### Azure Pipelines (с шардингом) {#azure-pipelines-sharded}
 
 ```yaml
 trigger:
@@ -327,7 +327,7 @@ steps:
     CI: 'true'
 ```
 
-#### Azure Pipelines (контейнеризированные)
+#### Azure Pipelines (контейнеризированные) {#azure-pipelines-containerized}
 
 ```yml
 trigger:
@@ -351,7 +351,7 @@ steps:
     CI: 'true'
 ```
 
-### CircleCI
+### CircleCI {#circleci}
 
 Запуск Playwright на CircleCI очень похож на запуск на GitHub Actions. Чтобы указать предварительно собранный Playwright [Docker-образ](./docker.mdx), просто измените определение агента с `docker:` в вашей конфигурации следующим образом:
 
@@ -364,7 +364,7 @@ executors:
 
 Примечание: При использовании определения агента docker вы указываете класс ресурсов, где playwright запускается на уровне 'medium' [здесь](https://circleci.com/docs/configuration-reference?#docker-execution-environment). Поведение Playwright по умолчанию - устанавливать количество рабочих процессов в соответствии с обнаруженным количеством ядер (2 в случае уровня medium). Переопределение количества рабочих процессов на большее значение приведёт к ненужным тайм-аутам и сбоям.
 
-#### Шардинг в CircleCI
+#### Шардинг в CircleCI {#sharding-in-circleci}
 
 Шардинг в CircleCI индексируется с 0, что означает, что вам нужно будет переопределить значения переменных окружения параллелизма. Следующий пример демонстрирует, как запустить Playwright с параллелизмом CircleCI, равным 4, добавив 1 к `CIRCLE_NODE_INDEX`, чтобы передать в аргумент `--shard` cli.
 
@@ -376,7 +376,7 @@ executors:
       - run: SHARD="$((${CIRCLE_NODE_INDEX}+1))"; npx playwright test --shard=${SHARD}/${CIRCLE_NODE_TOTAL}
 ```
 
-### Jenkins
+### Jenkins {#jenkins}
 
 Jenkins поддерживает Docker-агенты для конвейеров. Используйте [Docker-образ Playwright](./docker.mdx) для запуска тестов на Jenkins.
 
@@ -394,7 +394,7 @@ pipeline {
 }
 ```
 
-### Bitbucket Pipelines
+### Bitbucket Pipelines {#bitbucket-pipelines}
 
 Bitbucket Pipelines может использовать публичные [Docker-образы как среды сборки](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). Чтобы запустить тесты Playwright на Bitbucket, используйте наш публичный Docker-образ ([см. Dockerfile](./docker.mdx)).
 
@@ -402,7 +402,7 @@ Bitbucket Pipelines может использовать публичные [Dock
 image: mcr.microsoft.com/playwright:v1.57.0-noble
 ```
 
-### GitLab CI
+### GitLab CI {#gitlab-ci}
 
 Чтобы запустить тесты Playwright на GitLab, используйте наш публичный Docker-образ ([см. Dockerfile](./docker.mdx)).
 
@@ -417,7 +417,7 @@ tests:
   ...
 ```
 
-#### Шардинг
+#### Шардинг {#sharding}
 
 GitLab CI поддерживает [шардинг тестов между несколькими заданиями](https://docs.gitlab.com/ee/ci/jobs/job_control.html#parallelize-large-jobs) с использованием ключевого слова [parallel](https://docs.gitlab.com/ee/ci/yaml/index.html#parallel). Тестовое задание будет разделено на несколько меньших заданий, которые выполняются параллельно. Параллельные задания именуются последовательно от `job_name 1/N` до `job_name N/N`.
 
@@ -452,7 +452,7 @@ tests:
     - npx playwright test --project=$PROJECT --shard=$SHARD
 ```
 
-### Google Cloud Build
+### Google Cloud Build {#google-cloud-build}
 
 Чтобы запустить тесты Playwright на Google Cloud Build, используйте наш публичный Docker-образ ([см. Dockerfile](./docker.mdx)).
 
@@ -465,7 +465,7 @@ steps:
   - 'CI=true'
 ```
 
-### Drone
+### Drone {#drone}
 
 Чтобы запустить тесты Playwright на Drone, используйте наш публичный Docker-образ ([см. Dockerfile](./docker.mdx)).
 
@@ -481,13 +481,13 @@ steps:
       - npx playwright test
 ```
 
-## Кэширование браузеров
+## Кэширование браузеров {#caching-browsers}
 
 Кэширование бинарных файлов браузеров не рекомендуется, так как время, необходимое для восстановления кэша, сопоставимо с временем, необходимым для загрузки бинарных файлов. Особенно в Linux необходимо установить [зависимости операционной системы](./browsers.mdx#install-system-dependencies), которые не подлежат кэшированию.
 
 Если вы всё же хотите кэшировать бинарные файлы браузеров между запусками CI, кэшируйте [эти директории](./browsers.mdx#managing-browser-binaries) в вашей конфигурации CI, используя хэш версии Playwright.
 
-## Отладка запусков браузера
+## Отладка запусков браузера {#debugging-browser-launches}
 
 Playwright поддерживает переменную окружения `DEBUG` для вывода отладочных логов во время выполнения. Установка её в `pw:browser` полезна при отладке ошибок `Error: Failed to launch browser`.
 
@@ -495,7 +495,7 @@ Playwright поддерживает переменную окружения `DEB
 DEBUG=pw:browser npx playwright test
 ```
 
-## Запуск с интерфейсом
+## Запуск с интерфейсом {#running-headed}
 
 По умолчанию Playwright запускает браузеры в безголовом режиме. См. в нашем руководстве [Запуск тестов](./running-tests.mdx#run-tests-in-headed-mode), как запускать тесты с интерфейсом.
 

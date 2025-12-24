@@ -6,11 +6,11 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Введение
+## Введение {#introduction}
 
 Playwright может взаимодействовать с HTML-элементами ввода, такими как текстовые поля, флажки, радиокнопки, опции выбора, клики мыши, ввод символов, клавиш и сочетаний клавиш, а также загружать файлы и фокусировать элементы.
 
-## Текстовый ввод
+## Текстовый ввод {#text-input}
 
 Использование [Locator.fill()](/api/class-locator.mdx#locator-fill) — это самый простой способ заполнить поля формы. Он фокусирует элемент и вызывает событие `input` с введенным текстом. Работает для элементов `<input>`, `<textarea>` и `[contenteditable]`.
 
@@ -28,7 +28,7 @@ page.getByLabel("Appointment time").fill("13-15");
 page.getByLabel("Local time").fill("2020-03-02T05:15");
 ```
 
-## Флажки и радиокнопки
+## Флажки и радиокнопки {#checkboxes-and-radio-buttons}
 
 Использование [Locator.setChecked()](/api/class-locator.mdx#locator-set-checked) — это самый простой способ установить или снять флажок или радиокнопку. Этот метод можно использовать с элементами `input[type=checkbox]`, `input[type=radio]` и `[role=checkbox]`.
 
@@ -43,7 +43,7 @@ assertTrue(page.getByLabel("Subscribe to newsletter")).isChecked();
 page.getByLabel("XL").check();
 ```
 
-## Выбор опций
+## Выбор опций {#select-options}
 
 Выбирает одну или несколько опций в элементе `<select>` с помощью [Locator.selectOption()](/api/class-locator.mdx#locator-select-option). Вы можете указать `value` или `label` для выбора. Можно выбрать несколько опций.
 
@@ -58,7 +58,7 @@ page.getByLabel("Choose a color").selectOption(new SelectOption().setLabel("Blue
 page.getByLabel("Choose multiple colors").selectOption(new String[] {"red", "green", "blue"});
 ```
 
-## Клик мышью
+## Клик мышью {#mouse-click}
 
 Выполняет простой человеческий клик.
 
@@ -94,7 +94,7 @@ page.getByText("Item").click(new Locator.ClickOptions().setPosition(0, 0));
 - ждут, пока он не начнет получать события указателя в точке действия, например, ждут, пока элемент не станет не закрытым другими элементами
 - повторяют попытку, если элемент отсоединяется во время любой из вышеуказанных проверок
 
-#### Принудительный клик
+#### Принудительный клик {#forcing-the-click}
 
 Иногда приложения используют нетривиальную логику, когда при наведении на элемент он перекрывается другим элементом, который перехватывает клик. Это поведение неотличимо от ошибки, когда элемент закрывается, и клик отправляется в другое место. Если вы знаете, что это происходит, вы можете обойти проверки [actionability](./actionability.mdx) и принудительно выполнить клик:
 
@@ -102,7 +102,7 @@ page.getByText("Item").click(new Locator.ClickOptions().setPosition(0, 0));
 page.getByRole(AriaRole.BUTTON).click(new Locator.ClickOptions().setForce(true));
 ```
 
-#### Программный клик
+#### Программный клик {#programmatic-click}
 
 Если вас не интересует тестирование вашего приложения в реальных условиях и вы хотите симулировать клик любым возможным способом, вы можете вызвать поведение [`HTMLElement.click()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click) просто отправив событие клика на элемент с помощью [Locator.dispatchEvent()](/api/class-locator.mdx#locator-dispatch-event):
 
@@ -110,7 +110,7 @@ page.getByRole(AriaRole.BUTTON).click(new Locator.ClickOptions().setForce(true))
 page.getByRole(AriaRole.BUTTON).dispatchEvent("click");
 ```
 
-## Ввод символов
+## Ввод символов {#type-characters}
 
 :::caution
 
@@ -126,7 +126,7 @@ page.locator("#area").pressSequentially("Hello World!");
 
 Этот метод будет генерировать все необходимые события клавиатуры, с учетом всех событий `keydown`, `keyup`, `keypress`. Вы даже можете указать необязательную `delay` между нажатиями клавиш, чтобы симулировать поведение реального пользователя.
 
-## Клавиши и сочетания клавиш
+## Клавиши и сочетания клавиш {#keys-and-shortcuts}
 
 ```java
 // Нажмите Enter
@@ -164,7 +164,7 @@ page.locator("#name").press("Shift+ArrowLeft");
 
 Обратите внимание, что вам все равно нужно указать заглавную `A` в `Shift-A`, чтобы получить заглавный символ. `Shift-a` дает строчную букву, как если бы у вас был включен `CapsLock`.
 
-## Загрузка файлов
+## Загрузка файлов {#upload-files}
 
 Вы можете выбрать входные файлы для загрузки с помощью метода [Locator.setInputFiles()](/api/class-locator.mdx#locator-set-input-files). Он ожидает, что первый аргумент указывает на [элемент ввода](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input) с типом `"file"`. Несколько файлов могут быть переданы в массиве. Если некоторые из путей к файлам являются относительными, они разрешаются относительно текущего рабочего каталога. Пустой массив очищает выбранные файлы.
 
@@ -195,7 +195,7 @@ FileChooser fileChooser = page.waitForFileChooser(() -> {
 fileChooser.setFiles(Paths.get("myfile.pdf"));
 ```
 
-## Фокусировка элемента
+## Фокусировка элемента {#focus-element}
 
 Для динамических страниц, которые обрабатывают события фокуса, вы можете сфокусировать данный элемент с помощью [Locator.focus()](/api/class-locator.mdx#locator-focus).
 
@@ -203,7 +203,7 @@ fileChooser.setFiles(Paths.get("myfile.pdf"));
 page.getByLabel("Password").focus();
 ```
 
-## Перетаскивание
+## Перетаскивание {#drag-and-drop}
 
 Вы можете выполнить операцию перетаскивания с помощью [Locator.dragTo()](/api/class-locator.mdx#locator-drag-to). Этот метод будет:
 - Наведите курсор на элемент, который будет перетаскиваться.
@@ -215,7 +215,7 @@ page.getByLabel("Password").focus();
 page.locator("#item-to-be-dragged").dragTo(page.locator("#item-to-drop-at"));
 ```
 
-### Ручное перетаскивание
+### Ручное перетаскивание {#dragging-manually}
 
 Если вы хотите точно контролировать операцию перетаскивания, используйте методы более низкого уровня, такие как [Locator.hover()](/api/class-locator.mdx#locator-hover), [Mouse.down()](/api/class-mouse.mdx#mouse-down), [Mouse.move()](/api/class-mouse.mdx#mouse-move) и [Mouse.up()](/api/class-mouse.mdx#mouse-up).
 
@@ -230,7 +230,7 @@ page.mouse().up();
 Если ваша страница полагается на событие `dragover`, вам нужно как минимум два перемещения мыши, чтобы вызвать его во всех браузерах. Чтобы надежно выполнить второе перемещение мыши, повторите ваш [Mouse.move()](/api/class-mouse.mdx#mouse-move) или [Locator.hover()](/api/class-locator.mdx#locator-hover) дважды. Последовательность операций будет следующей: наведите курсор на элемент для перетаскивания, нажмите мышь, наведите курсор на элемент для сброса, наведите курсор на элемент для сброса второй раз, отпустите мышь.
 :::
 
-## Прокрутка
+## Прокрутка {#scrolling}
 
 В большинстве случаев Playwright автоматически прокручивает для вас перед выполнением любых действий. Поэтому вам не нужно прокручивать явно.
 

@@ -6,7 +6,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Введение
+## Введение {#introduction}
 
 Playwright может быть использован для доступа к [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) API вашего приложения.
 
@@ -19,7 +19,7 @@ Playwright может быть использован для доступа к [
 
 Следующие примеры опираются на пакет [`pytest-playwright`](./test-runners.mdx), который добавляет фикстуры Playwright в тестовый фреймворк Pytest.
 
-## Написание теста API
+## Написание теста API {#writing-api-test}
 
 [APIRequestContext] может отправлять все виды HTTP(S) запросов по сети.
 
@@ -28,7 +28,7 @@ Playwright может быть использован для доступа к [
 - Создавать несколько задач и проверять состояние сервера.
 - Удалять репозиторий после выполнения тестов.
 
-### Настройка
+### Настройка {#configure}
 
 GitHub API требует авторизации, поэтому мы настроим токен один раз для всех тестов. Заодно мы также установим `baseURL`, чтобы упростить тесты.
 
@@ -62,7 +62,7 @@ def api_request_context(
 
 ```
 
-### Написание тестов
+### Написание тестов {#write-tests}
 
 Теперь, когда мы инициализировали объект запроса, мы можем добавить несколько тестов, которые будут создавать новые задачи в репозитории.
 
@@ -114,7 +114,7 @@ def test_should_create_feature_request(api_request_context: APIRequestContext) -
     assert issue["body"] == "Feature description"
 ```
 
-### Настройка и завершение
+### Настройка и завершение {#setup-and-teardown}
 
 Эти тесты предполагают, что репозиторий уже существует. Скорее всего, вам нужно создавать новый перед запуском тестов и удалять его после. Для этого используйте [session fixture](https://docs.pytest.org/en/stable/how-to/fixtures.html#fixture-scopes). Часть до `yield` — это before all, а часть после — after all.
 
@@ -133,7 +133,7 @@ def create_test_repository(
     assert deleted_repo.ok
 ```
 
-### Полный пример теста
+### Полный пример теста {#complete-test-example}
 
 Вот полный пример теста API:
 
@@ -225,7 +225,7 @@ def test_should_create_feature_request(api_request_context: APIRequestContext) -
     assert issue["body"] == "Feature description"
 ```
 
-## Подготовка состояния сервера через API вызовы
+## Подготовка состояния сервера через API вызовы {#prepare-server-state-via-api-calls}
 
 Следующий тест создает новую задачу через API, а затем переходит к списку всех задач в проекте, чтобы проверить, что она появляется в начале списка. Проверка выполняется с использованием [LocatorAssertions].
 
@@ -247,7 +247,7 @@ def test_last_created_issue_should_be_first_in_the_list(api_request_context: API
     expect(first_issue).to_have_text("[Feature] request 2")
 ```
 
-## Проверка состояния сервера после выполнения действий пользователя
+## Проверка состояния сервера после выполнения действий пользователя {#check-the-server-state-after-running-user-actions}
 
 Следующий тест создает новую задачу через пользовательский интерфейс в браузере, а затем проверяет через API, была ли она создана:
 
@@ -266,7 +266,7 @@ def test_last_created_issue_should_be_on_the_server(api_request_context: APIRequ
     assert new_issue.json()["body"] == "Bug description"
 ```
 
-## Повторное использование состояния аутентификации
+## Повторное использование состояния аутентификации {#reuse-authentication-state}
 
 Веб-приложения используют аутентификацию на основе куки или токенов, где аутентифицированное состояние хранится как [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies). Playwright предоставляет метод [api_request_context.storage_state()](/api/class-apirequestcontext.mdx#api-request-context-storage-state), который может быть использован для получения состояния хранилища из аутентифицированного контекста, а затем создания новых контекстов с этим состоянием.
 

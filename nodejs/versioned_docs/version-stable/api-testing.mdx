@@ -6,7 +6,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Введение
+## Введение {#introduction}
 
 Playwright может быть использован для доступа к [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) API вашего приложения.
 
@@ -17,7 +17,7 @@ Playwright может быть использован для доступа к [
 
 Все это можно достичь с помощью методов [APIRequestContext].
 
-## Написание теста API
+## Написание теста API {#writing-api-test}
 
 [APIRequestContext] может отправлять все виды HTTP(S) запросов по сети.
 
@@ -26,7 +26,7 @@ Playwright может быть использован для доступа к [
 - Создавать несколько задач и проверять состояние сервера.
 - Удалять репозиторий после выполнения тестов.
 
-### Конфигурация
+### Конфигурация {#configuration}
 
 GitHub API требует авторизации, поэтому мы настроим токен один раз для всех тестов. Заодно мы также установим `baseURL`, чтобы упростить тесты. Вы можете либо поместить их в файл конфигурации, либо в файл теста с помощью `test.use()`.
 
@@ -64,7 +64,7 @@ export default defineConfig({
 });
 ```
 
-### Написание тестов
+### Написание тестов {#writing-tests}
 
 Playwright Test поставляется с встроенной фикстурой `request`, которая учитывает такие параметры конфигурации, как `baseURL` или `extraHTTPHeaders`, которые мы указали, и готова отправлять запросы.
 
@@ -109,7 +109,7 @@ test('should create a feature request', async ({ request }) => {
 });
 ```
 
-### Настройка и завершение
+### Настройка и завершение {#setup-and-teardown}
 
 Эти тесты предполагают, что репозиторий существует. Вероятно, вы захотите создать новый перед запуском тестов и удалить его после. Используйте хуки `beforeAll` и `afterAll` для этого.
 
@@ -131,7 +131,7 @@ test.afterAll(async ({ request }) => {
 });
 ```
 
-## Использование контекста запросов
+## Использование контекста запросов {#using-request-context}
 
 За кулисами, [`request` fixture](./api/class-fixtures#fixtures-request) фактически вызовет [apiRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context). Вы всегда можете сделать это вручную, если хотите больше контроля. Ниже приведен автономный скрипт, который делает то же самое, что и `beforeAll` и `afterAll` из выше.
 
@@ -169,11 +169,11 @@ const USER = 'github-username';
 })();
 ```
 
-## Отправка API-запросов из UI-тестов
+## Отправка API-запросов из UI-тестов {#sending-api-requests-from-ui-tests}
 
 Во время выполнения тестов внутри браузеров вы можете захотеть сделать вызовы к HTTP API вашего приложения. Это может быть полезно, если вам нужно подготовить состояние сервера перед выполнением теста или проверить некоторые постусловия на сервере после выполнения некоторых действий в браузере. Все это можно достичь с помощью методов [APIRequestContext].
 
-### Установление предусловий
+### Установление предусловий {#establishing-preconditions}
 
 Следующий тест создает новую задачу через API, а затем переходит к списку всех задач в проекте, чтобы проверить, что она появляется в начале списка.
 
@@ -219,7 +219,7 @@ test('last created issue should be first in the list', async ({ page }) => {
 });
 ```
 
-### Проверка постусловий
+### Проверка постусловий {#validating-postconditions}
 
 Следующий тест создает новую задачу через пользовательский интерфейс в браузере, а затем проверяет, была ли она создана через API:
 
@@ -269,7 +269,7 @@ test('last created issue should be on the server', async ({ page }) => {
 });
 ```
 
-## Повторное использование состояния аутентификации
+## Повторное использование состояния аутентификации {#reusing-authentication-state}
 
 Веб-приложения используют аутентификацию на основе куки или токенов, где аутентифицированное состояние хранится в виде [куки](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies). Playwright предоставляет метод [apiRequestContext.storageState()](/api/class-apirequestcontext.mdx#api-request-context-storage-state), который может быть использован для получения состояния хранилища из аутентифицированного контекста, а затем создания новых контекстов с этим состоянием.
 
@@ -290,7 +290,7 @@ await requestContext.storageState({ path: 'state.json' });
 const context = await browser.newContext({ storageState: 'state.json' });
 ```
 
-## Контекстный запрос vs глобальный запрос
+## Контекстный запрос vs глобальный запрос {#context-request-vs-global-request}
 
 Существует два типа [APIRequestContext]:
 * ассоциированный с [BrowserContext]

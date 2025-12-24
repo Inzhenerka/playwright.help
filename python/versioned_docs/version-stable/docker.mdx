@@ -6,11 +6,11 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Введение
+## Введение {#introduction}
 
 [Dockerfile.noble] может быть использован для запуска скриптов Playwright в среде Docker. Этот образ включает [браузеры Playwright](./browsers.mdx#install-browsers) и [системные зависимости браузера](./browsers.mdx#install-system-dependencies). Пакет/зависимость Playwright не включены в образ и должны быть установлены отдельно.
 
-## Использование
+## Использование {#usage}
 
 Этот Docker-образ опубликован в [Microsoft Artifact Registry].
 
@@ -19,17 +19,17 @@ import HTMLCard from '@site/src/components/HTMLCard';
 Этот Docker-образ предназначен только для тестирования и разработки. Не рекомендуется использовать этот Docker-образ для посещения ненадежных веб-сайтов.
 :::
 
-### Загрузка образа
+### Загрузка образа {#pull-the-image}
 
 ```bash
 docker pull mcr.microsoft.com/playwright/python:v1.56.0-noble
 ```
 
-### Запуск образа
+### Запуск образа {#run-the-image}
 
 По умолчанию Docker-образ будет использовать пользователя `root` для запуска браузеров. Это отключит песочницу Chromium, которая недоступна с root. Если вы запускаете доверенный код (например, сквозные тесты) и хотите избежать хлопот с управлением отдельным пользователем, то пользователь root может быть подходящим. Для веб-скрейпинга или обхода мы рекомендуем создать отдельного пользователя внутри контейнера Docker и использовать профиль seccomp.
 
-#### Сквозные тесты
+#### Сквозные тесты {#end-to-end-tests}
 
 На доверенных веб-сайтах вы можете избежать создания отдельного пользователя и использовать root, так как вы доверяете коду, который будет выполняться в браузерах.
 
@@ -37,7 +37,7 @@ docker pull mcr.microsoft.com/playwright/python:v1.56.0-noble
 docker run -it --rm --ipc=host mcr.microsoft.com/playwright/python:v1.56.0-noble /bin/bash
 ```
 
-#### Обход и скрейпинг
+#### Обход и скрейпинг {#crawling-and-scraping}
 
 На ненадежных веб-сайтах рекомендуется использовать отдельного пользователя для запуска браузеров в сочетании с профилем seccomp. Внутри контейнера или если вы используете Docker-образ как базовый образ, вам нужно использовать `adduser` для этого.
 
@@ -62,22 +62,22 @@ docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_prof
 }
 ```
 
-### Рекомендуемая конфигурация Docker
+### Рекомендуемая конфигурация Docker {#recommended-docker-configuration}
 
 При запуске Playwright в Docker рекомендуется следующая конфигурация:
 1. Рекомендуется использовать флаг Docker [`--init`](https://docs.docker.com/reference/cli/docker/container/run/#init), чтобы избежать особой обработки процессов с PID=1. Это частая причина появления процессов-зомби.
 1. При использовании Chromium рекомендуется `--ipc=host`. Без этого Chromium может испытывать нехватку памяти и падать. Подробнее об этой опции — в [документации Docker](https://docs.docker.com/reference/cli/docker/container/run/#ipc).
 1. **Если при запуске Chromium появляются странные ошибки**, попробуйте при локальной разработке запускать контейнер с `docker run --cap-add=SYS_ADMIN`.
 
-### Использование на CI
+### Использование на CI {#using-on-ci}
 
 Смотрите наши [руководства по непрерывной интеграции](./ci.mdx) для примеров конфигураций.
 
-### Удаленное подключение
+### Удаленное подключение {#remote-connection}
 
 Вы можете запустить Playwright Server в Docker, оставив ваши тесты работающими на хост-системе или другой машине. Это полезно для запуска тестов на неподдерживаемых дистрибутивах Linux или в сценариях удаленного выполнения.
 
-#### Запуск Playwright Server
+#### Запуск Playwright Server {#running-the-playwright-server}
 
 Запустите Playwright Server в Docker:
 
@@ -85,7 +85,7 @@ docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_prof
 docker run -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.56.0-noble /bin/sh -c "npx -y playwright@1.56.0 run-server --port 3000 --host 0.0.0.0"
 ```
 
-#### Подключение к серверу
+#### Подключение к серверу {#connecting-to-the-server}
 
 <Tabs
   groupId="python-flavor"
@@ -117,7 +117,7 @@ async with async_playwright() as p:
 </TabItem>
 </Tabs>
 
-#### Конфигурация сети
+#### Конфигурация сети {#network-configuration}
 
 Если вам нужно получить доступ к локальным серверам из контейнера Docker:
 
@@ -132,7 +132,7 @@ docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --wo
 При запуске тестов удаленно убедитесь, что версия Playwright в ваших тестах соответствует версии, работающей в контейнере Docker.
 :::
 
-## Теги образов
+## Теги образов {#image-tags}
 
 Смотрите [все доступные теги образов].
 
@@ -146,17 +146,17 @@ docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --wo
 Рекомендуется всегда закреплять ваш Docker-образ на определенной версии, если это возможно. Если версия Playwright в вашем Docker-образе не совпадает с версией в вашем проекте/тестах, Playwright не сможет найти исполняемые файлы браузера.
 :::
 
-### Базовые образы
+### Базовые образы {#base-images}
 
 В настоящее время мы публикуем образы на основе следующих версий [Ubuntu](https://hub.docker.com/_/ubuntu):
 - **Ubuntu 24.04 LTS** (Noble Numbat), теги образов включают `noble`
 - **Ubuntu 22.04 LTS** (Jammy Jellyfish), теги образов включают `jammy`
 
-#### Alpine
+#### Alpine {#alpine}
 
 Сборки браузеров для Firefox и WebKit создаются для библиотеки [glibc](https://en.wikipedia.org/wiki/Glibc). Alpine Linux и другие дистрибутивы, основанные на стандартной библиотеке [musl](https://en.wikipedia.org/wiki/Musl), не поддерживаются.
 
-## Создание собственного образа
+## Создание собственного образа {#build-your-own-image}
 
 Чтобы запустить Playwright внутри Docker, вам нужно установить Python, [браузеры Playwright](./browsers.mdx#install-browsers) и [системные зависимости браузера](./browsers.mdx#install-system-dependencies). Смотрите следующий Dockerfile:
 

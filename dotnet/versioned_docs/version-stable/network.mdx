@@ -6,18 +6,18 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Введение
+## Введение {#introduction}
 
 Playwright предоставляет API для **мониторинга** и **модификации** сетевого трафика браузера, как HTTP, так и HTTPS. Любые запросы, которые делает страница, включая [XHR](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) и [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) запросы, могут быть отслежены, изменены и обработаны.
 
-## Мокирование API
+## Мокирование API {#mock-apis}
 
 Ознакомьтесь с нашим [руководством по мокированию API](./mock.mdx), чтобы узнать больше о том, как
 - мокировать API-запросы и никогда не обращаться к API
 - выполнять API-запрос и изменять ответ
 - использовать HAR-файлы для мокирования сетевых запросов.
 
-## HTTP-аутентификация
+## HTTP-аутентификация {#http-authentication}
 
 Выполнение HTTP-аутентификации.
 
@@ -34,7 +34,7 @@ var page = await context.NewPageAsync();
 await page.GotoAsync("https://example.com");
 ```
 
-## HTTP-прокси
+## HTTP-прокси {#http-proxy}
 
 Вы можете настроить страницы для загрузки через HTTP(S)-прокси или SOCKSv5. Прокси может быть установлен глобально для всего браузера или для каждого контекста браузера отдельно.
 
@@ -65,7 +65,7 @@ await using var context = await browser.NewContextAsync(new()
 });
 ```
 
-## Сетевые события
+## Сетевые события {#network-events}
 
 Вы можете отслеживать все [Request] и [Response]:
 
@@ -89,7 +89,7 @@ await page.GetByText("Update").ClickAsync();
 var response = await waitForResponseTask;
 ```
 
-#### Вариации
+#### Вариации {#variations}
 
 Ожидание [Response] с [Page.RunAndWaitForResponseAsync()](/api/class-page.mdx#page-wait-for-response)
 
@@ -105,11 +105,11 @@ await page.GetByText("Update").ClickAsync();
 var response = await waitForResponseTask;
 ```
 
-## Обработка запросов
+## Обработка запросов {#handle-requests}
 
 Вы можете мокировать API-эндпоинты, обрабатывая сетевые запросы в вашем скрипте Playwright.
 
-#### Вариации
+#### Вариации {#variations-1}
 
 Настройте маршрут для всего контекста браузера с помощью [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) или страницы с [Page.RouteAsync()](/api/class-page.mdx#page-route). Это будет применяться к всплывающим окнам и открытым ссылкам.
 
@@ -120,7 +120,7 @@ await page.RouteAsync("**/api/fetch_data", async route => {
 await page.GotoAsync("https://example.com");
 ```
 
-## Изменение запросов
+## Изменение запросов {#modify-requests}
 
 ```csharp
 // Удаление заголовка
@@ -136,7 +136,7 @@ await Page.RouteAsync("**/*", async route => await route.ContinueAsync(new() { M
 
 Вы можете продолжать запросы с модификациями. Пример выше удаляет HTTP-заголовок из исходящих запросов.
 
-## Прерывание запросов
+## Прерывание запросов {#abort-requests}
 
 Вы можете прерывать запросы, используя [Page.RouteAsync()](/api/class-page.mdx#page-route) и [Route.AbortAsync()](/api/class-route.mdx#route-abort).
 
@@ -152,7 +152,7 @@ else
 });
 ```
 
-## Изменение ответов
+## Изменение ответов {#modify-responses}
 
 Чтобы изменить ответ, используйте [APIRequestContext] для получения оригинального ответа, а затем передайте ответ в [Route.FulfillAsync()](/api/class-route.mdx#route-fulfill). Вы можете переопределить отдельные поля в ответе через опции:
 
@@ -180,7 +180,7 @@ await Page.RouteAsync("**/title.html", async route =>
 });
 ```
 
-## Шаблоны URL с глобальными символами
+## Шаблоны URL с глобальными символами {#glob-url-patterns}
 
 Playwright использует упрощённые glob-шаблоны для сопоставления URL в методах перехвата сетевых запросов, таких как [Page.RouteAsync()](/api/class-page.mdx#page-route) или [Page.RunAndWaitForResponseAsync()](/api/class-page.mdx#page-wait-for-response). Эти шаблоны поддерживают базовые подстановочные символы:
 1. Звёздочки:
@@ -201,7 +201,7 @@ Playwright использует упрощённые glob-шаблоны для 
 - При использовании шаблонов с глобальными символами для сопоставления URL учитывайте полную структуру URL, включая протокол и разделители пути.
 - Для более сложных требований к сопоставлению рассмотрите возможность использования [RegExp] вместо шаблонов с глобальными символами.
 
-## WebSockets
+## WebSockets {#websockets}
 
 Playwright поддерживает инспекцию, мокирование и модификацию [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) из коробки. Ознакомьтесь с нашим [руководством по мокированию API](./mock.mdx#mock-websockets), чтобы узнать, как мокировать WebSockets.
 
@@ -217,7 +217,7 @@ page.WebSocket += (_, ws) =>
 };
 ```
 
-## Отсутствующие сетевые события и Service Workers
+## Отсутствующие сетевые события и Service Workers {#missing-network-events-and-service-workers}
 
 Встроенные методы Playwright — [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) и [Page.RouteAsync()](/api/class-page.mdx#page-route) — позволяют нативно маршрутизировать запросы в тестах и выполнять мокинг и перехват.
 

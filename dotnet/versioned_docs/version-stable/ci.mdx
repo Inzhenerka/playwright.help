@@ -6,7 +6,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Введение
+## Введение {#introduction}
 
 Тесты Playwright могут выполняться в средах CI. Мы создали примеры конфигураций для распространенных провайдеров CI.
 
@@ -25,13 +25,13 @@ import HTMLCard from '@site/src/components/HTMLCard';
    dotnet test
    ```
    
-## Конфигурации CI
+## Конфигурации CI {#ci-configurations}
 
 [Командные инструменты](./browsers#install-system-dependencies) могут быть использованы для установки всех зависимостей операционной системы в CI.
 
-### GitHub Actions
+### GitHub Actions {#github-actions}
 
-#### При push/pull_request
+#### При push/pull_request {#on-pushpull_request}
 
 Тесты будут запускаться при push или pull request в ветках main/master. [Рабочий процесс](https://docs.github.com/en/actions/using-workflows/about-workflows) установит все зависимости, установит Playwright и затем запустит тесты.
 
@@ -60,7 +60,7 @@ jobs:
       run: dotnet test
 ```
 
-#### Через контейнеры
+#### Через контейнеры {#via-containers}
 
 GitHub Actions поддерживает [запуск задач в контейнере](https://docs.github.com/en/actions/using-jobs/running-jobs-in-a-container) с помощью опции [`jobs.<job_id>.container`](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idcontainer). Это полезно, чтобы не загрязнять среду хоста зависимостями и иметь консистентную среду, например, для тестирования скриншотов/визуальной регрессии на разных операционных системах.
 
@@ -89,7 +89,7 @@ jobs:
         run: dotnet test
 ```
 
-#### При развертывании
+#### При развертывании {#on-deployment}
 
 Это запустит тесты после того, как [развертывание GitHub](https://developer.github.com/v3/repos/deployments/) перейдет в состояние `success`. Сервисы, такие как Vercel, используют этот шаблон, чтобы вы могли запускать ваши end-to-end тесты в их развернутой среде.
 
@@ -118,11 +118,11 @@ jobs:
         PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
 ```
 
-### Docker
+### Docker {#docker}
 
 У нас есть [готовый Docker-образ](./docker.mdx), который можно использовать напрямую или взять как ориентир, чтобы обновить ваши существующие Docker-определения. Обязательно следуйте [рекомендуемой конфигурации Docker](./docker.mdx#recommended-docker-configuration), чтобы обеспечить лучшую производительность.
 
-### Azure Pipelines
+### Azure Pipelines {#azure-pipelines}
 
 Для агентов Windows или macOS не требуется дополнительной конфигурации, просто установите Playwright и запустите ваши тесты.
 
@@ -151,7 +151,7 @@ steps:
   displayName: 'Run tests'
 ```
 
-#### Azure Pipelines (контейнеризированный)
+#### Azure Pipelines (контейнеризированный) {#azure-pipelines-containerized}
 
 ```yml
 trigger:
@@ -174,7 +174,7 @@ steps:
   displayName: 'Run tests'
 ```
 
-### CircleCI
+### CircleCI {#circleci}
 
 Запуск Playwright на CircleCI очень похож на запуск на GitHub Actions. Чтобы указать предварительно собранный Playwright [Docker-образ](./docker.mdx), просто измените определение агента с помощью `docker:` в вашей конфигурации следующим образом:
 
@@ -187,7 +187,7 @@ executors:
 
 Примечание: При использовании определения агента docker вы указываете класс ресурсов, где Playwright запускается на уровне 'medium' [здесь](https://circleci.com/docs/configuration-reference?#docker-execution-environment). Поведение Playwright по умолчанию - устанавливать количество рабочих процессов в соответствии с обнаруженным количеством ядер (2 в случае уровня medium). Переопределение количества рабочих процессов на большее значение приведет к ненужным тайм-аутам и сбоям.
 
-### Jenkins
+### Jenkins {#jenkins}
 
 Jenkins поддерживает Docker-агенты для конвейеров. Используйте [Docker-образ Playwright](./docker.mdx) для запуска тестов на Jenkins.
 
@@ -205,7 +205,7 @@ pipeline {
 }
 ```
 
-### Bitbucket Pipelines
+### Bitbucket Pipelines {#bitbucket-pipelines}
 
 Bitbucket Pipelines может использовать публичные [Docker-образы как среды сборки](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). Чтобы запустить тесты Playwright на Bitbucket, используйте наш публичный Docker-образ ([см. Dockerfile](./docker.mdx)).
 
@@ -213,17 +213,17 @@ Bitbucket Pipelines может использовать публичные [Dock
 image: mcr.microsoft.com/playwright/dotnet:v1.56.0-noble
 ```
 
-### GitLab CI
+### GitLab CI {#gitlab-ci}
 
 Чтобы запустить тесты Playwright на GitLab, используйте наш публичный Docker-образ ([см. Dockerfile](./docker.mdx)).
 
-## Кэширование браузеров
+## Кэширование браузеров {#caching-browsers}
 
 Кэширование бинарных файлов браузеров не рекомендуется, так как время, необходимое для восстановления кэша, сопоставимо с временем, необходимым для загрузки бинарных файлов. Особенно в Linux, [зависимости операционной системы](./browsers.mdx#install-system-dependencies) должны быть установлены, которые не подлежат кэшированию.
 
 Если вы все же хотите кэшировать бинарные файлы браузеров между запусками CI, кэшируйте [эти директории](./browsers.mdx#managing-browser-binaries) в вашей конфигурации CI, используя хэш версии Playwright.
 
-## Отладка запусков браузера
+## Отладка запусков браузера {#debugging-browser-launches}
 
 Playwright поддерживает переменную окружения `DEBUG` для вывода отладочных логов во время выполнения. Установка ее в `pw:browser` полезна при отладке ошибок `Error: Failed to launch browser`.
 
@@ -231,7 +231,7 @@ Playwright поддерживает переменную окружения `DEB
 DEBUG=pw:browser dotnet test
 ```
 
-## Запуск с интерфейсом
+## Запуск с интерфейсом {#running-headed}
 
 По умолчанию Playwright запускает браузеры в безголовом режиме. Смотрите в нашем руководстве [Запуск тестов](./running-tests.mdx#run-tests-in-headed-mode), как запускать тесты с интерфейсом.
 
