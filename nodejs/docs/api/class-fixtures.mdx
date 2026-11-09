@@ -26,9 +26,57 @@ Playwright Test comes with builtin fixtures listed below, and you can add your o
 
 ---
 
+## Methods
+
+### mount {/* #fixtures-mount */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.62</font><x-search>fixtures.mount</x-search>
+
+Mounts a component story and returns a [Locator] pointing to the root element the story was rendered into. Scope your queries from the returned locator: `component.getByRole('button')`, not `page.getByRole('button')`.
+
+A **story** is a small wrapper component that embeds the component under test in one specific scenario: hard-coded props, mock data, providers, recorded callbacks. Stories are rendered by a **gallery** page that you implement and serve at [testOptions.baseURL](/api/class-testoptions.mdx#test-options-base-url). The gallery exposes `window.mount(params)` and `window.unmount()` functions that render a story into its root element. Each call to [fixtures.mount()](/api/class-fixtures.mdx#fixtures-mount) navigates to [testOptions.baseURL](/api/class-testoptions.mdx#test-options-base-url) and calls `window.mount()` with the story id and props, so tests are fully isolated from each other.
+
+**Usage**
+
+```js
+test('click should expand', async ({ mount }) => {
+  const component = await mount('components/Expandable/Stateful');
+  await component.getByRole('button').click();
+  await expect(component.getByTestId('expanded')).toHaveValue('true');
+});
+```
+
+Pass the story type as a template argument to type-check the props:
+
+```js
+import type { WithTitle } from './Button.story';
+
+test('renders the title', async ({ mount }) => {
+  const component = await mount<typeof WithTitle>('Button/WithTitle', { title: 'Hello' });
+  await expect(component).toContainText('Hello');
+});
+```
+
+The returned locator is augmented with two methods:
+* `update(props)` - re-renders the same story with new props without remounting, preserving component state;
+* `unmount()` - unmounts the story.
+
+**Arguments**
+- `storyId` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="fixtures-mount-option-story-id"/><a href="#fixtures-mount-option-story-id" class="list-anchor">#</a>
+  
+  Identifier of the story to mount, as resolved by the gallery page. Conventionally, the story file path plus the exported story name, for example `'components/Button/Primary'`.
+- `props` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="fixtures-mount-option-props"/><a href="#fixtures-mount-option-props" class="list-anchor">#</a>
+  
+  Optional plain, serializable props passed to the story.
+
+**Returns**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="fixtures-mount-return"/><a href="#fixtures-mount-return" class="list-anchor">#</a>
+
+---
+
 ## Properties
 
-### browser {#fixtures-browser}
+### browser {/* #fixtures-browser */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>fixtures.browser</x-search>
 
@@ -50,7 +98,7 @@ test.beforeAll(async ({ browser }) => {
 
 ---
 
-### browserName {#fixtures-browser-name}
+### browserName {/* #fixtures-browser-name */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>fixtures.browserName</x-search>
 
@@ -70,7 +118,7 @@ test('skip this test in Firefox', async ({ page, browserName }) => {
 
 ---
 
-### context {#fixtures-context}
+### context {/* #fixtures-context */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>fixtures.context</x-search>
 
@@ -94,7 +142,7 @@ test('example test', async ({ page, context }) => {
 
 ---
 
-### page {#fixtures-page}
+### page {/* #fixtures-page */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>fixtures.page</x-search>
 
@@ -121,7 +169,7 @@ test('basic test', async ({ page }) => {
 
 ---
 
-### request {#fixtures-request}
+### request {/* #fixtures-request */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>fixtures.request</x-search>
 
@@ -147,11 +195,6 @@ test('basic test', async ({ request }) => {
 - [APIRequestContext]
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -164,10 +207,11 @@ test('basic test', async ({ request }) => {
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -186,6 +230,7 @@ test('basic test', async ({ request }) => {
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -193,9 +238,18 @@ test('basic test', async ({ request }) => {
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -213,6 +267,7 @@ test('basic test', async ({ request }) => {
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -225,6 +280,7 @@ test('basic test', async ({ request }) => {
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -246,6 +302,7 @@ test('basic test', async ({ request }) => {
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"

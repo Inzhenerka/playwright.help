@@ -12,7 +12,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Методы {#methods}
 
-### newContext {#api-request-new-context}
+### newContext {/* #api-request-new-context */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequest.newContext</x-search>
 
@@ -29,11 +29,11 @@ await apiRequest.newContext(options);
 - `options` [Object] *(необязательно)*
   - `baseURL` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-base-url"/><a href="#api-request-new-context-option-base-url" class="list-anchor">#</a>
     
-    Методы, такие как [apiRequestContext.get()](/api/class-apirequestcontext.mdx#api-request-context-get), учитывают базовый URL, используя конструктор [`URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) для построения соответствующего URL. Примеры:
-    * baseURL: `http://localhost:3000` и отправка запроса на `/bar.html` приводит к `http://localhost:3000/bar.html`
-    * baseURL: `http://localhost:3000/foo/` и отправка запроса на `./bar.html` приводит к `http://localhost:3000/foo/bar.html`
-    * baseURL: `http://localhost:3000/foo` (без завершающего слэша) и навигация на `./bar.html` приводит к `http://localhost:3000/bar.html`
-  - `clientCertificates` [Array]&lt;[Object]&gt; *(необязательно)* <font size="2">Добавлено в: 1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-client-certificates"/><a href="#api-request-new-context-option-client-certificates" class="list-anchor">#</a>
+Методы, такие как [apiRequestContext.get()](/api/class-apirequestcontext.mdx#api-request-context-get), учитывают базовый URL, используя конструктор [`URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) для построения соответствующего URL. Примеры:
+    * baseURL: `http://localhost:3000` и отправка запроса к `/bar.html` дают в результате `http://localhost:3000/bar.html`
+    * baseURL: `http://localhost:3000/foo/` и отправка запроса к `./bar.html` дают в результате `http://localhost:3000/foo/bar.html`
+    * baseURL: `http://localhost:3000/foo` (без завершающего слеша) и переход к `./bar.html` дают в результате `http://localhost:3000/bar.html`
+  - `clientCertificates` [Array]&lt;[Object]&gt; *(необязательно)* <font size="2">Добавлено в: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-client-certificates"/><a href="#api-request-new-context-option-client-certificates" class="list-anchor">#</a>
     - `origin` [string]
       
       Точный источник, для которого сертификат действителен. Источник включает протокол `https`, имя хоста и, при необходимости, порт.
@@ -77,8 +77,8 @@ await apiRequest.newContext(options);
     Объект, содержащий дополнительные HTTP заголовки, которые будут отправлены с каждым запросом. По умолчанию отсутствуют.
   - `failOnStatusCode` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-fail-on-status-code"/><a href="#api-request-new-context-option-fail-on-status-code" class="list-anchor">#</a>
     
-    Указывает, следует ли выбрасывать исключение при кодах ответа, отличных от 2xx и 3xx. По умолчанию объект ответа возвращается для всех кодов состояния.
-  - `httpCredentials` [Object] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-http-credentials"/><a href="#api-request-new-context-option-http-credentials" class="list-anchor">#</a>
+Определяет, следует ли выбрасывать исключение при получении кодов ответа, отличных от 2xx и 3xx. По умолчанию объект ответа возвращается для всех кодов состояния.
+  - `httpCredentials` [Object] | [Array]&lt;[Object]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-http-credentials"/><a href="#api-request-new-context-option-http-credentials" class="list-anchor">#</a>
     - `username` [string]
       
       
@@ -92,7 +92,9 @@ await apiRequest.newContext(options);
       
       Эта опция применяется только к запросам, отправленным из соответствующего [APIRequestContext], и не влияет на запросы, отправленные из браузера. `'always'` - заголовок `Authorization` с учетными данными базовой аутентификации будет отправлен с каждым API запросом. `'unauthorized` - учетные данные отправляются только при получении ответа 401 (Unauthorized) с заголовком `WWW-Authenticate`. По умолчанию `'unauthorized'`.
     
-    Учетные данные для [HTTP аутентификации](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Если источник не указан, имя пользователя и пароль отправляются на любые серверы при несанкционированных ответах.
+Учетные данные для [HTTP-аутентификации](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Если источник (origin) не указан, имя пользователя и пароль отправляются любым серверам в ответ на сообщения об отсутствии авторизации.
+    
+    Передайте массив, чтобы использовать разные учетные данные для разных источников. Используется первая запись, соответствующая источнику запроса, а записи без указанного источника соответствуют любому запросу.
   - `ignoreHTTPSErrors` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-ignore-https-errors"/><a href="#api-request-new-context-option-ignore-https-errors" class="list-anchor">#</a>
     
     Игнорировать ли ошибки HTTPS при отправке сетевых запросов. По умолчанию `false`.
@@ -166,11 +168,6 @@ await apiRequest.newContext(options);
 - [Promise]&lt;[APIRequestContext]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-return"/><a href="#api-request-new-context-return" class="list-anchor">#</a>
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -183,10 +180,11 @@ await apiRequest.newContext(options);
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -205,6 +203,7 @@ await apiRequest.newContext(options);
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -212,9 +211,18 @@ await apiRequest.newContext(options);
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -232,6 +240,7 @@ await apiRequest.newContext(options);
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -244,6 +253,7 @@ await apiRequest.newContext(options);
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -265,6 +275,7 @@ await apiRequest.newContext(options);
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

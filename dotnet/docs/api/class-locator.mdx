@@ -16,7 +16,7 @@ Locators are the central piece of Playwright's auto-waiting and retry-ability. I
 
 ## Methods
 
-### AllAsync {#locator-all}
+### AllAsync {/* #locator-all */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.29</font><x-search>locator.AllAsync</x-search>
 
@@ -43,7 +43,7 @@ foreach (var li in await page.GetByRole("listitem").AllAsync())
 
 ---
 
-### AllInnerTextsAsync {#locator-all-inner-texts}
+### AllInnerTextsAsync {/* #locator-all-inner-texts */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.AllInnerTextsAsync</x-search>
 
@@ -65,7 +65,7 @@ var texts = await page.GetByRole(AriaRole.Link).AllInnerTextsAsync();
 
 ---
 
-### AllTextContentsAsync {#locator-all-text-contents}
+### AllTextContentsAsync {/* #locator-all-text-contents */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.AllTextContentsAsync</x-search>
 
@@ -87,7 +87,7 @@ var texts = await page.GetByRole(AriaRole.Link).AllTextContentsAsync();
 
 ---
 
-### And {#locator-and}
+### And {/* #locator-and */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.34</font><x-search>locator.And</x-search>
 
@@ -111,7 +111,7 @@ var button = page.GetByRole(AriaRole.Button).And(page.GetByTitle("Subscribe"));
 
 ---
 
-### AriaSnapshotAsync {#locator-aria-snapshot}
+### AriaSnapshotAsync {/* #locator-aria-snapshot */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.49</font><x-search>locator.AriaSnapshotAsync</x-search>
 
@@ -125,6 +125,15 @@ await page.GetByRole(AriaRole.Link).AriaSnapshotAsync();
 
 **Arguments**
 - `options` `LocatorAriaSnapshotOptions?` *(optional)*
+  - `Boxes` [bool]? *(optional)* <font size="2">Added in: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-option-boxes"/><a href="#locator-aria-snapshot-option-boxes" class="list-anchor">#</a>
+    
+    When `true`, appends each element's bounding box as `[box=x,y,width,height]` to the snapshot. Coordinates are relative to the viewport, in CSS pixels, as returned by [`Element.getBoundingClientRect()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect). Defaults to `false`.
+  - `Depth` [int]? *(optional)* <font size="2">Added in: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-option-depth"/><a href="#locator-aria-snapshot-option-depth" class="list-anchor">#</a>
+    
+    When specified, limits the depth of the snapshot.
+  - `Mode` `enum AriaSnapshotMode { Ai, Default }?` *(optional)* <font size="2">Added in: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-option-mode"/><a href="#locator-aria-snapshot-option-mode" class="list-anchor">#</a>
+    
+    When set to `"ai"`, returns a snapshot optimized for AI consumption. Defaults to `"default"`. See details for more information.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-option-timeout"/><a href="#locator-aria-snapshot-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -158,9 +167,12 @@ Below is the HTML markup and the respective ARIA snapshot:
     - link "About"
 ```
 
+An AI-optimized snapshot, controlled by [Mode](/api/class-locator.mdx#locator-aria-snapshot-option-mode), is different from a default snapshot:
+1. Includes element references `[ref=e2]`. 2. Does not wait for an element matching the locator, and throws when no elements match. 3. Includes snapshots of `<iframe>`s inside the target. 4. Can omit names that repeat printed descendants, such as a heading containing a link. Names that identify dialogs, landmarks, groups, tables and table headers are retained.
+
 ---
 
-### BlurAsync {#locator-blur}
+### BlurAsync {/* #locator-blur */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.28</font><x-search>locator.BlurAsync</x-search>
 
@@ -183,7 +195,7 @@ await Locator.BlurAsync(options);
 
 ---
 
-### BoundingBoxAsync {#locator-bounding-box}
+### BoundingBoxAsync {/* #locator-bounding-box */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.BoundingBoxAsync</x-search>
 
@@ -227,7 +239,7 @@ Assuming the page is static, it is safe to use bounding box coordinates to perfo
 
 ---
 
-### CheckAsync {#locator-check}
+### CheckAsync {/* #locator-check */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.CheckAsync</x-search>
 
@@ -260,6 +272,9 @@ await page.GetByRole(AriaRole.Checkbox).CheckAsync();
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `Scroll` `enum ScrollMode { Auto, None }?` *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-check-option-scroll"/><a href="#locator-check-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-check-option-timeout"/><a href="#locator-check-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -285,7 +300,7 @@ When all steps combined have not finished during the specified [Timeout](/api/cl
 
 ---
 
-### ClearAsync {#locator-clear}
+### ClearAsync {/* #locator-clear */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.28</font><x-search>locator.ClearAsync</x-search>
 
@@ -325,7 +340,7 @@ If the target element is not an `<input>`, `<textarea>` or `[contenteditable]` e
 
 ---
 
-### ClickAsync {#locator-click}
+### ClickAsync {/* #locator-click */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.ClickAsync</x-search>
 
@@ -382,6 +397,9 @@ await page.Locator("canvas").ClickAsync(new() {
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `Scroll` `enum ScrollMode { Auto, None }?` *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-click-option-scroll"/><a href="#locator-click-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
   - `Steps` [int]? *(optional)* <font size="2">Added in: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-click-option-steps"/><a href="#locator-click-option-steps" class="list-anchor">#</a>
     
     Defaults to 1. Sends `n` interpolated `mousemove` events to represent travel between Playwright's current cursor position and the provided destination. When set to 1, emits a single `mousemove` event at the destination location.
@@ -409,7 +427,7 @@ When all steps combined have not finished during the specified [Timeout](/api/cl
 
 ---
 
-### ContentFrame {#locator-content-frame}
+### ContentFrame {/* #locator-content-frame */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.43</font><x-search>locator.ContentFrame</x-search>
 
@@ -433,7 +451,7 @@ await frameLocator.GetByRole(AriaRole.Button).ClickAsync();
 
 ---
 
-### CountAsync {#locator-count}
+### CountAsync {/* #locator-count */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.CountAsync</x-search>
 
@@ -455,7 +473,7 @@ int count = await page.GetByRole(AriaRole.Listitem).CountAsync();
 
 ---
 
-### DblClickAsync {#locator-dblclick}
+### DblClickAsync {/* #locator-dblclick */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.DblClickAsync</x-search>
 
@@ -497,6 +515,9 @@ await Locator.DblClickAsync(options);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `Scroll` `enum ScrollMode { Auto, None }?` *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-dblclick-option-scroll"/><a href="#locator-dblclick-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
   - `Steps` [int]? *(optional)* <font size="2">Added in: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-dblclick-option-steps"/><a href="#locator-dblclick-option-steps" class="list-anchor">#</a>
     
     Defaults to 1. Sends `n` interpolated `mousemove` events to represent travel between Playwright's current cursor position and the provided destination. When set to 1, emits a single `mousemove` event at the destination location.
@@ -528,7 +549,7 @@ When all steps combined have not finished during the specified [Timeout](/api/cl
 
 ---
 
-### Describe {#locator-describe}
+### Describe {/* #locator-describe */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.53</font><x-search>locator.Describe</x-search>
 
@@ -551,11 +572,11 @@ await button.ClickAsync();
 
 ---
 
-### Description {#locator-description}
+### Description {/* #locator-description */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.57</font><x-search>locator.Description</x-search>
 
-Returns locator description previously set with [Locator.Describe()](/api/class-locator.mdx#locator-describe). Returns `null` if no custom description has been set. Prefer `Locator.toString()` for a human-readable representation, as it uses the description when available.
+Returns locator description previously set with [Locator.Describe()](/api/class-locator.mdx#locator-describe). Returns `null` if no custom description has been set.
 
 **Usage**
 
@@ -572,7 +593,7 @@ Console.WriteLine(input.Description()); // null
 
 ---
 
-### DispatchEventAsync {#locator-dispatch-event}
+### DispatchEventAsync {/* #locator-dispatch-event */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.DispatchEventAsync</x-search>
 
@@ -629,7 +650,7 @@ await locator.DispatchEventAsync("dragstart", new Dictionary<string, object>
 
 ---
 
-### DragToAsync {#locator-drag-to}
+### DragToAsync {/* #locator-drag-to */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.18</font><x-search>locator.DragToAsync</x-search>
 
@@ -666,6 +687,9 @@ await source.DragToAsync(target, new()
     
     
     This option has no effect.
+  - `Scroll` `enum ScrollMode { Auto, None }?` *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drag-to-option-scroll"/><a href="#locator-drag-to-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
   - `SourcePosition` SourcePosition? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drag-to-option-source-position"/><a href="#locator-drag-to-option-source-position" class="list-anchor">#</a>
     - `X` [float]
       
@@ -701,7 +725,61 @@ This method drags the locator to another target locator or target position. It w
 
 ---
 
-### EvaluateAsync {#locator-evaluate}
+### DropAsync {/* #locator-drop */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>locator.DropAsync</x-search>
+
+Simulate an external drag-and-drop of files or clipboard-like data onto this locator.
+
+**Usage**
+
+Drop a file buffer onto an upload area:
+
+Drop plain text and a URL together:
+
+**Arguments**
+- `payload` Payload<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drop-option-payload"/><a href="#locator-drop-option-payload" class="list-anchor">#</a>
+  - `Files` [string]? | [IEnumerable]?&lt;[string]&gt; | Files? | [IEnumerable]?&lt;Files&gt; *(optional)*
+    - `Name` [string]
+      
+      File name
+    - `MimeType` [string]
+      
+      File type
+    - `Buffer` [byte]&#91;&#93;
+      
+      File content
+    
+    
+  - `Data` [IDictionary]?&lt;[string], [string]&gt; *(optional)*
+    
+    
+  Data to drop onto the target. Provide `files` (file paths or in-memory buffers), `data` (a mime-type → string map for clipboard-like content such as `text/plain`, `text/html`, `text/uri-list`), or both.
+- `options` `LocatorDropOptions?` *(optional)*
+  - `Position` Position? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drop-option-position"/><a href="#locator-drop-option-position" class="list-anchor">#</a>
+    - `X` [float]
+      
+      
+    - `Y` [float]
+      
+      
+    A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drop-option-timeout"/><a href="#locator-drop-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drop-return"/><a href="#locator-drop-return" class="list-anchor">#</a>
+
+**Details**
+
+Dispatches the native `dragenter`, `dragover`, and `drop` events at the center of the target element with a synthetic [DataTransfer] carrying the provided files and/or data entries. Works cross-browser by constructing the [DataTransfer] in the page context.
+
+If the target element's `dragover` listener does not call `preventDefault()`, the target is considered to have rejected the drop: Playwright dispatches `dragleave` and this method throws.
+
+---
+
+### EvaluateAsync {/* #locator-evaluate */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.EvaluateAsync</x-search>
 
@@ -741,7 +819,7 @@ If [expression](/api/class-locator.mdx#locator-evaluate-option-expression) throw
 
 ---
 
-### EvaluateAllAsync {#locator-evaluate-all}
+### EvaluateAllAsync {/* #locator-evaluate-all */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.EvaluateAllAsync</x-search>
 
@@ -775,7 +853,7 @@ If [expression](/api/class-locator.mdx#locator-evaluate-all-option-expression) t
 
 ---
 
-### EvaluateHandleAsync {#locator-evaluate-handle}
+### EvaluateHandleAsync {/* #locator-evaluate-handle */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.EvaluateHandleAsync</x-search>
 
@@ -816,7 +894,7 @@ See [Page.EvaluateHandleAsync()](/api/class-page.mdx#page-evaluate-handle) for m
 
 ---
 
-### FillAsync {#locator-fill}
+### FillAsync {/* #locator-fill */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.FillAsync</x-search>
 
@@ -861,7 +939,7 @@ To send fine-grained keyboard events, use [Locator.PressSequentiallyAsync()](/ap
 
 ---
 
-### Filter {#locator-filter}
+### Filter {/* #locator-filter */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.22</font><x-search>locator.Filter</x-search>
 
@@ -902,14 +980,14 @@ await rowLocator
     Matches elements containing specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring. For example, `"Playwright"` matches `<article><div>Playwright</div></article>`.
   - `Visible` [bool]? *(optional)* <font size="2">Added in: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-option-visible"/><a href="#locator-filter-option-visible" class="list-anchor">#</a>
     
-    Only matches visible or invisible elements.
+    Only matches visible or invisible elements. Prefer the [Locator.Visible](/api/class-locator.mdx#locator-visible) shortcut when matching only visible elements.
 
 **Returns**
 - [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-return"/><a href="#locator-filter-return" class="list-anchor">#</a>
 
 ---
 
-### First {#locator-first}
+### First {/* #locator-first */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.First</x-search>
 
@@ -926,7 +1004,7 @@ Locator.First
 
 ---
 
-### FocusAsync {#locator-focus}
+### FocusAsync {/* #locator-focus */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.FocusAsync</x-search>
 
@@ -949,7 +1027,7 @@ await Locator.FocusAsync(options);
 
 ---
 
-### FrameLocator {#locator-frame-locator}
+### FrameLocator {/* #locator-frame-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>locator.FrameLocator</x-search>
 
@@ -972,7 +1050,7 @@ await locator.ClickAsync();
 
 ---
 
-### GetAttributeAsync {#locator-get-attribute}
+### GetAttributeAsync {/* #locator-get-attribute */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.GetAttributeAsync</x-search>
 
@@ -1003,7 +1081,7 @@ await Locator.GetAttributeAsync(name, options);
 
 ---
 
-### GetByAltText {#locator-get-by-alt-text}
+### GetByAltText {/* #locator-get-by-alt-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.GetByAltText</x-search>
 
@@ -1035,7 +1113,7 @@ await page.GetByAltText("Playwright logo").ClickAsync();
 
 ---
 
-### GetByLabel {#locator-get-by-label}
+### GetByLabel {/* #locator-get-by-label */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.GetByLabel</x-search>
 
@@ -1070,7 +1148,7 @@ await page.GetByLabel("Password").FillAsync("secret");
 
 ---
 
-### GetByPlaceholder {#locator-get-by-placeholder}
+### GetByPlaceholder {/* #locator-get-by-placeholder */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.GetByPlaceholder</x-search>
 
@@ -1106,7 +1184,7 @@ await page
 
 ---
 
-### GetByRole {#locator-get-by-role}
+### GetByRole {/* #locator-get-by-role */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.GetByRole</x-search>
 
@@ -1125,7 +1203,7 @@ Consider the following DOM structure.
 <button>Submit</button>
 ```
 
-You can locate each element by it's implicit role:
+You can locate each element by its implicit role:
 
 ```csharp
 await Expect(Page
@@ -1153,6 +1231,11 @@ await page
     An attribute that is usually set by `aria-checked` or native `<input type=checkbox>` controls.
     
     Learn more about [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
+  - `Description|DescriptionRegex` [string]? | [Regex]? *(optional)* <font size="2">Added in: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-role-option-description"/><a href="#locator-get-by-role-option-description" class="list-anchor">#</a>
+    
+    Option to match the [accessible description](https://w3c.github.io/accname/#dfn-accessible-description). By default, matching is case-insensitive and searches for a substring, use [Exact](/api/class-locator.mdx#locator-get-by-role-option-exact) to control this behavior.
+    
+    Learn more about [accessible description](https://w3c.github.io/accname/#dfn-accessible-description).
   - `Disabled` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-role-option-disabled"/><a href="#locator-get-by-role-option-disabled" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-disabled` or `disabled`.
@@ -1164,7 +1247,7 @@ await page
     
   - `Exact` [bool]? *(optional)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-role-option-exact"/><a href="#locator-get-by-role-option-exact" class="list-anchor">#</a>
     
-    Whether [Name|NameRegex](/api/class-locator.mdx#locator-get-by-role-option-name) is matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when [Name|NameRegex](/api/class-locator.mdx#locator-get-by-role-option-name) is a regular expression. Note that exact match still trims whitespace.
+    Whether [Name|NameRegex](/api/class-locator.mdx#locator-get-by-role-option-name) and [Description|DescriptionRegex](/api/class-locator.mdx#locator-get-by-role-option-description) are matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when the value is a regular expression. Note that exact match still trims whitespace.
   - `Expanded` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-role-option-expanded"/><a href="#locator-get-by-role-option-expanded" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-expanded`.
@@ -1207,7 +1290,7 @@ Many html elements have an implicitly [defined role](https://w3c.github.io/html-
 
 ---
 
-### GetByTestId {#locator-get-by-test-id}
+### GetByTestId {/* #locator-get-by-test-id */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.GetByTestId</x-search>
 
@@ -1221,7 +1304,7 @@ Consider the following DOM structure.
 <button data-testid="directions">Itinéraire</button>
 ```
 
-You can locate the element by it's test id:
+You can locate the element by its test id:
 
 ```csharp
 await page.GetByTestId("directions").ClickAsync();
@@ -1241,7 +1324,7 @@ By default, the `data-testid` attribute is used as a test id. Use [Selectors.Set
 
 ---
 
-### GetByText {#locator-get-by-text}
+### GetByText {/* #locator-get-by-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.GetByText</x-search>
 
@@ -1297,7 +1380,7 @@ Input elements of the type `button` and `submit` are matched by their `value` in
 
 ---
 
-### GetByTitle {#locator-get-by-title}
+### GetByTitle {/* #locator-get-by-title */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.GetByTitle</x-search>
 
@@ -1331,7 +1414,24 @@ await Expect(Page.GetByTitle("Issues count")).toHaveText("25 issues");
 
 ---
 
-### HighlightAsync {#locator-highlight}
+### HideHighlightAsync {/* #locator-hide-highlight */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>locator.HideHighlightAsync</x-search>
+
+Hides the element highlight previously added by [Locator.HighlightAsync()](/api/class-locator.mdx#locator-highlight).
+
+**Usage**
+
+```csharp
+await Locator.HideHighlightAsync();
+```
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hide-highlight-return"/><a href="#locator-hide-highlight-return" class="list-anchor">#</a>
+
+---
+
+### HighlightAsync {/* #locator-highlight */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><x-search>locator.HighlightAsync</x-search>
 
@@ -1340,15 +1440,21 @@ Highlight the corresponding element(s) on the screen. Useful for debugging, don'
 **Usage**
 
 ```csharp
-await Locator.HighlightAsync();
+await Locator.HighlightAsync(options);
 ```
 
+**Arguments**
+- `options` `LocatorHighlightOptions?` *(optional)*
+  - `Style` [string]? *(optional)* <font size="2">Added in: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-highlight-option-style"/><a href="#locator-highlight-option-style" class="list-anchor">#</a>
+    
+    Additional inline CSS applied to the highlight overlay, e.g. `"outline: 2px dashed red"`.
+
 **Returns**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-highlight-return"/><a href="#locator-highlight-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-highlight-return"/><a href="#locator-highlight-return" class="list-anchor">#</a>
 
 ---
 
-### HoverAsync {#locator-hover}
+### HoverAsync {/* #locator-hover */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.HoverAsync</x-search>
 
@@ -1384,6 +1490,9 @@ await page.GetByRole(AriaRole.Link).HoverAsync();
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `Scroll` `enum ScrollMode { Auto, None }?` *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-scroll"/><a href="#locator-hover-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-timeout"/><a href="#locator-hover-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -1407,7 +1516,7 @@ When all steps combined have not finished during the specified [Timeout](/api/cl
 
 ---
 
-### InnerHTMLAsync {#locator-inner-html}
+### InnerHTMLAsync {/* #locator-inner-html */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.InnerHTMLAsync</x-search>
 
@@ -1430,7 +1539,7 @@ await Locator.InnerHTMLAsync(options);
 
 ---
 
-### InnerTextAsync {#locator-inner-text}
+### InnerTextAsync {/* #locator-inner-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.InnerTextAsync</x-search>
 
@@ -1458,7 +1567,7 @@ await Locator.InnerTextAsync(options);
 
 ---
 
-### InputValueAsync {#locator-input-value}
+### InputValueAsync {/* #locator-input-value */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.InputValueAsync</x-search>
 
@@ -1490,7 +1599,7 @@ Throws elements that are not an input, textarea or a select. However, if the ele
 
 ---
 
-### IsCheckedAsync {#locator-is-checked}
+### IsCheckedAsync {/* #locator-is-checked */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.IsCheckedAsync</x-search>
 
@@ -1518,7 +1627,7 @@ var isChecked = await page.GetByRole(AriaRole.Checkbox).IsCheckedAsync();
 
 ---
 
-### IsDisabledAsync {#locator-is-disabled}
+### IsDisabledAsync {/* #locator-is-disabled */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.IsDisabledAsync</x-search>
 
@@ -1546,7 +1655,7 @@ Boolean disabled = await page.GetByRole(AriaRole.Button).IsDisabledAsync();
 
 ---
 
-### IsEditableAsync {#locator-is-editable}
+### IsEditableAsync {/* #locator-is-editable */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.IsEditableAsync</x-search>
 
@@ -1574,7 +1683,7 @@ Boolean editable = await page.GetByRole(AriaRole.Textbox).IsEditableAsync();
 
 ---
 
-### IsEnabledAsync {#locator-is-enabled}
+### IsEnabledAsync {/* #locator-is-enabled */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.IsEnabledAsync</x-search>
 
@@ -1602,7 +1711,7 @@ Boolean enabled = await page.GetByRole(AriaRole.Button).IsEnabledAsync();
 
 ---
 
-### IsHiddenAsync {#locator-is-hidden}
+### IsHiddenAsync {/* #locator-is-hidden */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.IsHiddenAsync</x-search>
 
@@ -1633,7 +1742,7 @@ Boolean hidden = await page.GetByRole(AriaRole.Button).IsHiddenAsync();
 
 ---
 
-### IsVisibleAsync {#locator-is-visible}
+### IsVisibleAsync {/* #locator-is-visible */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.IsVisibleAsync</x-search>
 
@@ -1664,7 +1773,7 @@ Boolean visible = await page.GetByRole(AriaRole.Button).IsVisibleAsync();
 
 ---
 
-### Last {#locator-last}
+### Last {/* #locator-last */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.Last</x-search>
 
@@ -1673,7 +1782,7 @@ Returns locator to the last matching element.
 **Usage**
 
 ```csharp
-var banana = await page.GetByRole(AriaRole.Listitem).Last(1);
+var banana = page.GetByRole(AriaRole.Listitem).Last;
 ```
 
 **Returns**
@@ -1681,7 +1790,7 @@ var banana = await page.GetByRole(AriaRole.Listitem).Last(1);
 
 ---
 
-### Locator {#locator-locator}
+### Locator {/* #locator-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.Locator</x-search>
 
@@ -1724,7 +1833,36 @@ Locator.Locator(selectorOrLocator, options);
 
 ---
 
-### Nth {#locator-nth}
+### NormalizeAsync {/* #locator-normalize */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>locator.NormalizeAsync</x-search>
+
+Returns a new locator that uses best practices for referencing the matched element, prioritizing test ids, aria roles, and other user-facing attributes over CSS selectors. This is useful for converting implementation-detail selectors into more resilient, human-readable locators.
+
+**Usage**
+
+An agent can pick an element by its ref from an [Page.AriaSnapshotAsync()](/api/class-page.mdx#page-aria-snapshot) taken in the `"ai"` mode. Refs only work for the latest snapshot. Normalize the ref locator and convert it to a string to get resilient locator code in your language, the same way `codegen` does.
+
+Consider the following aria snapshot.
+
+```yaml
+- button "Submit" [ref=e2]
+```
+
+You can turn the ref into locator code:
+
+```csharp
+var normalized = await page.GetByRef("e2").NormalizeAsync();
+Console.WriteLine(normalized.ToString());
+// GetByRole(AriaRole.Button, new() { Name = "Submit" })
+```
+
+**Returns**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-normalize-return"/><a href="#locator-normalize-return" class="list-anchor">#</a>
+
+---
+
+### Nth {/* #locator-nth */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.Nth</x-search>
 
@@ -1744,7 +1882,7 @@ var banana = await page.GetByRole(AriaRole.Listitem).Nth(2);
 
 ---
 
-### Or {#locator-or}
+### Or {/* #locator-or */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.33</font><x-search>locator.Or</x-search>
 
@@ -1780,7 +1918,7 @@ await newEmail.ClickAsync();
 
 ---
 
-### Page {#locator-page}
+### Page {/* #locator-page */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.19</font><x-search>locator.Page</x-search>
 
@@ -1797,7 +1935,7 @@ Locator.Page
 
 ---
 
-### PressAsync {#locator-press}
+### PressAsync {/* #locator-press */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.PressAsync</x-search>
 
@@ -1850,7 +1988,7 @@ Shortcuts such as `key: "Control+o"`, `key: "Control++` or `key: "Control+Shift+
 
 ---
 
-### PressSequentiallyAsync {#locator-press-sequentially}
+### PressSequentiallyAsync {/* #locator-press-sequentially */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.38</font><x-search>locator.PressSequentiallyAsync</x-search>
 
@@ -1903,7 +2041,7 @@ await locator.PressAsync("Enter");
 
 ---
 
-### ScreenshotAsync {#locator-screenshot}
+### ScreenshotAsync {/* #locator-screenshot */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.ScreenshotAsync</x-search>
 
@@ -1950,7 +2088,7 @@ await page.GetByRole(AriaRole.Link).ScreenshotAsync(new() {
     The file path to save the image to. The screenshot type will be inferred from file extension. If [Path](/api/class-locator.mdx#locator-screenshot-option-path) is a relative path, then it is resolved relative to the current working directory. If no path is provided, the image won't be saved to the disk.
   - `Quality` [int]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-quality"/><a href="#locator-screenshot-option-quality" class="list-anchor">#</a>
     
-    The quality of the image, between 0-100. Not applicable to `png` images.
+    The quality of the image, between 0-100. Not applicable to `png` images. For `jpeg` the default is `80`. For `webp`, a quality of `100` (the default) produces a lossless image, while lower values use lossy compression.
   - `Scale` `enum ScreenshotScale { Css, Device }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-scale"/><a href="#locator-screenshot-option-scale" class="list-anchor">#</a>
     
     When set to `"css"`, screenshot will have a single pixel per each css pixel on the page. For high-dpi devices, this will keep screenshots small. Using `"device"` option will produce a single pixel per each device pixel, so screenshots of high-dpi devices will be twice as large or even larger.
@@ -1962,7 +2100,7 @@ await page.GetByRole(AriaRole.Link).ScreenshotAsync(new() {
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-timeout"/><a href="#locator-screenshot-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-  - `Type` `enum ScreenshotType { Png, Jpeg }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-type"/><a href="#locator-screenshot-option-type" class="list-anchor">#</a>
+  - `Type` `enum ScreenshotType { Png, Jpeg, Webp }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-type"/><a href="#locator-screenshot-option-type" class="list-anchor">#</a>
     
     Specify screenshot type, defaults to `png`.
 
@@ -1979,7 +2117,7 @@ Returns the buffer with the captured screenshot.
 
 ---
 
-### ScrollIntoViewIfNeededAsync {#locator-scroll-into-view-if-needed}
+### ScrollIntoViewIfNeededAsync {/* #locator-scroll-into-view-if-needed */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.ScrollIntoViewIfNeededAsync</x-search>
 
@@ -2004,7 +2142,7 @@ await Locator.ScrollIntoViewIfNeededAsync(options);
 
 ---
 
-### SelectOptionAsync {#locator-select-option}
+### SelectOptionAsync {/* #locator-select-option */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.SelectOptionAsync</x-search>
 
@@ -2073,7 +2211,7 @@ Triggers a `change` and `input` event once all the provided options have been se
 
 ---
 
-### SelectTextAsync {#locator-select-text}
+### SelectTextAsync {/* #locator-select-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.SelectTextAsync</x-search>
 
@@ -2101,7 +2239,7 @@ await Locator.SelectTextAsync(options);
 
 ---
 
-### SetCheckedAsync {#locator-set-checked}
+### SetCheckedAsync {/* #locator-set-checked */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>locator.SetCheckedAsync</x-search>
 
@@ -2137,6 +2275,9 @@ await page.GetByRole(AriaRole.Checkbox).SetCheckedAsync(true);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `Scroll` `enum ScrollMode { Auto, None }?` *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-scroll"/><a href="#locator-set-checked-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-timeout"/><a href="#locator-set-checked-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -2161,7 +2302,7 @@ When all steps combined have not finished during the specified [Timeout](/api/cl
 
 ---
 
-### SetInputFilesAsync {#locator-set-input-files}
+### SetInputFilesAsync {/* #locator-set-input-files */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.SetInputFilesAsync</x-search>
 
@@ -2226,7 +2367,7 @@ This method expects [Locator] to point to an [input element](https://developer.m
 
 ---
 
-### TapAsync {#locator-tap}
+### TapAsync {/* #locator-tap */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.TapAsync</x-search>
 
@@ -2262,6 +2403,9 @@ await Locator.TapAsync(options);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `Scroll` `enum ScrollMode { Auto, None }?` *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-scroll"/><a href="#locator-tap-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-timeout"/><a href="#locator-tap-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -2290,7 +2434,7 @@ When all steps combined have not finished during the specified [Timeout](/api/cl
 
 ---
 
-### TextContentAsync {#locator-text-content}
+### TextContentAsync {/* #locator-text-content */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.TextContentAsync</x-search>
 
@@ -2318,7 +2462,7 @@ await Locator.TextContentAsync(options);
 
 ---
 
-### UncheckAsync {#locator-uncheck}
+### UncheckAsync {/* #locator-uncheck */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.UncheckAsync</x-search>
 
@@ -2351,6 +2495,9 @@ await page.GetByRole(AriaRole.Checkbox).UncheckAsync();
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `Scroll` `enum ScrollMode { Auto, None }?` *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-scroll"/><a href="#locator-uncheck-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-timeout"/><a href="#locator-uncheck-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -2376,7 +2523,37 @@ When all steps combined have not finished during the specified [Timeout](/api/cl
 
 ---
 
-### WaitForAsync {#locator-wait-for}
+### Visible {/* #locator-visible */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.63</font><x-search>locator.Visible</x-search>
+
+Returns a locator that matches only [visible](../actionability.mdx#visible) elements, ignoring the invisible ones. This is the recommended way to distinguish elements by visibility, as opposed to the `:visible` CSS pseudo-class.
+
+Note that visibility is checked every time the locator is used, and not at the moment of the [Locator.Visible](/api/class-locator.mdx#locator-visible) call.
+
+**Usage**
+
+Consider a page with two buttons, the first invisible and the second visible.
+
+```html
+<button style='display: none'>Invisible</button>
+<button>Visible</button>
+```
+
+This will only find the second button, because it is visible, and then click it.
+
+```csharp
+await page.Locator("button").Visible.ClickAsync();
+```
+
+To match invisible elements instead, use [Locator.Filter()](/api/class-locator.mdx#locator-filter) with the [Visible](/api/class-locator.mdx#locator-filter-option-visible) option set to `false`.
+
+**Returns**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-visible-return"/><a href="#locator-visible-return" class="list-anchor">#</a>
+
+---
+
+### WaitForAsync {/* #locator-wait-for */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>locator.WaitForAsync</x-search>
 
@@ -2409,9 +2586,69 @@ orderSent.WaitForAsync();
 
 ---
 
+### WaitForFunctionAsync {/* #locator-wait-for-function */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.62</font><x-search>locator.WaitForFunctionAsync</x-search>
+
+Returns when [expression](/api/class-locator.mdx#locator-wait-for-function-option-expression) returns a truthy value, called with the matching element as a first argument, and [arg](/api/class-locator.mdx#locator-wait-for-function-option-arg) as a second argument.
+
+This is a generic way to wait for an element to reach a custom condition without asserting it. The locator is re-resolved on each retry, so it tolerates the element being re-rendered while waiting.
+
+If [expression](/api/class-locator.mdx#locator-wait-for-function-option-expression) returns a [Promise], this method will wait for the promise to resolve before checking its value.
+
+If [expression](/api/class-locator.mdx#locator-wait-for-function-option-expression) throws or rejects, this method throws.
+
+**Usage**
+
+Wait for an attribute to appear:
+
+Passing argument to [expression](/api/class-locator.mdx#locator-wait-for-function-option-expression):
+
+**Arguments**
+- `expression` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-function-option-expression"/><a href="#locator-wait-for-function-option-expression" class="list-anchor">#</a>
+  
+  JavaScript expression to be evaluated in the browser context. If the expression evaluates to a function, the function is automatically invoked.
+- `arg` [EvaluationArgument]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-function-option-arg"/><a href="#locator-wait-for-function-option-arg" class="list-anchor">#</a>
+  
+  Optional argument to pass to [expression](/api/class-locator.mdx#locator-wait-for-function-option-expression).
+- `options` `LocatorWaitForFunctionOptions?` *(optional)*
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-function-option-timeout"/><a href="#locator-wait-for-function-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-function-return"/><a href="#locator-wait-for-function-return" class="list-anchor">#</a>
+
+---
+
+### Within {/* #locator-within */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>locator.Within</x-search>
+
+Returns a locator that matches this locator's elements inside each element matched by [locator](/api/class-locator.mdx#locator-within-option-locator).
+
+Note that relative locators, such as [Locator.Nth()](/api/class-locator.mdx#locator-nth) or [Locator.First](/api/class-locator.mdx#locator-first), are resolved separately inside each matched parent. In the example below, `page.getByRole('cell').nth(2)` picks the third cell of every row, not the third cell in the whole table.
+
+**Usage**
+
+```csharp
+var thirdColumn = page.GetByRole(AriaRole.Cell).Nth(2).Within(page.GetByRole(AriaRole.Row));
+await Expect(thirdColumn).ToHaveTextAsync(new[] { "Apple", "Banana", "Cherry" });
+```
+
+**Arguments**
+- `locator` [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-within-option-locator"/><a href="#locator-within-option-locator" class="list-anchor">#</a>
+  
+  Locator matching the parent elements to search within.
+
+**Returns**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-within-return"/><a href="#locator-within-return" class="list-anchor">#</a>
+
+---
+
 ## Deprecated
 
-### ElementHandleAsync {#locator-element-handle}
+### ElementHandleAsync {/* #locator-element-handle */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.ElementHandleAsync</x-search>
 
@@ -2441,7 +2678,7 @@ await Locator.ElementHandleAsync(options);
 
 ---
 
-### ElementHandlesAsync {#locator-element-handles}
+### ElementHandlesAsync {/* #locator-element-handles */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.ElementHandlesAsync</x-search>
 
@@ -2465,11 +2702,11 @@ await Locator.ElementHandlesAsync();
 
 ---
 
-### TypeAsync {#locator-type}
+### TypeAsync {/* #locator-type */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.TypeAsync</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 In most cases, you should use [Locator.FillAsync()](/api/class-locator.mdx#locator-fill) instead. You only need to press keys one by one if there is special keyboard handling on the page - in this case use [Locator.PressSequentiallyAsync()](/api/class-locator.mdx#locator-press-sequentially).
 
@@ -2517,6 +2754,8 @@ To press a special key, like `Control` or `ArrowDown`, use [Locator.PressAsync()
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -2536,15 +2775,18 @@ To press a special key, like `Control` or `ArrowDown`, use [Locator.PressAsync()
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

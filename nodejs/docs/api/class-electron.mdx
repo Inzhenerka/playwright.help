@@ -46,21 +46,42 @@ const { _electron: electron } = require('playwright');
 ```
 
 **Supported Electron versions are:**
-* v12.2.0+
-* v13.4.0+
-* v14+
+* v21+
 
 **Known issues:**
 
 If you are not able to launch Electron and it will end up in timeouts during launch, try the following:
 * Ensure that `nodeCliInspect` ([FuseV1Options.EnableNodeCliInspectArguments](https://www.electronjs.org/docs/latest/tutorial/fuses#nodecliinspect)) fuse is **not** set to `false`.
 
+**Mocking native dialogs:**
+
+Playwright does not intercept the native Electron [dialog](https://www.electronjs.org/docs/latest/api/dialog) API (`dialog.showOpenDialog`, `dialog.showSaveDialog`, `dialog.showMessageBox`, etc.) because those calls happen in the Electron main process and go straight to OS APIs. Use [electronApplication.evaluate()](/api/class-electronapplication.mdx#electron-application-evaluate) to replace the relevant methods in the main process so tests run deterministically without any OS-level UI:
+
+```js
+// Stub the open dialog to always return a fixed path.
+await electronApp.evaluate(({ dialog }, filePaths) => {
+  dialog.showOpenDialog = () => Promise.resolve({ canceled: false, filePaths });
+}, ['/path/to/file.txt']);
+
+// Stub the save dialog.
+await electronApp.evaluate(({ dialog }, filePath) => {
+  dialog.showSaveDialog = () => Promise.resolve({ canceled: false, filePath });
+}, '/path/to/saved.txt');
+
+// Stub showMessageBox to click the first button.
+await electronApp.evaluate(({ dialog }) => {
+  dialog.showMessageBox = () => Promise.resolve({ response: 0, checkboxChecked: false });
+});
+```
+
+The replacement persists until the application is closed. Synchronous variants (`showOpenDialogSync`, `showSaveDialogSync`, `showMessageBoxSync`) can be stubbed the same way — just return the value directly instead of a `Promise`.
+
 
 ---
 
 ## Methods
 
-### launch {#electron-launch}
+### launch {/* #electron-launch */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>electron.launch</x-search>
 
@@ -81,9 +102,15 @@ await electron.launch(options);
   - `args` [Array]&lt;[string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-args"/><a href="#electron-launch-option-args" class="list-anchor">#</a>
     
     Additional arguments to pass to the application when launching. You typically pass the main script name here.
+  - `artifactsDir` [string] *(optional)* <font size="2">Added in: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-artifacts-dir"/><a href="#electron-launch-option-artifacts-dir" class="list-anchor">#</a>
+    
+    If specified, artifacts (traces, videos, downloads, HAR files, etc.) are saved into this directory. The directory is not cleaned up when the browser closes. If not specified, a temporary directory is used and cleaned up when the browser closes.
   - `bypassCSP` [boolean] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-bypass-csp"/><a href="#electron-launch-option-bypass-csp" class="list-anchor">#</a>
     
     Toggles bypassing page's Content-Security-Policy. Defaults to `false`.
+  - `chromiumSandbox` [boolean] *(optional)* <font size="2">Added in: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-chromium-sandbox"/><a href="#electron-launch-option-chromium-sandbox" class="list-anchor">#</a>
+    
+    Enable Chromium sandboxing. Defaults to `false`.
   - `colorScheme` [null] | "light" | "dark" | "no-preference" *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-color-scheme"/><a href="#electron-launch-option-color-scheme" class="list-anchor">#</a>
     
     Emulates [prefers-colors-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme) media feature, supported values are `'light'` and `'dark'`. See [page.emulateMedia()](/api/class-page.mdx#page-emulate-media) for more details. Passing `null` resets emulation to system defaults. Defaults to `'light'`.
@@ -109,7 +136,7 @@ await electron.launch(options);
     - `accuracy` [number] *(optional)*
       
       Non-negative accuracy value. Defaults to `0`.
-  - `httpCredentials` [Object] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-http-credentials"/><a href="#electron-launch-option-http-credentials" class="list-anchor">#</a>
+  - `httpCredentials` [Object] | [Array]&lt;[Object]&gt; *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-http-credentials"/><a href="#electron-launch-option-http-credentials" class="list-anchor">#</a>
     - `username` [string]
       
       
@@ -124,6 +151,8 @@ await electron.launch(options);
       This option only applies to the requests sent from corresponding [APIRequestContext] and does not affect requests sent from the browser. `'always'` - `Authorization` header with basic authentication credentials will be sent with the each API request. `'unauthorized` - the credentials are only sent when 401 (Unauthorized) response with `WWW-Authenticate` header is received. Defaults to `'unauthorized'`.
     
     Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). If no origin is specified, the username and password are sent to any servers upon unauthorized responses.
+    
+    Pass an array to use different credentials for different origins. The first entry that matches the request origin is used, and entries with no origin match any request.
   - `ignoreHTTPSErrors` [boolean] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-ignore-https-errors"/><a href="#electron-launch-option-ignore-https-errors" class="list-anchor">#</a>
     
     Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
@@ -152,9 +181,9 @@ await electron.launch(options);
     
     Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into `recordHar.path` file. If not specified, the HAR is not recorded. Make sure to await [browserContext.close()](/api/class-browsercontext.mdx#browser-context-close) for the HAR to be saved.
   - `recordVideo` [Object] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-record-video"/><a href="#electron-launch-option-record-video" class="list-anchor">#</a>
-    - `dir` [string]
+    - `dir` [string] *(optional)*
       
-      Path to the directory to put videos into.
+      Path to the directory to put videos into. If not specified, the videos will be stored in `artifactsDir` (see [browserType.launch()](/api/class-browsertype.mdx#browser-type-launch) options).
     - `size` [Object] *(optional)*
       - `width` [number]
         
@@ -164,6 +193,36 @@ await electron.launch(options);
         Video frame height.
       
       Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport` scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
+    - `fps` [number] *(optional)*
+      
+      Frame rate of the recorded videos in frames per second. Defaults to `25`. Firefox and WebKit currently capture up to 25 frames per second.
+    - `showActions` [Object] *(optional)*
+      - `duration` [number] *(optional)*
+        
+        How long each annotation is displayed in milliseconds. Defaults to `500`.
+      - `position` "top-left" | "top" | "top-right" | "bottom-left" | "bottom" | "bottom-right" *(optional)*
+        
+        Position of the action title overlay. Defaults to `"top-right"`.
+      - `fontSize` [number] *(optional)*
+        
+        Font size of the action title in pixels. Defaults to `24`. Deprecated, use `style.title` instead.
+      - `cursor` "none" | "pointer" *(optional)*
+        
+        Cursor decoration shown for pointer actions. `"pointer"` (the default) renders a mouse pointer that animates from the previous action point to the next one. `"none"` disables the cursor decoration.
+      - `style` [Object] *(optional)*
+        - `point` [string] *(optional)*
+          
+          CSS declarations for the zero-sized marker centered on the action point. Not shown when omitted.
+        - `highlight` [string] *(optional)*
+          
+          CSS declarations for the box that covers the target element. Not shown when omitted.
+        - `title` [string] *(optional)*
+          
+          CSS declarations for the action title.
+        
+        Styles of the action decorations.
+      
+      If specified, enables visual annotations on interacted elements during video recording.
     
     Enables video recording for all pages into `recordVideo.dir` directory. If not specified videos are not recorded. Make sure to await [browserContext.close()](/api/class-browsercontext.mdx#browser-context-close) for videos to be saved.
   - `timeout` [number] *(optional)* <font size="2">Added in: v1.15</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-timeout"/><a href="#electron-launch-option-timeout" class="list-anchor">#</a>
@@ -180,11 +239,6 @@ await electron.launch(options);
 - [Promise]&lt;[ElectronApplication]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-return"/><a href="#electron-launch-return" class="list-anchor">#</a>
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -197,10 +251,11 @@ await electron.launch(options);
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -219,6 +274,7 @@ await electron.launch(options);
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -226,9 +282,18 @@ await electron.launch(options);
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -246,6 +311,7 @@ await electron.launch(options);
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -258,6 +324,7 @@ await electron.launch(options);
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -279,6 +346,7 @@ await electron.launch(options);
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"

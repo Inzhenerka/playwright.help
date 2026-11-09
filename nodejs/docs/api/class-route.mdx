@@ -16,7 +16,7 @@ Learn more about [networking](../network.mdx).
 
 ## Methods
 
-### abort {#route-abort}
+### abort {/* #route-abort */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>route.abort</x-search>
 
@@ -53,7 +53,7 @@ await route.abort(errorCode);
 
 ---
 
-### continue {#route-continue}
+### continue {/* #route-continue */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>route.continue</x-search>
 
@@ -99,12 +99,14 @@ The [headers](/api/class-route.mdx#route-continue-option-headers) option applies
 
 :::warning
 
-The `Cookie` header cannot be overridden using this method. If a value is provided, it will be ignored, and the cookie will be loaded from the browser's cookie store. To set custom cookies, use [browserContext.addCookies()](/api/class-browsercontext.mdx#browser-context-add-cookies).
+Some request headers are **forbidden** and cannot be overridden (for example, `Cookie`, `Host`, `Content-Length` and others, see [this MDN page](https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_request_header) for full list). If an override is provided for a forbidden header, it will be ignored and the original request header will be used.
+
+To set custom cookies, use [browserContext.addCookies()](/api/class-browsercontext.mdx#browser-context-add-cookies).
 :::
 
 ---
 
-### fallback {#route-fallback}
+### fallback {/* #route-fallback */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.23</font><x-search>route.fallback</x-search>
 
@@ -189,7 +191,7 @@ Use [route.continue()](/api/class-route.mdx#route-continue) to immediately send 
 
 ---
 
-### fetch {#route-fetch}
+### fetch {/* #route-fetch */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.29</font><x-search>route.fetch</x-search>
 
@@ -223,6 +225,9 @@ await page.route('https://dog.ceo/api/breeds/list/all', async route => {
   - `postData` [string] | [Buffer] | [Serializable] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fetch-option-post-data"/><a href="#route-fetch-option-post-data" class="list-anchor">#</a>
     
     Allows to set post data of the request. If the data parameter is an object, it will be serialized to json string and `content-type` header will be set to `application/json` if not explicitly set. Otherwise the `content-type` header will be set to `application/octet-stream` if not explicitly set.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fetch-option-signal"/><a href="#route-fetch-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-fetch-option-timeout"/><a href="#route-fetch-option-timeout" class="list-anchor">#</a>
     
     Request timeout in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
@@ -239,7 +244,7 @@ Note that [headers](/api/class-route.mdx#route-fetch-option-headers) option will
 
 ---
 
-### fulfill {#route-fulfill}
+### fulfill {/* #route-fulfill */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>route.fulfill</x-search>
 
@@ -294,7 +299,7 @@ await page.route('**/xhr_endpoint', route => route.fulfill({ path: 'mock_data.js
 
 ---
 
-### request {#route-request}
+### request {/* #route-request */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>route.request</x-search>
 
@@ -310,11 +315,6 @@ route.request();
 - [Request]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="route-request-return"/><a href="#route-request-return" class="list-anchor">#</a>
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -327,10 +327,11 @@ route.request();
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -349,6 +350,7 @@ route.request();
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -356,9 +358,18 @@ route.request();
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -376,6 +387,7 @@ route.request();
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -388,6 +400,7 @@ route.request();
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -409,6 +422,7 @@ route.request();
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"

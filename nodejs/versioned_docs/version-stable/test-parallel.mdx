@@ -128,7 +128,57 @@ test('runs second', async () => {
 });
 ```
 
-## Отключение режима fully parallel {#opt-out-of-fully-parallel-mode}
+## Блокировки тестов {/* #test-locks */}
+
+Некоторые тесты в вашем наборе могут обращаться к общему ресурсу, который не поддерживает одновременный доступ, например к внешнему сервису или глобальной настройке учётной записи. Для таких тестов можно объявить именованные блокировки, чтобы тесты с одинаковым именем блокировки никогда не выполнялись одновременно, а все остальные тесты продолжали выполняться параллельно. Блокировки действуют между файлами, рабочими процессами и [проектами](./test-projects.mdx).
+
+```js title="settings.spec.ts"
+import { test, expect } from '@playwright/test';
+
+test('update user settings', { lock: 'user-settings' }, async ({ page }) => {
+  // ...
+});
+```
+
+```js title="profile.spec.ts"
+import { test, expect } from '@playwright/test';
+
+// Никогда не выполняется одновременно с тестом 'update user settings' выше,
+// даже в другом проекте.
+test('rename user', { lock: 'user-settings' }, async ({ page }) => {
+  // ...
+});
+```
+
+Тест может объявить несколько блокировок и будет выполняться только тогда, когда все они станут доступны. Также можно объявить блокировки для группы с помощью [test.describe()](/api/class-test.mdx#test-describe), применив их ко всем тестам внутри неё.
+
+```js
+test('reset the database', { lock: ['database', 'external-api'] }, async () => {
+  // ...
+});
+```
+
+Также можно добавить блокировки для содержащего тест файла или группы describe с помощью [test.describe.configure()](/api/class-test.mdx#test-describe-configure).  Повторные вызовы добавляют блокировки, не удаляя существующие.
+
+```js
+test.describe.configure({ lock: 'user-settings' });
+```
+
+Playwright захватывает все блокировки теста перед его запуском и освобождает их после его завершения.
+
+Встроенная блокировка `-exclusive-` позволяет выполнять тест изолированно: он запускается только тогда, когда никакие другие тесты не выполняются, и до его завершения другие тесты не запускаются. Все остальные тесты по-прежнему выполняются параллельно друг с другом. Это полезно для отдельных тестов, чувствительных к любой одновременной активности, например тестов, которые измеряют производительность или перезапускают общий сервис.
+
+```js
+test('restart the server', { lock: '-exclusive-' }, async () => {
+  // Пока выполняется этот тест, никакие другие тесты не выполняются.
+});
+```
+
+:::note
+В режиме по умолчанию и в [последовательном режиме](#serial-mode) все тесты в файле выполняются вместе по порядку, поэтому блокировка, объявленная для любого теста, удерживается на протяжении выполнения всего файла.
+:::
+
+## Отключение полностью параллельного режима
 
 Если ваша конфигурация применяет параллельный режим ко всем тестам с помощью [testConfig.fullyParallel](/api/class-testconfig.mdx#test-config-fully-parallel), вам всё равно может понадобиться запускать некоторые тесты с настройками по умолчанию. Режим можно переопределить на уровне `describe`:
 
@@ -140,7 +190,45 @@ test.describe('runs in parallel with other describes', () => {
 });
 ```
 
-## Разбиение тестов на шарды между несколькими машинами {#shard-tests-between-multiple-machines}
+## Как избежать общего состояния в параллельных тестах
+
+Playwright запускает тесты в отдельных рабочих процессах, каждый из которых использует собственный изолированный [BrowserContext], поэтому файлы cookie, хранилища и глобальные переменные в памяти уже изолированы. Нестабильность возникает из-за состояния, которое существует *за пределами* отдельного теста. Ниже приведены решения для распространённых случаев.
+
+### Выделяйте каждому тесту собственные данные на сервере
+
+Два теста, которые создают или редактируют одну и ту же запись, вступают в состояние гонки. Формируйте уникальный идентификатор на основе [testInfo.testId](/api/class-testinfo.mdx#test-info-test-id), чтобы параллельные тесты никогда не конфликтовали:
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('creates an order', async ({ page }, testInfo) => {
+  const orderId = `order-${testInfo.testId}`;
+  await page.goto(`/orders/new?id=${orderId}`);
+  await expect(page.getByText(orderId)).toBeVisible();
+});
+```
+
+Если несколько тестов могут использовать один набор данных, создавайте его один раз для каждого рабочего процесса — см. раздел [Изоляция тестовых данных между параллельными рабочими процессами](#isolate-test-data-between-parallel-workers).
+
+### Записывайте данные по уникальному пути к файлу
+
+Если несколько тестов записывают данные по одному и тому же пути, они перезаписывают результаты друг друга. Метод [testInfo.outputPath()](/api/class-testinfo.mdx#test-info-output-path) возвращает путь, выделенный для текущего теста:
+
+```js
+import { test } from '@playwright/test';
+import fs from 'fs';
+
+test('exports a CSV', async ({ page }, testInfo) => {
+  const file = testInfo.outputPath('export.csv');
+  await fs.promises.writeFile(file, 'a,b,c', 'utf8');
+});
+```
+
+### Обеспечивайте независимость тестов
+
+Прежде всего, [изолируйте тесты](./writing-tests.mdx#test-isolation) друг от друга. Тест, который передаёт состояние через переменную уровня модуля или зависит от побочных эффектов другого теста, работает при последовательном запуске тестов в определённом порядке, но перестаёт работать, как только они запускаются параллельно или в другом порядке. Подготавливайте всё необходимое для теста в самом тесте или в [фикстуре](./test-fixtures.mdx#creating-a-fixture) и никогда не полагайтесь на то, что другой тест уже был выполнен.
+
+## Распределение тестов между несколькими машинами с помощью шардинга {/* #shard-tests-between-multiple-machines */}
 
 Playwright Test может разделить набор тестов, чтобы он мог выполняться на нескольких машинах. См. [руководство по разделению](./test-sharding.mdx) для получения более подробной информации.
 
@@ -173,7 +261,7 @@ export default defineConfig({
 
 ## Индекс рабочего процесса и параллельный индекс {#worker-index-and-parallel-index}
 
-Каждому рабочему процессу присваиваются два идентификатора: уникальный индекс рабочего процесса, который начинается с 1, и параллельный индекс, который находится в диапазоне от `0` до `workers - 1`. Когда рабочий процесс перезапускается, например, после сбоя, новый рабочий процесс имеет тот же `parallelIndex` и новый `workerIndex`.
+Каждому рабочему процессу назначаются два идентификатора: уникальный индекс рабочего процесса, нумерация которого начинается с 0, и индекс параллельного выполнения в диапазоне от `0` до `workers - 1`. При перезапуске рабочего процесса, например после сбоя, новый рабочий процесс получает тот же `parallelIndex` и новый `workerIndex`.
 
 Вы можете прочитать индекс из переменных окружения `process.env.TEST_WORKER_INDEX` и `process.env.TEST_PARALLEL_INDEX`, или получить к ним доступ через [testInfo.workerIndex](/api/class-testinfo.mdx#test-info-worker-index) и [testInfo.parallelIndex](/api/class-testinfo.mdx#test-info-parallel-index).
 
@@ -283,11 +371,6 @@ export default defineConfig({
 :::
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -300,10 +383,11 @@ export default defineConfig({
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -322,6 +406,7 @@ export default defineConfig({
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -329,9 +414,18 @@ export default defineConfig({
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -349,6 +443,7 @@ export default defineConfig({
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -361,6 +456,7 @@ export default defineConfig({
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -382,6 +478,7 @@ export default defineConfig({
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

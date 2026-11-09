@@ -1,0 +1,222 @@
+---
+title: "Сеть и имитация ответов"
+---
+
+# Сеть и имитация ответов
+
+Анализируйте сетевой трафик, имитируйте ответы API и тестируйте поведение без подключения к сети. Просмотр запросов входит в **core** и доступен всегда. Для имитации ответов и управления состоянием сети требуется [возможность](../capabilities.mdx) **network**.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--caps=network"]
+    }
+  }
+}
+```
+
+## Просмотр сетевых запросов
+
+### browser_network_requests
+
+Возвращает нумерованный список сетевых запросов с момента загрузки страницы. Входит в **core** — дополнительные возможности не требуются.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `static` | boolean | нет | Включать успешно загруженные статические ресурсы, такие как изображения, шрифты и скрипты. По умолчанию false |
+| `filter` | string | нет | Возвращать только запросы, URL которых соответствует этому регулярному выражению, например `/api/.*user` |
+| `filename` | string | нет | Сохранить список в файл вместо возврата в виде текста |
+
+```txt
+→ browser_network_requests { filter: "api" }
+
+  1. [GET] https://api.example.com/me => [200] OK
+  2. [POST] https://api.example.com/users/create => [201] Created
+  3. [GET] https://api.example.com/settings => [200] OK
+
+  Примечание: 14 запросов статических ресурсов не показаны. Используйте параметр "static", чтобы увидеть их.
+```
+
+### browser_network_request
+
+Возвращает полные сведения об отдельном запросе — общую информацию, заголовки и тела запроса и ответа — по номеру,
+выведенному инструментом `browser_network_requests`.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `index` | number | да | Индекс запроса, начиная с 1 |
+| `part` | string | нет | Вернуть только указанную часть: `request-headers`, `request-body`, `response-headers`, `response-body` |
+| `filename` | string | нет | Сохранить результат в файл вместо возврата в виде текста |
+
+```txt
+→ browser_network_request { index: 2 }
+
+  #2 [POST] https://api.example.com/users/create
+
+    General
+      status:    [201] Created
+      duration:  45ms
+      type:      fetch
+      mimeType:  application/json
+
+    Request headers
+      content-type: application/json
+      ...
+
+    Response headers
+      content-type: application/json
+      ...
+
+  Вызовите browser_network_request с part="request-body", чтобы прочитать тело запроса.
+  Вызовите browser_network_request с part="response-body", чтобы прочитать тело ответа.
+
+→ browser_network_request { index: 2, part: "response-body" }
+
+  {"id":42,"name":"Alice"}
+```
+
+Двоичные тела ответов записываются в выходной каталог, а инструмент возвращает путь к файлу.
+
+## Имитация ответов API
+
+### browser_route
+
+Настраивает маршрут для имитации сетевых запросов, соответствующих шаблону URL. Если указан `status` или `body`,
+на запрос возвращается заданный ответ; в противном случае запрос продолжается с применёнными
+изменениями заголовков.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `pattern` | string | да | Шаблон URL для сопоставления, например `**/api/users`, `**/*.{png,jpg}` |
+| `status` | number | нет | Возвращаемый код состояния HTTP (по умолчанию 200) |
+| `body` | string | нет | Тело ответа (текст или строка JSON) |
+| `contentType` | string | нет | Заголовок Content-Type, например `application/json` |
+| `headers` | string[] | нет | Заголовки, добавляемые к запросу, в формате `"Name: Value"` |
+| `removeHeaders` | string | нет | Список имён заголовков, которые нужно удалить из запроса, через запятую |
+
+### Имитация конечной точки API
+
+```txt
+Вы: Настрой имитацию конечной точки /api/users, чтобы она возвращала двух тестовых пользователей.
+
+→ browser_route {
+    pattern: "**/api/users",
+    status: 200,
+    body: "[{\"id\":1,\"name\":\"Alice\"},{\"id\":2,\"name\":\"Bob\"}]",
+    contentType: "application/json"
+  }
+→ browser_navigate { url: "https://app.example.com/users" }
+
+  - heading "Users" [level=1] [ref=e2]
+  - list [ref=e4]:
+    - listitem [ref=e5]: Alice
+    - listitem [ref=e6]: Bob
+```
+
+### Проверка обработки ошибок
+
+```txt
+Вы: Проверь, что происходит, когда API возвращает ошибку 503.
+
+→ browser_route { pattern: "**/api/users", status: 503 }
+→ browser_navigate { url: "https://app.example.com/users" }
+
+  - heading "Something went wrong" [level=1] [ref=e2]
+  - button "Retry" [ref=e5]
+
+→ browser_take_screenshot
+```
+
+Удалите имитацию и проверьте восстановление работы:
+
+```txt
+→ browser_unroute
+→ browser_click { target: "e5" }
+
+  - heading "Users" [level=1] [ref=e2]
+```
+
+### Блокировка ресурсов
+
+```txt
+→ browser_route { pattern: "**/*.jpg", status: 404 }
+→ browser_route { pattern: "**/analytics/**", status: 204 }
+```
+
+### Добавление или удаление заголовков запроса
+
+```txt
+→ browser_route { pattern: "**/api/**", headers: ["X-Debug: 1"] }
+→ browser_route { pattern: "**/api/**", removeHeaders: "cookie,authorization" }
+```
+
+### Условная имитация с помощью кода
+
+Для сложных сценариев — задержек, условных ответов, анализа тела запроса — используйте `browser_run_code_unsafe`:
+
+```txt
+→ browser_run_code_unsafe {
+    code: "async (page) => {
+      await page.route('**/api/search', async route => {
+        const url = new URL(route.request().url());
+        const query = url.searchParams.get('q');
+        await route.fulfill({
+          body: JSON.stringify(query === 'empty' ? [] : [{ title: 'Result: ' + query }])
+        });
+      });
+    }"
+  }
+```
+
+## Управление маршрутами
+
+### browser_route_list
+
+Выводит список всех активных маршрутов. Не принимает параметров.
+
+```txt
+→ browser_route_list
+
+  1. **/api/users (status=200, body=[{"id":1,"name":"Alice"}]..., contentType=application/json)
+  2. **/*.jpg (status=404)
+  3. **/analytics/** (status=204)
+```
+
+### browser_unroute
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `pattern` | string | нет | Шаблон URL, для которого нужно удалить маршрут. Не указывайте этот параметр, чтобы удалить все маршруты |
+
+## Проверка автономного режима
+
+### browser_network_state_set
+
+Задаёт состояние сети браузера. В автономном режиме все сетевые запросы завершаются ошибкой.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `state` | string | да | `online` или `offline` |
+
+```txt
+→ browser_network_state_set { state: "offline" }
+→ browser_navigate { url: "https://app.example.com" }
+
+  - heading "No internet connection" [level=1] [ref=e2]
+
+→ browser_network_state_set { state: "online" }
+```
+
+## Ограничение источников
+
+Независимо от имитации ответов, серверу можно указать, к каким источникам (origins) браузер вообще может обращаться:
+
+```json
+["@playwright/mcp@latest", "--allowed-origins=https://example.com;http://localhost:*"]
+["@playwright/mcp@latest", "--blocked-origins=https://ads.example.com"]
+```
+
+Оба параметра принимают списки, разделённые точкой с запятой, причём список блокировки проверяется первым. Это вспомогательные
+ограничения, а не механизм обеспечения безопасности — они не влияют на перенаправления.

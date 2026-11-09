@@ -9,20 +9,155 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 This API is used for the Web API testing. You can use it to trigger API endpoints, configure micro-services, prepare environment or the service to your e2e test.
 
-Each Playwright browser context has associated with it [APIRequestContext] instance which shares cookie storage with the browser context and can be accessed via [BrowserContext.APIRequest](/api/class-browsercontext.mdx#browser-context-request) or [Page.APIRequest](/api/class-page.mdx#page-request). It is also possible to create a new APIRequestContext instance manually by calling [ApiRequest.NewContextAsync()](/api/class-apirequest.mdx#api-request-new-context).
+Each Playwright browser context has an associated [APIRequestContext], accessible via [BrowserContext.APIRequest](/api/class-browsercontext.mdx#browser-context-request) or [Page.APIRequest](/api/class-page.mdx#page-request) (these return the
+
+**same instance** — `page.request` is a shortcut for `page.context().request`). You can also create a standalone, isolated instance with [ApiRequest.NewContextAsync()](/api/class-apirequest.mdx#api-request-new-context).
 
 **Cookie management**
 
-[APIRequestContext] returned by [BrowserContext.APIRequest](/api/class-browsercontext.mdx#browser-context-request) and [Page.APIRequest](/api/class-page.mdx#page-request) shares cookie storage with the corresponding [BrowserContext]. Each API request will have `Cookie` header populated with the values from the browser context. If the API response contains `Set-Cookie` header it will automatically update [BrowserContext] cookies and requests made from the page will pick them up. This means that if you log in using this API, your e2e test will be logged in and vice versa.
+The [APIRequestContext] returned by [BrowserContext.APIRequest](/api/class-browsercontext.mdx#browser-context-request) and
 
-If you want API requests to not interfere with the browser cookies you should create a new [APIRequestContext] by calling [ApiRequest.NewContextAsync()](/api/class-apirequest.mdx#api-request-new-context). Such `APIRequestContext` object will have its own isolated cookie storage.
+[Page.APIRequest](/api/class-page.mdx#page-request) uses the same cookie jar as its [BrowserContext]:
+
+If you want API requests that do **not** share cookies with the browser, create an isolated context via [ApiRequest.NewContextAsync()](/api/class-apirequest.mdx#api-request-new-context). Such `APIRequestContext` object will have its own isolated cookie storage.
 
 
 ---
 
 ## Methods
 
-### CreateFormData {#api-request-context-create-form-data}
+### AddCookiesAsync {/* #api-request-context-add-cookies */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>apiRequestContext.AddCookiesAsync</x-search>
+
+Adds cookies into this request context. They will be sent with matching subsequent requests. For [BrowserContext.APIRequest](/api/class-browsercontext.mdx#browser-context-request) and [Page.APIRequest](/api/class-page.mdx#page-request), this is equivalent to calling [BrowserContext.AddCookiesAsync()](/api/class-browsercontext.mdx#browser-context-add-cookies) on the corresponding browser context.
+
+**Usage**
+
+```csharp
+await request.AddCookiesAsync(new[] { cookie1, cookie2 });
+```
+
+**Arguments**
+- `cookies` [IEnumerable]&lt;Cookies&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-add-cookies-option-cookies"/><a href="#api-request-context-add-cookies-option-cookies" class="list-anchor">#</a>
+  - `Name` [string]
+    
+    
+  - `Value` [string]
+    
+    
+  - `Url` [string]? *(optional)*
+    
+    Either `url` or both `domain` and `path` are required. Optional.
+  - `Domain` [string]? *(optional)*
+    
+    For the cookie to apply to all subdomains as well, prefix domain with a dot, like this: ".example.com". Either `url` or both `domain` and `path` are required. Optional.
+  - `Path` [string]? *(optional)*
+    
+    Either `url` or both `domain` and `path` are required. Optional.
+  - `Expires` [float]? *(optional)*
+    
+    Unix time in seconds. Optional.
+  - `HttpOnly` [bool]? *(optional)*
+    
+    Optional.
+  - `Secure` [bool]? *(optional)*
+    
+    Optional.
+  - `SameSite` `enum SameSiteAttribute { Strict, Lax, None }?` *(optional)*
+    
+    Optional.
+  - `PartitionKey` [string]? *(optional)*
+    
+    For partitioned third-party cookies (aka [CHIPS](https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Privacy_sandbox/Partitioned_cookies)), the partition key. Optional.
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-add-cookies-return"/><a href="#api-request-context-add-cookies-return" class="list-anchor">#</a>
+
+---
+
+### ClearCookiesAsync {/* #api-request-context-clear-cookies */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>apiRequestContext.ClearCookiesAsync</x-search>
+
+Removes cookies from this request context. Accepts optional filter. For [BrowserContext.APIRequest](/api/class-browsercontext.mdx#browser-context-request) and [Page.APIRequest](/api/class-page.mdx#page-request), this is equivalent to calling [BrowserContext.ClearCookiesAsync()](/api/class-browsercontext.mdx#browser-context-clear-cookies) on the corresponding browser context.
+
+**Usage**
+
+```csharp
+await request.ClearCookiesAsync();
+await request.ClearCookiesAsync(new() { Name = "session-id" });
+await request.ClearCookiesAsync(new() { Domain = "my-origin.com" });
+await request.ClearCookiesAsync(new() { Path = "/api/v1" });
+await request.ClearCookiesAsync(new() { Name = "session-id", Domain = "my-origin.com" });
+```
+
+**Arguments**
+- `options` `ApiRequestContextClearCookiesOptions?` *(optional)*
+  - `Domain|DomainRegex` [string]? | [Regex]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-option-domain"/><a href="#api-request-context-clear-cookies-option-domain" class="list-anchor">#</a>
+    
+    Only removes cookies with the given domain.
+  - `Name|NameRegex` [string]? | [Regex]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-option-name"/><a href="#api-request-context-clear-cookies-option-name" class="list-anchor">#</a>
+    
+    Only removes cookies with the given name.
+  - `Path|PathRegex` [string]? | [Regex]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-option-path"/><a href="#api-request-context-clear-cookies-option-path" class="list-anchor">#</a>
+    
+    Only removes cookies with the given path.
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-return"/><a href="#api-request-context-clear-cookies-return" class="list-anchor">#</a>
+
+---
+
+### CookiesAsync {/* #api-request-context-cookies */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>apiRequestContext.CookiesAsync</x-search>
+
+If no URLs are specified, this method returns all cookies. If URLs are specified, only cookies that affect those URLs are returned. For [BrowserContext.APIRequest](/api/class-browsercontext.mdx#browser-context-request) and [Page.APIRequest](/api/class-page.mdx#page-request), this is equivalent to calling [BrowserContext.CookiesAsync()](/api/class-browsercontext.mdx#browser-context-cookies) on the corresponding browser context.
+
+**Usage**
+
+```csharp
+await ApiRequestContext.CookiesAsync(urls);
+```
+
+**Arguments**
+- `urls` [string]? | [IEnumerable]?&lt;[string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-cookies-option-urls"/><a href="#api-request-context-cookies-option-urls" class="list-anchor">#</a>
+  
+  Optional list of URLs.
+
+**Returns**
+- [IReadOnlyList]&lt;Cookies&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-cookies-return"/><a href="#api-request-context-cookies-return" class="list-anchor">#</a>
+  - `name` [string]
+    
+    
+  - `value` [string]
+    
+    
+  - `domain` [string]
+    
+    
+  - `path` [string]
+    
+    
+  - `expires` [float]
+    
+    Unix time in seconds.
+  - `httpOnly` [bool]
+    
+    
+  - `secure` [bool]
+    
+    
+  - `sameSite` `enum SameSiteAttribute { Strict, Lax, None }`
+    
+    
+  - `partitionKey` [string]? *(optional)*
+    
+    
+---
+
+### CreateFormData {/* #api-request-context-create-form-data */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.23</font><x-search>apiRequestContext.CreateFormData</x-search>
 
@@ -39,7 +174,7 @@ ApiRequestContext.CreateFormData
 
 ---
 
-### DeleteAsync {#api-request-context-delete}
+### DeleteAsync {/* #api-request-context-delete */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.DeleteAsync</x-search>
 
@@ -99,7 +234,7 @@ await ApiRequestContext.DeleteAsync(url, options);
 
 ---
 
-### DisposeAsync {#api-request-context-dispose}
+### DisposeAsync {/* #api-request-context-dispose */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.DisposeAsync</x-search>
 
@@ -122,7 +257,7 @@ await ApiRequestContext.DisposeAsync(options);
 
 ---
 
-### FetchAsync {#api-request-context-fetch}
+### FetchAsync {/* #api-request-context-fetch */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.FetchAsync</x-search>
 
@@ -205,7 +340,7 @@ await Request.FetchAsync("https://example.com/api/uploadScript", new() { Method 
 
 ---
 
-### GetAsync {#api-request-context-get}
+### GetAsync {/* #api-request-context-get */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.GetAsync</x-search>
 
@@ -272,7 +407,7 @@ await request.GetAsync("https://example.com/api/getText", new() { Params = query
 
 ---
 
-### HeadAsync {#api-request-context-head}
+### HeadAsync {/* #api-request-context-head */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.HeadAsync</x-search>
 
@@ -332,7 +467,7 @@ await ApiRequestContext.HeadAsync(url, options);
 
 ---
 
-### PatchAsync {#api-request-context-patch}
+### PatchAsync {/* #api-request-context-patch */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.PatchAsync</x-search>
 
@@ -392,7 +527,7 @@ await ApiRequestContext.PatchAsync(url, options);
 
 ---
 
-### PostAsync {#api-request-context-post}
+### PostAsync {/* #api-request-context-post */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.PostAsync</x-search>
 
@@ -481,7 +616,7 @@ await request.PostAsync("https://example.com/api/uploadScript", new() { Multipar
 
 ---
 
-### PutAsync {#api-request-context-put}
+### PutAsync {/* #api-request-context-put */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.PutAsync</x-search>
 
@@ -541,7 +676,7 @@ await ApiRequestContext.PutAsync(url, options);
 
 ---
 
-### StorageStateAsync {#api-request-context-storage-state}
+### StorageStateAsync {/* #api-request-context-storage-state */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.StorageStateAsync</x-search>
 
@@ -558,12 +693,34 @@ await ApiRequestContext.StorageStateAsync(options);
   - `IndexedDB` [bool]? *(optional)* <font size="2">Added in: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-indexed-db"/><a href="#api-request-context-storage-state-option-indexed-db" class="list-anchor">#</a>
     
     Set to `true` to include IndexedDB in the storage state snapshot.
+  - `Opfs` [bool]? *(optional)* <font size="2">Added in: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-opfs"/><a href="#api-request-context-storage-state-option-opfs" class="list-anchor">#</a>
+    
+    Set to `true` to include the origin private file system in the storage state snapshot.
   - `Path` [string]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-path"/><a href="#api-request-context-storage-state-option-path" class="list-anchor">#</a>
     
     The file path to save the storage state to. If [Path](/api/class-apirequestcontext.mdx#api-request-context-storage-state-option-path) is a relative path, then it is resolved relative to current working directory. If no path is provided, storage state is still returned, but won't be saved to the disk.
 
 **Returns**
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-return"/><a href="#api-request-context-storage-state-return" class="list-anchor">#</a>
+
+---
+
+## Properties
+
+### Tracing {/* #api-request-context-tracing */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>apiRequestContext.Tracing</x-search>
+
+Tracing recorder for requests made through this API request context.
+
+**Usage**
+
+```csharp
+ApiRequestContext.Tracing
+```
+
+**Type**
+- [Tracing]
 
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
@@ -577,6 +734,8 @@ await ApiRequestContext.StorageStateAsync(options);
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -596,15 +755,18 @@ await ApiRequestContext.StorageStateAsync(options);
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

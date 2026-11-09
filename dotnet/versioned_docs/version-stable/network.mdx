@@ -126,7 +126,7 @@ await page.GotoAsync("https://example.com");
 // Удаление заголовка
 await page.RouteAsync("**/*", async route => {
     var headers = new Dictionary<string, string>(route.Request.Headers.ToDictionary(x => x.Key, x => x.Value));
-    headers.Remove("X-Secret");
+    headers.Remove("x-secret");
     await route.ContinueAsync(new() { Headers = headers });
 });
 
@@ -180,7 +180,41 @@ await Page.RouteAsync("**/title.html", async route =>
 });
 ```
 
-## Шаблоны URL с глобальными символами {#glob-url-patterns}
+## Как работает перехват запросов
+
+Маршруты находятся между страницей и сетевым стеком браузера. Обработчик запускается до того, как сетевой стек обработает запрос: [Route.ContinueAsync()](/api/class-route.mdx#route-continue) передаёт его дальше, [Route.FulfillAsync()](/api/class-route.mdx#route-fulfill) возвращает ответ без обращения к сети, а [Route.AbortAsync()](/api/class-route.mdx#route-abort) прерывает запрос с ошибкой.
+
+```mermaid
+sequenceDiagram
+  participant Page
+  participant Playwright
+  participant Network as Сетевой стек
+  participant Server
+
+  Page->>Playwright: запрос
+  Note over Playwright: выполняется обработчик маршрута
+  Playwright->>Network: route.continue()
+  Note over Network: добавляет Cookie, Host, Sec-Fetch-*, ...
+  Network->>Server: запрос
+  Server-->>Network: ответ
+  Note over Network: сохраняет cookie
+  Network-->>Playwright: заголовки ответа в том виде, в котором их отправил сервер
+  Network-->>Page: ответ
+```
+
+### Заголовки, управляемые сетевым стеком
+
+Некоторые заголовки добавляются сетевым стеком непосредственно перед отправкой запроса: `Cookie`, `Host`, `Accept-Encoding`, `Content-Length`, `Sec-Fetch-*` и ряд других. Это граница безопасности: например, cookie с атрибутом `HttpOnly` никогда не предоставляется странице. Поскольку обработчик маршрута запускается до этого этапа, наличие этих заголовков в [Request.Headers](/api/class-request.mdx#request-headers) или [Request.AllHeadersAsync()](/api/class-request.mdx#request-all-headers) не гарантируется, и переопределить их нельзя. Заголовок `cookie`, переданный в [Route.ContinueAsync()](/api/class-route.mdx#route-continue), игнорируется: вместо него используются данные из хранилища cookie браузера.
+
+При обработке ответа сетевой стек уже выполнил свою работу, поэтому [Response.AllHeadersAsync()](/api/class-response.mdx#response-all-headers) возвращает заголовки точно в том виде, в котором их отправил сервер, включая `Set-Cookie` для cookie с атрибутом `HttpOnly`. Чтобы увидеть точные заголовки запроса, фактически отправленные по сети, наблюдайте за запросом, не перехватывая его с помощью маршрута: если маршруты не настроены, [Request.AllHeadersAsync()](/api/class-request.mdx#request-all-headers) включает все эти заголовки.
+
+### Перенаправления
+
+Playwright рассматривает запрос и его перенаправления как единое целое. Обработчик вызывается один раз для исходного запроса, а затем браузер самостоятельно следует перенаправлению. [Response.Request](/api/class-response.mdx#response-request) возвращает последний запрос в цепочке, а [Request.RedirectedFrom](/api/class-request.mdx#request-redirected-from) позволяет пройти по ней в обратном направлении до перехваченного вами запроса. Заголовки, переданные в [Route.ContinueAsync()](/api/class-route.mdx#route-continue), применяются на каждом этапе цепочки, за исключением `cookie`, который всегда формируется на основе хранилища cookie.
+
+Возврат ответа со статусом `3xx` не даёт повторной возможности перехватить запрос. Chromium и Firefox следуют перенаправлению без вызова вашего обработчика, а WebKit отклоняет такой вызов. Чтобы вернуть другое содержимое, передайте это содержимое при формировании ответа. Чтобы отправить запрос по другому адресу, передайте `url` в [Route.ContinueAsync()](/api/class-route.mdx#route-continue) или [Route.FallbackAsync()](/api/class-route.mdx#route-fallback).
+
+## Glob-шаблоны URL
 
 Playwright использует упрощённые glob-шаблоны для сопоставления URL в методах перехвата сетевых запросов, таких как [Page.RouteAsync()](/api/class-page.mdx#page-route) или [Page.RunAndWaitForResponseAsync()](/api/class-page.mdx#page-wait-for-response). Эти шаблоны поддерживают базовые подстановочные символы:
 1. Звёздочки:
@@ -237,6 +271,8 @@ page.WebSocket += (_, ws) =>
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -256,15 +292,18 @@ page.WebSocket += (_, ws) =>
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

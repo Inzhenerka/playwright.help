@@ -10,9 +10,17 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 Каждый контекст браузера Playwright имеет связанный с ним экземпляр [APIRequestContext], который разделяет хранилище cookie с контекстом браузера и может быть доступен через [BrowserContext.APIRequest](/api/class-browsercontext.mdx#browser-context-request) или [Page.APIRequest](/api/class-page.mdx#page-request). Также возможно создать новый экземпляр APIRequestContext вручную, вызвав [ApiRequest.NewContextAsync()](/api/class-apirequest.mdx#api-request-new-context).
 
-**Управление cookie**
+У каждого контекста браузера Playwright есть связанный [APIRequestContext], доступный через [BrowserContext.APIRequest](/api/class-browsercontext.mdx#browser-context-request) или [Page.APIRequest](/api/class-page.mdx#page-request) (они возвращают
 
-[APIRequestContext], возвращаемый [BrowserContext.APIRequest](/api/class-browsercontext.mdx#browser-context-request) и [Page.APIRequest](/api/class-page.mdx#page-request), разделяет хранилище cookie с соответствующим [BrowserContext]. Каждый API-запрос будет иметь заголовок `Cookie`, заполненный значениями из контекста браузера. Если ответ API содержит заголовок `Set-Cookie`, он автоматически обновит cookie [BrowserContext], и запросы, сделанные со страницы, их подхватят. Это означает, что если вы войдете в систему с помощью этого API, ваш e2e тест будет авторизован, и наоборот.
+**один и тот же экземпляр** — `page.request` представляет собой сокращённую запись для `page.context().request`). Вы также можете создать отдельный, изолированный экземпляр с помощью [ApiRequest.NewContextAsync()](/api/class-apirequest.mdx#api-request-new-context).
+
+**Управление файлами cookie**
+
+[APIRequestContext], возвращаемый [BrowserContext.APIRequest](/api/class-browsercontext.mdx#browser-context-request) и
+
+[Page.APIRequest](/api/class-page.mdx#page-request), использует то же хранилище файлов cookie, что и связанный с ним [BrowserContext]:
+
+Если вам нужны API-запросы, которые **не** используют общее с браузером хранилище файлов cookie, создайте изолированный контекст с помощью [ApiRequest.NewContextAsync()](/api/class-apirequest.mdx#api-request-new-context). Такой объект `APIRequestContext` будет иметь собственное изолированное хранилище файлов cookie.
 
 Если вы хотите, чтобы API-запросы не вмешивались в cookie браузера, вы должны создать новый [APIRequestContext], вызвав [ApiRequest.NewContextAsync()](/api/class-apirequest.mdx#api-request-new-context). Такой объект `APIRequestContext` будет иметь собственное изолированное хранилище cookie.
 
@@ -20,7 +28,138 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Методы {#methods}
 
-### CreateFormData {#api-request-context-create-form-data}
+### AddCookiesAsync {/* #api-request-context-add-cookies */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>apiRequestContext.AddCookiesAsync</x-search>
+
+Добавляет файлы cookie в этот контекст запросов. Они будут отправляться с соответствующими последующими запросами. Для [BrowserContext.APIRequest](/api/class-browsercontext.mdx#browser-context-request) и [Page.APIRequest](/api/class-page.mdx#page-request) это эквивалентно вызову [BrowserContext.AddCookiesAsync()](/api/class-browsercontext.mdx#browser-context-add-cookies) в соответствующем контексте браузера.
+
+**Usage**
+
+```csharp
+await request.AddCookiesAsync(new[] { cookie1, cookie2 });
+```
+
+**Arguments**
+- `cookies` [IEnumerable]&lt;Cookies&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-add-cookies-option-cookies"/><a href="#api-request-context-add-cookies-option-cookies" class="list-anchor">#</a>
+  - `Name` [string]
+    
+    
+  - `Value` [string]
+    
+    
+  - `Url` [string]? *(optional)*
+    
+    Требуется либо `url`, либо оба параметра `domain` и `path`. Необязательный параметр.
+  - `Domain` [string]? *(optional)*
+    
+    Чтобы файл cookie также применялся ко всем поддоменам, добавьте точку перед доменом, например: ".example.com". Требуется либо `url`, либо оба параметра `domain` и `path`. Необязательный параметр.
+  - `Path` [string]? *(optional)*
+    
+    Требуется либо `url`, либо оба параметра `domain` и `path`. Необязательный параметр.
+  - `Expires` [float]? *(optional)*
+    
+    Время Unix в секундах. Необязательный параметр.
+  - `HttpOnly` [bool]? *(optional)*
+    
+    Optional.
+  - `Secure` [bool]? *(optional)*
+    
+    Optional.
+  - `SameSite` `enum SameSiteAttribute { Strict, Lax, None }?` *(optional)*
+    
+    Optional.
+  - `PartitionKey` [string]? *(optional)*
+    
+    Ключ раздела для сторонних файлов cookie с разделением по сайту ([CHIPS](https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Privacy_sandbox/Partitioned_cookies)). Необязательный параметр.
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-add-cookies-return"/><a href="#api-request-context-add-cookies-return" class="list-anchor">#</a>
+
+---
+
+### ClearCookiesAsync {/* #api-request-context-clear-cookies */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>apiRequestContext.ClearCookiesAsync</x-search>
+
+Удаляет файлы cookie из этого контекста запросов. Принимает необязательный фильтр. Для [BrowserContext.APIRequest](/api/class-browsercontext.mdx#browser-context-request) и [Page.APIRequest](/api/class-page.mdx#page-request) это эквивалентно вызову [BrowserContext.ClearCookiesAsync()](/api/class-browsercontext.mdx#browser-context-clear-cookies) в соответствующем контексте браузера.
+
+**Usage**
+
+```csharp
+await request.ClearCookiesAsync();
+await request.ClearCookiesAsync(new() { Name = "session-id" });
+await request.ClearCookiesAsync(new() { Domain = "my-origin.com" });
+await request.ClearCookiesAsync(new() { Path = "/api/v1" });
+await request.ClearCookiesAsync(new() { Name = "session-id", Domain = "my-origin.com" });
+```
+
+**Arguments**
+- `options` `ApiRequestContextClearCookiesOptions?` *(optional)*
+  - `Domain|DomainRegex` [string]? | [Regex]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-option-domain"/><a href="#api-request-context-clear-cookies-option-domain" class="list-anchor">#</a>
+    
+    Удаляет только файлы cookie с указанным доменом.
+  - `Name|NameRegex` [string]? | [Regex]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-option-name"/><a href="#api-request-context-clear-cookies-option-name" class="list-anchor">#</a>
+    
+    Удаляет только файлы cookie с указанным именем.
+  - `Path|PathRegex` [string]? | [Regex]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-option-path"/><a href="#api-request-context-clear-cookies-option-path" class="list-anchor">#</a>
+    
+    Удаляет только файлы cookie с указанным путём.
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-return"/><a href="#api-request-context-clear-cookies-return" class="list-anchor">#</a>
+
+---
+
+### CookiesAsync {/* #api-request-context-cookies */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>apiRequestContext.CookiesAsync</x-search>
+
+Если URL не указаны, этот метод возвращает все файлы cookie. Если URL указаны, возвращаются только файлы cookie, применимые к этим URL. Для [BrowserContext.APIRequest](/api/class-browsercontext.mdx#browser-context-request) и [Page.APIRequest](/api/class-page.mdx#page-request) это эквивалентно вызову [BrowserContext.CookiesAsync()](/api/class-browsercontext.mdx#browser-context-cookies) в соответствующем контексте браузера.
+
+**Usage**
+
+```csharp
+await ApiRequestContext.CookiesAsync(urls);
+```
+
+**Arguments**
+- `urls` [string]? | [IEnumerable]?&lt;[string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-cookies-option-urls"/><a href="#api-request-context-cookies-option-urls" class="list-anchor">#</a>
+  
+  Необязательный список URL.
+
+**Returns**
+- [IReadOnlyList]&lt;Cookies&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-cookies-return"/><a href="#api-request-context-cookies-return" class="list-anchor">#</a>
+  - `name` [string]
+    
+    
+  - `value` [string]
+    
+    
+  - `domain` [string]
+    
+    
+  - `path` [string]
+    
+    
+  - `expires` [float]
+    
+    Время Unix в секундах.
+  - `httpOnly` [bool]
+    
+    
+  - `secure` [bool]
+    
+    
+  - `sameSite` `enum SameSiteAttribute { Strict, Lax, None }`
+    
+    
+  - `partitionKey` [string]? *(optional)*
+    
+    
+---
+
+### CreateFormData {/* #api-request-context-create-form-data */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.23</font><x-search>apiRequestContext.CreateFormData</x-search>
 
@@ -37,7 +176,7 @@ ApiRequestContext.CreateFormData
 
 ---
 
-### DeleteAsync {#api-request-context-delete}
+### DeleteAsync {/* #api-request-context-delete */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.DeleteAsync</x-search>
 
@@ -97,7 +236,7 @@ await ApiRequestContext.DeleteAsync(url, options);
 
 ---
 
-### DisposeAsync {#api-request-context-dispose}
+### DisposeAsync {/* #api-request-context-dispose */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.DisposeAsync</x-search>
 
@@ -120,7 +259,7 @@ await ApiRequestContext.DisposeAsync(options);
 
 ---
 
-### FetchAsync {#api-request-context-fetch}
+### FetchAsync {/* #api-request-context-fetch */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.FetchAsync</x-search>
 
@@ -203,7 +342,7 @@ await Request.FetchAsync("https://example.com/api/uploadScript", new() { Method 
 
 ---
 
-### GetAsync {#api-request-context-get}
+### GetAsync {/* #api-request-context-get */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.GetAsync</x-search>
 
@@ -270,7 +409,7 @@ await request.GetAsync("https://example.com/api/getText", new() { Params = query
 
 ---
 
-### HeadAsync {#api-request-context-head}
+### HeadAsync {/* #api-request-context-head */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.HeadAsync</x-search>
 
@@ -330,7 +469,7 @@ await ApiRequestContext.HeadAsync(url, options);
 
 ---
 
-### PatchAsync {#api-request-context-patch}
+### PatchAsync {/* #api-request-context-patch */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.PatchAsync</x-search>
 
@@ -390,7 +529,7 @@ await ApiRequestContext.PatchAsync(url, options);
 
 ---
 
-### PostAsync {#api-request-context-post}
+### PostAsync {/* #api-request-context-post */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.PostAsync</x-search>
 
@@ -479,7 +618,7 @@ await request.PostAsync("https://example.com/api/uploadScript", new() { Multipar
 
 ---
 
-### PutAsync {#api-request-context-put}
+### PutAsync {/* #api-request-context-put */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.PutAsync</x-search>
 
@@ -539,7 +678,7 @@ await ApiRequestContext.PutAsync(url, options);
 
 ---
 
-### StorageStateAsync {#api-request-context-storage-state}
+### StorageStateAsync {/* #api-request-context-storage-state */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.StorageStateAsync</x-search>
 
@@ -555,13 +694,35 @@ await ApiRequestContext.StorageStateAsync(options);
 - `options` `ApiRequestContextStorageStateOptions?` *(опционально)*
   - `IndexedDB` [bool]? *(опционально)* <font size="2">Добавлено в: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-indexed-db"/><a href="#api-request-context-storage-state-option-indexed-db" class="list-anchor">#</a>
     
-    Установите в `true`, чтобы включить IndexedDB в снимок состояния хранилища.
-  - `Path` [string]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-path"/><a href="#api-request-context-storage-state-option-path" class="list-anchor">#</a>
+Установите значение `true`, чтобы включить IndexedDB в снимок состояния хранилища.
+  - `Opfs` [bool]? *(необязательно)* <font size="2">Добавлено в: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-opfs"/><a href="#api-request-context-storage-state-option-opfs" class="list-anchor">#</a>
+    
+    Установите значение `true`, чтобы включить приватную файловую систему источника (origin private file system) в снимок состояния хранилища.
+  - `Path` [string]? *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-path"/><a href="#api-request-context-storage-state-option-path" class="list-anchor">#</a>
     
     Путь к файлу для сохранения состояния хранилища. Если [Path](/api/class-apirequestcontext.mdx#api-request-context-storage-state-option-path) является относительным путем, то он разрешается относительно текущей рабочей директории. Если путь не указан, состояние хранилища все равно возвращается, но не будет сохранено на диск.
 
 **Возвращает**
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-return"/><a href="#api-request-context-storage-state-return" class="list-anchor">#</a>
+
+---
+
+## Свойства {#properties}
+
+### Tracing {/* #api-request-context-tracing */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.60</font><x-search>apiRequestContext.Tracing</x-search>
+
+Средство записи трассировки для запросов, выполняемых через этот контекст API-запросов.
+
+**Использование**
+
+```csharp
+ApiRequestContext.Tracing
+```
+
+**Тип**
+- [Tracing]
 
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
@@ -575,6 +736,8 @@ await ApiRequestContext.StorageStateAsync(options);
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -594,15 +757,18 @@ await ApiRequestContext.StorageStateAsync(options);
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

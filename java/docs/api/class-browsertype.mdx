@@ -31,7 +31,7 @@ public class Example {
 
 ## Methods
 
-### connect {#browser-type-connect}
+### connect {/* #browser-type-connect */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserType.connect</x-search>
 
@@ -45,12 +45,12 @@ The major and minor version of the Playwright instance that connects needs to ma
 **Usage**
 
 ```java
-BrowserType.connect(wsEndpoint);
-BrowserType.connect(wsEndpoint, options);
+BrowserType.connect(endpoint);
+BrowserType.connect(endpoint, options);
 ```
 
 **Arguments**
-- `wsEndpoint` [String] <font size="2">Added in: v1.10</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-option-ws-endpoint"/><a href="#browser-type-connect-option-ws-endpoint" class="list-anchor">#</a>
+- `endpoint` [String] <font size="2">Added in: v1.10</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-option-endpoint"/><a href="#browser-type-connect-option-endpoint" class="list-anchor">#</a>
   
   A Playwright browser websocket endpoint to connect to. You obtain this endpoint via `BrowserServer.wsEndpoint`.
 - `options` `BrowserType.ConnectOptions` *(optional)*
@@ -82,7 +82,7 @@ BrowserType.connect(wsEndpoint, options);
 
 ---
 
-### connectOverCDP {#browser-type-connect-over-cdp}
+### connectOverCDP {/* #browser-type-connect-over-cdp */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>browserType.connectOverCDP</x-search>
 
@@ -99,6 +99,10 @@ Connecting over the Chrome DevTools Protocol is only supported for Chromium-base
 This connection is significantly lower fidelity than the Playwright protocol connection via [BrowserType.connect()](/api/class-browsertype.mdx#browser-type-connect). If you are experiencing issues or attempting to use advanced functionality, you probably want to use [BrowserType.connect()](/api/class-browsertype.mdx#browser-type-connect).
 :::
 
+:::warning
+Playwright maintains a curated list of arguments for launching the browser. If you launch the browser without Playwright and do not pass the exact same arguments, some of Playwright functionality may be broken upon connecting to the browser.
+:::
+
 **Usage**
 
 ```java
@@ -111,10 +115,21 @@ Page page = defaultContext.pages().get(0);
 - `endpointURL` [String] <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-endpoint-url"/><a href="#browser-type-connect-over-cdp-option-endpoint-url" class="list-anchor">#</a>
   
   A CDP websocket endpoint or http url to connect to. For example `http://localhost:9222/` or `ws://127.0.0.1:9222/devtools/browser/387adf4c-243f-4051-a181-46798f4a46f4`.
+  
+  Alternatively, a browser channel name such as `chrome` or `msedge` to connect to a browser with remote debugging enabled in its default user data directory. On Linux, Playwright uses `CHROME_USER_DATA_DIR` when set. Otherwise, it uses `CHROME_CONFIG_HOME`, then `XDG_CONFIG_HOME`, then `~/.config` to locate that directory.
 - `options` `BrowserType.ConnectOverCDPOptions` *(optional)*
+  - `setArtifactsDir` [Path] *(optional)* <font size="2">Added in: v1.61</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-artifacts-dir"/><a href="#browser-type-connect-over-cdp-option-artifacts-dir" class="list-anchor">#</a>
+    
+    If specified, browser artifacts (such as traces and downloads) are saved into this directory.
   - `setHeaders` [Map]&lt;[String], [String]&gt; *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-headers"/><a href="#browser-type-connect-over-cdp-option-headers" class="list-anchor">#</a>
     
     Additional HTTP headers to be sent with connect request. Optional.
+  - `setIsLocal` [boolean] *(optional)* <font size="2">Added in: v1.58</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-is-local"/><a href="#browser-type-connect-over-cdp-option-is-local" class="list-anchor">#</a>
+    
+    Tells Playwright that it runs on the same host as the CDP server. It will enable certain optimizations that rely upon the file system being the same between Playwright and the Browser.
+  - `setNoDefaults` [boolean] *(optional)* <font size="2">Added in: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-no-defaults"/><a href="#browser-type-connect-over-cdp-option-no-defaults" class="list-anchor">#</a>
+    
+    When true, Playwright will not apply its default overrides to the existing default browser context. Specifically, [setAcceptDownloads](/api/class-browser.mdx#browser-new-context-option-accept-downloads) and font families are left at the browser's settings, focus emulation is not enabled, and media emulation options (such as [setColorScheme](/api/class-browser.mdx#browser-new-context-option-color-scheme), [setReducedMotion](/api/class-browser.mdx#browser-new-context-option-reduced-motion), [setForcedColors](/api/class-browser.mdx#browser-new-context-option-forced-colors), and [setContrast](/api/class-browser.mdx#browser-new-context-option-contrast)) are not applied. Useful when attaching to a user's daily-driver browser where these overrides would interfere with existing browser state. New contexts created via [Browser.newContext()](/api/class-browser.mdx#browser-new-context) are not affected. Defaults to `false`.
   - `setSlowMo` [double] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-slow-mo"/><a href="#browser-type-connect-over-cdp-option-slow-mo" class="list-anchor">#</a>
     
     Slows down Playwright operations by the specified amount of milliseconds. Useful so that you can see what is going on. Defaults to 0.
@@ -127,7 +142,7 @@ Page page = defaultContext.pages().get(0);
 
 ---
 
-### executablePath {#browser-type-executable-path}
+### executablePath {/* #browser-type-executable-path */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserType.executablePath</x-search>
 
@@ -144,7 +159,7 @@ BrowserType.executablePath();
 
 ---
 
-### launch {#browser-type-launch}
+### launch {/* #browser-type-launch */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserType.launch</x-search>
 
@@ -176,6 +191,9 @@ Browser browser = chromium.launch(new BrowserType.LaunchOptions()
     :::
     
     Additional arguments to pass to the browser instance. The list of Chromium flags can be found [here](https://peter.sh/experiments/chromium-command-line-switches/).
+  - `setArtifactsDir` [Path] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-artifacts-dir"/><a href="#browser-type-launch-option-artifacts-dir" class="list-anchor">#</a>
+    
+    If specified, artifacts (traces, videos, downloads, HAR files, etc.) are saved into this directory. The directory is not cleaned up when the browser closes. If not specified, a temporary directory is used and cleaned up when the browser closes.
   - `setChannel` [String] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-channel"/><a href="#browser-type-launch-option-channel" class="list-anchor">#</a>
     
     Browser distribution channel.
@@ -238,7 +256,7 @@ Browser browser = chromium.launch(new BrowserType.LaunchOptions()
     Slows down Playwright operations by the specified amount of milliseconds. Useful so that you can see what is going on.
   - `setTimeout` [double] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-timeout"/><a href="#browser-type-launch-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds to wait for the browser instance to start. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
+    Maximum time in milliseconds to wait for the browser instance to start. Defaults to `180000` (3 minutes). Pass `0` to disable timeout.
   - `setTracesDir` [Path] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-traces-dir"/><a href="#browser-type-launch-option-traces-dir" class="list-anchor">#</a>
     
     If specified, traces are saved into this directory.
@@ -248,7 +266,7 @@ Browser browser = chromium.launch(new BrowserType.LaunchOptions()
 
 ---
 
-### launchPersistentContext {#browser-type-launch-persistent-context}
+### launchPersistentContext {/* #browser-type-launch-persistent-context */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserType.launchPersistentContext</x-search>
 
@@ -289,6 +307,9 @@ BrowserType.launchPersistentContext(userDataDir, options);
     :::
     
     Additional arguments to pass to the browser instance. The list of Chromium flags can be found [here](https://peter.sh/experiments/chromium-command-line-switches/).
+  - `setArtifactsDir` [Path] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-artifacts-dir"/><a href="#browser-type-launch-persistent-context-option-artifacts-dir" class="list-anchor">#</a>
+    
+    If specified, artifacts (traces, videos, downloads, HAR files, etc.) are saved into this directory. The directory is not cleaned up when the browser closes. If not specified, a temporary directory is used and cleaned up when the browser closes.
   - `setBaseURL` [String] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-base-url"/><a href="#browser-type-launch-persistent-context-option-base-url" class="list-anchor">#</a>
     
     When using [Page.navigate()](/api/class-page.mdx#page-goto), [Page.route()](/api/class-page.mdx#page-route), [Page.waitForURL()](/api/class-page.mdx#page-wait-for-url), [Page.waitForRequest()](/api/class-page.mdx#page-wait-for-request), or [Page.waitForResponse()](/api/class-page.mdx#page-wait-for-response) it takes the base URL in consideration by using the [`URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor for building the corresponding URL. Unset by default. Examples:
@@ -308,7 +329,7 @@ BrowserType.launchPersistentContext(userDataDir, options);
   - `setChromiumSandbox` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-chromium-sandbox"/><a href="#browser-type-launch-persistent-context-option-chromium-sandbox" class="list-anchor">#</a>
     
     Enable Chromium sandboxing. Defaults to `false`.
-  - `setClientCertificates` [List]&lt;ClientCertificates&gt; *(optional)* <font size="2">Added in: 1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-client-certificates"/><a href="#browser-type-launch-persistent-context-option-client-certificates" class="list-anchor">#</a>
+  - `setClientCertificates` [List]&lt;ClientCertificates&gt; *(optional)* <font size="2">Added in: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-client-certificates"/><a href="#browser-type-launch-persistent-context-option-client-certificates" class="list-anchor">#</a>
     - `setOrigin` [String]
       
       Exact origin that the certificate is valid for. Origin includes `https` protocol, a hostname and optionally a port.
@@ -401,7 +422,7 @@ BrowserType.launchPersistentContext(userDataDir, options);
   - `setHeadless` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-headless"/><a href="#browser-type-launch-persistent-context-option-headless" class="list-anchor">#</a>
     
     Whether to run browser in headless mode. More details for [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and [Firefox](https://hacks.mozilla.org/2017/12/using-headless-mode-in-firefox/). Defaults to `true`.
-  - `setHttpCredentials` HttpCredentials *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-http-credentials"/><a href="#browser-type-launch-persistent-context-option-http-credentials" class="list-anchor">#</a>
+  - `setHttpCredentials` HttpCredentials | [List]&lt;HttpCredentials&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-http-credentials"/><a href="#browser-type-launch-persistent-context-option-http-credentials" class="list-anchor">#</a>
     - `setUsername` [String]
       
       
@@ -416,6 +437,8 @@ BrowserType.launchPersistentContext(userDataDir, options);
       This option only applies to the requests sent from corresponding [APIRequestContext] and does not affect requests sent from the browser. `'always'` - `Authorization` header with basic authentication credentials will be sent with the each API request. `'unauthorized` - the credentials are only sent when 401 (Unauthorized) response with `WWW-Authenticate` header is received. Defaults to `'unauthorized'`.
     
     Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). If no origin is specified, the username and password are sent to any servers upon unauthorized responses.
+    
+    Pass an array to use different credentials for different origins. The first entry that matches the request origin is used, and entries with no origin match any request.
   - `setIgnoreAllDefaultArgs` [boolean] *(optional)* <font size="2">Added in: v1.9</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-ignore-all-default-args"/><a href="#browser-type-launch-persistent-context-option-ignore-all-default-args" class="list-anchor">#</a>
     
     If `true`, Playwright does not pass its own configurations args and only uses the ones from [setArgs](/api/class-browsertype.mdx#browser-type-launch-persistent-context-option-args). Dangerous option; use with care. Defaults to `false`.
@@ -427,7 +450,7 @@ BrowserType.launchPersistentContext(userDataDir, options);
     Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
   - `setIsMobile` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-is-mobile"/><a href="#browser-type-launch-persistent-context-option-is-mobile" class="list-anchor">#</a>
     
-    Whether the `meta viewport` tag is taken into account and touch events are enabled. isMobile is a part of device, so you don't actually need to set it manually. Defaults to `false` and is not supported in Firefox. Learn more about [mobile emulation](../emulation.mdx#ismobile).
+    Whether the `meta viewport` tag is taken into account and touch events are enabled. isMobile is a part of device, so you don't actually need to set it manually. Defaults to `false`. Learn more about [mobile emulation](../emulation.mdx#ismobile).
   - `setJavaScriptEnabled` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-java-script-enabled"/><a href="#browser-type-launch-persistent-context-option-java-script-enabled" class="list-anchor">#</a>
     
     Whether or not to enable JavaScript in the context. Defaults to `true`. Learn more about [disabling JavaScript](../emulation.mdx#javascript-enabled).
@@ -471,6 +494,9 @@ BrowserType.launchPersistentContext(userDataDir, options);
   - `setRecordVideoDir` [Path] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-record-video-dir"/><a href="#browser-type-launch-persistent-context-option-record-video-dir" class="list-anchor">#</a>
     
     Enables video recording for all pages into the specified directory. If not specified videos are not recorded. Make sure to call [BrowserContext.close()](/api/class-browsercontext.mdx#browser-context-close) for videos to be saved.
+  - `setRecordVideoFps` [int] *(optional)* <font size="2">Added in: v1.64</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-record-video-fps"/><a href="#browser-type-launch-persistent-context-option-record-video-fps" class="list-anchor">#</a>
+    
+    Frame rate of the recorded videos in frames per second. Defaults to `25`. Firefox and WebKit currently capture up to 25 frames per second.
   - `setRecordVideoSize` RecordVideoSize *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-record-video-size"/><a href="#browser-type-launch-persistent-context-option-record-video-size" class="list-anchor">#</a>
     - `setWidth` [int]
       
@@ -505,7 +531,7 @@ BrowserType.launchPersistentContext(userDataDir, options);
     If set to true, enables strict selectors mode for this context. In the strict selectors mode all operations on selectors that imply single target DOM element will throw when more than one element matches the selector. This option does not affect any Locator APIs (Locators are always strict). Defaults to `false`. See [Locator] to learn more about the strict mode.
   - `setTimeout` [double] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-timeout"/><a href="#browser-type-launch-persistent-context-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds to wait for the browser instance to start. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
+    Maximum time in milliseconds to wait for the browser instance to start. Defaults to `180000` (3 minutes). Pass `0` to disable timeout.
   - `setTimezoneId` [String] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-timezone-id"/><a href="#browser-type-launch-persistent-context-option-timezone-id" class="list-anchor">#</a>
     
     Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs. Defaults to the system timezone.
@@ -535,7 +561,7 @@ BrowserType.launchPersistentContext(userDataDir, options);
 
 ---
 
-### name {#browser-type-name}
+### name {/* #browser-type-name */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserType.name</x-search>
 
@@ -561,6 +587,8 @@ BrowserType.name();
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -582,15 +610,18 @@ BrowserType.name();
 [RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -603,6 +634,7 @@ BrowserType.name();
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[BiConsumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html "BiConsumer"
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
@@ -610,6 +642,7 @@ BrowserType.name();
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[Integer]: https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html "Integer"
 [long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"

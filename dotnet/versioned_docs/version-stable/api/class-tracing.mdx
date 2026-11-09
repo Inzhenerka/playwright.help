@@ -40,7 +40,7 @@ await context.Tracing.StopAsync(new()
 
 ## Методы {#methods}
 
-### GroupAsync {#tracing-group}
+### GroupAsync {/* #tracing-group */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.49</font><x-search>tracing.GroupAsync</x-search>
 
@@ -80,11 +80,11 @@ await Page.Context.Tracing.GroupEndAsync();
     Указывает пользовательское расположение для отображения группы в просмотрщике трассировок. По умолчанию используется расположение вызова [Tracing.GroupAsync()](/api/class-tracing.mdx#tracing-group).
 
 **Возвращает**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-group-return"/><a href="#tracing-group-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-group-return"/><a href="#tracing-group-return" class="list-anchor">#</a>
 
 ---
 
-### GroupEndAsync {#tracing-group-end}
+### GroupEndAsync {/* #tracing-group-end */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.49</font><x-search>tracing.GroupEndAsync</x-search>
 
@@ -101,11 +101,11 @@ await Tracing.GroupEndAsync();
 
 ---
 
-### StartAsync {#tracing-start}
+### StartAsync {/* #tracing-start */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>tracing.StartAsync</x-search>
 
-Начать трассировку.
+Начинает запись трассировки. Освобождение возвращённого объекта [Disposable] останавливает запись трассировки без её сохранения, аналогично вызову [Tracing.StopAsync()](/api/class-tracing.mdx#tracing-stop) без указания пути.
 
 :::note
 
@@ -134,19 +134,26 @@ await context.Tracing.StopAsync(new()
 ```
 
 **Аргументы**
-- `options` `TracingStartOptions?` *(опционально)*
-  - `Name` [string]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-name"/><a href="#tracing-start-option-name" class="list-anchor">#</a>
+- `options` `TracingStartOptions?` *(необязательно)*
+  - `AriaSnapshots` [bool]? *(необязательно)* <font size="2">Добавлено в: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-aria-snapshots"/><a href="#tracing-start-option-aria-snapshots" class="list-anchor">#</a>
+    
+    Определяет, следует ли сохранять ARIA-снимок страницы при каждом действии.
+  - `Live` [bool]? *(необязательно)* <font size="2">Добавлено в: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-live"/><a href="#tracing-start-option-live" class="list-anchor">#</a>
+    
+    Если включено, трассировка записывается в неархивированный файл, который обновляется в реальном времени по мере выполнения действий, вместо кеширования изменений и их упаковки в zip-архив по завершении. Это полезно для просмотра трассировки в реальном времени во время выполнения тестов.
+  - `Name` [string]? *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-name"/><a href="#tracing-start-option-name" class="list-anchor">#</a>
     
     Если указано, промежуточные файлы трассировки будут сохранены в файлы с данным префиксом имени внутри директории [TracesDir](/api/class-browsertype.mdx#browser-type-launch-option-traces-dir), указанной в [BrowserType.LaunchAsync()](/api/class-browsertype.mdx#browser-type-launch). Чтобы указать имя конечного zip-файла трассировки, необходимо передать опцию `path` в [Tracing.StopAsync()](/api/class-tracing.mdx#tracing-stop).
   - `Screenshots` [bool]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-screenshots"/><a href="#tracing-start-option-screenshots" class="list-anchor">#</a>
     
-    Нужно ли захватывать скриншоты во время трассировки. Скриншоты используются для построения предварительного просмотра временной шкалы.
-  - `Snapshots` [bool]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-snapshots"/><a href="#tracing-start-option-snapshots" class="list-anchor">#</a>
+Определяет, следует ли делать скриншоты во время трассировки. Скриншоты используются для предварительного просмотра временной шкалы.
+  - `ScreenSnapshots` [bool]? *(необязательно)* <font size="2">Добавлено в: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-screen-snapshots"/><a href="#tracing-start-option-screen-snapshots" class="list-anchor">#</a>
     
-    Если эта опция включена, трассировка будет
-    * захватывать снимок DOM при каждом действии
-    * записывать сетевую активность
-  - `Sources` [bool]? *(опционально)* <font size="2">Добавлено в: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-sources"/><a href="#tracing-start-option-sources" class="list-anchor">#</a>
+    Определяет, следует ли делать скриншот страницы при каждом действии.
+  - `Snapshots` [bool]? *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-snapshots"/><a href="#tracing-start-option-snapshots" class="list-anchor">#</a>
+    
+    Определяет, следует ли создавать снимок DOM и записывать сетевую активность при каждом действии.
+  - `Sources` [bool]? *(необязательно)* <font size="2">Добавлено в: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-sources"/><a href="#tracing-start-option-sources" class="list-anchor">#</a>
     
     Включать ли исходные файлы для действий трассировки.
   - `Title` [string]? *(опционально)* <font size="2">Добавлено в: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-title"/><a href="#tracing-start-option-title" class="list-anchor">#</a>
@@ -154,15 +161,15 @@ await context.Tracing.StopAsync(new()
     Имя трассировки, отображаемое в Trace Viewer.
 
 **Возвращает**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-return"/><a href="#tracing-start-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-return"/><a href="#tracing-start-return" class="list-anchor">#</a>
 
 ---
 
-### StartChunkAsync {#tracing-start-chunk}
+### StartChunkAsync {/* #tracing-start-chunk */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.15</font><x-search>tracing.StartChunkAsync</x-search>
 
-Начать новый фрагмент трассировки. Если вы хотите записать несколько трассировок в одном [BrowserContext], используйте [Tracing.StartAsync()](/api/class-tracing.mdx#tracing-start) один раз, а затем создайте несколько фрагментов трассировки с помощью [Tracing.StartChunkAsync()](/api/class-tracing.mdx#tracing-start-chunk) и [Tracing.StopChunkAsync()](/api/class-tracing.mdx#tracing-stop-chunk).
+Начинает новый фрагмент трассировки. Освобождение возвращённого объекта [Disposable] останавливает фрагмент без его сохранения, аналогично вызову [Tracing.StopChunkAsync()](/api/class-tracing.mdx#tracing-stop-chunk) без указания пути. Если вы хотите записать несколько трассировок в одном и том же [BrowserContext], вызовите [Tracing.StartAsync()](/api/class-tracing.mdx#tracing-start) один раз, а затем создавайте отдельные фрагменты трассировки с помощью [Tracing.StartChunkAsync()](/api/class-tracing.mdx#tracing-start-chunk) и [Tracing.StopChunkAsync()](/api/class-tracing.mdx#tracing-stop-chunk).
 
 **Использование**
 
@@ -205,11 +212,48 @@ await context.Tracing.StopChunkAsync(new()
     Имя трассировки, отображаемое в Trace Viewer.
 
 **Возвращает**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-chunk-return"/><a href="#tracing-start-chunk-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-chunk-return"/><a href="#tracing-start-chunk-return" class="list-anchor">#</a>
 
 ---
 
-### StopAsync {#tracing-stop}
+### StartHarAsync {/* #tracing-start-har */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.60</font><x-search>tracing.StartHarAsync</x-search>
+
+Начинает запись сетевой активности в этом контексте в формате HAR (HTTP Archive). Файл HAR записывается на диск при вызове [Tracing.StopHarAsync()](/api/class-tracing.mdx#tracing-stop-har) или при освобождении возвращённого объекта [Disposable].
+
+Для каждого экземпляра [Tracing] одновременно может быть активна только одна запись HAR.
+
+**Usage**
+
+```csharp
+await context.Tracing.StartHarAsync("trace.har");
+var page = await context.NewPageAsync();
+await page.GotoAsync("https://playwright.dev");
+await context.Tracing.StopHarAsync();
+```
+
+**Arguments**
+- `path` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-path"/><a href="#tracing-start-har-option-path" class="list-anchor">#</a>
+  
+  Путь в файловой системе для записи файла HAR. Если имя файла заканчивается на `.zip`, HAR сохраняется как zip-архив с телами ответов в отдельных файлах.
+- `options` `TracingStartHarOptions?` *(optional)*
+  - `Content` `enum HarContentPolicy { Omit, Embed, Attach }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-content"/><a href="#tracing-start-har-option-content" class="list-anchor">#</a>
+    
+    Необязательная настройка для управления содержимым ресурсов. Если указано `omit`, содержимое не сохраняется. Если указано `attach`, ресурсы сохраняются как отдельные файлы или записи в ZIP-архиве. Если указано `embed`, содержимое сохраняется непосредственно в файле HAR в соответствии со спецификацией HAR. По умолчанию используется `attach` для выходных файлов `.zip` и `embed` для всех остальных расширений файлов.
+  - `Mode` `enum HarMode { Full, Minimal }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-mode"/><a href="#tracing-start-har-option-mode" class="list-anchor">#</a>
+    
+    Если задано значение `minimal`, записывается только информация, необходимая для маршрутизации из HAR. При этом не записываются размеры, временные характеристики, сведения о странице, файлы cookie, сведения о безопасности и другие типы информации HAR, которые не используются при воспроизведении из HAR. По умолчанию используется `full`.
+  - `UrlFilter|UrlFilterRegex` [string]? | [Regex]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-url-filter"/><a href="#tracing-start-har-option-url-filter" class="list-anchor">#</a>
+    
+    Шаблон glob или регулярное выражение для фильтрации запросов, сохраняемых в HAR. По умолчанию фильтрация отсутствует.
+
+**Returns**
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-return"/><a href="#tracing-start-har-return" class="list-anchor">#</a>
+
+---
+
+### StopAsync {/* #tracing-stop */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>tracing.StopAsync</x-search>
 
@@ -232,7 +276,7 @@ await Tracing.StopAsync(options);
 
 ---
 
-### StopChunkAsync {#tracing-stop-chunk}
+### StopChunkAsync {/* #tracing-stop-chunk */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.15</font><x-search>tracing.StopChunkAsync</x-search>
 
@@ -253,6 +297,22 @@ await Tracing.StopChunkAsync(options);
 **Возвращает**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-stop-chunk-return"/><a href="#tracing-stop-chunk-return" class="list-anchor">#</a>
 
+---
+
+### StopHarAsync {/* #tracing-stop-har */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.60</font><x-search>tracing.StopHarAsync</x-search>
+
+Останавливает запись HAR и сохраняет HAR-файл по пути, указанному при вызове [Tracing.StartHarAsync()](/api/class-tracing.mdx#tracing-start-har).
+
+**Использование**
+
+```csharp
+await Tracing.StopHarAsync();
+```
+
+**Возвращает**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-stop-har-return"/><a href="#tracing-stop-har-return" class="list-anchor">#</a>
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -264,6 +324,8 @@ await Tracing.StopChunkAsync(options);
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -283,15 +345,18 @@ await Tracing.StopChunkAsync(options);
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

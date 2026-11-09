@@ -80,11 +80,11 @@ page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Sign in"))
 
 Playwright предоставляет способ повторного использования аутентифицированного состояния в тестах. Таким образом, вы можете войти в систему только один раз, а затем пропустить шаг входа для всех тестов.
 
-Веб-приложения используют аутентификацию на основе куки или токенов, где аутентифицированное состояние хранится в виде [куки](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies), в [локальном хранилище](https://developer.mozilla.org/en-US/docs/Web/API/Storage) или в [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API). Playwright предоставляет метод [BrowserContext.storageState()](/api/class-browsercontext.mdx#browser-context-storage-state), который можно использовать для получения состояния хранилища из аутентифицированных контекстов, а затем создания новых контекстов с предварительно заполненным состоянием.
+Веб-приложения используют аутентификацию на основе файлов cookie или токенов, при которой состояние аутентификации хранится в [файлах cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies), в [локальном хранилище](https://developer.mozilla.org/en-US/docs/Web/API/Storage), в [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) или в виде ключей доступа (passkeys — учётных данных [WebAuthn](https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API)). Playwright предоставляет метод [BrowserContext.storageState()](/api/class-browsercontext.mdx#browser-context-storage-state), который позволяет получить состояние хранилища из контекстов с выполненной аутентификацией, а затем создать новые контексты с предварительно заполненным состоянием.
 
-Состояние куки, локального хранилища и IndexedDB может использоваться в разных браузерах. Они зависят от модели аутентификации вашего приложения, которая может требовать некоторой комбинации куки, локального хранилища или IndexedDB.
+Файлы cookie, локальное хранилище, IndexedDB и виртуальные учётные данные WebAuthn (ключи доступа) можно использовать в разных браузерах. Их использование зависит от модели аутентификации вашего приложения, которой может потребоваться определённая комбинация файлов cookie, локального хранилища, IndexedDB или ключей доступа.
 
-Следующий фрагмент кода получает состояние из аутентифицированного контекста и создает новый контекст с этим состоянием.
+Следующий фрагмент кода получает состояние из контекста с выполненной аутентификацией и создаёт новый контекст с этим состоянием. Если ваше приложение хранит токены аутентификации в IndexedDB, как, например, Firebase Authentication, включите [setIndexedDB](/api/class-browsercontext.mdx#browser-context-storage-state-option-indexed-db) при сохранении состояния. По умолчанию IndexedDB не включается в снимок состояния.
 
 ```java
 // Сохранение состояния хранилища в файл.
@@ -99,7 +99,7 @@ BrowserContext context = browser.newContext(
 
 ### Сессионное хранилище {#session-storage}
 
-Повторное использование аутентифицированного состояния охватывает аутентификацию на основе [куки](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies), [локального хранилища](https://developer.mozilla.org/en-US/docs/Web/API/Storage) и [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API). Редко [сессионное хранилище](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) используется для хранения информации, связанной с аутентифицированным состоянием. Сессионное хранилище специфично для определенного домена и не сохраняется между загрузками страниц. Playwright не предоставляет API для сохранения сессионного хранилища, но следующий фрагмент кода может быть использован для сохранения/загрузки сессионного хранилища.
+Повторное использование состояния аутентификации поддерживает аутентификацию на основе [файлов cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies), [локального хранилища](https://developer.mozilla.org/en-US/docs/Web/API/Storage), [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) и ключей доступа passkey ([WebAuthn](https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API)). В редких случаях для хранения информации, связанной с состоянием входа в систему, используется [хранилище сеанса](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage). Хранилище сеанса привязано к определённому домену и не сохраняется между загрузками страниц. Playwright не предоставляет API для сохранения хранилища сеанса, но для его сохранения и загрузки можно использовать следующий фрагмент кода.
 
 ```java
 // Получение сессионного хранилища и сохранение в переменную окружения
@@ -108,6 +108,7 @@ System.getenv().put("SESSION_STORAGE", sessionStorage);
 
 // Установка сессионного хранилища в новом контексте
 String sessionStorage = System.getenv("SESSION_STORAGE");
+String escapedSessionStorage = sessionStorage.replace("\\", "\\\\").replace("'", "\\'");
 context.addInitScript("(storage => {\n" +
   "  if (window.location.hostname === 'example.com') {\n" +
   "    const entries = JSON.parse(storage);\n" +
@@ -115,7 +116,7 @@ context.addInitScript("(storage => {\n" +
   "      window.sessionStorage.setItem(key, value);\n" +
   "    };\n" +
   "  }\n" +
-  "})('" + sessionStorage + "')");
+  "})('" + escapedSessionStorage + "')");
 ```
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
@@ -128,6 +129,8 @@ context.addInitScript("(storage => {\n" +
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -149,15 +152,18 @@ context.addInitScript("(storage => {\n" +
 [RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -170,6 +176,7 @@ context.addInitScript("(storage => {\n" +
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[BiConsumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html "BiConsumer"
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
@@ -177,6 +184,7 @@ context.addInitScript("(storage => {\n" +
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[Integer]: https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html "Integer"
 [long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"

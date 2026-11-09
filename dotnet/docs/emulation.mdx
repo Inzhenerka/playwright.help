@@ -12,7 +12,7 @@ With Playwright you can test your app on any browser as well as emulate a real d
 
 ## Devices
 
-Playwright comes with a [registry of device parameters](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json) using [Playwright.Devices](/api/class-playwright.mdx#playwright-devices) for selected desktop, tablet and mobile devices. It can be used to simulate browser behavior for a specific device such as user agent, screen size, viewport and if it has touch enabled. All tests will run with the specified device parameters.
+Playwright comes with a [registry of device parameters](https://github.com/microsoft/playwright/blob/main/packages/isomorphic/deviceDescriptorsSource.json) using [Playwright.Devices](/api/class-playwright.mdx#playwright-devices) for selected desktop, tablet and mobile devices. It can be used to simulate browser behavior for a specific device such as user agent, screen size, viewport and if it has touch enabled. All tests will run with the specified device parameters.
 
 ```csharp
 using Microsoft.Playwright;
@@ -27,7 +27,17 @@ var iphone13 = playwright.Devices["iPhone 13"];
 await using var context = await browser.NewContextAsync(iphone13);
 ```
 
-<img width="458" alt="playwright.dev website emulated for iPhone 13" src="https://user-images.githubusercontent.com/13063165/220411073-76fe59f9-9a2d-463d-8e30-c19a7deca133.png" />
+<img height="1582" width="916" alt="playwright.dev website emulated for iPhone 13" src="https://user-images.githubusercontent.com/13063165/220411073-76fe59f9-9a2d-463d-8e30-c19a7deca133.png" />
+
+**Note**: Pre-configured devices assume a specific platform. For example, "Desktop Chrome" will provide a Windows-specific user agent string.
+
+If you would like to use the user agent specific to the platform that is running the tests, we recommend unsetting the user agent property.
+
+```csharp
+var desktopChrome = playwright.Devices["Desktop Chrome"];
+desktopChrome.UserAgent = null;
+var context = await browser.NewContextAsync(desktopChrome);
+```
 
 ## Viewport
 
@@ -78,7 +88,7 @@ await using var context = await browser.NewContextAsync(new()
 });
 ```
 
-<img width="1394" alt="Bing in german lang and timezone" src="https://user-images.githubusercontent.com/13063165/220416571-ccc96ab1-44bb-4579-8430-64502fc24a15.png" />
+<img height="1824" width="2788" alt="Bing in german lang and timezone" src="https://user-images.githubusercontent.com/13063165/220416571-ccc96ab1-44bb-4579-8430-64502fc24a15.png" />
 
 ## Permissions
 
@@ -108,7 +118,7 @@ await using var context = await browser.NewContextAsync(new()
 });
 ```
 
-<img width="1394" alt="geolocation for italy on bing maps" src="https://user-images.githubusercontent.com/13063165/220417670-bb22d815-f5cd-47c4-8562-0b88165eac27.png" />
+<img height="1824" width="2788" alt="geolocation for italy on bing maps" src="https://user-images.githubusercontent.com/13063165/220417670-bb22d815-f5cd-47c4-8562-0b88165eac27.png" />
 
 Change the location later:
 
@@ -120,7 +130,7 @@ await context.SetGeolocationAsync(new Geolocation() { Longitude = 48.858455, Lat
 
 ## Color Scheme and Media
 
-Emulate the users `"colorScheme"`. Supported values are 'light' and 'dark'. You can also emulate the media type with [Page.EmulateMediaAsync()](/api/class-page.mdx#page-emulate-media).
+Emulate the users `"colorScheme"`. Supported values are 'light', 'dark', and 'no-preference'. You can also emulate the media type with [Page.EmulateMediaAsync()](/api/class-page.mdx#page-emulate-media).
 
 ```csharp
 // Create context with dark mode
@@ -148,7 +158,27 @@ await page.EmulateMediaAsync(new()
 });
 ```
 
-<img width="1394" alt="playwright web in dark mode" src="https://user-images.githubusercontent.com/13063165/220411638-55d2b051-4678-4da7-9f0b-ed22f5a3c47c.png" />
+<img height="1824" width="2788" alt="playwright web in dark mode" src="https://user-images.githubusercontent.com/13063165/220411638-55d2b051-4678-4da7-9f0b-ed22f5a3c47c.png" />
+
+The `"reducedMotion"`, `"forcedColors"` and `"contrast"` options emulate the `prefers-reduced-motion`, `forced-colors` and `prefers-contrast` media features the same way. Supported values are `'reduce'` and `'no-preference'` for reduced motion, `'active'` and `'none'` for forced colors, and `'more'` and `'no-preference'` for contrast. [Page.EmulateMediaAsync()](/api/class-page.mdx#page-emulate-media) changes them for a single page.
+
+```csharp
+// Create context with reduced motion, forced colors and more contrast
+await using var context = await browser.NewContextAsync(new()
+{
+    ReducedMotion = ReducedMotion.Reduce, // or NoPreference
+    ForcedColors = ForcedColors.Active, // or None
+    Contrast = Contrast.More // or NoPreference
+});
+
+// Change the media features for the page
+await page.EmulateMediaAsync(new()
+{
+    ReducedMotion = ReducedMotion.Reduce,
+    ForcedColors = ForcedColors.Active,
+    Contrast = Contrast.More
+});
+```
 
 ## User Agent
 
@@ -165,6 +195,10 @@ Emulate the network being offline.
 ```csharp
 var context = await browser.NewContextAsync(new() { Offline = true });
 ```
+
+:::note
+Offline emulation only affects requests that go through the browser's regular network stack, such as page navigations, `fetch()`, `XMLHttpRequest` and WebSockets. It does not affect WebRTC traffic: established `RTCPeerConnection`s keep sending and receiving media over UDP. To test WebRTC connection loss, interrupt the connection outside the browser, for example by stopping the TURN server or using an OS-level firewall.
+:::
 
 ## JavaScript Enabled
 
@@ -186,6 +220,8 @@ var context = await browser.NewContextAsync(new() { JavaScriptEnabled = false })
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -205,15 +241,18 @@ var context = await browser.NewContextAsync(new() { JavaScriptEnabled = false })
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

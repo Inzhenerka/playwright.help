@@ -14,7 +14,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Методы {#methods}
 
-### new_context {#api-request-new-context}
+### new_context {/* #api-request-new-context */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequest.new_context</x-search>
 
@@ -30,11 +30,11 @@ api_request.new_context(**kwargs)
 **Аргументы**
 - `base_url` [str] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-base-url"/><a href="#api-request-new-context-option-base-url" class="list-anchor">#</a>
   
-  Методы, такие как [api_request_context.get()](/api/class-apirequestcontext.mdx#api-request-context-get), учитывают базовый URL, используя конструктор [`URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) для построения соответствующего URL. Примеры:
-  * baseURL: `http://localhost:3000` и отправка запроса на `/bar.html` приводит к `http://localhost:3000/bar.html`
-  * baseURL: `http://localhost:3000/foo/` и отправка запроса на `./bar.html` приводит к `http://localhost:3000/foo/bar.html`
-  * baseURL: `http://localhost:3000/foo` (без завершающего слэша) и навигация к `./bar.html` приводит к `http://localhost:3000/bar.html`
-- `client_certificates` [List]\[[Dict]\] *(опционально)* <font size="2">Добавлено в: 1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-client-certificates"/><a href="#api-request-new-context-option-client-certificates" class="list-anchor">#</a>
+Такие методы, как [api_request_context.get()](/api/class-apirequestcontext.mdx#api-request-context-get), учитывают базовый URL, используя конструктор [`URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) для построения соответствующего URL. Примеры:
+  * baseURL: `http://localhost:3000` и отправка запроса на `/bar.html` дают в результате `http://localhost:3000/bar.html`
+  * baseURL: `http://localhost:3000/foo/` и отправка запроса на `./bar.html` дают в результате `http://localhost:3000/foo/bar.html`
+  * baseURL: `http://localhost:3000/foo` (без завершающей косой черты) и переход на `./bar.html` дают в результате `http://localhost:3000/bar.html`
+- `client_certificates` [List]\[[Dict]\] *(необязательно)* <font size="2">Добавлено в: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-client-certificates"/><a href="#api-request-new-context-option-client-certificates" class="list-anchor">#</a>
   - `origin` [str]
     
     Точный источник, для которого сертификат действителен. Источник включает протокол `https`, имя хоста и, возможно, порт.
@@ -78,8 +78,8 @@ api_request.new_context(**kwargs)
   Объект, содержащий дополнительные HTTP-заголовки, которые будут отправлены с каждым запросом. По умолчанию отсутствуют.
 - `fail_on_status_code` [bool] *(опционально)* <font size="2">Добавлено в: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-fail-on-status-code"/><a href="#api-request-new-context-option-fail-on-status-code" class="list-anchor">#</a>
   
-  Следует ли выбрасывать исключение для кодов ответа, отличных от 2xx и 3xx. По умолчанию объект ответа возвращается для всех кодов состояния.
-- `http_credentials` [Dict] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-http-credentials"/><a href="#api-request-new-context-option-http-credentials" class="list-anchor">#</a>
+Следует ли выбрасывать исключение при получении кодов ответа, отличных от 2xx и 3xx. По умолчанию объект ответа возвращается для всех кодов состояния.
+- `http_credentials` [Dict] | [List]\[[Dict]\] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-http-credentials"/><a href="#api-request-new-context-option-http-credentials" class="list-anchor">#</a>
   - `username` [str]
     
     
@@ -93,8 +93,10 @@ api_request.new_context(**kwargs)
     
     Эта опция применяется только к запросам, отправленным из соответствующего [APIRequestContext] и не влияет на запросы, отправленные из браузера. `'always'` - заголовок `Authorization` с учетными данными базовой аутентификации будет отправлен с каждым API-запросом. `'unauthorized` - учетные данные отправляются только при получении ответа 401 (Unauthorized) с заголовком `WWW-Authenticate`. По умолчанию `'unauthorized'`.
   
-  Учетные данные для [HTTP-аутентификации](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Если источник не указан, имя пользователя и пароль отправляются на любые серверы при получении неавторизованных ответов.
-- `ignore_https_errors` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-ignore-https-errors"/><a href="#api-request-new-context-option-ignore-https-errors" class="list-anchor">#</a>
+Учётные данные для [HTTP-аутентификации](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Если источник (origin) не указан, имя пользователя и пароль отправляются любым серверам в ответ на сообщения об отсутствии авторизации.
+  
+  Передайте массив, чтобы использовать разные учётные данные для разных источников. Используется первая запись, соответствующая источнику запроса, а записи без указанного источника соответствуют любому запросу.
+- `ignore_https_errors` [bool] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-ignore-https-errors"/><a href="#api-request-new-context-option-ignore-https-errors" class="list-anchor">#</a>
   
   Игнорировать ли ошибки HTTPS при отправке сетевых запросов. По умолчанию `false`.
 - `max_redirects` [int] *(опционально)* <font size="2">Добавлено в: v1.52</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-max-redirects"/><a href="#api-request-new-context-option-max-redirects" class="list-anchor">#</a>
@@ -177,11 +179,15 @@ api_request.new_context(**kwargs)
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [Error]: /api/class-error.mdx "Error"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
@@ -195,14 +201,17 @@ api_request.new_context(**kwargs)
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

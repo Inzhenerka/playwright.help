@@ -367,6 +367,8 @@ Playwright Test использует [worker-процессы](./test-parallel.m
 
 Ниже мы создадим фикстуру `account`, которая будет общей для всех тестов в одном и том же worker, и переопределим фикстуру `page`, чтобы для каждого теста выполнять вход в этот аккаунт. Чтобы генерировать уникальные аккаунты, мы используем [workerInfo.workerIndex](/api/class-workerinfo.mdx#worker-info-worker-index), доступный любому тесту или фикстуре. Обратите внимание на «кортежный» синтаксис для worker-фикстуры: нужно передать `{scope: 'worker'}`, чтобы раннер настраивал эту фикстуру один раз на worker.
 
+Фикстуры уровня воркера запускаются один раз на воркер и получают отдельный тайм-аут, равный тайм-ауту теста по умолчанию. Его можно изменить параметром `timeout`. См. [fixture timeout](#fixture-timeout).
+
 ```js title="my-test.ts"
 import { test as base } from '@playwright/test';
 
@@ -447,7 +449,7 @@ export { expect } from '@playwright/test';
 
 ## Таймаут фикстуры {#fixture-timeout}
 
-По умолчанию фикстура наследует значение таймаута теста. Однако для медленных фикстур, особенно [worker-scoped](#worker-scoped-fixtures), удобно иметь отдельный таймаут. Так вы можете держать общий таймаут теста небольшим и дать медленной фикстуре больше времени.
+Фикстура считается частью теста, поэтому время её настройки и очистки учитывается в тайм-ауте теста. Таким образом, медленная фикстура может приводить к превышению тайм-аута теста. Для такой фикстуры можно установить отдельный, более длительный тайм-аут, сохранив при этом небольшой общий тайм-аут теста.
 
 ```js
 import { test as base, expect } from '@playwright/test';
@@ -464,7 +466,9 @@ test('example test', async ({ slowFixture }) => {
 });
 ```
 
-## Фикстуры-опции {#fixtures-options}
+В отличие от обычных фикстур с областью действия теста, каждая [фикстура с областью действия рабочего процесса](#worker-scoped-fixtures) имеет собственный тайм-аут, равный тайм-ауту теста. Вы можете изменить тайм-аут для фикстуры с областью действия рабочего процесса таким же образом.
+
+## Параметры фикстур {/* #fixtures-options */}
 
 Playwright Test поддерживает запуск нескольких тестовых проектов, которые можно настраивать отдельно. Вы можете использовать фикстуры-«опции» (option fixtures), чтобы сделать параметры конфигурации декларативными и типобезопасными. Подробнее см. [параметризация тестов](./test-parameterize.mdx).
 
@@ -853,11 +857,6 @@ test('basic', async ({ }) => {
 Обратите внимание, что фикстуры всё равно будут выполняться один раз на [процесс worker](./test-parallel.mdx#worker-processes), но вам не нужно переопределять их в каждом файле.
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -870,10 +869,11 @@ test('basic', async ({ }) => {
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -892,6 +892,7 @@ test('basic', async ({ }) => {
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -899,9 +900,18 @@ test('basic', async ({ }) => {
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -919,6 +929,7 @@ test('basic', async ({ }) => {
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -931,6 +942,7 @@ test('basic', async ({ }) => {
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -952,6 +964,7 @@ test('basic', async ({ }) => {
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

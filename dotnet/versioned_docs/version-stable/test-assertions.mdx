@@ -6,7 +6,21 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Список утверждений {#list-of-assertions}
+## Введение
+
+Playwright включает проверки, специально предназначенные для веб-приложений, которые автоматически повторяются до тех пор, пока не будет выполнено ожидаемое условие. Рассмотрим следующий пример:
+
+```csharp
+await Expect(Page.GetByTestId("status")).ToHaveTextAsync("Submitted");
+```
+
+Playwright будет повторно проверять элемент с тестовым идентификатором `status`, пока его текст не станет равен `"Submitted"`. При каждой попытке Playwright будет заново находить элемент и проверять его, пока условие не будет выполнено или не истечёт время ожидания.
+
+По умолчанию время ожидания для проверок составляет 5 секунд.
+
+## Автоматически повторяющиеся проверки
+
+Следующие проверки будут повторяться до тех пор, пока проверка не пройдёт успешно или не истечёт отведённое на неё время ожидания.
 
 | Утверждение | Описание |
 | :- | :- |
@@ -39,7 +53,26 @@ import HTMLCard from '@site/src/components/HTMLCard';
 | | | [Expect(Page).ToHaveURLAsync()](/api/class-pageassertions.mdx#page-assertions-to-have-url) | Страница имеет URL |
 | | | [Expect(Response).ToBeOKAsync()](/api/class-apiresponseassertions.mdx#api-response-assertions-to-be-ok) | Ответ имеет статус OK |
 
-## Установка пользовательского таймаута {#setting-a-custom-timeout}
+## Пользовательское сообщение для Expect
+
+Вы можете указать пользовательское сообщение для проверки вторым аргументом функции `expect`, например:
+
+```csharp
+await Expect(Page.GetByText("Name"), "should be logged in").ToBeVisibleAsync();
+```
+
+Если проверка expect завершится неудачно, ошибка будет выглядеть следующим образом:
+
+```bash
+Microsoft.Playwright.PlaywrightException : should be logged in
+
+Locator expected to be visible
+Call log:
+- Expect "ToBeVisibleAsync" with timeout 5000ms
+- waiting for GetByText("Name")
+```
+
+## Установка пользовательского тайм-аута
 
 Вы можете задать пользовательский таймаут для утверждений как глобально, так и для каждого утверждения отдельно. Таймаут по умолчанию составляет 5 секунд.
 
@@ -154,6 +187,8 @@ await Expect(Page.GetByText("Name")).ToBeVisibleAsync(new() { Timeout = 10_000 }
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -173,15 +208,18 @@ await Expect(Page.GetByText("Name")).ToBeVisibleAsync(new() { Timeout = 10_000 }
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

@@ -26,7 +26,7 @@ const { chromium } = require('playwright');  // Или 'firefox', или 'webkit
 
 ## Методы {#methods}
 
-### connect {#browser-type-connect}
+### connect {/* #browser-type-connect */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserType.connect</x-search>
 
@@ -40,12 +40,12 @@ const { chromium } = require('playwright');  // Или 'firefox', или 'webkit
 **Использование**
 
 ```js
-await browserType.connect(wsEndpoint);
-await browserType.connect(wsEndpoint, options);
+await browserType.connect(endpoint);
+await browserType.connect(endpoint, options);
 ```
 
 **Аргументы**
-- `wsEndpoint` [string] <font size="2">Добавлено в: v1.10</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-option-ws-endpoint"/><a href="#browser-type-connect-option-ws-endpoint" class="list-anchor">#</a>
+- `endpoint` [string] <font size="2">Добавлено в: v1.10</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-option-endpoint"/><a href="#browser-type-connect-option-endpoint" class="list-anchor">#</a>
   
   Веб-сокет конечная точка браузера Playwright для подключения. Вы получаете эту конечную точку через `BrowserServer.wsEndpoint`.
 - `options` [Object] *(необязательно)*
@@ -64,28 +64,20 @@ await browserType.connect(wsEndpoint, options);
     1. `"*.test.internal-domain,*.staging.internal-domain,<loopback>"` для открытия тестовых/стадийных развертываний и localhost.
   - `headers` [Object]&lt;[string], [string]&gt; *(необязательно)* <font size="2">Добавлено в: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-option-headers"/><a href="#browser-type-connect-option-headers" class="list-anchor">#</a>
     
-    Дополнительные HTTP заголовки, которые будут отправлены с запросом на подключение веб-сокета. Необязательно.
-  - `logger` [Logger] *(необязательно)* <font size="2">Добавлено в: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-option-logger"/><a href="#browser-type-connect-option-logger" class="list-anchor">#</a>
-    
-    :::warning[Устарело]
-    Логи, получаемые логгером, неполные. Пожалуйста, используйте трассировку (tracing) вместо этого.
-    :::
-
-
-    Приёмник (sink) логгера для логирования Playwright. Необязательно.
+    Дополнительные HTTP-заголовки, отправляемые с запросом на подключение к веб-сокету. Необязательно.
   - `slowMo` [number] *(необязательно)* <font size="2">Добавлено в: v1.10</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-option-slow-mo"/><a href="#browser-type-connect-option-slow-mo" class="list-anchor">#</a>
     
-    Замедляет операции Playwright на указанное количество миллисекунд. Полезно, чтобы вы могли видеть, что происходит. По умолчанию 0.
+    Замедляет операции Playwright на указанное количество миллисекунд. Полезно, чтобы вы могли видеть, что происходит. По умолчанию — 0.
   - `timeout` [number] *(необязательно)* <font size="2">Добавлено в: v1.10</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-option-timeout"/><a href="#browser-type-connect-option-timeout" class="list-anchor">#</a>
     
-    Максимальное время в миллисекундах для ожидания установления соединения. По умолчанию `0` (без таймаута).
+    Максимальное время ожидания установления соединения в миллисекундах. По умолчанию — `0` (без ограничения времени ожидания).
 
 **Возвращает**
 - [Promise]&lt;[Browser]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-return"/><a href="#browser-type-connect-return" class="list-anchor">#</a>
 
 ---
 
-### connectOverCDP {#browser-type-connect-over-cdp}
+### connectOverCDP {/* #browser-type-connect-over-cdp */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>browserType.connectOverCDP</x-search>
 
@@ -102,6 +94,10 @@ await browserType.connect(wsEndpoint, options);
 Это соединение значительно менее точное, чем соединение по протоколу Playwright через [browserType.connect()](/api/class-browsertype.mdx#browser-type-connect). Если у вас возникают проблемы или вы пытаетесь использовать расширенные функции, вам, вероятно, следует использовать [browserType.connect()](/api/class-browsertype.mdx#browser-type-connect).
 :::
 
+:::warning
+Playwright поддерживает специально подобранный список аргументов для запуска браузера. Если вы запускаете браузер без Playwright и не передаёте в точности те же аргументы, некоторые функции Playwright могут работать некорректно после подключения к браузеру.
+:::
+
 **Использование**
 
 ```js
@@ -113,38 +109,40 @@ const page = defaultContext.pages()[0];
 **Аргументы**
 - `endpointURL` [string] <font size="2">Добавлено в: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-endpoint-url"/><a href="#browser-type-connect-over-cdp-option-endpoint-url" class="list-anchor">#</a>
   
-  Веб-сокет конечная точка CDP или http URL для подключения. Например, `http://localhost:9222/` или `ws://127.0.0.1:9222/devtools/browser/387adf4c-243f-4051-a181-46798f4a46f4`.
+Конечная точка WebSocket CDP или HTTP URL для подключения. Например, `http://localhost:9222/` или `ws://127.0.0.1:9222/devtools/browser/387adf4c-243f-4051-a181-46798f4a46f4`.
+  
+  В качестве альтернативы можно указать имя канала браузера, например `chrome` или `msedge`, чтобы подключиться к браузеру с включённой удалённой отладкой, использующему каталог пользовательских данных по умолчанию. В Linux Playwright использует `CHROME_USER_DATA_DIR`, если эта переменная задана. В противном случае для определения расположения этого каталога последовательно используются `CHROME_CONFIG_HOME`, затем `XDG_CONFIG_HOME`, затем `~/.config`.
 - `options` [Object] *(необязательно)*
+  - `artifactsDir` [string] *(необязательно)* <font size="2">Добавлено в: v1.61</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-artifacts-dir"/><a href="#browser-type-connect-over-cdp-option-artifacts-dir" class="list-anchor">#</a>
+    
+    Если указан, артефакты браузера (например, трассировки и загруженные файлы) сохраняются в этом каталоге.
   - `endpointURL` [string] *(необязательно)* <font size="2">Добавлено в: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-endpoint-url"/><a href="#browser-type-connect-over-cdp-option-endpoint-url" class="list-anchor">#</a>
     
     :::warning[Устарело]
     Вместо этого используйте первый аргумент.
     :::
-
   - `headers` [Object]&lt;[string], [string]&gt; *(необязательно)* <font size="2">Добавлено в: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-headers"/><a href="#browser-type-connect-over-cdp-option-headers" class="list-anchor">#</a>
-
-    Дополнительные HTTP заголовки, которые будут отправлены с запросом на подключение. Необязательно.
-  - `logger` [Logger] *(необязательно)* <font size="2">Добавлено в: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-logger"/><a href="#browser-type-connect-over-cdp-option-logger" class="list-anchor">#</a>
     
-    :::warning[Устарело]
-    Логи, получаемые логгером, неполные. Пожалуйста, используйте трассировку (tracing) вместо этого.
-    :::
-
-    Приёмник (sink) логгера для логирования Playwright. Необязательно.
-
-  - `slowMo` [number] (опционально) <font size="2">Добавлено в: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-slow-mo"/><a href="#browser-type-connect-over-cdp-option-slow-mo" class="list-anchor">#</a>
+    Дополнительные HTTP-заголовки, отправляемые с запросом на подключение. Необязательный параметр.
+  - `isLocal` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.58</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-is-local"/><a href="#browser-type-connect-over-cdp-option-is-local" class="list-anchor">#</a>
     
-    Замедляет операции Playwright на указанное количество миллисекунд. Полезно, чтобы вы могли видеть, что происходит. По умолчанию 0.
+    Сообщает Playwright, что он работает на том же хосте, что и CDP-сервер. Это позволяет включить определённые оптимизации, которые зависят от того, что Playwright и браузер используют одну и ту же файловую систему.
+  - `noDefaults` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-no-defaults"/><a href="#browser-type-connect-over-cdp-option-no-defaults" class="list-anchor">#</a>
+    
+    Если установлено значение `true`, Playwright не будет применять свои стандартные переопределения настроек к существующему контексту браузера по умолчанию. В частности, для [acceptDownloads](/api/class-browser.mdx#browser-new-context-option-accept-downloads) и семейств шрифтов сохраняются настройки браузера, эмуляция фокуса не включается, а параметры эмуляции медиавозможностей (такие как [colorScheme](/api/class-browser.mdx#browser-new-context-option-color-scheme), [reducedMotion](/api/class-browser.mdx#browser-new-context-option-reduced-motion), [forcedColors](/api/class-browser.mdx#browser-new-context-option-forced-colors) и [contrast](/api/class-browser.mdx#browser-new-context-option-contrast)) не применяются. Это полезно при подключении к браузеру, которым пользователь пользуется повседневно, когда такие переопределения могли бы нарушить текущее состояние браузера. На новые контексты, созданные с помощью [browser.newContext()](/api/class-browser.mdx#browser-new-context), этот параметр не влияет. По умолчанию — `false`.
+  - `slowMo` [number] *(необязательно)* <font size="2">Добавлено в: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-slow-mo"/><a href="#browser-type-connect-over-cdp-option-slow-mo" class="list-anchor">#</a>
+    
+    Замедляет операции Playwright на указанное количество миллисекунд. Это полезно, чтобы вы могли видеть, что происходит. По умолчанию — 0.
   - `timeout` [number] *(необязательно)* <font size="2">Добавлено в: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-timeout"/><a href="#browser-type-connect-over-cdp-option-timeout" class="list-anchor">#</a>
     
-    Максимальное время в миллисекундах для ожидания установления соединения. По умолчанию `30000` (30 секунд). Установите `0`, чтобы отключить таймаут.
+    Максимальное время ожидания установления соединения в миллисекундах. По умолчанию — `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут.
 
 **Возвращает**
 - [Promise]&lt;[Browser]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-return"/><a href="#browser-type-connect-over-cdp-return" class="list-anchor">#</a>
 
 ---
 
-### executablePath {#browser-type-executable-path}
+### executablePath {/* #browser-type-executable-path */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserType.executablePath</x-search>
 
@@ -161,7 +159,7 @@ browserType.executablePath();
 
 ---
 
-### launch {#browser-type-launch}
+### launch {/* #browser-type-launch */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserType.launch</x-search>
 
@@ -192,7 +190,10 @@ const browser = await chromium.launch({  // Или 'firefox', или 'webkit'.
     Используйте пользовательские аргументы браузера на свой страх и риск, так как некоторые из них могут нарушить функциональность Playwright.
     :::
     
-    Дополнительные аргументы для передачи экземпляру браузера. Список флагов Chromium можно найти [здесь](https://peter.sh/experiments/chromium-command-line-switches/).
+Дополнительные аргументы для передачи экземпляру браузера. Список флагов Chromium можно найти [здесь](https://peter.sh/experiments/chromium-command-line-switches/).
+  - `artifactsDir` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-artifacts-dir"/><a href="#browser-type-launch-option-artifacts-dir" class="list-anchor">#</a>
+    
+    Если указан, артефакты (трассировки, видео, загрузки, файлы HAR и т. д.) сохраняются в этот каталог. Каталог не очищается при закрытии браузера. Если не указан, используется временный каталог, который очищается при закрытии браузера.
   - `channel` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-channel"/><a href="#browser-type-launch-option-channel" class="list-anchor">#</a>
     
     Канал распространения браузера.
@@ -202,15 +203,7 @@ const browser = await chromium.launch({  // Или 'firefox', или 'webkit'.
     Используйте "chrome", "chrome-beta", "chrome-dev", "chrome-canary", "msedge", "msedge-beta", "msedge-dev" или "msedge-canary", чтобы использовать брендированные [Google Chrome и Microsoft Edge](../browsers.mdx#google-chrome--microsoft-edge).
   - `chromiumSandbox` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-chromium-sandbox"/><a href="#browser-type-launch-option-chromium-sandbox" class="list-anchor">#</a>
     
-    Включить песочницу Chromium. По умолчанию `false`.
-  - `devtools` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-devtools"/><a href="#browser-type-launch-option-devtools" class="list-anchor">#</a>
-    
-    :::warning[Устарело]
-    Используйте [инструменты отладки](../debug.mdx) вместо.
-    :::
-    
-    
-    **Только для Chromium** Указывает, следует ли автоматически открывать панель инструментов разработчика для каждой вкладки. Если эта опция установлена в `true`, опция [headless](/api/class-browsertype.mdx#browser-type-launch-option-headless) будет установлена в `false`.
+Включает изоляцию Chromium в песочнице. По умолчанию — `false`.
   - `downloadsPath` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-downloads-path"/><a href="#browser-type-launch-option-downloads-path" class="list-anchor">#</a>
     
     Если указано, принятые загрузки будут скачиваться в этот каталог. Иначе создаётся временный каталог, который удаляется при закрытии браузера. В любом случае загрузки удаляются при закрытии контекста браузера, в котором они были созданы.
@@ -231,15 +224,12 @@ const browser = await chromium.launch({  // Или 'firefox', или 'webkit'.
     Закрыть процесс браузера при SIGTERM. По умолчанию `true`.
   - `headless` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-headless"/><a href="#browser-type-launch-option-headless" class="list-anchor">#</a>
     
-    Указывает, следует ли запускать браузер в безголовом режиме. Более подробная информация для [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) и [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode). По умолчанию `true`, если опция [devtools](/api/class-browsertype.mdx#browser-type-launch-option-devtools) не установлена в `true`.
+    Указывает, следует ли запускать браузер в безголовом режиме. Более подробная информация для [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) и [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode). По умолчанию — `true`.
   - `ignoreDefaultArgs` [boolean] | [Array]&lt;[string]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-ignore-default-args"/><a href="#browser-type-launch-option-ignore-default-args" class="list-anchor">#</a>
-    
-    Запускать ли браузер в headless-режиме. Подробнее: [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) и [Firefox](https://hacks.mozilla.org/2017/12/using-headless-mode-in-firefox/). По умолчанию `true`, если только опция [devtools](/api/class-browsertype.mdx#browser-type-launch-option-devtools) не равна `true`.
-  - `ignoreDefaultArgs` [boolean] | [Array]&lt;[string]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-ignore-default-args"/><a href="#browser-type-launch-option-ignore-default-args" class="list-anchor">#</a>
-    
-    Если `true`, Playwright не передаёт свои конфигурационные аргументы и использует только те, что указаны в [args](/api/class-browsertype.mdx#browser-type-launch-option-args). Если передан массив, из аргументов по умолчанию будут отфильтрованы указанные. Опция опасная; используйте с осторожностью. По умолчанию `false`.
+
+    При значении `true` Playwright передаёт только аргументы из [args](/api/class-browsertype.mdx#browser-type-launch-option-args). Если передать массив, Playwright исключит перечисленные в нём аргументы по умолчанию. Используйте с осторожностью.
   - `logger` [Logger] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-logger"/><a href="#browser-type-launch-option-logger" class="list-anchor">#</a>
-    
+
     :::warning[Устарело]
     Логи, получаемые логгером, неполные. Пожалуйста, используйте трассировку (tracing) вместо этого.
     :::
@@ -266,7 +256,7 @@ const browser = await chromium.launch({  // Или 'firefox', или 'webkit'.
     Замедляет операции Playwright на указанное количество миллисекунд. Полезно, чтобы вы могли видеть, что происходит.
   - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-timeout"/><a href="#browser-type-launch-option-timeout" class="list-anchor">#</a>
     
-    Максимальное время в миллисекундах для ожидания запуска экземпляра браузера. По умолчанию `30000` (30 секунд). Установите `0`, чтобы отключить таймаут.
+Максимальное время ожидания запуска экземпляра браузера в миллисекундах. По умолчанию — `180000` (3 минуты). Передайте `0`, чтобы отключить тайм-аут.
   - `tracesDir` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-traces-dir"/><a href="#browser-type-launch-option-traces-dir" class="list-anchor">#</a>
     
     Если указано, трассировки сохраняются в этот каталог.
@@ -276,7 +266,7 @@ const browser = await chromium.launch({  // Или 'firefox', или 'webkit'.
 
 ---
 
-### launchPersistentContext {#browser-type-launch-persistent-context}
+### launchPersistentContext {/* #browser-type-launch-persistent-context */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserType.launchPersistentContext</x-search>
 
@@ -316,7 +306,10 @@ await browserType.launchPersistentContext(userDataDir, options);
     Используйте пользовательские аргументы браузера на свой страх и риск, так как некоторые из них могут нарушить функциональность Playwright.
     :::
     
-    Дополнительные аргументы для передачи экземпляру браузера. Список флагов Chromium можно найти [здесь](https://peter.sh/experiments/chromium-command-line-switches/).
+Дополнительные аргументы для передачи экземпляру браузера. Список флагов Chromium можно найти [здесь](https://peter.sh/experiments/chromium-command-line-switches/).
+  - `artifactsDir` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-artifacts-dir"/><a href="#browser-type-launch-persistent-context-option-artifacts-dir" class="list-anchor">#</a>
+    
+    Если указан, артефакты (трассировки, видео, загруженные файлы, HAR-файлы и т. д.) сохраняются в этот каталог. Каталог не очищается при закрытии браузера. Если не указан, используется временный каталог, который очищается при закрытии браузера.
   - `baseURL` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-base-url"/><a href="#browser-type-launch-persistent-context-option-base-url" class="list-anchor">#</a>
     
     При использовании [page.goto()](/api/class-page.mdx#page-goto), [page.route()](/api/class-page.mdx#page-route), [page.waitForURL()](/api/class-page.mdx#page-wait-for-url), [page.waitForRequest()](/api/class-page.mdx#page-wait-for-request) или [page.waitForResponse()](/api/class-page.mdx#page-wait-for-response) учитывается базовый URL, используя конструктор [`URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) для построения соответствующего URL. По умолчанию не установлен. Примеры:
@@ -335,8 +328,8 @@ await browserType.launchPersistentContext(userDataDir, options);
     Используйте "chrome", "chrome-beta", "chrome-dev", "chrome-canary", "msedge", "msedge-beta", "msedge-dev" или "msedge-canary", чтобы использовать брендированные [Google Chrome и Microsoft Edge](../browsers.mdx#google-chrome--microsoft-edge).
   - `chromiumSandbox` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-chromium-sandbox"/><a href="#browser-type-launch-persistent-context-option-chromium-sandbox" class="list-anchor">#</a>
     
-    Включить песочницу Chromium. По умолчанию `false`.
-  - `clientCertificates` [Array]&lt;[Object]&gt; *(необязательно)* <font size="2">Добавлено в: 1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-client-certificates"/><a href="#browser-type-launch-persistent-context-option-client-certificates" class="list-anchor">#</a>
+Включает изоляцию Chromium (sandboxing). По умолчанию — `false`.
+  - `clientCertificates` [Array]&lt;[Object]&gt; *(необязательно)* <font size="2">Добавлено в: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-client-certificates"/><a href="#browser-type-launch-persistent-context-option-client-certificates" class="list-anchor">#</a>
     - `origin` [string]
       
       Точный источник, для которого сертификат действителен. Источник включает протокол `https`, имя хоста и, возможно, порт.
@@ -383,16 +376,8 @@ await browserType.launchPersistentContext(userDataDir, options);
     Эмулирует медиа-функцию `'prefers-contrast'`, поддерживаемые значения: `'no-preference'`, `'more'`. См. [page.emulateMedia()](/api/class-page.mdx#page-emulate-media) для получения дополнительной информации. Передача `null` сбрасывает эмуляцию на системные настройки по умолчанию. По умолчанию `'no-preference'`.
   - `deviceScaleFactor` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-device-scale-factor"/><a href="#browser-type-launch-persistent-context-option-device-scale-factor" class="list-anchor">#</a>
     
-    Укажите коэффициент масштабирования устройства (можно рассматривать как dpr). По умолчанию `1`. Узнайте больше о [эмуляции устройств с коэффициентом масштабирования устройства](../emulation.mdx#devices).
-  - `devtools` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-devtools"/><a href="#browser-type-launch-persistent-context-option-devtools" class="list-anchor">#</a>
-    
-    :::warning[Устарело]
-    Используйте [инструменты отладки](../debug.mdx) вместо.
-    :::
-    
-    
-    **Только для Chromium** Указывает, следует ли автоматически открывать панель инструментов разработчика для каждой вкладки. Если эта опция установлена в `true`, опция [headless](/api/class-browsertype.mdx#browser-type-launch-persistent-context-option-headless) будет установлена в `false`.
-  - `downloadsPath` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-downloads-path"/><a href="#browser-type-launch-persistent-context-option-downloads-path" class="list-anchor">#</a>
+Задаёт коэффициент масштабирования устройства (можно рассматривать как dpr). По умолчанию — `1`. Подробнее об [эмуляции устройств с заданным коэффициентом масштабирования](../emulation.mdx#devices).
+  - `downloadsPath` [string] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-downloads-path"/><a href="#browser-type-launch-persistent-context-option-downloads-path" class="list-anchor">#</a>
     
     Если указано, принятые загрузки загружаются в этот каталог. В противном случае создается временный каталог, который удаляется при закрытии браузера. В любом случае загрузки удаляются, когда закрывается контекст браузера, в котором они были созданы.
   - `env` [Object]&lt;[string], [string] | [number] | [boolean]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-env"/><a href="#browser-type-launch-persistent-context-option-env" class="list-anchor">#</a>
@@ -434,8 +419,8 @@ await browserType.launchPersistentContext(userDataDir, options);
     Указывает, поддерживает ли viewport события касания. По умолчанию false. Узнайте больше о [мобильной эмуляции](../emulation.mdx#devices).
   - `headless` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-headless"/><a href="#browser-type-launch-persistent-context-option-headless" class="list-anchor">#</a>
     
-    Запускать ли браузер в headless-режиме. Подробнее: [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) и [Firefox](https://hacks.mozilla.org/2017/12/using-headless-mode-in-firefox/). По умолчанию `true`, если только опция [devtools](/api/class-browsertype.mdx#browser-type-launch-option-devtools) не равна `true`.
-  - `httpCredentials` [Object] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-http-credentials"/><a href="#browser-type-launch-persistent-context-option-http-credentials" class="list-anchor">#</a>
+Определяет, следует ли запускать браузер в режиме без графического интерфейса (headless). Подробнее см. в документации для [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) и [Firefox](https://hacks.mozilla.org/2017/12/using-headless-mode-in-firefox/). По умолчанию — `true`.
+  - `httpCredentials` [Object] | [Array]&lt;[Object]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-http-credentials"/><a href="#browser-type-launch-persistent-context-option-http-credentials" class="list-anchor">#</a>
     - `username` [string]
       
       
@@ -449,7 +434,9 @@ await browserType.launchPersistentContext(userDataDir, options);
       
       Эта опция применяется только к запросам, отправленным из соответствующего [APIRequestContext], и не влияет на запросы, отправленные из браузера. `'always'` - заголовок `Authorization` с учетными данными базовой аутентификации будет отправлен с каждым API запросом. `'unauthorized` - учетные данные отправляются только при получении ответа 401 (Unauthorized) с заголовком `WWW-Authenticate`. По умолчанию `'unauthorized'`.
     
-    Учетные данные для [HTTP аутентификации](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Если не указан источник, имя пользователя и пароль отправляются на любые серверы при несанкционированных ответах.
+Учётные данные для [HTTP-аутентификации](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Если источник (origin) не указан, имя пользователя и пароль отправляются любым серверам в ответ на сообщения об отсутствии авторизации.
+    
+    Передайте массив, чтобы использовать разные учётные данные для разных источников. Используется первая запись, соответствующая источнику запроса, а записи без указания источника соответствуют любому запросу.
   - `ignoreDefaultArgs` [boolean] | [Array]&lt;[string]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-ignore-default-args"/><a href="#browser-type-launch-persistent-context-option-ignore-default-args" class="list-anchor">#</a>
     
     Если `true`, Playwright не передает свои собственные аргументы конфигурации и использует только те, что из [args](/api/class-browsertype.mdx#browser-type-launch-persistent-context-option-args). Если передан массив, то фильтруются указанные аргументы по умолчанию. Опасная опция; используйте с осторожностью. По умолчанию `false`.
@@ -458,8 +445,8 @@ await browserType.launchPersistentContext(userDataDir, options);
     Указывает, следует ли игнорировать ошибки HTTPS при отправке сетевых запросов. По умолчанию `false`.
   - `isMobile` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-is-mobile"/><a href="#browser-type-launch-persistent-context-option-is-mobile" class="list-anchor">#</a>
     
-    Указывает, учитывается ли тег `meta viewport` и включены ли события касания. isMobile является частью устройства, поэтому вам не нужно устанавливать его вручную. По умолчанию `false` и не поддерживается в Firefox. Узнайте больше о [мобильной эмуляции](../emulation.mdx#ismobile).
-  - `javaScriptEnabled` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-java-script-enabled"/><a href="#browser-type-launch-persistent-context-option-java-script-enabled" class="list-anchor">#</a>
+Определяет, учитывается ли тег `meta viewport` и включены ли сенсорные события. isMobile входит в состав параметров устройства, поэтому задавать его вручную не требуется. По умолчанию — `false`. Подробнее о [мобильной эмуляции](../emulation.mdx#ismobile).
+  - `javaScriptEnabled` [boolean] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-java-script-enabled"/><a href="#browser-type-launch-persistent-context-option-java-script-enabled" class="list-anchor">#</a>
     
     Указывает, следует ли включать JavaScript в контексте. По умолчанию `true`. Узнайте больше о [отключении JavaScript](../emulation.mdx#javascript-enabled).
   - `locale` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-locale"/><a href="#browser-type-launch-persistent-context-option-locale" class="list-anchor">#</a>
@@ -511,11 +498,11 @@ await browserType.launchPersistentContext(userDataDir, options);
       
       Шаблон glob или regex для фильтрации запросов, которые сохраняются в HAR. Когда был предоставлен [baseURL](/api/class-browser.mdx#browser-new-context-option-base-url) через параметры контекста, и переданный URL является путем, он объединяется с помощью конструктора [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL). По умолчанию отсутствует.
     
-    Включает запись [HAR](http://www.softwareishard.com/blog/har-12-spec) для всех страниц в файл `recordHar.path`. Если не указано, HAR не записывается. Убедитесь, что вы ожидаете [browserContext.close()](/api/class-browsercontext.mdx#browser-context-close) для сохранения HAR.
+Включает запись [HAR](http://www.softwareishard.com/blog/har-12-spec) для всех страниц в файл `recordHar.path`. Если параметр не указан, HAR не записывается. Чтобы HAR был сохранён, обязательно дождитесь завершения вызова [browserContext.close()](/api/class-browsercontext.mdx#browser-context-close).
   - `recordVideo` [Object] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-record-video"/><a href="#browser-type-launch-persistent-context-option-record-video" class="list-anchor">#</a>
-    - `dir` [string]
+    - `dir` [string] *(необязательно)*
       
-      Путь к каталогу для сохранения видео.
+      Путь к каталогу для сохранения видео. Если параметр не указан, видео будут сохраняться в `artifactsDir` (см. параметры [browserType.launch()](/api/class-browsertype.mdx#browser-type-launch)).
     - `size` [Object] *(необязательно)*
       - `width` [number]
         
@@ -524,7 +511,37 @@ await browserType.launchPersistentContext(userDataDir, options);
         
         Высота видеофрейма.
       
-      Необязательные размеры записываемых видео. Если не указано, размер будет равен `viewport`, уменьшенному, чтобы вписаться в 800x800. Если `viewport` не настроен явно, размер видео по умолчанию составляет 800x450. Фактическое изображение каждой страницы будет уменьшено, если это необходимо, чтобы соответствовать указанному размеру.
+Необязательные размеры записываемых видео. Если не указаны, размер будет равен `viewport`, уменьшенному с сохранением пропорций так, чтобы он вписывался в 800x800. Если `viewport` не настроен явно, размер видео по умолчанию составляет 800x450. Фактическое изображение каждой страницы при необходимости будет уменьшено, чтобы вписаться в указанный размер.
+    - `fps` [number] *(необязательно)*
+      
+      Частота кадров записываемых видео в кадрах в секунду. По умолчанию — `25`. Firefox и WebKit в настоящее время записывают до 25 кадров в секунду.
+    - `showActions` [Object] *(необязательно)*
+      - `duration` [number] *(необязательно)*
+        
+        Длительность отображения каждой аннотации в миллисекундах. По умолчанию — `500`.
+      - `position` "top-left" | "top" | "top-right" | "bottom-left" | "bottom" | "bottom-right" *(необязательно)*
+        
+        Положение накладываемого заголовка действия. По умолчанию — `"top-right"`.
+      - `fontSize` [number] *(необязательно)*
+        
+        Размер шрифта заголовка действия в пикселях. По умолчанию — `24`. Устарело, используйте вместо этого `style.title`.
+      - `cursor` "none" | "pointer" *(необязательно)*
+        
+        Визуальное оформление курсора, отображаемое для действий с указателем. `"pointer"` (значение по умолчанию) отображает указатель мыши, который анимированно перемещается от точки предыдущего действия к точке следующего. `"none"` отключает визуальное оформление курсора.
+      - `style` [Object] *(необязательно)*
+        - `point` [string] *(необязательно)*
+          
+          CSS-объявления для маркера нулевого размера, центрированного в точке действия. Если не указаны, маркер не отображается.
+        - `highlight` [string] *(необязательно)*
+          
+          CSS-объявления для прямоугольника, покрывающего целевой элемент. Если не указаны, прямоугольник не отображается.
+        - `title` [string] *(необязательно)*
+          
+          CSS-объявления для заголовка действия.
+        
+        Стили визуального оформления действий.
+      
+      Если указано, включает визуальные аннотации на элементах, с которыми выполняется взаимодействие, во время записи видео.
     
     Включает запись видео для всех страниц в каталог `recordVideo.dir`. Если не указано, видео не записываются. Убедитесь, что вы ожидаете [browserContext.close()](/api/class-browsercontext.mdx#browser-context-close) для сохранения видео.
   - `reducedMotion` [null] | "reduce" | "no-preference" *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-reduced-motion"/><a href="#browser-type-launch-persistent-context-option-reduced-motion" class="list-anchor">#</a>
@@ -552,7 +569,7 @@ await browserType.launchPersistentContext(userDataDir, options);
     Если установлено в true, включает строгий режим селекторов для этого контекста. В строгом режиме селекторы, которые подразумевают единственный целевой элемент DOM, будут вызывать ошибку, если совпадает более одного элемента. Эта опция не влияет на любые API Locator (локаторы всегда строгие). По умолчанию `false`. См. [Locator], чтобы узнать больше о строгом режиме.
   - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-timeout"/><a href="#browser-type-launch-persistent-context-option-timeout" class="list-anchor">#</a>
     
-    Максимальное время в миллисекундах для ожидания запуска экземпляра браузера. По умолчанию `30000` (30 секунд). Установите `0`, чтобы отключить таймаут.
+Максимальное время ожидания запуска экземпляра браузера в миллисекундах. По умолчанию — `180000` (3 минуты). Передайте `0`, чтобы отключить тайм-аут.
   - `timezoneId` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-timezone-id"/><a href="#browser-type-launch-persistent-context-option-timezone-id" class="list-anchor">#</a>
     
     Изменяет часовой пояс контекста. См. [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) для списка поддерживаемых идентификаторов часовых поясов. По умолчанию используется системный часовой пояс.
@@ -561,25 +578,7 @@ await browserType.launchPersistentContext(userDataDir, options);
     Если указано, трассировки сохраняются в этот каталог.
   - `userAgent` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-user-agent"/><a href="#browser-type-launch-persistent-context-option-user-agent" class="list-anchor">#</a>
     
-    Конкретный пользовательский агент для использования в этом контексте.
-  - `videoSize` [Object] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-video-size"/><a href="#browser-type-launch-persistent-context-option-video-size" class="list-anchor">#</a>
-    
-    :::warning[Устарело]
-    Используйте [recordVideo](/api/class-browsertype.mdx#browser-type-launch-persistent-context-option-record-video) вместо.
-    :::
-    
-    - `width` [number]
-      
-      Ширина видеофрейма.
-    - `height` [number]
-      
-      Высота видеофрейма.
-  - `videosPath` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-videos-path"/><a href="#browser-type-launch-persistent-context-option-videos-path" class="list-anchor">#</a>
-    
-    :::warning[Устарело]
-    Используйте [recordVideo](/api/class-browsertype.mdx#browser-type-launch-persistent-context-option-record-video) вместо.
-    :::
-    
+Конкретная строка user agent для использования в этом контексте.
   - `viewport` [null] | [Object] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-viewport"/><a href="#browser-type-launch-persistent-context-option-viewport" class="list-anchor">#</a>
     - `width` [number]
       
@@ -600,7 +599,7 @@ await browserType.launchPersistentContext(userDataDir, options);
 
 ---
 
-### launchServer {#browser-type-launch-server}
+### launchServer {/* #browser-type-launch-server */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserType.launchServer</x-search>
 
@@ -632,7 +631,10 @@ const { chromium } = require('playwright');  // Или 'webkit', или 'firefox
     Используйте пользовательские аргументы браузера на свой страх и риск, так как некоторые из них могут нарушить функциональность Playwright.
     :::
     
-    Дополнительные аргументы для передачи экземпляру браузера. Список флагов Chromium можно найти [здесь](https://peter.sh/experiments/chromium-command-line-switches/).
+Дополнительные аргументы для передачи экземпляру браузера. Список флагов Chromium можно найти [здесь](https://peter.sh/experiments/chromium-command-line-switches/).
+  - `artifactsDir` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-artifacts-dir"/><a href="#browser-type-launch-server-option-artifacts-dir" class="list-anchor">#</a>
+    
+    Если указан, артефакты (трассировки, видео, загруженные файлы, HAR-файлы и т. д.) сохраняются в этот каталог. При закрытии браузера каталог не очищается. Если не указан, используется временный каталог, который очищается при закрытии браузера.
   - `channel` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-channel"/><a href="#browser-type-launch-server-option-channel" class="list-anchor">#</a>
     
     Канал распространения браузера.
@@ -642,58 +644,50 @@ const { chromium } = require('playwright');  // Или 'webkit', или 'firefox
     Используйте "chrome", "chrome-beta", "chrome-dev", "chrome-canary", "msedge", "msedge-beta", "msedge-dev" или "msedge-canary", чтобы использовать брендированные [Google Chrome и Microsoft Edge](../browsers.mdx#google-chrome--microsoft-edge).
   - `chromiumSandbox` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-chromium-sandbox"/><a href="#browser-type-launch-server-option-chromium-sandbox" class="list-anchor">#</a>
     
-    Включить песочницу Chromium. По умолчанию `false`.
-  - `devtools` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-devtools"/><a href="#browser-type-launch-server-option-devtools" class="list-anchor">#</a>
-    
-    :::warning[Устарело]
-    Используйте [инструменты отладки](../debug.mdx) вместо.
-    :::
-    
-
-    **Только для Chromium** Указывает, следует ли автоматически открывать панель инструментов разработчика для каждой вкладки. Если эта опция установлена в `true`, опция [headless](/api/class-browsertype.mdx#browser-type-launch-server-option-headless) будет установлена в `false`.
+Включает изоляцию Chromium в песочнице. По умолчанию `false`.
   - `downloadsPath` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-downloads-path"/><a href="#browser-type-launch-server-option-downloads-path" class="list-anchor">#</a>
     
-    Если указано, принятые загрузки загружаются в этот каталог. В противном случае создается временный каталог, который удаляется при закрытии браузера. В любом случае загрузки удаляются, когда закрывается контекст браузера, в котором они были созданы.
-  - `env` [Object]&lt;[string], [string] | [number] | [boolean]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-env"/><a href="#browser-type-launch-server-option-env" class="list-anchor">#</a>
-    
-    Если указано, принятые загрузки будут скачиваться в этот каталог. Иначе создаётся временный каталог, который удаляется при закрытии браузера. В любом случае загрузки удаляются при закрытии контекста браузера, в котором они были созданы.
-  - `env` [Object]&lt;[string], [string] | [undefined]&gt; (опционально)<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-env"/><a href="#browser-type-launch-server-option-env" class="list-anchor">#</a>
+    Если указан, принятые загрузки сохраняются в этом каталоге. В противном случае создаётся временный каталог, который удаляется при закрытии браузера. В любом случае загруженные файлы удаляются при закрытии контекста браузера, в котором они были созданы.
+  - `env` [Object]&lt;[string], [string] | [undefined]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-env"/><a href="#browser-type-launch-server-option-env" class="list-anchor">#</a>
   - `executablePath` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-executable-path"/><a href="#browser-type-launch-server-option-executable-path" class="list-anchor">#</a>
-
-    Пользовательские настройки Firefox. Подробнее о пользовательских настройках Firefox см. в [`about:config`](https://support.mozilla.org/en-US/kb/about-config-editor-firefox).
     
-    Также можно указать путь к пользовательскому файлу [`policies.json`](https://mozilla.github.io/policy-templates/) через переменную окружения `PLAYWRIGHT_FIREFOX_POLICIES_JSON`.
+    Путь к исполняемому файлу браузера, который будет запущен вместо поставляемого в комплекте. Если [executablePath](/api/class-browsertype.mdx#browser-type-launch-server-option-executable-path) — относительный путь, он разрешается относительно текущего рабочего каталога. Обратите внимание, что Playwright работает только с поставляемыми в комплекте Chromium, Firefox или WebKit; другие версии используйте на свой страх и риск.
+  - `firefoxUserPrefs` [Object]&lt;[string], [string] | [number] | [boolean]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-firefox-user-prefs"/><a href="#browser-type-launch-server-option-firefox-user-prefs" class="list-anchor">#</a>
+    
+    Пользовательские настройки Firefox. Подробнее о пользовательских настройках Firefox см. в документации по [`about:config`](https://support.mozilla.org/en-US/kb/about-config-editor-firefox).
+    
+    Вы также можете указать путь к собственному [файлу `policies.json`](https://mozilla.github.io/policy-templates/) с помощью переменной окружения `PLAYWRIGHT_FIREFOX_POLICIES_JSON`.
   - `handleSIGHUP` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-handle-sighup"/><a href="#browser-type-launch-server-option-handle-sighup" class="list-anchor">#</a>
     
-    Закрыть процесс браузера при нажатии Ctrl-C. По умолчанию `true`.
+    Завершает процесс браузера при получении сигнала SIGHUP. По умолчанию `true`.
+  - `handleSIGINT` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-handle-sigint"/><a href="#browser-type-launch-server-option-handle-sigint" class="list-anchor">#</a>
+    
+    Завершает процесс браузера при нажатии Ctrl-C. По умолчанию `true`.
   - `handleSIGTERM` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-handle-sigterm"/><a href="#browser-type-launch-server-option-handle-sigterm" class="list-anchor">#</a>
     
-    Закрыть процесс браузера при SIGTERM. По умолчанию `true`.
+    Завершает процесс браузера при получении сигнала SIGTERM. По умолчанию `true`.
   - `headless` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-headless"/><a href="#browser-type-launch-server-option-headless" class="list-anchor">#</a>
     
-    Указывает, следует ли запускать браузер в безголовом режиме. Более подробная информация для [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) и [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode). По умолчанию `true`, если опция [devtools](/api/class-browsertype.mdx#browser-type-launch-server-option-devtools) не установлена в `true`.
+    Определяет, следует ли запускать браузер в режиме без графического интерфейса (headless). Подробнее см. для [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) и [Firefox](https://hacks.mozilla.org/2017/12/using-headless-mode-in-firefox/). По умолчанию `true`.
   - `host` [string] *(необязательно)* <font size="2">Добавлено в: v1.45</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-host"/><a href="#browser-type-launch-server-option-host" class="list-anchor">#</a>
     
-    Запускать ли браузер в headless-режиме. Подробнее: [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) и [Firefox](https://hacks.mozilla.org/2017/12/using-headless-mode-in-firefox/). По умолчанию `true`, если только опция [devtools](/api/class-browsertype.mdx#browser-type-launch-option-devtools) не равна `true`.
-  - `host` [string] (опционально) <font size="2">Добавлено в: v1.45</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-host"/><a href="#browser-type-launch-server-option-host" class="list-anchor">#</a>
+    Адрес хоста для WebSocket. Параметр необязателен; по умолчанию используется `localhost`, при котором принимаются подключения только через интерфейс обратной петли (loopback). Укажите явный адрес (например, `0.0.0.0`), чтобы принимать подключения из сети. Учтите, что это открывает доступ к RPC браузера любому, кто может подключиться к прослушиваемому порту.
+  - `ignoreDefaultArgs` [boolean] | [Array]&lt;[string]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-ignore-default-args"/><a href="#browser-type-launch-server-option-ignore-default-args" class="list-anchor">#</a>
     
-    Если `true`, Playwright не передает свои собственные аргументы конфигурации и использует только те, что из [args](/api/class-browsertype.mdx#browser-type-launch-server-option-args). Если передан массив, то фильтруются указанные аргументы по умолчанию. Опасная опция; используйте с осторожностью. По умолчанию `false`.
+    Если `true`, Playwright не передаёт собственные аргументы конфигурации и использует только аргументы из [args](/api/class-browsertype.mdx#browser-type-launch-server-option-args). Если передан массив, указанные в нём аргументы исключаются из набора аргументов по умолчанию. Опасный параметр; используйте с осторожностью. По умолчанию `false`.
   - `logger` [Logger] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-logger"/><a href="#browser-type-launch-server-option-logger" class="list-anchor">#</a>
     
-    Логгер для ведения журналов Playwright.
-  - `port` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-port"/><a href="#browser-type-launch-server-option-port" class="list-anchor">#</a>
-    
     :::warning[Устарело]
-    Логи, получаемые логгером, неполные. Пожалуйста, используйте трассировку (tracing) вместо этого.
+    Журналы, получаемые средством журналирования, неполны. Вместо этого используйте трассировку.
     :::
     
     
-    Приёмник (sink) логгера для логирования Playwright.
-    - `port` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-port"/><a href="#browser-type-launch-server-option-port" class="list-anchor">#</a>
-        
-        Порт для веб-сокета. По умолчанию `0`, что означает выбор любого доступного порта.
-    - `proxy` [Object] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-proxy"/><a href="#browser-type-launch-server-option-proxy" class="list-anchor">#</a>
-      - `server` [string]
+    Приёмник сообщений журнала Playwright.
+  - `port` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-port"/><a href="#browser-type-launch-server-option-port" class="list-anchor">#</a>
+    
+    Порт для WebSocket. По умолчанию — 0, что означает выбор любого доступного порта.
+  - `proxy` [Object] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-proxy"/><a href="#browser-type-launch-server-option-proxy" class="list-anchor">#</a>
+    - `server` [string]
       
       Прокси, который будет использоваться для всех запросов. Поддерживаются HTTP и SOCKS прокси, например `http://myproxy.com:3128` или `socks5://myproxy.com:3128`. Краткая форма `myproxy.com:3128` считается HTTP прокси.
     - `bypass` [string] *(необязательно)*
@@ -709,7 +703,7 @@ const { chromium } = require('playwright');  // Или 'webkit', или 'firefox
     Настройки сетевого прокси.
   - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-timeout"/><a href="#browser-type-launch-server-option-timeout" class="list-anchor">#</a>
     
-    Максимальное время в миллисекундах для ожидания запуска экземпляра браузера. По умолчанию `30000` (30 секунд). Установите `0`, чтобы отключить таймаут.
+Максимальное время ожидания запуска экземпляра браузера в миллисекундах. По умолчанию — `180000` (3 минуты). Передайте `0`, чтобы отключить тайм-аут.
   - `tracesDir` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-traces-dir"/><a href="#browser-type-launch-server-option-traces-dir" class="list-anchor">#</a>
     
     Если указано, трассировки сохраняются в этот каталог.
@@ -727,7 +721,7 @@ const { chromium } = require('playwright');  // Или 'webkit', или 'firefox
 
 ---
 
-### name {#browser-type-name}
+### name {/* #browser-type-name */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browserType.name</x-search>
 
@@ -743,11 +737,6 @@ browserType.name();
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-name-return"/><a href="#browser-type-name-return" class="list-anchor">#</a>
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -760,10 +749,11 @@ browserType.name();
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -782,6 +772,7 @@ browserType.name();
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -789,9 +780,18 @@ browserType.name();
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -809,6 +809,7 @@ browserType.name();
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -821,6 +822,7 @@ browserType.name();
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -842,6 +844,7 @@ browserType.name();
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

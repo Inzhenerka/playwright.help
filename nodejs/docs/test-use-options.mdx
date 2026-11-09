@@ -66,9 +66,12 @@ export default defineConfig({
 | Option | Description |
 | :- | :- |
 | [testOptions.colorScheme](/api/class-testoptions.mdx#test-options-color-scheme) | [Emulates](./emulation.mdx#color-scheme-and-media) `'prefers-colors-scheme'` media feature, supported values are `'light'` and `'dark'` |
+| [testOptions.contrast](/api/class-testoptions.mdx#test-options-contrast) | [Emulates](./emulation.mdx#color-scheme-and-media) `'prefers-contrast'` media feature, supported values are `'no-preference'` and `'more'` |
+| [testOptions.forcedColors](/api/class-testoptions.mdx#test-options-forced-colors) | [Emulates](./emulation.mdx#color-scheme-and-media) `'forced-colors'` media feature, supported values are `'active'` and `'none'` |
 | [testOptions.geolocation](/api/class-testoptions.mdx#test-options-geolocation) | Context [geolocation](./emulation.mdx#geolocation). |
 | [testOptions.locale](/api/class-testoptions.mdx#test-options-locale) | [Emulates](./emulation.mdx#locale--timezone) the user locale, for example `en-GB`, `de-DE`, etc. |
 | [testOptions.permissions](/api/class-testoptions.mdx#test-options-permissions) | A list of [permissions](./emulation.mdx#permissions) to grant to all pages in the context. |
+| [testOptions.reducedMotion](/api/class-testoptions.mdx#test-options-reduced-motion) | [Emulates](./emulation.mdx#color-scheme-and-media) `'prefers-reduced-motion'` media feature, supported values are `'reduce'` and `'no-preference'` |
 | [testOptions.timezoneId](/api/class-testoptions.mdx#test-options-timezone-id) | Changes the [timezone](./emulation.mdx#locale--timezone) of the context. |
 | [testOptions.viewport](/api/class-testoptions.mdx#test-options-viewport) | [Viewport](./emulation.mdx#viewport) used for all pages in the context. |
 
@@ -113,11 +116,13 @@ export default defineConfig({
 | Option | Description |
 | :- | :- |
 | [testOptions.acceptDownloads](/api/class-testoptions.mdx#test-options-accept-downloads) | Whether to automatically download all the attachments, defaults to `true`. [Learn more](./downloads.mdx) about working with downloads. |
+| [testOptions.clientCertificates](/api/class-testoptions.mdx#test-options-client-certificates) | TLS Client Authentication allows the server to request a client certificate and verify it. |
 | [testOptions.extraHTTPHeaders](/api/class-testoptions.mdx#test-options-extra-http-headers) | An object containing additional HTTP headers to be sent with every request. All header values must be strings. |
 | [testOptions.httpCredentials](/api/class-testoptions.mdx#test-options-http-credentials) | Credentials for [HTTP authentication](./network.mdx#http-authentication). |
 | [testOptions.ignoreHTTPSErrors](/api/class-testoptions.mdx#test-options-ignore-https-errors) | Whether to ignore HTTPS errors during navigation. |
 | [testOptions.offline](/api/class-testoptions.mdx#test-options-offline) | Whether to emulate network being offline. |
 | [testOptions.proxy](/api/class-testoptions.mdx#test-options-proxy) | [Proxy settings](./network.mdx#http-proxy) used for all pages in the test. |
+| [testOptions.serviceWorkers](/api/class-testoptions.mdx#test-options-service-workers) | Whether to allow sites to register Service workers, defaults to `'allow'`. [Learn more](./network.mdx#missing-network-events-and-service-workers) about Service Workers and network mocking. |
 
 :::note
 
@@ -152,6 +157,58 @@ export default defineConfig({
 | [testOptions.screenshot](/api/class-testoptions.mdx#test-options-screenshot) | Capture [screenshots](./screenshots.mdx) of your test. Options include `'off'`, `'on'` and `'only-on-failure'` |
 | [testOptions.trace](/api/class-testoptions.mdx#test-options-trace) | Playwright can produce test traces while running the tests. Later on, you can view the trace and get detailed information about Playwright execution by opening [Trace Viewer](./trace-viewer.mdx). Options include: `'off'`, `'on'`, `'retain-on-failure'` and `'on-first-retry'`  |
 | [testOptions.video](/api/class-testoptions.mdx#test-options-video) | Playwright can record [videos](./videos.mdx) for your tests. Options include: `'off'`, `'on'`, `'retain-on-failure'` and `'on-first-retry'` |
+
+#### Trace modes
+
+The `trace` option supports several modes that differ in **which runs are recorded** and **which recordings are kept** after the test finishes. The initial run of a test is the "first run"; subsequent runs caused by [retries](./test-retries.mdx) are "retries".
+
+| Mode | Records a trace on | Keeps the trace when |
+| :- | :- | :- |
+| `'off'` | never | — |
+| `'on'` | every run | always |
+| `'retain-on-failure'` | every run | that run failed |
+| `'retain-on-first-failure'` | first run only | the first run failed |
+| `'retain-on-failure-and-retries'` | every run | that run failed, or it is a retry |
+| `'on-first-retry'` | first retry only | always |
+| `'on-all-retries'` | every retry | always |
+
+The following table shows which traces are kept in a few common scenarios, assuming `retries: 2` is configured:
+
+| Mode | Passes on first run | Fails, then passes on retry | Fails on every run |
+| :- | :- | :- | :- |
+| `'off'` | — | — | — |
+| `'on'` | first run | first run + retry | all three runs |
+| `'retain-on-failure'` | — | first run | all three runs |
+| `'retain-on-first-failure'` | — | first run | first run |
+| `'retain-on-failure-and-retries'` | — | first run + retry | all three runs |
+| `'on-first-retry'` | — | first retry | first retry |
+| `'on-all-retries'` | — | first retry | both retries |
+
+#### Video modes
+
+The `video` option supports the same set of modes as `trace`, and they record and keep recordings using the same rules.
+
+| Mode | Records a video on | Keeps the video when |
+| :- | :- | :- |
+| `'off'` | never | — |
+| `'on'` | every run | always |
+| `'retain-on-failure'` | every run | that run failed |
+| `'retain-on-first-failure'` | first run only | the first run failed |
+| `'retain-on-failure-and-retries'` | every run | that run failed, or it is a retry |
+| `'on-first-retry'` | first retry only | always |
+| `'on-all-retries'` | every retry | always |
+
+The following table shows which videos are kept in a few common scenarios, assuming `retries: 2` is configured:
+
+| Mode | Passes on first run | Fails, then passes on retry | Fails on every run |
+| :- | :- | :- | :- |
+| `'off'` | — | — | — |
+| `'on'` | first run | first run + retry | all three runs |
+| `'retain-on-failure'` | — | first run | all three runs |
+| `'retain-on-first-failure'` | — | first run | first run |
+| `'retain-on-failure-and-retries'` | — | first run + retry | all three runs |
+| `'on-first-retry'` | — | first retry | first retry |
+| `'on-all-retries'` | — | first retry | both retries |
 
 ### Other Options
 
@@ -188,6 +245,7 @@ export default defineConfig({
 | [testOptions.bypassCSP](/api/class-testoptions.mdx#test-options-bypass-csp) |Toggles bypassing Content-Security-Policy. Useful when CSP includes the production origin. Defaults to `false`. |
 | [testOptions.channel](/api/class-testoptions.mdx#test-options-channel) | Browser channel to use. [Learn more](./browsers.mdx) about different browsers and channels. |
 | [testOptions.headless](/api/class-testoptions.mdx#test-options-headless) | Whether to run the browser in headless mode meaning no browser is shown when running tests. Defaults to `true`. |
+| [testOptions.navigationTimeout](/api/class-testoptions.mdx#test-options-navigation-timeout) | Timeout for each navigation action in milliseconds. Defaults to `0` (no timeout). Learn more about [timeouts](./test-timeouts.mdx). |
 | [testOptions.testIdAttribute](/api/class-testoptions.mdx#test-options-test-id-attribute) | Changes the default [`data-testid` attribute](./locators.mdx#locate-by-test-id) used by Playwright locators. |
 
 ### More browser and context options
@@ -210,7 +268,7 @@ However, most common ones like `headless` or `viewport` are available directly i
 
 ### Explicit Context Creation and Option Inheritance
 
-If using the built-in `browser` fixture, calling [browser.newContext()](/api/class-browser.mdx#browser-new-context) will create a context with options inherited from the config:
+While a test or hook runs, every browser context created through the Playwright instance used by the test runner inherits context options from the `use` section.  This includes contexts created with the built-in `browser` fixture, a separately launched browser, [browserType.launchPersistentContext()](/api/class-browsertype.mdx#browser-type-launch-persistent-context), or a direct `playwright-core` import that resolves to the same instance.  Explicit context options take precedence:
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -348,11 +406,6 @@ test('no base url', async ({ page }) => {
 ```
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -365,10 +418,11 @@ test('no base url', async ({ page }) => {
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -387,6 +441,7 @@ test('no base url', async ({ page }) => {
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -394,9 +449,18 @@ test('no base url', async ({ page }) => {
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -414,6 +478,7 @@ test('no base url', async ({ page }) => {
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -426,6 +491,7 @@ test('no base url', async ({ page }) => {
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -447,6 +513,7 @@ test('no base url', async ({ page }) => {
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"

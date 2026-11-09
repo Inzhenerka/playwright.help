@@ -24,9 +24,57 @@ Playwright Test поставляется с предустановленными
 
 ---
 
-## Свойства {#properties}
+## Методы
 
-### browser {#fixtures-browser}
+### mount {/* #fixtures-mount */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.62</font><x-search>fixtures.mount</x-search>
+
+Монтирует историю компонента и возвращает [Locator], указывающий на корневой элемент, в который была отрисована история. Ограничивайте область поиска возвращённым локатором: `component.getByRole('button')`, а не `page.getByRole('button')`.
+
+**История** — это небольшой компонент-обёртка, который встраивает тестируемый компонент в один конкретный сценарий: с фиксированными пропсами, имитационными данными, провайдерами и регистрацией вызовов обратного вызова. Истории отрисовываются на странице **галереи**, которую вы реализуете и предоставляете по адресу [testOptions.baseURL](/api/class-testoptions.mdx#test-options-base-url). Галерея предоставляет функции `window.mount(params)` и `window.unmount()`, которые отрисовывают историю в её корневом элементе и удаляют её из него. Каждый вызов [fixtures.mount()](/api/class-fixtures.mdx#fixtures-mount) выполняет переход по адресу [testOptions.baseURL](/api/class-testoptions.mdx#test-options-base-url) и вызывает `window.mount()` с идентификатором истории и пропсами, поэтому тесты полностью изолированы друг от друга.
+
+**Использование**
+
+```js
+test('click should expand', async ({ mount }) => {
+  const component = await mount('components/Expandable/Stateful');
+  await component.getByRole('button').click();
+  await expect(component.getByTestId('expanded')).toHaveValue('true');
+});
+```
+
+Передайте тип истории в качестве аргумента типа, чтобы проверять типы пропсов:
+
+```js
+import type { WithTitle } from './Button.story';
+
+test('renders the title', async ({ mount }) => {
+  const component = await mount<typeof WithTitle>('Button/WithTitle', { title: 'Hello' });
+  await expect(component).toContainText('Hello');
+});
+```
+
+Возвращаемый локатор дополнен двумя методами:
+* `update(props)` — повторно отрисовывает ту же историю с новыми пропсами без повторного монтирования, сохраняя состояние компонента;
+* `unmount()` — размонтирует историю.
+
+**Аргументы**
+- `storyId` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="fixtures-mount-option-story-id"/><a href="#fixtures-mount-option-story-id" class="list-anchor">#</a>
+  
+  Идентификатор истории для монтирования, который разрешается страницей галереи. По соглашению состоит из пути к файлу истории и имени экспортируемой истории, например `'components/Button/Primary'`.
+- `props` [Object] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="fixtures-mount-option-props"/><a href="#fixtures-mount-option-props" class="list-anchor">#</a>
+  
+  Необязательные пропсы, передаваемые истории в виде обычного сериализуемого объекта.
+
+**Возвращает**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="fixtures-mount-return"/><a href="#fixtures-mount-return" class="list-anchor">#</a>
+
+---
+
+## Свойства
+
+### browser {/* #fixtures-browser */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>fixtures.browser</x-search>
 
@@ -48,7 +96,7 @@ test.beforeAll(async ({ browser }) => {
 
 ---
 
-### browserName {#fixtures-browser-name}
+### browserName {/* #fixtures-browser-name */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>fixtures.browserName</x-search>
 
@@ -68,7 +116,7 @@ test('skip this test in Firefox', async ({ page, browserName }) => {
 
 ---
 
-### context {#fixtures-context}
+### context {/* #fixtures-context */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>fixtures.context</x-search>
 
@@ -92,7 +140,7 @@ test('example test', async ({ page, context }) => {
 
 ---
 
-### page {#fixtures-page}
+### page {/* #fixtures-page */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>fixtures.page</x-search>
 
@@ -119,7 +167,7 @@ test('basic test', async ({ page }) => {
 
 ---
 
-### request {#fixtures-request}
+### request {/* #fixtures-request */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>fixtures.request</x-search>
 
@@ -144,11 +192,6 @@ test('basic test', async ({ request }) => {
 **Тип**
 - [APIRequestContext]
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -161,10 +204,11 @@ test('basic test', async ({ request }) => {
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -183,6 +227,7 @@ test('basic test', async ({ request }) => {
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -190,9 +235,18 @@ test('basic test', async ({ request }) => {
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -210,6 +264,7 @@ test('basic test', async ({ request }) => {
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -222,6 +277,7 @@ test('basic test', async ({ request }) => {
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -243,6 +299,7 @@ test('basic test', async ({ request }) => {
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги изображений]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"

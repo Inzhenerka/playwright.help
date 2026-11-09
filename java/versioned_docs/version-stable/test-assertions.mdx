@@ -6,7 +6,21 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Список утверждений {#list-of-assertions}
+## Введение
+
+Playwright включает специализированные для веба проверки, которые автоматически повторяются до тех пор, пока не будет выполнено ожидаемое условие. Рассмотрим следующий пример:
+
+```java
+assertThat(page.getByTestId("status")).hasText("Submitted");
+```
+
+Playwright будет повторно проверять элемент с тестовым идентификатором `status`, пока его текст не станет равен `"Submitted"`. Он будет заново находить элемент и проверять его до тех пор, пока условие не будет выполнено или не истечёт время ожидания.
+
+По умолчанию время ожидания для проверок составляет 5 секунд.
+
+## Автоматически повторяемые проверки
+
+Следующие проверки будут повторяться до тех пор, пока проверка не пройдёт успешно или не истечёт отведённое для неё время ожидания.
 
 | Утверждение | Описание |
 | :- | :- |
@@ -39,6 +53,29 @@ import HTMLCard from '@site/src/components/HTMLCard';
 | [assertThat(page).hasURL()](/api/class-pageassertions.mdx#page-assertions-to-have-url) | У страницы есть URL |
 | [assertThat(response).isOK()](/api/class-apiresponseassertions.mdx#api-response-assertions-to-be-ok) | Ответ имеет статус OK |
 
+## Настройка пользовательского тайм-аута
+
+Вы можете задать пользовательский тайм-аут для проверок как глобально, так и для каждой проверки отдельно. Тайм-аут по умолчанию составляет 5 секунд.
+
+### Глобальный тайм-аут
+
+```java
+import com.microsoft.playwright.assertions.PlaywrightAssertions;
+
+PlaywrightAssertions.setDefaultAssertionTimeout(10_000);
+```
+
+### Тайм-аут для отдельной проверки
+
+```java
+import com.microsoft.playwright.assertions.LocatorAssertions;
+
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
+assertThat(page.getByText("Name")).isVisible(
+    new LocatorAssertions.IsVisibleOptions().setTimeout(10_000));
+```
+
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
@@ -50,6 +87,8 @@ import HTMLCard from '@site/src/components/HTMLCard';
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -71,15 +110,18 @@ import HTMLCard from '@site/src/components/HTMLCard';
 [RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -92,6 +134,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[BiConsumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html "BiConsumer"
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
@@ -99,6 +142,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[Integer]: https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html "Integer"
 [long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"

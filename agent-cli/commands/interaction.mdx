@@ -1,0 +1,139 @@
+---
+title: "Взаимодействие"
+---
+
+# Взаимодействие
+
+## Команды
+
+| Команда | Описание |
+|---------|-------------|
+| `click <target> [button]` | Нажать на элемент кнопкой мыши (`left`, `right` или `middle`) |
+| `dblclick <target> [button]` | Дважды нажать на элемент |
+| `fill <target> <text>` | Очистить поле ввода и заполнить его текстом |
+| `type <text>` | Ввести текст в элемент, находящийся в фокусе |
+| `select <target> <value>` | Выбрать вариант в раскрывающемся списке |
+| `check <target>` / `uncheck <target>` | Установить или снять флажок либо переключатель |
+| `hover <target>` | Навести указатель мыши на элемент |
+| `drag <startTarget> <endTarget>` | Выполнить перетаскивание между двумя элементами |
+| `drop <target>` | Перетащить файлы или данные на элемент извне страницы |
+| `upload <files...>` | Загрузить один или несколько файлов |
+| `resize <width> <height>` | Изменить размер окна браузера |
+
+## Выбор целевых элементов
+
+### Идентификаторы элементов из снимков (рекомендуется)
+
+```bash
+playwright-cli snapshot                 # получить идентификаторы элементов
+playwright-cli click e15                # нажать по идентификатору
+playwright-cli fill e3 "hello"          # заполнить по идентификатору
+```
+
+На большой странице `find` находит элемент без создания снимка всего дерева:
+
+```bash
+playwright-cli find "Add to cart"
+# - button "Add to cart" [ref=e42]
+playwright-cli click e42
+```
+
+### CSS-селекторы
+
+```bash
+playwright-cli click "#main > button.submit"
+playwright-cli click "[data-testid='submit']"
+playwright-cli fill "#email" "test@example.com"
+```
+
+### Локаторы Playwright
+
+```bash
+playwright-cli click "getByRole('button', { name: 'Submit' })"
+playwright-cli click "getByTestId('submit-button')"
+playwright-cli click "getByText('Login')"
+playwright-cli fill "getByLabel('Email')" "test@example.com"
+```
+
+## Нажатия
+
+```bash
+playwright-cli click e15                       # нажатие левой кнопкой мыши
+playwright-cli click e15 right                 # нажатие правой кнопкой мыши (контекстное меню)
+playwright-cli click e15 middle                # нажатие средней кнопкой мыши
+playwright-cli dblclick e15                    # двойное нажатие
+
+# удерживать клавиши-модификаторы: Alt, Control, ControlOrMeta, Meta, Shift
+playwright-cli click e15 --modifiers=Shift
+playwright-cli click e15 --modifiers=ControlOrMeta --modifiers=Shift
+```
+
+Параметр `--modifiers` можно указывать несколько раз — по одному разу для каждой клавиши.
+
+## Взаимодействие с формами
+
+```bash
+# Заполнить текстовое поле
+playwright-cli fill e3 "test@example.com"
+
+# Заполнить и отправить (после заполнения нажимается Enter)
+playwright-cli fill e3 "search query" --submit
+
+# Ввести текст в текущий элемент в фокусе, при необходимости отправив форму
+playwright-cli type "search query"
+playwright-cli type "search query" --submit
+
+# Выбрать вариант в раскрывающемся списке
+playwright-cli select e7 "United States"
+
+# Флажки
+playwright-cli check e10                # установить флажок
+playwright-cli uncheck e10              # снять флажок
+
+# Загрузить файлы через поле загрузки файлов или диалог выбора файлов
+playwright-cli upload /path/to/file.pdf
+playwright-cli upload /path/to/a.pdf /path/to/b.pdf
+
+# Изменить размер окна браузера
+playwright-cli resize 375 812           # область просмотра мобильного устройства
+playwright-cli resize 1920 1080         # настольный компьютер
+```
+
+## Перетаскивание
+
+`drag` перемещает один элемент страницы на другой. `drop` имитирует перетаскивание,
+начатое *за пределами* страницы — например, файла с рабочего стола или текста из другого приложения.
+
+```bash
+# изменить порядок элементов на странице
+playwright-cli drag e2 e8
+
+# перетащить файлы в область перетаскивания
+playwright-cli drop e4 --path=/abs/path/to/image.png
+playwright-cli drop e4 --path=/abs/path/a.png --path=/abs/path/b.png
+
+# перетащить данные с указанным типом
+playwright-cli drop e4 --data="text/plain=hello world"
+playwright-cli drop e4 --data='application/json={"id":1}'
+```
+
+Параметры `--path` и `--data` можно указывать несколько раз. Пути должны быть абсолютными; значения `--data` задаются
+в формате `mime/type=value`.
+
+## Пример рабочего процесса: форма входа
+
+```bash
+$ playwright-cli snapshot
+# - textbox "Email" [ref=e3]
+# - textbox "Password" [ref=e5]
+# - checkbox "Remember me" [ref=e7]
+# - button "Sign in" [ref=e9]
+
+$ playwright-cli fill e3 "alice@example.com"
+$ playwright-cli fill e5 "s3cureP@ss!"
+$ playwright-cli check e7
+$ playwright-cli click e9
+
+$ playwright-cli snapshot
+# - heading "Welcome back, Alice!" [level=1]
+```

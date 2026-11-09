@@ -59,7 +59,41 @@ asyncio.run(main())
 
 ## Методы {#methods}
 
-### close {#browser-close}
+### bind {/* #browser-bind */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>browser.bind</x-search>
+
+Привязывает браузер к именованному каналу или веб-сокету, делая его доступным для подключения других клиентов.
+
+**Использование**
+
+```python
+browser.bind(title)
+browser.bind(title, **kwargs)
+```
+
+**Аргументы**
+- `title` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-bind-option-title"/><a href="#browser-bind-option-title" class="list-anchor">#</a>
+  
+  Название сервера браузера, используемое для идентификации.
+- `host` [str] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-bind-option-host"/><a href="#browser-bind-option-host" class="list-anchor">#</a>
+  
+  Хост, к которому привязывается сервер веб-сокетов. Если указан, вместо именованного канала создаётся сервер веб-сокетов.
+- `port` [int] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-bind-option-port"/><a href="#browser-bind-option-port" class="list-anchor">#</a>
+  
+  Порт, к которому привязывается сервер веб-сокетов. Если указан, вместо именованного канала создаётся сервер веб-сокетов. Используйте `0`, чтобы ОС выбрала доступный порт.
+- `workspace_dir` [str] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-bind-option-workspace-dir"/><a href="#browser-bind-option-workspace-dir" class="list-anchor">#</a>
+  
+  Рабочий каталог, связанный с этим сервером браузера.
+
+**Возвращает**
+- [Dict]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-bind-return"/><a href="#browser-bind-return" class="list-anchor">#</a>
+  - `endpoint` [str]
+    
+    
+---
+
+### close {/* #browser-close */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browser.close</x-search>
 
@@ -91,7 +125,7 @@ browser.close(**kwargs)
 
 ---
 
-### new_browser_cdp_session {#browser-new-browser-cdp-session}
+### new_browser_cdp_session {/* #browser-new-browser-cdp-session */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.11</font><x-search>browser.new_browser_cdp_session</x-search>
 
@@ -113,7 +147,7 @@ browser.new_browser_cdp_session()
 
 ---
 
-### new_context {#browser-new-context}
+### new_context {/* #browser-new-context */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browser.new_context</x-search>
 
@@ -180,8 +214,8 @@ await browser.close()
   * baseURL: `http://localhost:3000/foo` (без завершающего слэша) и переход на `./bar.html` приводит к `http://localhost:3000/bar.html`
 - `bypass_csp` [bool] (опционально)<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-bypass-csp"/><a href="#browser-new-context-option-bypass-csp" class="list-anchor">#</a>
   
-  Переключает обход политики безопасности контента страницы. По умолчанию `false`.
-- `client_certificates` [List]\[[Dict]\] (опционально) <font size="2">Добавлено в: 1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-client-certificates"/><a href="#browser-new-context-option-client-certificates" class="list-anchor">#</a>
+Включает или отключает обход политики Content-Security-Policy страницы. По умолчанию — `false`.
+- `client_certificates` [List]\[[Dict]\] *(необязательно)* <font size="2">Добавлено в: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-client-certificates"/><a href="#browser-new-context-option-client-certificates" class="list-anchor">#</a>
   - `origin` [str]
     
     Точный источник, для которого сертификат действителен. Источник включает протокол `https`, имя хоста и, возможно, порт.
@@ -247,8 +281,8 @@ await browser.close()
     Неотрицательное значение точности. По умолчанию `0`.
 - `has_touch` [bool] (опционально)<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-has-touch"/><a href="#browser-new-context-option-has-touch" class="list-anchor">#</a>
   
-  Указывает, поддерживает ли видовая область сенсорные события. По умолчанию false. Узнайте больше о [мобильной эмуляции](../emulation.mdx#devices).
-- `http_credentials` [Dict] (опционально)<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-http-credentials"/><a href="#browser-new-context-option-http-credentials" class="list-anchor">#</a>
+Указывает, поддерживает ли область просмотра сенсорные события. По умолчанию — false. Подробнее об [эмуляции мобильных устройств](../emulation.mdx#devices).
+- `http_credentials` [Dict] | [List]\[[Dict]\] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-http-credentials"/><a href="#browser-new-context-option-http-credentials" class="list-anchor">#</a>
   - `username` [str]
     
     
@@ -262,14 +296,16 @@ await browser.close()
     
     Этот параметр применяется только к запросам, отправленным из соответствующего [APIRequestContext], и не влияет на запросы, отправленные из браузера. `'always'` - заголовок `Authorization` с учетными данными базовой аутентификации будет отправляться с каждым API-запросом. `'unauthorized` - учетные данные отправляются только при получении ответа 401 (Unauthorized) с заголовком `WWW-Authenticate`. По умолчанию `'unauthorized'`.
   
-  Учетные данные для [HTTP-аутентификации](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Если источник не указан, имя пользователя и пароль отправляются на любые серверы при получении неавторизованных ответов.
-- `ignore_https_errors` [bool] (опционально)<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-ignore-https-errors"/><a href="#browser-new-context-option-ignore-https-errors" class="list-anchor">#</a>
+Учётные данные для [HTTP-аутентификации](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Если источник (origin) не указан, имя пользователя и пароль отправляются любым серверам в ответ на сообщения об отсутствии авторизации.
+  
+  Передайте массив, чтобы использовать разные учётные данные для разных источников. Используется первая запись, соответствующая источнику запроса, а записи без указания источника соответствуют любому запросу.
+- `ignore_https_errors` [bool] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-ignore-https-errors"/><a href="#browser-new-context-option-ignore-https-errors" class="list-anchor">#</a>
   
   Игнорировать ли ошибки HTTPS при отправке сетевых запросов. По умолчанию `false`.
 - `is_mobile` [bool] (опционально)<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-is-mobile"/><a href="#browser-new-context-option-is-mobile" class="list-anchor">#</a>
   
-  Учитывается ли тег `meta viewport` и включены ли сенсорные события. isMobile является частью устройства, поэтому вам не нужно устанавливать его вручную. По умолчанию `false` и не поддерживается в Firefox. Узнайте больше о [мобильной эмуляции](../emulation.mdx#ismobile).
-- `java_script_enabled` [bool] (опционально)<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-java-script-enabled"/><a href="#browser-new-context-option-java-script-enabled" class="list-anchor">#</a>
+Определяет, учитывается ли тег `meta viewport` и включены ли сенсорные события. Параметр isMobile входит в настройки устройства, поэтому задавать его вручную не требуется. По умолчанию — `false`. Подробнее об [эмуляции мобильных устройств](../emulation.mdx#ismobile).
+- `java_script_enabled` [bool] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-java-script-enabled"/><a href="#browser-new-context-option-java-script-enabled" class="list-anchor">#</a>
   
   Включать ли JavaScript в контексте. По умолчанию `true`. Узнайте больше о [отключении JavaScript](../emulation.mdx#javascript-enabled).
 - `locale` [str] (опционально)<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-locale"/><a href="#browser-new-context-option-locale" class="list-anchor">#</a>
@@ -314,8 +350,11 @@ await browser.close()
 - `record_har_url_filter` [str] | [Pattern] (опционально)<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-record-har-url-filter"/><a href="#browser-new-context-option-record-har-url-filter" class="list-anchor">#</a>
 - `record_video_dir` [Union]\[[str], [pathlib.Path]\] (опционально)<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-record-video-dir"/><a href="#browser-new-context-option-record-video-dir" class="list-anchor">#</a>
   
-  Включает запись видео для всех страниц в указанную директорию. Если не указано, видео не записываются. Убедитесь, что вызвали [browser_context.close()](/api/class-browsercontext.mdx#browser-context-close), чтобы видео были сохранены.
-- `record_video_size` [Dict] (опционально)<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-record-video-size"/><a href="#browser-new-context-option-record-video-size" class="list-anchor">#</a>
+Включает запись видео для всех страниц в указанный каталог. Если параметр не указан, видео не записывается. Обязательно вызовите [browser_context.close()](/api/class-browsercontext.mdx#browser-context-close), чтобы видео были сохранены.
+- `record_video_fps` [int] *(необязательно)* <font size="2">Добавлено в: v1.64</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-record-video-fps"/><a href="#browser-new-context-option-record-video-fps" class="list-anchor">#</a>
+  
+  Частота кадров записываемых видео в кадрах в секунду. По умолчанию — `25`. Firefox и WebKit в настоящее время поддерживают запись с частотой до 25 кадров в секунду.
+- `record_video_size` [Dict] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-record-video-size"/><a href="#browser-new-context-option-record-video-size" class="list-anchor">#</a>
   - `width` [int]
     
     Ширина кадра видео.
@@ -410,7 +449,7 @@ await browser.close()
 
 ---
 
-### new_page {#browser-new-page}
+### new_page {/* #browser-new-page */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browser.new_page</x-search>
 
@@ -437,8 +476,8 @@ browser.new_page(**kwargs)
   * baseURL: `http://localhost:3000/foo` (без завершающего слэша) и переход на `./bar.html` приводит к `http://localhost:3000/bar.html`
 - `bypass_csp` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-bypass-csp"/><a href="#browser-new-page-option-bypass-csp" class="list-anchor">#</a>
   
-  Переключает обход политики безопасности контента страницы. По умолчанию `false`.
-- `client_certificates` [List]\[[Dict]\] *(опционально)* <font size="2">Добавлено в: 1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-client-certificates"/><a href="#browser-new-page-option-client-certificates" class="list-anchor">#</a>
+Включает или отключает обход политики Content-Security-Policy страницы. По умолчанию — `false`.
+- `client_certificates` [List]\[[Dict]\] *(необязательно)* <font size="2">Добавлено в: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-client-certificates"/><a href="#browser-new-page-option-client-certificates" class="list-anchor">#</a>
   - `origin` [str]
     
     Точный источник, для которого сертификат действителен. Источник включает протокол `https`, имя хоста и, возможно, порт.
@@ -504,8 +543,8 @@ browser.new_page(**kwargs)
     Неотрицательное значение точности. По умолчанию `0`.
 - `has_touch` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-has-touch"/><a href="#browser-new-page-option-has-touch" class="list-anchor">#</a>
   
-  Указывает, поддерживает ли видовая область сенсорные события. По умолчанию false. Узнайте больше о [мобильной эмуляции](../emulation.mdx#devices).
-- `http_credentials` [Dict] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-http-credentials"/><a href="#browser-new-page-option-http-credentials" class="list-anchor">#</a>
+Указывает, поддерживает ли область просмотра события касания. По умолчанию — false. Подробнее об [эмуляции мобильных устройств](../emulation.mdx#devices).
+- `http_credentials` [Dict] | [List]\[[Dict]\] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-http-credentials"/><a href="#browser-new-page-option-http-credentials" class="list-anchor">#</a>
   - `username` [str]
     
     
@@ -519,14 +558,16 @@ browser.new_page(**kwargs)
     
     Эта опция применяется только к запросам, отправленным из соответствующего [APIRequestContext] и не влияет на запросы, отправленные из браузера. `'always'` - заголовок `Authorization` с учетными данными базовой аутентификации будет отправляться с каждым API-запросом. `'unauthorized` - учетные данные отправляются только при получении ответа 401 (Unauthorized) с заголовком `WWW-Authenticate`. По умолчанию `'unauthorized'`.
   
-  Учетные данные для [HTTP-аутентификации](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Если источник не указан, имя пользователя и пароль отправляются на любые серверы при получении неавторизованных ответов.
-- `ignore_https_errors` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-ignore-https-errors"/><a href="#browser-new-page-option-ignore-https-errors" class="list-anchor">#</a>
+Учётные данные для [HTTP-аутентификации](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Если источник (origin) не указан, имя пользователя и пароль отправляются любым серверам в ответ на сообщения об отсутствии авторизации.
+  
+  Передайте массив, чтобы использовать разные учётные данные для разных источников. Используется первая запись, соответствующая источнику запроса, а записи без указанного источника соответствуют любому запросу.
+- `ignore_https_errors` [bool] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-ignore-https-errors"/><a href="#browser-new-page-option-ignore-https-errors" class="list-anchor">#</a>
   
   Игнорировать ли ошибки HTTPS при отправке сетевых запросов. По умолчанию `false`.
 - `is_mobile` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-is-mobile"/><a href="#browser-new-page-option-is-mobile" class="list-anchor">#</a>
   
-  Учитывается ли тег `meta viewport` и включены ли сенсорные события. isMobile является частью устройства, поэтому вам не нужно устанавливать его вручную. По умолчанию `false` и не поддерживается в Firefox. Узнайте больше о [мобильной эмуляции](../emulation.mdx#ismobile).
-- `java_script_enabled` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-java-script-enabled"/><a href="#browser-new-page-option-java-script-enabled" class="list-anchor">#</a>
+Определяет, учитывается ли тег `meta viewport` и включены ли сенсорные события. Параметр isMobile входит в состав настроек устройства, поэтому задавать его вручную не требуется. По умолчанию — `false`. Подробнее об [эмуляции мобильных устройств](../emulation.mdx#ismobile).
+- `java_script_enabled` [bool] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-java-script-enabled"/><a href="#browser-new-page-option-java-script-enabled" class="list-anchor">#</a>
   
   Включать ли JavaScript в контексте. По умолчанию `true`. Узнайте больше о [отключении JavaScript](../emulation.mdx#javascript-enabled).
 - `locale` [str] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-locale"/><a href="#browser-new-page-option-locale" class="list-anchor">#</a>
@@ -571,8 +612,11 @@ browser.new_page(**kwargs)
 - `record_har_url_filter` [str] | [Pattern] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-record-har-url-filter"/><a href="#browser-new-page-option-record-har-url-filter" class="list-anchor">#</a>
 - `record_video_dir` [Union]\[[str], [pathlib.Path]\] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-record-video-dir"/><a href="#browser-new-page-option-record-video-dir" class="list-anchor">#</a>
   
-  Включает запись видео для всех страниц в указанную директорию. Если не указано, видео не записываются. Убедитесь, что вызов [browser_context.close()](/api/class-browsercontext.mdx#browser-context-close) для сохранения видео.
-- `record_video_size` [Dict] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-record-video-size"/><a href="#browser-new-page-option-record-video-size" class="list-anchor">#</a>
+Включает запись видео для всех страниц в указанный каталог. Если не задано, видео не записываются. Обязательно вызовите [browser_context.close()](/api/class-browsercontext.mdx#browser-context-close), чтобы видео были сохранены.
+- `record_video_fps` [int] *(необязательно)* <font size="2">Добавлено в: v1.64</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-record-video-fps"/><a href="#browser-new-page-option-record-video-fps" class="list-anchor">#</a>
+  
+  Частота кадров записываемых видео в кадрах в секунду. По умолчанию — `25`. Firefox и WebKit в настоящее время захватывают до 25 кадров в секунду.
+- `record_video_size` [Dict] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-record-video-size"/><a href="#browser-new-page-option-record-video-size" class="list-anchor">#</a>
   - `width` [int]
     
     Ширина кадра видео.
@@ -667,7 +711,7 @@ browser.new_page(**kwargs)
 
 ---
 
-### start_tracing {#browser-start-tracing}
+### start_tracing {/* #browser-start-tracing */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.11</font><x-search>browser.start_tracing</x-search>
 
@@ -709,13 +753,13 @@ await browser.stop_tracing()
 </Tabs>
 
 **Аргументы**
-- `page` [Page] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-start-tracing-option-page"/><a href="#browser-start-tracing-option-page" class="list-anchor">#</a>
+- `categories` [List]\[[str]\] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-start-tracing-option-categories"/><a href="#browser-start-tracing-option-categories" class="list-anchor">#</a>
   
-  Опционально, если указано, трассировка включает скриншоты данной страницы.
-- `categories` [List]\[[str]\] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-start-tracing-option-categories"/><a href="#browser-start-tracing-option-categories" class="list-anchor">#</a>
+  Указывает пользовательские категории для использования вместо категорий по умолчанию.
+- `page` [Page] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-start-tracing-option-page"/><a href="#browser-start-tracing-option-page" class="list-anchor">#</a>
   
-  укажите пользовательские категории для использования вместо стандартных.
-- `path` [Union]\[[str], [pathlib.Path]\] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-start-tracing-option-path"/><a href="#browser-start-tracing-option-path" class="list-anchor">#</a>
+  Необязательный параметр. Если указан, трассировка включает снимки экрана заданной страницы.
+- `path` [Union]\[[str], [pathlib.Path]\] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-start-tracing-option-path"/><a href="#browser-start-tracing-option-path" class="list-anchor">#</a>
   
   Путь для записи файла трассировки.
 - `screenshots` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-start-tracing-option-screenshots"/><a href="#browser-start-tracing-option-screenshots" class="list-anchor">#</a>
@@ -727,7 +771,7 @@ await browser.stop_tracing()
 
 ---
 
-### stop_tracing {#browser-stop-tracing}
+### stop_tracing {/* #browser-stop-tracing */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.11</font><x-search>browser.stop_tracing</x-search>
 
@@ -749,9 +793,26 @@ browser.stop_tracing()
 
 ---
 
-## Свойства {#properties}
+### unbind {/* #browser-unbind */}
 
-### browser_type {#browser-browser-type}
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.59</font><x-search>browser.unbind</x-search>
+
+Отменяет привязку сервера браузера, ранее созданную с помощью [browser.bind()](/api/class-browser.mdx#browser-bind).
+
+**Использование**
+
+```python
+browser.unbind()
+```
+
+**Возвращает**
+- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-unbind-return"/><a href="#browser-unbind-return" class="list-anchor">#</a>
+
+---
+
+## Свойства
+
+### browser_type {/* #browser-browser-type */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.23</font><x-search>browser.browser_type</x-search>
 
@@ -768,7 +829,7 @@ browser.browser_type
 
 ---
 
-### contexts {#browser-contexts}
+### contexts {/* #browser-contexts */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browser.contexts</x-search>
 
@@ -811,7 +872,7 @@ print(len(browser.contexts)) # выводит `1`
 
 ---
 
-### is_connected {#browser-is-connected}
+### is_connected {/* #browser-is-connected */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>browser.is_connected</x-search>
 
@@ -828,7 +889,7 @@ browser.is_connected()
 
 ---
 
-### version {#browser-version}
+### version {/* #browser-version */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до версии v1.9</font><x-search>browser.version</x-search>
 
@@ -847,7 +908,24 @@ browser.version
 
 ## События {#events}
 
-### on("disconnected") {#browser-event-disconnected}
+### on("context") {/* #browser-event-context */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.60</font><x-search>browser.on("context")</x-search>
+
+Возникает при создании нового контекста браузера.
+
+**Использование**
+
+```python
+browser.on("context", handler)
+```
+
+**Данные события**
+- [BrowserContext]
+
+---
+
+### on("disconnected") {/* #browser-event-disconnected */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до версии v1.9</font><x-search>browser.on("disconnected")</x-search>
 
@@ -875,11 +953,15 @@ browser.on("disconnected", handler)
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [Error]: /api/class-error.mdx "Error"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
@@ -893,14 +975,17 @@ browser.on("disconnected", handler)
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

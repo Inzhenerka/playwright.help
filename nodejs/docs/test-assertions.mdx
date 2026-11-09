@@ -56,6 +56,7 @@ The following assertions will retry until the assertion passes, or the assertion
 | [await expect(locator).toHaveValue()](./api/class-locatorassertions.mdx#locator-assertions-to-have-value) | Input has a value |
 | [await expect(locator).toHaveValues()](./api/class-locatorassertions.mdx#locator-assertions-to-have-values) | Select has options selected |
 | [await expect(locator).toMatchAriaSnapshot()](./api/class-locatorassertions.mdx#locator-assertions-to-match-aria-snapshot) | Element matches the Aria snapshot |
+| [await expect(page).toMatchAriaSnapshot()](./api/class-pageassertions.mdx#page-assertions-to-match-aria-snapshot) | Page matches the Aria snapshot |
 | [await expect(page).toHaveScreenshot()](./api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1) | Page has a screenshot |
 | [await expect(page).toHaveTitle()](./api/class-pageassertions.mdx#page-assertions-to-have-title) | Page has a title |
 | [await expect(page).toHaveURL()](./api/class-pageassertions.mdx#page-assertions-to-have-url) | Page has a URL |
@@ -229,17 +230,24 @@ await expect.poll(async () => {
 }).toBe(200);
 ```
 
-You can combine `expect.configure({ soft: true })` with expect.poll to perform soft assertions in polling logic.
+You can combine `expect.soft` with `expect.poll` to perform soft assertions in polling logic. This allows the test to continue even if the assertion inside poll fails.
+
+```js
+await expect.soft.poll(async () => {
+  const response = await page.request.get('https://api.example.com');
+  return response.status();
+}).toBe(200);
+```
+
+`expect.configure({ soft: true })` also chains with `expect.poll` and is useful when you want to reuse a configured instance.
 
 ```js
 const softExpect = expect.configure({ soft: true });
 await softExpect.poll(async () => {
   const response = await page.request.get('https://api.example.com');
   return response.status();
-}, {}).toBe(200);
+}).toBe(200);
 ```
-
-This allows the test to continue even if the assertion inside poll fails.
 
 ## expect.toPass
 
@@ -331,6 +339,46 @@ test('amount', async () => {
 });
 ```
 
+### Generic custom matchers
+
+TypeScript cannot carry a type parameter from the matcher implementation to the call site. If the matcher is generic over the received value, its type parameter becomes `unknown` when you call the matcher on `expect`.
+
+To get the type of the received value in the matcher arguments, declare the matcher signature in the `PlaywrightTest.Matchers` interface. Its second type parameter `T` is the type of the value passed to `expect`. Note that a generic matcher also needs an explicit `this` parameter type to access `this.utils` and other matcher state.
+
+```js title="fixtures.ts"
+import { expect as baseExpect } from '@playwright/test';
+import type { ExpectMatcherState } from '@playwright/test';
+
+export const expect = baseExpect.extend({
+  toSatisfy<T>(this: ExpectMatcherState, received: T, predicate: (value: T) => boolean) {
+    const pass = predicate(received);
+    return {
+      message: () => `expected ${this.utils.printReceived(received)} to satisfy the predicate`,
+      pass,
+    };
+  },
+});
+
+declare global {
+  namespace PlaywrightTest {
+    interface Matchers<R, T = unknown> {
+      toSatisfy(predicate: (value: T) => boolean): R;
+    }
+  }
+}
+```
+
+Now the `value` argument has the type of the received value.
+
+```js title="example.spec.ts"
+import { test, expect } from './fixtures';
+
+test('generic matcher', async () => {
+  expect('hello').toSatisfy(value => value.startsWith('h'));
+  expect(42).toSatisfy(value => value > 40);
+});
+```
+
 ### Compatibility with expect library
 
 :::note
@@ -360,11 +408,6 @@ test('passes', async ({ database }) => {
 ```
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -377,10 +420,11 @@ test('passes', async ({ database }) => {
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -399,6 +443,7 @@ test('passes', async ({ database }) => {
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -406,9 +451,18 @@ test('passes', async ({ database }) => {
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -426,6 +480,7 @@ test('passes', async ({ database }) => {
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -438,6 +493,7 @@ test('passes', async ({ database }) => {
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -459,6 +515,7 @@ test('passes', async ({ database }) => {
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"

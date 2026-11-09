@@ -47,7 +47,7 @@ class FrameExamples
 
 ## Methods
 
-### AddScriptTagAsync {#frame-add-script-tag}
+### AddScriptTagAsync {/* #frame-add-script-tag */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.AddScriptTagAsync</x-search>
 
@@ -81,7 +81,7 @@ await Frame.AddScriptTagAsync(options);
 
 ---
 
-### AddStyleTagAsync {#frame-add-style-tag}
+### AddStyleTagAsync {/* #frame-add-style-tag */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.AddStyleTagAsync</x-search>
 
@@ -112,7 +112,7 @@ await Frame.AddStyleTagAsync(options);
 
 ---
 
-### ChildFrames {#frame-child-frames}
+### ChildFrames {/* #frame-child-frames */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.ChildFrames</x-search>
 
@@ -127,7 +127,7 @@ Frame.ChildFrames
 
 ---
 
-### ContentAsync {#frame-content}
+### ContentAsync {/* #frame-content */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.ContentAsync</x-search>
 
@@ -136,15 +136,21 @@ Gets the full HTML contents of the frame, including the doctype.
 **Usage**
 
 ```csharp
-await Frame.ContentAsync();
+await Frame.ContentAsync(options);
 ```
+
+**Arguments**
+- `options` `FrameContentOptions?` *(optional)*
+  - `IncludeShadow` [bool]? *(optional)* <font size="2">Added in: v1.64</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-content-option-include-shadow"/><a href="#frame-content-option-include-shadow" class="list-anchor">#</a>
+    
+    When true, contents of open shadow roots are included as [declarative shadow DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM#declaratively_with_html), i.e. `<template shadowrootmode="open">` elements nested inside their host elements. Closed shadow roots are never included. Defaults to `false`.
 
 **Returns**
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-content-return"/><a href="#frame-content-return" class="list-anchor">#</a>
 
 ---
 
-### DragAndDropAsync {#frame-drag-and-drop}
+### DragAndDropAsync {/* #frame-drag-and-drop */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.13</font><x-search>frame.DragAndDropAsync</x-search>
 
@@ -173,6 +179,9 @@ await Frame.DragAndDropAsync(source, target, options);
     
     
     This option has no effect.
+  - `Scroll` `enum ScrollMode { Auto, None }?` *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-drag-and-drop-option-scroll"/><a href="#frame-drag-and-drop-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
   - `SourcePosition` SourcePosition? *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-drag-and-drop-option-source-position"/><a href="#frame-drag-and-drop-option-source-position" class="list-anchor">#</a>
     - `X` [float]
       
@@ -207,7 +216,7 @@ await Frame.DragAndDropAsync(source, target, options);
 
 ---
 
-### EvaluateAsync {#frame-evaluate}
+### EvaluateAsync {/* #frame-evaluate */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.EvaluateAsync</x-search>
 
@@ -233,7 +242,7 @@ Console.WriteLine(await frame.EvaluateAsync<int>("1 + 2")); // prints "3"
 [ElementHandle] instances can be passed as an argument to the [Frame.EvaluateAsync()](/api/class-frame.mdx#frame-evaluate):
 
 ```csharp
-var bodyHandle = await frame.EvaluateAsync("document.body");
+var bodyHandle = await frame.EvaluateHandleAsync("document.body");
 var html = await frame.EvaluateAsync<string>("([body, suffix]) => body.innerHTML + suffix", new object [] { bodyHandle, "hello" });
 await bodyHandle.DisposeAsync();
 ```
@@ -251,7 +260,7 @@ await bodyHandle.DisposeAsync();
 
 ---
 
-### EvaluateHandleAsync {#frame-evaluate-handle}
+### EvaluateHandleAsync {/* #frame-evaluate-handle */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.EvaluateHandleAsync</x-search>
 
@@ -296,7 +305,7 @@ await resultHandle.DisposeAsync();
 
 ---
 
-### FrameElementAsync {#frame-frame-element}
+### FrameElementAsync {/* #frame-frame-element */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.FrameElementAsync</x-search>
 
@@ -319,11 +328,13 @@ Console.WriteLine(frame == contentFrame); // -> True
 
 ---
 
-### FrameLocator {#frame-frame-locator}
+### FrameLocator {/* #frame-frame-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frame.FrameLocator</x-search>
 
 When working with iframes, you can create a frame locator that will enter the iframe and allow selecting elements in that iframe.
+
+When called without [selector](/api/class-frame.mdx#frame-frame-locator-option-selector), the search starts in this frame or in any of the iframes inside it, so that you don't need to locate each iframe first. Note that the rest of the locator is resolved inside a single frame, just like any other locator. If it matches elements inside multiple frames, an error is thrown.
 
 **Usage**
 
@@ -334,17 +345,24 @@ var locator = frame.FrameLocator("#my-iframe").GetByText("Submit");
 await locator.ClickAsync();
 ```
 
+Following snippet locates a button, either in the frame or in one of the iframes inside it:
+
+```csharp
+var locator = frame.FrameLocator().GetByRole(AriaRole.Button);
+await locator.ClickAsync();
+```
+
 **Arguments**
-- `selector` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-frame-locator-option-selector"/><a href="#frame-frame-locator-option-selector" class="list-anchor">#</a>
+- `selector` [string]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-frame-locator-option-selector"/><a href="#frame-frame-locator-option-selector" class="list-anchor">#</a>
   
-  A selector to use when resolving DOM element.
+  A selector that matches the frame element. When not specified, locator is matched in this frame or in any of the iframes inside it.
 
 **Returns**
 - [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-frame-locator-return"/><a href="#frame-frame-locator-return" class="list-anchor">#</a>
 
 ---
 
-### GetByAltText {#frame-get-by-alt-text}
+### GetByAltText {/* #frame-get-by-alt-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.GetByAltText</x-search>
 
@@ -376,7 +394,7 @@ await page.GetByAltText("Playwright logo").ClickAsync();
 
 ---
 
-### GetByLabel {#frame-get-by-label}
+### GetByLabel {/* #frame-get-by-label */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.GetByLabel</x-search>
 
@@ -411,7 +429,7 @@ await page.GetByLabel("Password").FillAsync("secret");
 
 ---
 
-### GetByPlaceholder {#frame-get-by-placeholder}
+### GetByPlaceholder {/* #frame-get-by-placeholder */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.GetByPlaceholder</x-search>
 
@@ -447,7 +465,7 @@ await page
 
 ---
 
-### GetByRole {#frame-get-by-role}
+### GetByRole {/* #frame-get-by-role */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.GetByRole</x-search>
 
@@ -466,7 +484,7 @@ Consider the following DOM structure.
 <button>Submit</button>
 ```
 
-You can locate each element by it's implicit role:
+You can locate each element by its implicit role:
 
 ```csharp
 await Expect(Page
@@ -494,6 +512,11 @@ await page
     An attribute that is usually set by `aria-checked` or native `<input type=checkbox>` controls.
     
     Learn more about [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
+  - `Description|DescriptionRegex` [string]? | [Regex]? *(optional)* <font size="2">Added in: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-get-by-role-option-description"/><a href="#frame-get-by-role-option-description" class="list-anchor">#</a>
+    
+    Option to match the [accessible description](https://w3c.github.io/accname/#dfn-accessible-description). By default, matching is case-insensitive and searches for a substring, use [Exact](/api/class-frame.mdx#frame-get-by-role-option-exact) to control this behavior.
+    
+    Learn more about [accessible description](https://w3c.github.io/accname/#dfn-accessible-description).
   - `Disabled` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-get-by-role-option-disabled"/><a href="#frame-get-by-role-option-disabled" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-disabled` or `disabled`.
@@ -505,7 +528,7 @@ await page
     
   - `Exact` [bool]? *(optional)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-get-by-role-option-exact"/><a href="#frame-get-by-role-option-exact" class="list-anchor">#</a>
     
-    Whether [Name|NameRegex](/api/class-frame.mdx#frame-get-by-role-option-name) is matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when [Name|NameRegex](/api/class-frame.mdx#frame-get-by-role-option-name) is a regular expression. Note that exact match still trims whitespace.
+    Whether [Name|NameRegex](/api/class-frame.mdx#frame-get-by-role-option-name) and [Description|DescriptionRegex](/api/class-frame.mdx#frame-get-by-role-option-description) are matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when the value is a regular expression. Note that exact match still trims whitespace.
   - `Expanded` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-get-by-role-option-expanded"/><a href="#frame-get-by-role-option-expanded" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-expanded`.
@@ -548,7 +571,7 @@ Many html elements have an implicitly [defined role](https://w3c.github.io/html-
 
 ---
 
-### GetByTestId {#frame-get-by-test-id}
+### GetByTestId {/* #frame-get-by-test-id */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.GetByTestId</x-search>
 
@@ -562,7 +585,7 @@ Consider the following DOM structure.
 <button data-testid="directions">Itinéraire</button>
 ```
 
-You can locate the element by it's test id:
+You can locate the element by its test id:
 
 ```csharp
 await page.GetByTestId("directions").ClickAsync();
@@ -582,7 +605,7 @@ By default, the `data-testid` attribute is used as a test id. Use [Selectors.Set
 
 ---
 
-### GetByText {#frame-get-by-text}
+### GetByText {/* #frame-get-by-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.GetByText</x-search>
 
@@ -638,7 +661,7 @@ Input elements of the type `button` and `submit` are matched by their `value` in
 
 ---
 
-### GetByTitle {#frame-get-by-title}
+### GetByTitle {/* #frame-get-by-title */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.GetByTitle</x-search>
 
@@ -672,7 +695,7 @@ await Expect(Page.GetByTitle("Issues count")).toHaveText("25 issues");
 
 ---
 
-### GotoAsync {#frame-goto}
+### GotoAsync {/* #frame-goto */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.GotoAsync</x-search>
 
@@ -726,7 +749,7 @@ await Frame.GotoAsync(url, options);
 
 ---
 
-### IsDetached {#frame-is-detached}
+### IsDetached {/* #frame-is-detached */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.IsDetached</x-search>
 
@@ -743,7 +766,7 @@ Frame.IsDetached
 
 ---
 
-### IsEnabledAsync {#frame-is-enabled}
+### IsEnabledAsync {/* #frame-is-enabled */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.IsEnabledAsync</x-search>
 
@@ -772,7 +795,7 @@ await Frame.IsEnabledAsync(selector, options);
 
 ---
 
-### Locator {#frame-locator}
+### Locator {/* #frame-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>frame.Locator</x-search>
 
@@ -817,7 +840,7 @@ Frame.Locator(selector, options);
 
 ---
 
-### Name {#frame-name}
+### Name {/* #frame-name */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.Name</x-search>
 
@@ -841,7 +864,7 @@ Frame.Name
 
 ---
 
-### Page {#frame-page}
+### Page {/* #frame-page */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.Page</x-search>
 
@@ -858,7 +881,7 @@ Frame.Page
 
 ---
 
-### ParentFrame {#frame-parent-frame}
+### ParentFrame {/* #frame-parent-frame */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.ParentFrame</x-search>
 
@@ -875,7 +898,7 @@ Frame.ParentFrame
 
 ---
 
-### SetContentAsync {#frame-set-content}
+### SetContentAsync {/* #frame-set-content */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.SetContentAsync</x-search>
 
@@ -908,7 +931,7 @@ await Frame.SetContentAsync(html, options);
 
 ---
 
-### TitleAsync {#frame-title}
+### TitleAsync {/* #frame-title */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.TitleAsync</x-search>
 
@@ -925,7 +948,7 @@ await Frame.TitleAsync();
 
 ---
 
-### Url {#frame-url}
+### Url {/* #frame-url */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.Url</x-search>
 
@@ -942,7 +965,7 @@ Frame.Url
 
 ---
 
-### WaitForFunctionAsync {#frame-wait-for-function}
+### WaitForFunctionAsync {/* #frame-wait-for-function */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.WaitForFunctionAsync</x-search>
 
@@ -996,7 +1019,7 @@ await page.MainFrame.WaitForFunctionAsync("selector => !!document.querySelector(
 
 ---
 
-### WaitForLoadStateAsync {#frame-wait-for-load-state}
+### WaitForLoadStateAsync {/* #frame-wait-for-load-state */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.WaitForLoadStateAsync</x-search>
 
@@ -1033,7 +1056,7 @@ await frame.WaitForLoadStateAsync(); // Defaults to LoadState.Load
 
 ---
 
-### WaitForURLAsync {#frame-wait-for-url}
+### WaitForURLAsync {/* #frame-wait-for-url */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>frame.WaitForURLAsync</x-search>
 
@@ -1049,7 +1072,7 @@ await frame.WaitForURLAsync("**/target.html");
 **Arguments**
 - `url` [string] | [Regex] | [Func]&lt;[string], bool&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-url-option-url"/><a href="#frame-wait-for-url-option-url" class="list-anchor">#</a>
   
-  A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+  A glob pattern, regex pattern, or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
 - `options` `FrameWaitForURLOptions?` *(optional)*
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-url-option-timeout"/><a href="#frame-wait-for-url-option-timeout" class="list-anchor">#</a>
     
@@ -1067,9 +1090,28 @@ await frame.WaitForURLAsync("**/target.html");
 
 ---
 
+## Properties
+
+### Webmcp {/* #frame-webmcp */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>frame.Webmcp</x-search>
+
+Tools that the frame registers through the experimental [WebMCP](https://webmachinelearning.github.io/webmcp/) browser API. See [WebMCP] for details.
+
+**Usage**
+
+```csharp
+Frame.Webmcp
+```
+
+**Type**
+- [WebMCP]
+
+---
+
 ## Deprecated
 
-### CheckAsync {#frame-check}
+### CheckAsync {/* #frame-check */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.CheckAsync</x-search>
 
@@ -1120,6 +1162,9 @@ await Frame.CheckAsync(selector, options);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `Scroll` `enum ScrollMode { Auto, None }?` *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-check-option-scroll"/><a href="#frame-check-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
   - `Strict` [bool]? *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-check-option-strict"/><a href="#frame-check-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1135,7 +1180,7 @@ await Frame.CheckAsync(selector, options);
 
 ---
 
-### ClickAsync {#frame-click}
+### ClickAsync {/* #frame-click */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.ClickAsync</x-search>
 
@@ -1197,6 +1242,9 @@ await Frame.ClickAsync(selector, options);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `Scroll` `enum ScrollMode { Auto, None }?` *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-click-option-scroll"/><a href="#frame-click-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
   - `Strict` [bool]? *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-click-option-strict"/><a href="#frame-click-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1212,7 +1260,7 @@ await Frame.ClickAsync(selector, options);
 
 ---
 
-### DblClickAsync {#frame-dblclick}
+### DblClickAsync {/* #frame-dblclick */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.DblClickAsync</x-search>
 
@@ -1275,6 +1323,9 @@ await Frame.DblClickAsync(selector, options);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `Scroll` `enum ScrollMode { Auto, None }?` *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-dblclick-option-scroll"/><a href="#frame-dblclick-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
   - `Strict` [bool]? *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-dblclick-option-strict"/><a href="#frame-dblclick-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1290,7 +1341,7 @@ await Frame.DblClickAsync(selector, options);
 
 ---
 
-### DispatchEventAsync {#frame-dispatch-event}
+### DispatchEventAsync {/* #frame-dispatch-event */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.DispatchEventAsync</x-search>
 
@@ -1354,7 +1405,7 @@ await frame.DispatchEventAsync("#source", "dragstart", new { dataTransfer });
 
 ---
 
-### EvalOnSelectorAsync {#frame-eval-on-selector}
+### EvalOnSelectorAsync {/* #frame-eval-on-selector */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>frame.EvalOnSelectorAsync</x-search>
 
@@ -1399,7 +1450,7 @@ var html = await frame.EvalOnSelectorAsync(".main-container", "(e, suffix) => e.
 
 ---
 
-### EvalOnSelectorAllAsync {#frame-eval-on-selector-all}
+### EvalOnSelectorAllAsync {/* #frame-eval-on-selector-all */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>frame.EvalOnSelectorAllAsync</x-search>
 
@@ -1438,7 +1489,7 @@ var divsCount = await frame.EvalOnSelectorAllAsync<bool>("div", "(divs, min) => 
 
 ---
 
-### FillAsync {#frame-fill}
+### FillAsync {/* #frame-fill */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.FillAsync</x-search>
 
@@ -1492,7 +1543,7 @@ await Frame.FillAsync(selector, value, options);
 
 ---
 
-### FocusAsync {#frame-focus}
+### FocusAsync {/* #frame-focus */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.FocusAsync</x-search>
 
@@ -1528,7 +1579,7 @@ await Frame.FocusAsync(selector, options);
 
 ---
 
-### GetAttributeAsync {#frame-get-attribute}
+### GetAttributeAsync {/* #frame-get-attribute */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.GetAttributeAsync</x-search>
 
@@ -1567,7 +1618,7 @@ await Frame.GetAttributeAsync(selector, name, options);
 
 ---
 
-### HoverAsync {#frame-hover}
+### HoverAsync {/* #frame-hover */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.HoverAsync</x-search>
 
@@ -1619,6 +1670,9 @@ await Frame.HoverAsync(selector, options);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `Scroll` `enum ScrollMode { Auto, None }?` *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-hover-option-scroll"/><a href="#frame-hover-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
   - `Strict` [bool]? *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-hover-option-strict"/><a href="#frame-hover-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1634,7 +1688,7 @@ await Frame.HoverAsync(selector, options);
 
 ---
 
-### InnerHTMLAsync {#frame-inner-html}
+### InnerHTMLAsync {/* #frame-inner-html */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.InnerHTMLAsync</x-search>
 
@@ -1670,7 +1724,7 @@ await Frame.InnerHTMLAsync(selector, options);
 
 ---
 
-### InnerTextAsync {#frame-inner-text}
+### InnerTextAsync {/* #frame-inner-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.InnerTextAsync</x-search>
 
@@ -1706,7 +1760,7 @@ await Frame.InnerTextAsync(selector, options);
 
 ---
 
-### InputValueAsync {#frame-input-value}
+### InputValueAsync {/* #frame-input-value */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.13</font><x-search>frame.InputValueAsync</x-search>
 
@@ -1744,7 +1798,7 @@ await Frame.InputValueAsync(selector, options);
 
 ---
 
-### IsCheckedAsync {#frame-is-checked}
+### IsCheckedAsync {/* #frame-is-checked */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.IsCheckedAsync</x-search>
 
@@ -1780,7 +1834,7 @@ await Frame.IsCheckedAsync(selector, options);
 
 ---
 
-### IsDisabledAsync {#frame-is-disabled}
+### IsDisabledAsync {/* #frame-is-disabled */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.IsDisabledAsync</x-search>
 
@@ -1816,7 +1870,7 @@ await Frame.IsDisabledAsync(selector, options);
 
 ---
 
-### IsEditableAsync {#frame-is-editable}
+### IsEditableAsync {/* #frame-is-editable */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.IsEditableAsync</x-search>
 
@@ -1852,7 +1906,7 @@ await Frame.IsEditableAsync(selector, options);
 
 ---
 
-### IsHiddenAsync {#frame-is-hidden}
+### IsHiddenAsync {/* #frame-is-hidden */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.IsHiddenAsync</x-search>
 
@@ -1891,7 +1945,7 @@ await Frame.IsHiddenAsync(selector, options);
 
 ---
 
-### IsVisibleAsync {#frame-is-visible}
+### IsVisibleAsync {/* #frame-is-visible */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.IsVisibleAsync</x-search>
 
@@ -1930,7 +1984,7 @@ await Frame.IsVisibleAsync(selector, options);
 
 ---
 
-### PressAsync {#frame-press}
+### PressAsync {/* #frame-press */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.PressAsync</x-search>
 
@@ -1990,7 +2044,7 @@ await Frame.PressAsync(selector, key, options);
 
 ---
 
-### QuerySelectorAsync {#frame-query-selector}
+### QuerySelectorAsync {/* #frame-query-selector */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>frame.QuerySelectorAsync</x-search>
 
@@ -2030,7 +2084,7 @@ await Frame.QuerySelectorAsync(selector, options);
 
 ---
 
-### QuerySelectorAllAsync {#frame-query-selector-all}
+### QuerySelectorAllAsync {/* #frame-query-selector-all */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>frame.QuerySelectorAllAsync</x-search>
 
@@ -2066,11 +2120,11 @@ await Frame.QuerySelectorAllAsync(selector);
 
 ---
 
-### RunAndWaitForNavigationAsync {#frame-wait-for-navigation}
+### RunAndWaitForNavigationAsync {/* #frame-wait-for-navigation */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.RunAndWaitForNavigationAsync</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 This method is inherently racy, please use [Frame.WaitForURLAsync()](/api/class-frame.mdx#frame-wait-for-url) instead.
 
@@ -2107,7 +2161,7 @@ Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/Hist
     Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Url|UrlRegex|UrlFunc` [string]? | [Regex]? | [Func]&lt;[string]?, bool&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-url"/><a href="#frame-wait-for-navigation-option-url" class="list-anchor">#</a>
     
-    A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+    A glob pattern, regex pattern, or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
   - `WaitUntil` `enum WaitUntilState { Load, DOMContentLoaded, NetworkIdle, Commit }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-wait-until"/><a href="#frame-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
     
     When to consider operation succeeded, defaults to `load`. Events can be either:
@@ -2121,11 +2175,11 @@ Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/Hist
 
 ---
 
-### WaitForNavigationAsync {#frame-wait-for-navigation}
+### WaitForNavigationAsync {/* #frame-wait-for-navigation */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.WaitForNavigationAsync</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 This method is inherently racy, please use [Frame.WaitForURLAsync()](/api/class-frame.mdx#frame-wait-for-url) instead.
 
@@ -2159,7 +2213,7 @@ Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/Hist
     Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Url|UrlRegex|UrlFunc` [string]? | [Regex]? | [Func]&lt;[string]?, bool&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-url"/><a href="#frame-wait-for-navigation-option-url" class="list-anchor">#</a>
     
-    A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+    A glob pattern, regex pattern, or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
   - `WaitUntil` `enum WaitUntilState { Load, DOMContentLoaded, NetworkIdle, Commit }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-wait-until"/><a href="#frame-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
     
     When to consider operation succeeded, defaults to `load`. Events can be either:
@@ -2173,7 +2227,7 @@ Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/Hist
 
 ---
 
-### SelectOptionAsync {#frame-select-option}
+### SelectOptionAsync {/* #frame-select-option */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.SelectOptionAsync</x-search>
 
@@ -2243,7 +2297,7 @@ await frame.SelectOptionAsync("select#colors", new[] { "red", "green", "blue" })
 
 ---
 
-### SetCheckedAsync {#frame-set-checked}
+### SetCheckedAsync {/* #frame-set-checked */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>frame.SetCheckedAsync</x-search>
 
@@ -2298,6 +2352,9 @@ await Frame.SetCheckedAsync(selector, checked, options);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `Scroll` `enum ScrollMode { Auto, None }?` *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-set-checked-option-scroll"/><a href="#frame-set-checked-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
   - `Strict` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-set-checked-option-strict"/><a href="#frame-set-checked-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -2313,7 +2370,7 @@ await Frame.SetCheckedAsync(selector, checked, options);
 
 ---
 
-### SetInputFilesAsync {#frame-set-input-files}
+### SetInputFilesAsync {/* #frame-set-input-files */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.SetInputFilesAsync</x-search>
 
@@ -2369,7 +2426,7 @@ await Frame.SetInputFilesAsync(selector, files, options);
 
 ---
 
-### TapAsync {#frame-tap}
+### TapAsync {/* #frame-tap */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.TapAsync</x-search>
 
@@ -2426,6 +2483,9 @@ await Frame.TapAsync(selector, options);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `Scroll` `enum ScrollMode { Auto, None }?` *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-tap-option-scroll"/><a href="#frame-tap-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
   - `Strict` [bool]? *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-tap-option-strict"/><a href="#frame-tap-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -2441,7 +2501,7 @@ await Frame.TapAsync(selector, options);
 
 ---
 
-### TextContentAsync {#frame-text-content}
+### TextContentAsync {/* #frame-text-content */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.TextContentAsync</x-search>
 
@@ -2477,11 +2537,11 @@ await Frame.TextContentAsync(selector, options);
 
 ---
 
-### TypeAsync {#frame-type}
+### TypeAsync {/* #frame-type */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.TypeAsync</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 In most cases, you should use [Locator.FillAsync()](/api/class-locator.mdx#locator-fill) instead. You only need to press keys one by one if there is special keyboard handling on the page - in this case use [Locator.PressSequentiallyAsync()](/api/class-locator.mdx#locator-press-sequentially).
 
@@ -2525,7 +2585,7 @@ To press a special key, like `Control` or `ArrowDown`, use [Keyboard.PressAsync(
 
 ---
 
-### UncheckAsync {#frame-uncheck}
+### UncheckAsync {/* #frame-uncheck */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.UncheckAsync</x-search>
 
@@ -2576,6 +2636,9 @@ await Frame.UncheckAsync(selector, options);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `Scroll` `enum ScrollMode { Auto, None }?` *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-uncheck-option-scroll"/><a href="#frame-uncheck-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
   - `Strict` [bool]? *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-uncheck-option-strict"/><a href="#frame-uncheck-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -2591,7 +2654,7 @@ await Frame.UncheckAsync(selector, options);
 
 ---
 
-### WaitForSelectorAsync {#frame-wait-for-selector}
+### WaitForSelectorAsync {/* #frame-wait-for-selector */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.WaitForSelectorAsync</x-search>
 
@@ -2662,7 +2725,7 @@ class FrameExamples
 
 ---
 
-### WaitForTimeoutAsync {#frame-wait-for-timeout}
+### WaitForTimeoutAsync {/* #frame-wait-for-timeout */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.WaitForTimeoutAsync</x-search>
 
@@ -2703,6 +2766,8 @@ await Frame.WaitForTimeoutAsync(timeout);
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -2722,15 +2787,18 @@ await Frame.WaitForTimeoutAsync(timeout);
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

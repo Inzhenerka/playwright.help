@@ -10,9 +10,17 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 Каждый контекст браузера Playwright связан с экземпляром [APIRequestContext], который разделяет хранилище куки с контекстом браузера и может быть доступен через [browserContext.request](/api/class-browsercontext.mdx#browser-context-request) или [page.request](/api/class-page.mdx#page-request). Также возможно вручную создать новый экземпляр APIRequestContext, вызвав [apiRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context).
 
-**Управление куки**
+Каждый браузерный контекст Playwright имеет связанный с ним [APIRequestContext], доступный через [browserContext.request](/api/class-browsercontext.mdx#browser-context-request) или [page.request](/api/class-page.mdx#page-request) (они возвращают
 
-[APIRequestContext], возвращаемый [browserContext.request](/api/class-browsercontext.mdx#browser-context-request) и [page.request](/api/class-page.mdx#page-request), разделяет хранилище куки с соответствующим [BrowserContext]. Каждый API-запрос будет иметь заголовок `Cookie`, заполненный значениями из контекста браузера. Если ответ API содержит заголовок `Set-Cookie`, он автоматически обновит куки [BrowserContext], и запросы, сделанные со страницы, будут их учитывать. Это означает, что если вы войдете в систему с помощью этого API, ваш e2e тест будет также авторизован и наоборот.
+**один и тот же экземпляр** — `page.request` является сокращением для `page.context().request`). Вы также можете создать отдельный изолированный экземпляр с помощью [apiRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context).
+
+**Управление файлами cookie**
+
+[APIRequestContext], возвращаемый [browserContext.request](/api/class-browsercontext.mdx#browser-context-request) и
+
+[page.request](/api/class-page.mdx#page-request), использует то же хранилище файлов cookie, что и связанный с ним [BrowserContext]:
+
+Если вам нужны API-запросы, которые **не** используют общие с браузером файлы cookie, создайте изолированный контекст с помощью [apiRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context). Такой объект `APIRequestContext` будет иметь собственное изолированное хранилище файлов cookie.
 
 Если вы хотите, чтобы API-запросы не мешали куки браузера, вам следует создать новый [APIRequestContext], вызвав [apiRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context). Такой объект `APIRequestContext` будет иметь свое собственное изолированное хранилище куки.
 
@@ -20,7 +28,140 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Методы {#methods}
 
-### delete {#api-request-context-delete}
+### addCookies {/* #api-request-context-add-cookies */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>apiRequestContext.addCookies</x-search>
+
+Добавляет файлы cookie в этот контекст запросов. Они будут отправляться с соответствующими последующими запросами. Для [browserContext.request](/api/class-browsercontext.mdx#browser-context-request) и [page.request](/api/class-page.mdx#page-request) это эквивалентно вызову [browserContext.addCookies()](/api/class-browsercontext.mdx#browser-context-add-cookies) в соответствующем контексте браузера.
+
+**Usage**
+
+```js
+await request.addCookies([cookieObject1, cookieObject2]);
+```
+
+**Arguments**
+- `cookies` [Array]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-add-cookies-option-cookies"/><a href="#api-request-context-add-cookies-option-cookies" class="list-anchor">#</a>
+  - `name` [string]
+    
+    
+  - `value` [string]
+    
+    
+  - `url` [string] *(optional)*
+    
+    Требуется либо `url`, либо оба параметра `domain` и `path`. Необязательный параметр.
+  - `domain` [string] *(optional)*
+    
+    Чтобы файл cookie также применялся ко всем поддоменам, добавьте точку перед доменом, например: ".example.com". Требуется либо `url`, либо оба параметра `domain` и `path`. Необязательный параметр.
+  - `path` [string] *(optional)*
+    
+    Требуется либо `url`, либо оба параметра `domain` и `path`. Необязательный параметр.
+  - `expires` [number] *(optional)*
+    
+    Время Unix в секундах. Необязательный параметр.
+  - `httpOnly` [boolean] *(optional)*
+    
+    Optional.
+  - `secure` [boolean] *(optional)*
+    
+    Optional.
+  - `sameSite` "Strict" | "Lax" | "None" *(optional)*
+    
+    Optional.
+  - `partitionKey` [string] *(optional)*
+    
+    Ключ раздела для сторонних файлов cookie с разделением по сайту ([CHIPS](https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Privacy_sandbox/Partitioned_cookies)). Необязательный параметр.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-add-cookies-return"/><a href="#api-request-context-add-cookies-return" class="list-anchor">#</a>
+
+---
+
+### clearCookies {/* #api-request-context-clear-cookies */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>apiRequestContext.clearCookies</x-search>
+
+Удаляет файлы cookie из этого контекста запросов. Принимает необязательный фильтр. Для [browserContext.request](/api/class-browsercontext.mdx#browser-context-request) и [page.request](/api/class-page.mdx#page-request) это эквивалентно вызову [browserContext.clearCookies()](/api/class-browsercontext.mdx#browser-context-clear-cookies) в соответствующем контексте браузера.
+
+**Usage**
+
+```js
+await request.clearCookies();
+await request.clearCookies({ name: 'session-id' });
+await request.clearCookies({ domain: 'my-origin.com' });
+await request.clearCookies({ domain: /.*my-origin\.com/ });
+await request.clearCookies({ path: '/api/v1' });
+await request.clearCookies({ name: 'session-id', domain: 'my-origin.com' });
+```
+
+**Arguments**
+- `options` [Object] *(optional)*
+  - `domain` [string] | [RegExp] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-option-domain"/><a href="#api-request-context-clear-cookies-option-domain" class="list-anchor">#</a>
+    
+    Удаляет только файлы cookie с указанным доменом.
+  - `name` [string] | [RegExp] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-option-name"/><a href="#api-request-context-clear-cookies-option-name" class="list-anchor">#</a>
+    
+    Удаляет только файлы cookie с указанным именем.
+  - `path` [string] | [RegExp] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-option-path"/><a href="#api-request-context-clear-cookies-option-path" class="list-anchor">#</a>
+    
+    Удаляет только файлы cookie с указанным путём.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-return"/><a href="#api-request-context-clear-cookies-return" class="list-anchor">#</a>
+
+---
+
+### cookies {/* #api-request-context-cookies */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>apiRequestContext.cookies</x-search>
+
+Если URL не указаны, этот метод возвращает все файлы cookie. Если URL указаны, возвращаются только файлы cookie, применимые к этим URL. Для [browserContext.request](/api/class-browsercontext.mdx#browser-context-request) и [page.request](/api/class-page.mdx#page-request) это эквивалентно вызову [browserContext.cookies()](/api/class-browsercontext.mdx#browser-context-cookies) в соответствующем контексте браузера.
+
+**Usage**
+
+```js
+await apiRequestContext.cookies();
+await apiRequestContext.cookies(urls);
+```
+
+**Arguments**
+- `urls` [string] | [Array]&lt;[string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-cookies-option-urls"/><a href="#api-request-context-cookies-option-urls" class="list-anchor">#</a>
+  
+  Необязательный список URL.
+
+**Returns**
+- [Promise]&lt;[Array]&lt;[Object]&gt;&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-cookies-return"/><a href="#api-request-context-cookies-return" class="list-anchor">#</a>
+  - `name` [string]
+    
+    
+  - `value` [string]
+    
+    
+  - `domain` [string]
+    
+    
+  - `path` [string]
+    
+    
+  - `expires` [number]
+    
+    Время Unix в секундах.
+  - `httpOnly` [boolean]
+    
+    
+  - `secure` [boolean]
+    
+    
+  - `sameSite` "Strict" | "Lax" | "None"
+    
+    
+  - `partitionKey` [string] *(optional)*
+    
+    
+---
+
+### delete {/* #api-request-context-delete */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.delete</x-search>
 
@@ -73,7 +214,10 @@ await apiRequestContext.delete(url, options);
     Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `multipart/form-data` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `multipart/form-data`, если не предоставлен явно. Значения файлов могут быть переданы либо как [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream), либо как объект, похожий на файл, содержащий имя файла, mime-тип и его содержимое.
   - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-params"/><a href="#api-request-context-delete-option-params" class="list-anchor">#</a>
     
-    Параметры запроса, которые будут отправлены с URL.
+Параметры запроса, которые будут отправлены вместе с URL.
+  - `signal` [AbortSignal] *(необязательно)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-signal"/><a href="#api-request-context-delete-option-signal" class="list-anchor">#</a>
+    
+    Позволяет отменить операцию с помощью [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). Если сигнал будет прерван, операция будет отменена и выбросит ошибку. Обратите внимание, что передача сигнала не отключает тайм-аут по умолчанию, который можно изменить с помощью [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); передайте `timeout: 0`, чтобы полностью отключить тайм-аут.
   - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-timeout"/><a href="#api-request-context-delete-option-timeout" class="list-anchor">#</a>
     
     Таймаут запроса в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить таймаут.
@@ -83,7 +227,7 @@ await apiRequestContext.delete(url, options);
 
 ---
 
-### dispose {#api-request-context-dispose}
+### dispose {/* #api-request-context-dispose */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.dispose</x-search>
 
@@ -107,7 +251,7 @@ await apiRequestContext.dispose(options);
 
 ---
 
-### fetch {#api-request-context-fetch}
+### fetch {/* #api-request-context-fetch */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.fetch</x-search>
 
@@ -184,7 +328,10 @@ await request.fetch('https://example.com/api/uploadForm', {
     Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `multipart/form-data` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `multipart/form-data`, если не предоставлен явно. Значения файлов могут быть переданы либо как [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream), либо как объект, похожий на файл, содержащий имя файла, mime-тип и его содержимое.
   - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-params"/><a href="#api-request-context-fetch-option-params" class="list-anchor">#</a>
     
-    Параметры запроса, которые будут отправлены с URL.
+Параметры запроса, которые будут отправлены вместе с URL.
+  - `signal` [AbortSignal] *(необязательно)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-signal"/><a href="#api-request-context-fetch-option-signal" class="list-anchor">#</a>
+    
+    Позволяет отменить операцию с помощью [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). Если сигнал отменён, операция будет прервана с ошибкой. Обратите внимание, что передача сигнала не отключает тайм-аут по умолчанию, который можно изменить с помощью [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); передайте `timeout: 0`, чтобы полностью отключить тайм-аут.
   - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-timeout"/><a href="#api-request-context-fetch-option-timeout" class="list-anchor">#</a>
     
     Таймаут запроса в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить таймаут.
@@ -194,7 +341,7 @@ await request.fetch('https://example.com/api/uploadForm', {
 
 ---
 
-### get {#api-request-context-get}
+### get {/* #api-request-context-get */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.get</x-search>
 
@@ -265,7 +412,10 @@ await request.get('https://example.com/api/getText', { params: queryString });
     Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `multipart/form-data` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `multipart/form-data`, если не предоставлен явно. Значения файлов могут быть переданы либо как [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream), либо как объект, похожий на файл, содержащий имя файла, mime-тип и его содержимое.
   - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-params"/><a href="#api-request-context-get-option-params" class="list-anchor">#</a>
     
-    Параметры запроса, которые будут отправлены с URL.
+Параметры запроса, отправляемые вместе с URL.
+  - `signal` [AbortSignal] *(необязательно)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-signal"/><a href="#api-request-context-get-option-signal" class="list-anchor">#</a>
+    
+    Позволяет отменить операцию с помощью [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). Если сигнал отменён, операция будет прервана с выбросом ошибки. Обратите внимание, что передача сигнала не отключает тайм-аут по умолчанию, который можно изменить с помощью [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); передайте `timeout: 0`, чтобы полностью отключить тайм-аут.
   - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-timeout"/><a href="#api-request-context-get-option-timeout" class="list-anchor">#</a>
     
     Таймаут запроса в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить таймаут.
@@ -275,7 +425,7 @@ await request.get('https://example.com/api/getText', { params: queryString });
 
 ---
 
-### head {#api-request-context-head}
+### head {/* #api-request-context-head */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.head</x-search>
 
@@ -328,7 +478,10 @@ await apiRequestContext.head(url, options);
     Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `multipart/form-data` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `multipart/form-data`, если не предоставлен явно. Значения файлов могут быть переданы либо как [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream), либо как объект, похожий на файл, содержащий имя файла, mime-тип и его содержимое.
   - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-params"/><a href="#api-request-context-head-option-params" class="list-anchor">#</a>
     
-    Параметры запроса, которые будут отправлены с URL.
+Параметры запроса, отправляемые вместе с URL.
+  - `signal` [AbortSignal] *(необязательно)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-signal"/><a href="#api-request-context-head-option-signal" class="list-anchor">#</a>
+    
+    Позволяет отменить операцию с помощью [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). Если сигнал отменён, операция будет прервана и будет выброшено исключение. Обратите внимание, что передача сигнала не отключает тайм-аут по умолчанию, который можно изменить с помощью [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); передайте `timeout: 0`, чтобы полностью отключить тайм-аут.
   - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-timeout"/><a href="#api-request-context-head-option-timeout" class="list-anchor">#</a>
     
     Таймаут запроса в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить таймаут.
@@ -338,7 +491,7 @@ await apiRequestContext.head(url, options);
 
 ---
 
-### patch {#api-request-context-patch}
+### patch {/* #api-request-context-patch */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.patch</x-search>
 
@@ -391,7 +544,10 @@ await apiRequestContext.patch(url, options);
     Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `multipart/form-data` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `multipart/form-data`, если не предоставлен явно. Значения файлов могут быть переданы либо как [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream), либо как объект, похожий на файл, содержащий имя файла, mime-тип и его содержимое.
   - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-params"/><a href="#api-request-context-patch-option-params" class="list-anchor">#</a>
     
-    Параметры запроса, которые будут отправлены с URL.
+Параметры запроса, которые будут отправлены вместе с URL.
+  - `signal` [AbortSignal] *(необязательно)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-signal"/><a href="#api-request-context-patch-option-signal" class="list-anchor">#</a>
+    
+    Позволяет отменить операцию с помощью [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). Если сигнал отменён, операция будет прервана и будет выброшена ошибка. Обратите внимание, что передача сигнала не отключает тайм-аут по умолчанию, который можно изменить с помощью [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); передайте `timeout: 0`, чтобы полностью отключить тайм-аут.
   - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-timeout"/><a href="#api-request-context-patch-option-timeout" class="list-anchor">#</a>
     
     Таймаут запроса в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить таймаут.
@@ -401,7 +557,7 @@ await apiRequestContext.patch(url, options);
 
 ---
 
-### post {#api-request-context-post}
+### post {/* #api-request-context-post */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.post</x-search>
 
@@ -485,7 +641,10 @@ await request.post('https://example.com/api/uploadForm', {
     Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `multipart/form-data` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `multipart/form-data`, если не предоставлен явно. Значения файлов могут быть переданы либо как [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream), либо как объект, похожий на файл, содержащий имя файла, mime-тип и его содержимое.
   - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-params"/><a href="#api-request-context-post-option-params" class="list-anchor">#</a>
     
-    Параметры запроса, которые будут отправлены с URL.
+Параметры запроса, которые будут отправлены вместе с URL.
+  - `signal` [AbortSignal] *(необязательно)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-signal"/><a href="#api-request-context-post-option-signal" class="list-anchor">#</a>
+    
+    Позволяет отменить операцию с помощью [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). Если сигнал отменён, операция будет прервана с выбросом ошибки. Обратите внимание, что передача сигнала не отключает тайм-аут по умолчанию, который можно изменить с помощью [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); передайте `timeout: 0`, чтобы полностью отключить тайм-аут.
   - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-timeout"/><a href="#api-request-context-post-option-timeout" class="list-anchor">#</a>
     
     Таймаут запроса в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить таймаут.
@@ -495,7 +654,7 @@ await request.post('https://example.com/api/uploadForm', {
 
 ---
 
-### put {#api-request-context-put}
+### put {/* #api-request-context-put */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.put</x-search>
 
@@ -548,7 +707,10 @@ await apiRequestContext.put(url, options);
     Предоставляет объект, который будет сериализован как html-форма с использованием кодировки `multipart/form-data` и отправлен в качестве тела этого запроса. Если этот параметр указан, заголовок `content-type` будет установлен в `multipart/form-data`, если не предоставлен явно. Значения файлов могут быть переданы либо как [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream), либо как объект, похожий на файл, содержащий имя файла, mime-тип и его содержимое.
   - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-params"/><a href="#api-request-context-put-option-params" class="list-anchor">#</a>
     
-    Параметры запроса, которые будут отправлены с URL.
+Параметры запроса, которые будут отправлены вместе с URL.
+  - `signal` [AbortSignal] *(необязательно)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-signal"/><a href="#api-request-context-put-option-signal" class="list-anchor">#</a>
+    
+    Позволяет отменить операцию с помощью [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). Если сигнал отменён, операция будет прервана и выбросит ошибку. Обратите внимание, что передача сигнала не отключает тайм-аут по умолчанию, который можно изменить с помощью [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); передайте `timeout: 0`, чтобы полностью отключить тайм-аут.
   - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-timeout"/><a href="#api-request-context-put-option-timeout" class="list-anchor">#</a>
     
     Таймаут запроса в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить таймаут.
@@ -558,7 +720,7 @@ await apiRequestContext.put(url, options);
 
 ---
 
-### storageState {#api-request-context-storage-state}
+### storageState {/* #api-request-context-storage-state */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.storageState</x-search>
 
@@ -575,7 +737,10 @@ await apiRequestContext.storageState(options);
 - `options` [Object] *(необязательно)*
   - `indexedDB` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-indexed-db"/><a href="#api-request-context-storage-state-option-indexed-db" class="list-anchor">#</a>
     
-    Установите в `true`, чтобы включить IndexedDB в снимок состояния хранилища.
+Установите значение `true`, чтобы включить IndexedDB в снимок состояния хранилища.
+  - `opfs` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-opfs"/><a href="#api-request-context-storage-state-option-opfs" class="list-anchor">#</a>
+    
+    Установите значение `true`, чтобы включить приватную файловую систему источника (origin private file system) в снимок состояния хранилища.
   - `path` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-path"/><a href="#api-request-context-storage-state-option-path" class="list-anchor">#</a>
     
     Путь к файлу для сохранения состояния хранилища. Если [path](/api/class-apirequestcontext.mdx#api-request-context-storage-state-option-path) является относительным путем, он будет разрешен относительно текущего рабочего каталога. Если путь не предоставлен, состояние хранилища все равно будет возвращено, но не будет сохранено на диске.
@@ -621,12 +786,25 @@ await apiRequestContext.storageState(options);
         
       
     
+---
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
+## Свойства {#properties}
+
+### tracing {/* #api-request-context-tracing */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.60</font><x-search>apiRequestContext.tracing</x-search>
+
+Средство записи трассировки для запросов, выполняемых через этот контекст API-запросов.
+
+**Использование**
+
+```js
+apiRequestContext.tracing
+```
+
+**Тип**
+- [Tracing]
+
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -639,10 +817,11 @@ await apiRequestContext.storageState(options);
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -661,6 +840,7 @@ await apiRequestContext.storageState(options);
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -668,9 +848,18 @@ await apiRequestContext.storageState(options);
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -688,6 +877,7 @@ await apiRequestContext.storageState(options);
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -700,6 +890,7 @@ await apiRequestContext.storageState(options);
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -721,6 +912,7 @@ await apiRequestContext.storageState(options);
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги изображений]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"

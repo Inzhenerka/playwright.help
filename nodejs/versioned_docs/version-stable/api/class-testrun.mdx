@@ -1,0 +1,256 @@
+---
+id: class-testrun
+title: "TestRun"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import HTMLCard from '@site/src/components/HTMLCard';
+
+
+Управляет тем, какие тесты будут запущены и каков их ожидаемый статус, а также предоставляет информацию о режимах выполнения наборов тестов. Объект [TestRun] доступен во время вызова [reporter.preprocess()](/api/class-reporter.mdx#reporter-preprocess). Проекты настройки и очистки (setup и teardown) изменять нельзя.
+
+
+---
+
+## Методы
+
+### exclude {/* #test-run-exclude */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.62</font><x-search>testRun.exclude</x-search>
+
+Исключает тест или набор тестов из запуска. Исключённые тесты не отображаются в отчёте, а их тела не выполняются.
+
+**Использование**
+
+```js
+testRun.exclude(test);
+```
+
+**Аргументы**
+- `test` [TestCase] | [Suite]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-run-exclude-option-test"/><a href="#test-run-exclude-option-test" class="list-anchor">#</a>
+  
+  Тест или набор тестов, который нужно исключить. Корневой набор тестов исключить нельзя.
+
+---
+
+### fail {/* #test-run-fail */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.62</font><x-search>testRun.fail</x-search>
+
+Помечает тест или каждый тест в наборе как «должен завершиться с ошибкой». Playwright запускает эти тесты и проверяет, что они действительно завершаются с ошибкой. Это полезно для документирования неработающей функциональности до её исправления.
+
+**Использование**
+
+```js
+testRun.fail(test);
+testRun.fail(test, reason);
+```
+
+**Аргументы**
+- `test` [TestCase] | [Suite]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-run-fail-option-test"/><a href="#test-run-fail-option-test" class="list-anchor">#</a>
+  
+  Тест или набор тестов, для которого нужно отметить ожидаемое завершение с ошибкой.
+- `reason` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-run-fail-option-reason"/><a href="#test-run-fail-option-reason" class="list-anchor">#</a>
+  
+  Необязательное пояснение, которое отображается в описании аннотации.
+
+---
+
+### fixme {/* #test-run-fixme */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.62</font><x-search>testRun.fixme</x-search>
+
+Помечает тест или каждый тест в наборе как fixme. Тела тестов не выполняются, а сами тесты отображаются в отчёте как пропущенные с намерением исправить их в дальнейшем.
+
+**Использование**
+
+```js
+testRun.fixme(test);
+testRun.fixme(test, reason);
+```
+
+**Аргументы**
+- `test` [TestCase] | [Suite]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-run-fixme-option-test"/><a href="#test-run-fixme-option-test" class="list-anchor">#</a>
+  
+  Тест или набор тестов, который нужно пометить как fixme.
+- `reason` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-run-fixme-option-reason"/><a href="#test-run-fixme-option-reason" class="list-anchor">#</a>
+  
+  Необязательное пояснение, которое отображается в описании аннотации.
+
+---
+
+### mode {/* #test-run-mode */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.65</font><x-search>testRun.mode</x-search>
+
+Возвращает режим выполнения, настроенный для набора тестов с помощью [test.describe.configure()](/api/class-test.mdx#test-describe-configure), [test.describe.serial()](/api/class-test.mdx#test-describe-serial) или [test.describe.parallel()](/api/class-test.mdx#test-describe-parallel). Если для набора режим не настроен, он наследует режим родительского набора. Наборы тестов проектов используют `"parallel"`, когда включён [testProject.fullyParallel](/api/class-testproject.mdx#test-project-fully-parallel), и `"default"` в противном случае. Корневой набор тестов использует `"default"`.
+
+Набор тестов с явно заданным режимом `"default"` не наследует `"parallel"` от родительского набора: его тесты выполняются по порядку в одном и том же рабочем процессе. Сам по себе режим не определяет полностью группы выполнения тестов, которые также зависят от фикстур рабочего процесса и хуков.
+
+Этот метод можно вызывать только во время [reporter.preprocess()](/api/class-reporter.mdx#reporter-preprocess). Он также позволяет проверять режим проектов настройки и очистки (setup и teardown).
+
+**Использование**
+
+```js
+testRun.mode(suite);
+```
+
+**Аргументы**
+- `suite` [Suite]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-run-mode-option-suite"/><a href="#test-run-mode-option-suite" class="list-anchor">#</a>
+  
+  Набор тестов, режим которого нужно проверить.
+
+**Возвращает**
+- "serial" | "parallel" | "default"<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-run-mode-return"/><a href="#test-run-mode-return" class="list-anchor">#</a>
+
+---
+
+### skip {/* #test-run-skip */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.62</font><x-search>testRun.skip</x-search>
+
+Пропускает тест или каждый тест в наборе. Тела тестов не выполняются, а сами тесты отображаются в отчёте как пропущенные.
+
+**Использование**
+
+```js
+testRun.skip(test);
+testRun.skip(test, reason);
+```
+
+**Аргументы**
+- `test` [TestCase] | [Suite]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-run-skip-option-test"/><a href="#test-run-skip-option-test" class="list-anchor">#</a>
+  
+  Тест или набор тестов, который нужно пропустить.
+- `reason` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-run-skip-option-reason"/><a href="#test-run-skip-option-reason" class="list-anchor">#</a>
+  
+  Необязательное пояснение, которое отображается в описании аннотации.
+
+---
+
+### skipSharding {/* #test-run-skip-sharding */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.62</font><x-search>testRun.skipSharding</x-search>
+
+Отключает встроенный фильтр шардов Playwright для текущего запуска, передавая распределение тестов по шардам репортёру. Репортёры обычно реализуют собственное распределение по шардам, вызывая [testRun.exclude()](/api/class-testrun.mdx#test-run-exclude) для тестов, не входящих в текущий шард.
+
+**Использование**
+
+```js
+testRun.skipSharding();
+```
+
+
+[APIRequest]: /api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
+[Browser]: /api/class-browser.mdx "Browser"
+[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[Clock]: /api/class-clock.mdx "Clock"
+[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
+[Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
+[Download]: /api/class-download.mdx "Download"
+[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[Frame]: /api/class-frame.mdx "Frame"
+[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
+[JSHandle]: /api/class-jshandle.mdx "JSHandle"
+[Keyboard]: /api/class-keyboard.mdx "Keyboard"
+[Locator]: /api/class-locator.mdx "Locator"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
+[Logger]: /api/class-logger.mdx "Logger"
+[Mouse]: /api/class-mouse.mdx "Mouse"
+[Page]: /api/class-page.mdx "Page"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
+[Playwright]: /api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
+[Request]: /api/class-request.mdx "Request"
+[Response]: /api/class-response.mdx "Response"
+[Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
+[Selectors]: /api/class-selectors.mdx "Selectors"
+[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
+[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: /api/class-tracing.mdx "Tracing"
+[Video]: /api/class-video.mdx "Video"
+[WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
+[WebSocket]: /api/class-websocket.mdx "WebSocket"
+[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
+[Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
+[Fixtures]: /api/class-fixtures.mdx "Fixtures"
+[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
+[FullProject]: /api/class-fullproject.mdx "FullProject"
+[Location]: /api/class-location.mdx "Location"
+[Test]: /api/class-test.mdx "Test"
+[TestConfig]: /api/class-testconfig.mdx "TestConfig"
+[TestInfo]: /api/class-testinfo.mdx "TestInfo"
+[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
+[TestOptions]: /api/class-testoptions.mdx "TestOptions"
+[TestProject]: /api/class-testproject.mdx "TestProject"
+[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
+[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
+[Reporter]: /api/class-reporter.mdx "Reporter"
+[Suite]: /api/class-suite.mdx "Suite"
+[TestCase]: /api/class-testcase.mdx "TestCase"
+[TestError]: /api/class-testerror.mdx "TestError"
+[TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
+[TestStep]: /api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Date]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date "Date"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
+[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
+
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "Все доступные теги образов"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
+[Dockerfile.noble]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

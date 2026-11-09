@@ -22,7 +22,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 ### Загрузка образа {#pull-the-image}
 
 ```bash
-docker pull mcr.microsoft.com/playwright/java:v1.56.0-noble
+docker pull mcr.microsoft.com/playwright/java:v1.64.0-noble
 ```
 
 ### Запуск образа {#run-the-image}
@@ -34,7 +34,7 @@ docker pull mcr.microsoft.com/playwright/java:v1.56.0-noble
 На доверенных веб-сайтах вы можете избежать создания отдельного пользователя и использовать root, так как вы доверяете коду, который будет выполняться в браузерах.
 
 ```bash
-docker run -it --rm --ipc=host mcr.microsoft.com/playwright/java:v1.56.0-noble /bin/bash
+docker run -it --rm --ipc=host mcr.microsoft.com/playwright/java:v1.64.0-noble /bin/bash
 ```
 
 #### Обход и скрейпинг {#crawling-and-scraping}
@@ -42,7 +42,7 @@ docker run -it --rm --ipc=host mcr.microsoft.com/playwright/java:v1.56.0-noble /
 На ненадежных веб-сайтах рекомендуется использовать отдельного пользователя для запуска браузеров в сочетании с профилем seccomp. Внутри контейнера или если вы используете Docker-образ как базовый образ, вам нужно использовать `adduser` для этого.
 
 ```bash
-docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_profile.json mcr.microsoft.com/playwright/java:v1.56.0-noble /bin/bash
+docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_profile.json mcr.microsoft.com/playwright/java:v1.64.0-noble /bin/bash
 ```
 
 [`seccomp_profile.json`](https://github.com/microsoft/playwright/blob/main/utils/docker/seccomp_profile.json) необходим для запуска Chromium с песочницей. Это [профиль seccomp по умолчанию для Docker](https://github.com/docker/engine/blob/d0d99b04cf6e00ed3fc27e81fc3d94e7eda70af3/profiles/seccomp/default.json) с дополнительными разрешениями на клонирование пространства имен пользователя:
@@ -82,7 +82,7 @@ docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_prof
 Запустите Playwright Server в Docker:
 
 ```bash
-docker run -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.56.0-noble /bin/sh -c "npx -y playwright@1.56.0 run-server --port 3000 --host 0.0.0.0"
+docker run -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.64.0-noble /bin/sh -c "npx -y playwright@1.64.0 run-server --port 3000 --host 0.0.0.0"
 ```
 
 #### Подключение к серверу {#connecting-to-the-server}
@@ -107,7 +107,7 @@ public class App {
 Если вам нужно получить доступ к локальным серверам из контейнера Docker:
 
 ```bash
-docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.56.0-noble /bin/sh -c "npx -y playwright@1.56.0 run-server --port 3000 --host 0.0.0.0"
+docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.64.0-noble /bin/sh -c "npx -y playwright@1.64.0 run-server --port 3000 --host 0.0.0.0"
 ```
 
 Это делает `hostmachine` указывающим на localhost хоста. Ваши тесты должны использовать `hostmachine` вместо `localhost` при доступе к локальным серверам.
@@ -117,14 +117,33 @@ docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --wo
 При запуске тестов удаленно убедитесь, что версия Playwright в ваших тестах соответствует версии, работающей в контейнере Docker.
 :::
 
-## Теги образов {#image-tags}
+### Подключение с помощью noVNC и GitHub Codespaces
+
+В средах Docker и GitHub Codespaces вы можете просматривать и генерировать тесты с помощью средства просмотра `noVNC`, встроенного в образ Docker. Чтобы веб-интерфейс VNC был доступен за пределами контейнера, включите компонент `desktop-lite` и укажите `webPort` в файле `.devcontainer/devcontainer.json`: 
+
+```json
+{
+  "image": "mcr.microsoft.com/playwright:v1.64.0-noble",
+  "forwardPorts": [6080],
+  "features": {
+    "desktop-lite": {
+      "webPort": "6080"
+    }
+  }
+}
+```
+
+После включения этого компонента вы можете открыть указанный порт в новой вкладке браузера и получить доступ к веб-интерфейсу `noVNC`. Это позволит вам записывать тесты, выбирать селекторы и использовать codegen непосредственно в контейнере.
+
+## Теги образов
 
 Смотрите [все доступные теги образов].
 
 В настоящее время мы публикуем образы со следующими тегами:
-- `:v1.56.0` — Docker-образ релиза Playwright v1.56.0 на базе Ubuntu 24.04 LTS (Noble Numbat).
-- `:v1.56.0-noble` — Docker-образ релиза Playwright v1.56.0 на базе Ubuntu 24.04 LTS (Noble Numbat).
-- `:v1.56.0-jammy` — Docker-образ релиза Playwright v1.56.0 на базе Ubuntu 22.04 LTS (Jammy Jellyfish).
+- `:v1.64.0` - Docker-образ релиза Playwright v1.64.0 на базе Ubuntu 24.04 LTS (Noble Numbat).
+- `:v1.64.0-noble` - Docker-образ релиза Playwright v1.64.0 на базе Ubuntu 24.04 LTS (Noble Numbat).
+- `:v1.64.0-jammy` - Docker-образ релиза Playwright v1.64.0 на базе Ubuntu 22.04 LTS (Jammy Jellyfish).
+- `:v1.64.0-resolute` - Docker-образ релиза Playwright v1.64.0 на базе Ubuntu 26.04 LTS (Resolute Raccoon).
 
 :::note
 
@@ -134,6 +153,7 @@ docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --wo
 ### Базовые образы {#base-images}
 
 В настоящее время мы публикуем образы на основе следующих версий [Ubuntu](https://hub.docker.com/_/ubuntu):
+- **Ubuntu 26.04 LTS** (Resolute Raccoon), теги образов включают `resolute`
 - **Ubuntu 24.04 LTS** (Noble Numbat), теги образов включают `noble`
 - **Ubuntu 22.04 LTS** (Jammy Jellyfish), теги образов включают `jammy`
 
@@ -152,6 +172,8 @@ docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --wo
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -173,15 +195,18 @@ docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --wo
 [RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -194,6 +219,7 @@ docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --wo
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[BiConsumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html "BiConsumer"
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
@@ -201,6 +227,7 @@ docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --wo
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[Integer]: https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html "Integer"
 [long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"

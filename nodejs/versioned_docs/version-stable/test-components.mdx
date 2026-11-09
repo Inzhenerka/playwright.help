@@ -1,496 +1,196 @@
 ---
 id: test-components
-title: "Компоненты (экспериментально)"
+title: "Компонентное тестирование"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-import LiteYouTube from '@site/src/components/LiteYouTube';
+## Введение
 
-## Введение {#introduction}
-
-Playwright Test теперь может тестировать ваши компоненты.
-
-<LiteYouTube id="y3YxX4sFJbM" title="Тестирование компонентов" />
-
-## Пример {#example}
-
-Вот как выглядит типичный тест компонента:
+Playwright Test позволяет тестировать компоненты вашего веб-приложения изолированно. Тест компонента — это обычный сквозной тест Playwright, который выполняется на небольшой странице **галереи историй**, обслуживаемой вашим собственным сервером разработки. Для этого не нужны ни отдельная среда выполнения для тестирования компонентов, ни интеграция со сборщиком, ни дополнительные npm-пакеты — всем управляет встроенная фикстура [fixtures.mount()](/api/class-fixtures.mdx#fixtures-mount) из `@playwright/test`.
 
 ```js
-test('событие должно работать', async ({ mount }) => {
-  let clicked = false;
+import { test, expect } from '@playwright/test';
 
-  // Монтируем компонент. Возвращает локатор, указывающий на компонент.
-  const component = await mount(
-    <Button title="Submit" onClick={() => { clicked = true }}></Button>
-  );
-
-  // Как и в любом тесте Playwright, утверждаем текст локатора.
-  await expect(component).toContainText('Submit');
-
-  // Выполняем клик по локатору. Это вызовет событие.
-  await component.click();
-
-  // Утверждаем, что соответствующие события были вызваны.
-  expect(clicked).toBeTruthy();
+test('click should expand', async ({ mount }) => {
+  const component = await mount('components/Expandable/Stateful');
+  await component.getByRole('button').click();
+  await expect(component.getByTestId('expanded')).toHaveValue('true');
 });
 ```
 
-## Как начать {#how-to-get-started}
+Тесты выполняются в Node.js, а компоненты — в настоящем браузере: выполняются реальные клики, рассчитывается реальная компоновка страницы, доступно визуальное регрессионное тестирование. При этом тесты получают все возможности Playwright Test: параллельное выполнение, параметризацию, повторные запуски и запись трассировок для последующего анализа сбоев.
 
-Добавление Playwright Test в существующий проект просто. Ниже приведены шаги для включения Playwright Test для проекта на React, Vue или Svelte.
+:::note
 
-### Шаг 1: Установите Playwright Test для компонентов для вашего соответствующего фреймворка {#step-1-install-playwright-test-for-components-for-your-respective-framework}
+Экспериментальные пакеты `@playwright/experimental-ct-react`, `-ct-react17` и `-ct-vue` были удалены и больше не публикуются. Если вы всё ещё используете их, оставайтесь на Playwright 1.62, пока не выполните инструкции из приведённого ниже [руководства по миграции](#migration-from-the-experimental-packages).
+:::
 
-<Tabs groupId="js-package-manager" defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'}, ] }>
+## Зачем нужен подход без привязки к фреймворку {#why-a-framework-agnostic-approach}
 
-<TabItem value="npm">
+Пакеты `@playwright/experimental-ct-*` позволяли писать JSX прямо в тесте, например `mount(<Button onClick={spy} />)`. Для этого Playwright сам находил компоненты в тестах, собирал их своей копией Vite со своей конфигурацией, запускал сервер и передавал свойства и обратные вызовы между Node.js и браузером.
+
+Из-за такого устройства пакеты так и остались экспериментальными:
+- **Поддерживались только совместимые настройки.** Псевдонимы путей, плагины и обработку CSS приходилось вручную дублировать в `ctViteConfig`. Проекты на webpack, Next.js и с собственным конвейером не могли использовать свою сборку. Для каждого фреймворка требовался отдельный пакет со своим кодом интеграции.
+- **Граница между Node.js и браузером создавала ограничения.** JSX из теста компилировался в Node.js и воссоздавался в браузере. Объекты нельзя было передавать напрямую, обратные вызовы работали с ограничениями из-за сериализации, а подмены модулей могли молча игнорироваться.
+
+Новый подход передаёт управление проекту:
+- **Вы управляете сборкой.** Компоненты собирает и отдаёт ваш сервер разработки с вашими плагинами, псевдонимами и CSS. Playwright открывает страницу, как в любом другом тесте.
+- **Подход работает с разными фреймворками.** От фреймворка зависит только страница галереи, небольшой модуль в вашем проекте. Если сервер разработки может отобразить компонент на React, Vue, Svelte, Solid или другом фреймворке, Playwright сможет его протестировать.
+- **Подход стабилен.** Тесты импортируют `test` и `expect` из `@playwright/test`, а [fixtures.mount()](/api/class-fixtures.mdx#fixtures-mount) входит в стандартный набор документированных фикстур. Экспериментальные пакеты и отдельный формат конфигурации больше не нужны.
+
+## Как это работает {#how-it-works}
+
+В основе подхода три понятия:
+- **История** — небольшой компонент-обёртка, который помещает тестируемый компонент в конкретный сценарий с заданными свойствами, тестовыми данными, провайдерами и записываемыми обратными вызовами. Истории лежат рядом с компонентом в файлах `*.story.tsx` или `.ts`/`.jsx`/`.js`/`.vue`. Каждый именованный экспорт задаёт одну историю.
+- **Галерея** — страница, которую отдаёт ваш сервер разработки. Она предоставляет функции `window.mount(params)` и `window.unmount()` для отображения истории из файлов проекта в элементе `#root` и её удаления. Вы реализуете галерею на своём фреймворке.
+- Фикстура [fixtures.mount()](/api/class-fixtures.mdx#fixtures-mount) открывает галерею ([testOptions.baseURL](/api/class-testoptions.mdx#test-options-base-url)), передаёт идентификатор истории и её свойства в `window.mount()` и возвращает [Locator] для корневого элемента галереи. Выполняйте поиск внутри него, например `component.getByRole('button').click()`.
+
+Всё необходимое компоненту настраивается *внутри истории*, которая выполняется в браузере. Тест наблюдает результат *через страницу*: DOM, URL и сетевые запросы.
+
+## Начало работы {#getting-started}
+
+### Шаг 1. Подключите навык к агенту {#step-1-point-your-coding-agent-at-the-skill}
+
+Галерея входит в код вашего приложения. Playwright поставляет навык, с помощью которого агент может настроить её за вас. Установите навыки и попросите Claude Code, GitHub Copilot или другого агента выполнить настройку:
 
 ```bash
-npm init playwright@latest -- --ct
+npx playwright init-skills
 ```
 
-</TabItem>
-
-<TabItem value="yarn">
-
-```bash
-yarn create playwright --ct
+```txt
+Set up component testing using the playwright-component-testing skill.
 ```
 
-</TabItem>
+Агент определит фреймворк и сборщик, реализует галерею для вашего стека, добавит проект Playwright в конфигурацию и напишет первую историю и тест.
 
-<TabItem value="pnpm">
+Галерея выполняет несколько требований:
+- Это одна страница в `playwright/gallery/`, которую отдаёт **ваш сервер разработки**. Приложения на Vite используют существующий сервер, а для других проектов можно запустить рядом с приложением отдельный сервер Vite.
+- Галерея находит файлы `*.story.*` и предоставляет две функции. `window.mount({ story, props })` отображает историю по идентификатору в элементе `#root`, а `window.unmount()` удаляет её. Если история не найдена или рендеринг завершился ошибкой, вызов `mount()` в тесте выбрасывает исключение.
+- Галерея повторно использует корневой элемент рендеринга. При вызове `component.update(props)` компонент обновляется без повторного монтирования и сохраняет состояние.
+- Галерея импортирует глобальные стили так же, как точка входа приложения. В `window.mount` можно выполнить общую настройку приложения, аналогичную прежним хукам `beforeMount`/`afterMount`.
 
-```bash
-pnpm create playwright --ct
-```
+Если вы предпочитаете написать галерею вручную, в установленном навыке есть полная спецификация с примерами для React и Vue в файле `references/gallery-spec.md`. Вся страница занимает несколько десятков строк.
 
-</TabItem>
+### Шаг 2. Настройте Playwright {#step-2-configure-playwright}
 
-</Tabs>
+Добавьте проект в `playwright.config.ts` и укажите адрес галереи в `baseURL`:
 
-Этот шаг создаёт несколько файлов в вашем рабочем пространстве:
+```js title="playwright.config.ts"
+import { defineConfig, devices } from '@playwright/test';
 
-```html title="playwright/index.html"
-<html lang="en">
-  <body>
-    <div id="root"></div>
-    <script type="module" src="./index.ts"></script>
-  </body>
-</html>
-```
-
-Этот файл определяет html-файл, который будет использоваться для рендеринга компонентов во время тестирования. Он должен содержать элемент с `id="root"`, именно туда монтируются компоненты. Он также должен ссылаться на скрипт под названием `playwright/index.{js,ts,jsx,tsx}`.
-
-Вы можете включать таблицы стилей, применять тему и внедрять код на страницу, где монтируется компонент, используя этот скрипт. Это может быть файл `.js`, `.ts`, `.jsx` или `.tsx`.
-
-```js title="playwright/index.ts"
-// Примените тему здесь, добавьте всё, что нужно вашему компоненту во время выполнения.
-```
-
-### Шаг 2. Создайте файл теста `src/App.spec.{ts,tsx}` {#step-2-create-a-test-file-srcappspec}
-
-<Tabs groupId="js-framework" defaultValue="react" values={[ {label: 'React', value: 'react'}, {label: 'Svelte', value: 'svelte'}, {label: 'Vue', value: 'vue'}, ] }>
-
-<TabItem value="react">
-
-```js title="app.spec.tsx"
-import { test, expect } from '@playwright/experimental-ct-react';
-import App from './App';
-
-test('должен работать', async ({ mount }) => {
-  const component = await mount(<App />);
-  await expect(component).toContainText('Learn React');
+export default defineConfig({
+  projects: [
+    {
+      name: 'components',
+      testDir: './tests/components',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'http://localhost:5173/playwright/gallery/index.html',
+        serviceWorkers: 'block',
+        reuseContext: true,
+      },
+    },
+  ],
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:5173/playwright/gallery/index.html',
+    reuseExistingServer: !process.env.CI,
+  },
 });
 ```
 
-</TabItem>
+Фикстура `mount` открывает `baseURL`, поэтому этот адрес должен вести на галерею. `serviceWorkers: 'block'` не даёт сервис-воркеру приложения подставлять кэшированные ответы в обход подмен через `page.route()`. `reuseContext: true` ускоряет компонентные тесты, повторно используя контекст браузера между тестами в одном воркере. Экспериментальные пакеты включали эту оптимизацию автоматически.
 
-<TabItem value="vue">
+### Шаг 3. Напишите историю {#step-3-write-a-story}
 
-```js title="app.spec.ts"
-import { test, expect } from '@playwright/experimental-ct-vue';
-import App from './App.vue';
+Истории лежат рядом с тестируемым компонентом. Каждый именованный экспорт задаёт отдельный сценарий:
 
-test('должен работать', async ({ mount }) => {
-  const component = await mount(App);
-  await expect(component).toContainText('Learn Vue');
+```js title="src/components/Button.story.tsx"
+import { Button } from './Button';
+
+export const Primary = () => <Button title='Submit' />;
+
+export const Disabled = () => <Button title='Submit' disabled />;
+```
+
+### Шаг 4: Напишите тест
+
+```js title="tests/components/button.spec.ts"
+import { test, expect } from '@playwright/test';
+
+test('renders primary button', async ({ mount }) => {
+  const component = await mount('components/Button/Primary');
+  await expect(component.getByRole('button')).toHaveText('Submit');
+});
+
+test('disabled button is disabled', async ({ mount }) => {
+  const component = await mount('components/Button/Disabled');
+  await expect(component.getByRole('button')).toBeDisabled();
 });
 ```
 
-```js title="app.spec.tsx"
-import { test, expect } from '@playwright/experimental-ct-vue';
-import App from './App.vue';
-
-test('должен работать', async ({ mount }) => {
-  const component = await mount(<App />);
-  await expect(component).toContainText('Learn Vue');
-});
-```
-
-Если вы используете TypeScript и Vue, убедитесь, что добавили файл `vue.d.ts` в ваш проект:
-
-```js
-declare module '*.vue';
-```
-
-</TabItem>
-
-<TabItem value="svelte">
-
-```js title="app.spec.ts"
-import { test, expect } from '@playwright/experimental-ct-svelte';
-import App from './App.svelte';
-
-test('должен работать', async ({ mount }) => {
-  const component = await mount(App);
-  await expect(component).toContainText('Learn Svelte');
-});
-```
-
-</TabItem>
-
-</Tabs>
-
-### Шаг 3. Запустите тесты {#step-3-run-the-tests}
-
-Вы можете запускать тесты, используя [расширение VS Code](./getting-started-vscode.mdx) или командную строку.
+### Шаг 5: Запустите тесты
 
 ```sh
-npm run test-ct
+npx playwright test --project=components
 ```
 
-### Дополнительное чтение: настройка отчетности, браузеров, трассировки {#further-reading-configure-reporting-browsers-tracing}
+## Истории как методология
 
-Обратитесь к [конфигурации Playwright](./test-configuration.mdx) для настройки вашего проекта.
+Истории — это не просто обходной путь для тестирования, а документация состояний ваших компонентов, в которой можно искать текстовыми средствами и которую можно проверять при ревью. Соглашения помогают сохранить эти свойства:
+- **Один экспорт на сценарий.** Предпочитайте экспорт новой истории параметризации существующей. Файл `Button.story.tsx`, экспортирующий `Primary`, `Disabled`, `WithLongTitle`, читается как спецификация компонента.
+- **Истории находятся рядом с компонентом.** `src/components/Button.story.tsx` документирует `src/components/Button.tsx`. При переименовании и рефакторинге оба файла изменяются вместе.
+- **Идентификаторы историй формируются на основе пути к файлу**: путь относительно `src/` без расширения `.story.*` плюс имя экспорта — `components/Button/Primary`. Также подходит любой уникальный суффикс: `mount('Button/Primary')`.
+- **История содержит всё, что нужно компоненту**: провайдеры, тестовые данные, состояние, обратные вызовы. Тест отвечает только за взаимодействия и проверки.
 
-## Тестовые истории {#test-stories}
+Поскольку каждая история представляет собой именованное состояние страницы, доступное по идентификатору, галерея также служит живым каталогом: откройте URL галереи в браузере и отобразите любую историю, чтобы изучить её визуально.
 
-Когда Playwright Test используется для тестирования веб-компонентов, тесты выполняются в Node.js, в то время как компоненты работают в реальном браузере. Это объединяет лучшее из обоих миров: компоненты работают в реальной среде браузера, выполняются реальные клики, выполняется реальная компоновка, возможна визуальная регрессия. В то же время тест может использовать все возможности Node.js, а также все функции Playwright Test. В результате те же параллельные, параметризованные тесты с той же историей постмортем-трассировки доступны во время тестирования компонентов.
+## Шаблоны тестирования
 
-Однако это вводит ряд ограничений:
-- Вы не можете передавать сложные живые объекты вашему компоненту. Можно передавать только простые объекты JavaScript и встроенные типы, такие как строки, числа, даты и т.д.
+### Записывайте состояние для проверок
 
-```js
-test('это будет работать', async ({ mount }) => {
-  const component = await mount(<ProcessViewer process={{ name: 'playwright' }}/>);
-});
-
-test('это не будет работать', async ({ mount }) => {
-  // `process` - это объект Node, мы не можем передать его в браузер и ожидать, что он будет работать.
-  const component = await mount(<ProcessViewer process={process}/>);
-});
-```
-
-- Вы не можете передавать данные вашему компоненту синхронно в обратном вызове:
-
-```js
-test('это не будет работать', async ({ mount }) => {
-  // () => 'red' обратный вызов живет в Node. Если компонент `ColorPicker` в браузере вызовет параметрическую функцию
-  // `colorGetter`, он не получит результат синхронно. Он сможет получить его через await, но это не то, как
-  // компоненты обычно строятся.
-  const component = await mount(<ColorPicker colorGetter={() => 'red'}/>);
-});
-```
-
-Обход этих и других ограничений быстрый и элегантный: для каждого случая использования тестируемого компонента создайте обертку этого компонента, специально предназначенную для тестирования. Это не только устранит ограничения, но и предложит мощные абстракции для тестирования, где вы сможете определить окружение, тему и другие аспекты рендеринга вашего компонента.
-
-Предположим, вы хотите протестировать следующий компонент:
-
-```js title="input-media.tsx"
-import React from 'react';
-
-type InputMediaProps = {
-  // Media - это сложный объект браузера, который мы не можем отправить в Node во время тестирования.
-  onChange(media: Media): void;
-};
-
-export function InputMedia(props: InputMediaProps) {
-  return <></> as any;
-}
-```
-
-Создайте файл истории для вашего компонента:
-
-```js title="input-media.story.tsx"
-import React from 'react';
-import InputMedia from './import-media';
-
-type InputMediaForTestProps = {
-  onMediaChange(mediaName: string): void;
-};
-
-export function InputMediaForTest(props: InputMediaForTestProps) {
-  // Вместо отправки сложного объекта `media` в тест, отправьте имя медиа.
-  return <InputMedia onChange={media => props.onMediaChange(media.name)} />;
-}
-// Экспортируйте больше историй здесь.
-```
-
-Затем протестируйте компонент через тестирование истории:
-
-```js title="input-media.spec.tsx"
-import { test, expect } from '@playwright/experimental-ct-react';
-import { InputMediaForTest } from './input-media.story.tsx';
-
-test('изменяет изображение', async ({ mount }) => {
-  let mediaSelected: string | null = null;
-
-  const component = await mount(
-    <InputMediaForTest
-      onMediaChange={mediaName => {
-        mediaSelected = mediaName;
-      }}
-    />
-  );
-  await component
-    .getByTestId('imageInput')
-    .setInputFiles('src/assets/logo.png');
-
-  await expect(component.getByAltText(/selected image/i)).toBeVisible();
-  await expect.poll(() => mediaSelected).toBe('logo.png');
-});
-```
-
-В результате для каждого компонента у вас будет файл истории, который экспортирует все истории, которые фактически тестируются. Эти истории живут в браузере и "конвертируют" сложные объекты в простые объекты, которые могут быть доступны в тесте.
-
-## Под капотом {#under-the-hood}
-
-Вот как работает тестирование компонентов:
-- Как только тесты выполняются, Playwright создает список компонентов, которые нужны тестам.
-- Затем он компилирует пакет, включающий эти компоненты, и обслуживает его с помощью локального статического веб-сервера.
-- При вызове `mount` в тесте Playwright переходит на фасадную страницу `/playwright/index.html` этого пакета и сообщает ей, чтобы она отобразила компонент.
-- События маршалируются обратно в среду Node.js для проверки.
-
-Playwright использует [Vite](https://vitejs.dev/) для создания пакета компонентов и его обслуживания.
-
-## Справочник API {#api-reference}
-
-### свойства {#props}
-
-Предоставьте props компоненту при монтировании.
-
-<Tabs groupId="js-framework" defaultValue="react" values={[ {label: 'React', value: 'react'}, {label: 'Svelte', value: 'svelte'}, {label: 'Vue', value: 'vue'}, ] }>
-
-<TabItem value="react">
-
-```js title="component.spec.tsx"
-import { test } from '@playwright/experimental-ct-react';
-
-test('props', async ({ mount }) => {
-  const component = await mount(<Component msg="greetings" />);
-});
-```
-
-</TabItem>
-
-<TabItem value="svelte">
-
-```js title="component.spec.ts"
-import { test } from '@playwright/experimental-ct-svelte';
-
-test('props', async ({ mount }) => {
-  const component = await mount(Component, { props: { msg: 'greetings' } });
-});
-```
-
-</TabItem>
-
-<TabItem value="vue">
-
-```js title="component.spec.ts"
-import { test } from '@playwright/experimental-ct-vue';
-
-test('props', async ({ mount }) => {
-  const component = await mount(Component, { props: { msg: 'greetings' } });
-});
-```
-
-```js title="component.spec.tsx"
-// Или, альтернативно, используя стиль `jsx`
-import { test } from '@playwright/experimental-ct-vue';
-
-test('props', async ({ mount }) => {
-  const component = await mount(<Component msg="greetings" />);
-});
-```
-
-</TabItem>
-
-</Tabs>
-
-### колбэки / события {#callbacks-events}
-
-Предоставьте обратные вызовы/события компоненту при монтировании.
-
-<Tabs groupId="js-framework" defaultValue="react" values={[ {label: 'React', value: 'react'}, {label: 'Svelte', value: 'svelte'}, {label: 'Vue', value: 'vue'}, ] }>
-
-<TabItem value="react">
-
-```js title="component.spec.tsx"
-import { test } from '@playwright/experimental-ct-react';
-
-test('callback', async ({ mount }) => {
-  const component = await mount(<Component onClick={() => {}} />);
-});
-```
-
-</TabItem>
-
-<TabItem value="svelte">
-
-```js title="component.spec.ts"
-import { test } from '@playwright/experimental-ct-svelte';
-
-test('event', async ({ mount }) => {
-  const component = await mount(Component, { on: { click() {} } });
-});
-```
-
-</TabItem>
-
-<TabItem value="vue">
-
-```js title="component.spec.ts"
-import { test } from '@playwright/experimental-ct-vue';
-
-test('event', async ({ mount }) => {
-  const component = await mount(Component, { on: { click() {} } });
-});
-```
-
-```js title="component.spec.tsx"
-// Или, альтернативно, используя стиль `jsx`
-import { test } from '@playwright/experimental-ct-vue';
-
-test('event', async ({ mount }) => {
-  const component = await mount(<Component v-on:click={() => {}} />);
-});
-```
-
-</TabItem>
-
-</Tabs>
-
-### дочерние элементы / слоты {#children-slots}
-
-Предоставьте children/slots компоненту при монтировании.
-
-<Tabs groupId="js-framework" defaultValue="react" values={[ {label: 'React', value: 'react'}, {label: 'Svelte', value: 'svelte'}, {label: 'Vue', value: 'vue'}, ] }>
-
-<TabItem value="react">
-
-```js title="component.spec.tsx"
-import { test } from '@playwright/experimental-ct-react';
-
-test('children', async ({ mount }) => {
-  const component = await mount(<Component>Child</Component>);
-});
-```
-
-</TabItem>
-
-<TabItem value="svelte">
-
-```js title="component.spec.ts"
-import { test } from '@playwright/experimental-ct-svelte';
-
-test('slot', async ({ mount }) => {
-  const component = await mount(Component, { slots: { default: 'Slot' } });
-});
-```
-
-</TabItem>
-
-<TabItem value="vue">
-
-```js title="component.spec.ts"
-import { test } from '@playwright/experimental-ct-vue';
-
-test('slot', async ({ mount }) => {
-  const component = await mount(Component, { slots: { default: 'Slot' } });
-});
-```
-
-```js title="component.spec.tsx"
-// Или, альтернативно, используя стиль `jsx`
-import { test } from '@playwright/experimental-ct-vue';
-
-test('children', async ({ mount }) => {
-  const component = await mount(<Component>Child</Component>);
-});
-```
-
-</TabItem>
-
-</Tabs>
-
-### хуки {#hooks}
-
-Вы можете использовать хуки `beforeMount` и `afterMount` для настройки вашего приложения. Это позволяет вам настраивать такие вещи, как маршрутизатор вашего приложения, фейковый сервер и т.д., предоставляя вам необходимую гибкость. Вы также можете передавать пользовательскую конфигурацию из вызова `mount` из теста, которая доступна из фикстуры `hooksConfig`. Это включает любую конфигурацию, которую нужно выполнить до или после монтирования компонента. Пример настройки маршрутизатора приведен ниже:
+Компоненты принимают обратные вызовы, а тестам нужно проверять, что они были вызваны. Вместо передачи обратных вызовов между Node.js и браузером **история хранит состояние и предоставляет обратные вызовы** — и записывает наблюдаемый результат в скрытую форму рядом с компонентом:
 
 <Tabs groupId="js-framework" defaultValue="react" values={[ {label: 'React', value: 'react'}, {label: 'Vue', value: 'vue'}, ] }>
 
 <TabItem value="react">
 
-```js title="playwright/index.tsx"
-import { beforeMount, afterMount } from '@playwright/experimental-ct-react/hooks';
-import { BrowserRouter } from 'react-router-dom';
+```js title="src/components/Expandable.story.tsx"
+import { useState } from 'react';
+import { Expandable } from './Expandable';
 
-export type HooksConfig = {
-  enableRouting?: boolean;
-}
-
-beforeMount<HooksConfig>(async ({ App, hooksConfig }) => {
-  if (hooksConfig?.enableRouting)
-    return <BrowserRouter><App /></BrowserRouter>;
-});
-```
-
-```js title="src/pages/ProductsPage.spec.tsx"
-import { test, expect } from '@playwright/experimental-ct-react';
-import type { HooksConfig } from '../playwright';
-import { ProductsPage } from './pages/ProductsPage';
-
-test('настройка маршрутизации через конфигурацию хуков', async ({ page, mount }) => {
-  const component = await mount<HooksConfig>(<ProductsPage />, {
-    hooksConfig: { enableRouting: true },
-  });
-  await expect(component.getByRole('link')).toHaveAttribute('href', '/products/42');
-});
+export const Stateful = () => {
+  const [expanded, setExpanded] = useState(false);
+  return <>
+    <Expandable expanded={expanded} setExpanded={setExpanded} title='Заголовок'>Подробности</Expandable>
+    <form hidden><input data-testid='expanded' readOnly value={String(expanded)} /></form>
+  </>;
+};
 ```
 
 </TabItem>
 
 <TabItem value="vue">
 
-```js title="playwright/index.ts"
-import { beforeMount, afterMount } from '@playwright/experimental-ct-vue/hooks';
-import { router } from '../src/router';
+```js title="src/components/Expandable.story.ts"
+import { defineComponent, h, ref } from 'vue';
+import Expandable from './Expandable.vue';
 
-export type HooksConfig = {
-  enableRouting?: boolean;
-}
-
-beforeMount<HooksConfig>(async ({ app, hooksConfig }) => {
-  if (hooksConfig?.enableRouting)
-    app.use(router);
+export const Stateful = defineComponent(() => {
+  const expanded = ref(false);
+  return () => h('div', [
+    h(Expandable, {
+      'expanded': expanded.value,
+      'onUpdate:expanded': (value: boolean) => expanded.value = value,
+      'title': 'Title',
+    }),
+    h('form', { hidden: true }, [
+      h('input', { 'data-testid': 'expanded', 'readonly': true, 'value': String(expanded.value) }),
+    ]),
+  ]);
 });
-```
-
-```js title="src/pages/ProductsPage.spec.ts"
-import { test, expect } from '@playwright/experimental-ct-vue';
-import type { HooksConfig } from '../playwright';
-import ProductsPage from './pages/ProductsPage.vue';
-
-test('настройка маршрутизации через конфигурацию хуков', async ({ page, mount }) => {
-  const component = await mount<HooksConfig>(ProductsPage, {
-    hooksConfig: { enableRouting: true },
-  });
-  await expect(component.getByRole('link')).toHaveAttribute('href', '/products/42');
 });
 ```
 
@@ -498,371 +198,155 @@ test('настройка маршрутизации через конфигур�
 
 </Tabs>
 
-### размонтирование {#unmount}
-
-Демонтируйте смонтированный компонент из DOM. Это полезно для тестирования поведения компонента при демонтаже. Примеры использования включают тестирование модального окна "Вы уверены, что хотите покинуть?" или обеспечение правильной очистки обработчиков событий для предотвращения утечек памяти.
-
-<Tabs groupId="js-framework" defaultValue="react" values={[ {label: 'React', value: 'react'}, {label: 'Svelte', value: 'svelte'}, {label: 'Vue', value: 'vue'}, ] }>
-
-<TabItem value="react">
-
-```js title="component.spec.tsx"
-import { test } from '@playwright/experimental-ct-react';
-
-test('unmount', async ({ mount }) => {
-  const component = await mount(<Component/>);
-  await component.unmount();
+```js title="tests/components/expandable.spec.ts"
+test('click should expand', async ({ mount }) => {
+  const component = await mount('components/Expandable/Stateful');
+  await component.getByRole('button').click();
+  await expect(component.getByTestId('expanded')).toHaveValue('true');
 });
 ```
 
-</TabItem>
+Этот приём лежит в основе подхода:
+- Весь сценарий выполняется в браузере. Обратные вызовы не нужно сериализовать и передавать между Node.js и браузером.
+- Проверка `toHaveValue()` повторяется автоматически, пока не появится нужное значение. Вручную ждать или опрашивать состояние не нужно.
+- Записывайте каждое наблюдаемое значение в отдельное поле с атрибутом `data-testid`. Для скалярных значений используйте `String(...)`, для структурированных данных — `JSON.stringify(...)`. Чтобы проверить отсутствие изменений, выполните действие и убедитесь, что значение осталось прежним.
+- Записанное состояние видно, когда история открыта в галерее. Нажимайте на компонент вручную и смотрите, как меняются значения. Так можно вручную проверить тот же сценарий, который покрывает автоматический тест. Оставьте атрибут `hidden` у формы, чтобы она не попадала на эталонный скриншот, или уберите его во время разработки, чтобы видеть состояние рядом с компонентом.
 
-<TabItem value="svelte">
+### Свойства для отдельного теста {#per-test-props}
 
-```js title="component.spec.ts"
-import { test } from '@playwright/experimental-ct-svelte';
+Если сценарию нужны параметры, передайте сериализуемые свойства вторым аргументом `mount`. Галерея передаст их истории:
 
-test('unmount', async ({ mount }) => {
-  const component = await mount(Component);
-  await component.unmount();
-});
+```js title="src/components/Button.story.tsx"
+import { Button } from './Button';
+
+export const WithTitle = ({ title = 'Default' }: { title?: string }) =>
+  <Button title={title} />;
 ```
 
-</TabItem>
+```js title="tests/components/button.spec.ts"
+import type { WithTitle } from '../../src/components/Button.story';
 
-<TabItem value="vue">
-
-```js title="component.spec.ts"
-import { test } from '@playwright/experimental-ct-vue';
-
-test('unmount', async ({ mount }) => {
-  const component = await mount(Component);
-  await component.unmount();
-});
+const component = await mount<typeof WithTitle>('Button/WithTitle', { title: 'Hello' });
 ```
 
-```js title="component.spec.tsx"
-// Или, альтернативно, используя стиль `jsx`
-import { test } from '@playwright/experimental-ct-vue';
+`mount` параметризуется типом истории: передайте тип истории в качестве аргумента типа, и типы пропсов (а также аргументов `update()`) будут проверяться на соответствие сигнатуре истории. Передавайте в пропсах только простые сериализуемые данные — колбэки должны находиться внутри истории.
 
-test('unmount', async ({ mount }) => {
-  const component = await mount(<Component/>);
-  await component.unmount();
-});
+### Изменение свойств через `update()` {#prop-transitions-with-update}
+
+Чтобы проверить реакцию компонента на изменение свойств **без повторного монтирования**, вызовите `component.update(newProps)`. История отобразится с новыми свойствами в существующем корневом элементе, а её состояние сохранится:
+
+```js
+const component = await mount('components/Counter/Default', { value: 1 });
+await expect(component.getByTestId('value')).toHaveText('1');
+await component.update({ value: 2 });
+await expect(component.getByTestId('value')).toHaveText('2');
 ```
 
-</TabItem>
+### Несколько состояний и визуальное сравнение {#multiple-states-and-visual-comparison}
 
-</Tabs>
+Каждый вызов `mount()` открывает страницу заново. Это изолирует тесты и позволяет быстро смонтировать несколько историй в одном тесте:
 
-### обновление {#update}
-
-Обновите props, slots/children и/или события/обратные вызовы смонтированного компонента. Эти входные данные компонента могут изменяться в любое время и обычно предоставляются родительским компонентом, но иногда необходимо убедиться, что ваши компоненты ведут себя правильно при новых входных данных.
-
-<Tabs groupId="js-framework" defaultValue="react" values={[ {label: 'React', value: 'react'}, {label: 'Svelte', value: 'svelte'}, {label: 'Vue', value: 'vue'}, ] }>
-
-<TabItem value="react">
-
-```js title="component.spec.tsx"
-import { test } from '@playwright/experimental-ct-react';
-
-test('update', async ({ mount }) => {
-  const component = await mount(<Component/>);
-  await component.update(
-      <Component msg="greetings" onClick={() => {}}>Child</Component>
-  );
-});
+```js
+await expect(await mount('Button/Primary')).toHaveScreenshot('primary.png');
+await expect(await mount('Button/Disabled')).toHaveScreenshot('disabled.png');
 ```
 
-</TabItem>
-
-<TabItem value="svelte">
-
-```js title="component.spec.ts"
-import { test } from '@playwright/experimental-ct-svelte';
-
-test('update', async ({ mount }) => {
-  const component = await mount(Component);
-  await component.update({
-    props: { msg: 'greetings' },
-    on: { click() {} },
-    slots: { default: 'Child' }
-  });
-});
-```
-
-</TabItem>
-
-<TabItem value="vue">
-
-```js title="component.spec.ts"
-import { test } from '@playwright/experimental-ct-vue';
-
-test('update', async ({ mount }) => {
-  const component = await mount(Component);
-  await component.update({
-    props: { msg: 'greetings' },
-    on: { click() {} },
-    slots: { default: 'Child' }
-  });
-});
-```
-
-```js title="component.spec.tsx"
-// Или, альтернативно, используя стиль `jsx`
-import { test } from '@playwright/experimental-ct-vue';
-
-test('update', async ({ mount }) => {
-  const component = await mount(<Component/>);
-  await component.update(
-      <Component msg="greetings" v-on:click={() => {}}>Child</Component>
-  );
-});
-```
-
-</TabItem>
-
-</Tabs>
+Делайте скриншот с помощью возвращённого корневого локатора, а не всей страницы, чтобы проверка не затрагивала дополнительные элементы, которые вы можете разместить в галерее.
 
 ### Обработка сетевых запросов {#handling-network-requests}
 
-Playwright предоставляет **экспериментальную** фикстуру `router` для перехвата и обработки сетевых запросов. Есть два способа использования фикстуры `router`:
-* Вызовите `router.route(url, handler)`, который ведет себя аналогично [page.route()](/api/class-page.mdx#page-route). См. руководство по [мокированию сети](./mock.mdx) для получения более подробной информации.
-* Вызовите `router.use(handlers)` и передайте обработчики запросов библиотеки [MSW](https://mswjs.io/) в него.
-
-Вот пример повторного использования ваших существующих обработчиков MSW в тесте.
+Используйте [page.route()](/api/class-page.mdx#page-route) как обычно — регистрируйте маршруты до вызова `mount()`, поскольку монтирование приводит к навигации:
 
 ```js
-import { handlers } from '@src/mocks/handlers';
-
-test.beforeEach(async ({ router }) => {
-  // установите общие обработчики перед каждым тестом
-  await router.use(...handlers);
-});
-
-test('пример теста', async ({ mount }) => {
-  // тестируйте как обычно, ваши обработчики активны
-  // ...
+test('renders the error state', async ({ page, mount }) => {
+  await page.route('**/api/items', route => route.fulfill({ status: 500 }));
+  const component = await mount('components/ItemList/Default');
+  await expect(component.getByRole('alert')).toContainText('Something went wrong');
 });
 ```
 
-Вы также можете ввести одноразовый обработчик для конкретного теста.
+Параметр `serviceWorkers: 'block'` в конфигурации не позволяет собственному сервис-воркеру приложения возвращать кешированные ответы, из-за которых запросы не попадали бы в обработчики маршрутов. Команды, использующие библиотеки обработчиков [MSW](https://mswjs.io/), могут вместо этого запускать сервис-воркер внутри истории или декоратора.
 
-```js
-import { http, HttpResponse } from 'msw';
+### Отладка историй {#debugging-stories}
 
-test('пример теста', async ({ mount, router }) => {
-  await router.use(http.get('/data', async ({ request }) => {
-    return HttpResponse.json({ value: 'mocked' });
-  }));
+Откройте URL галереи в браузере и вызовите `await window.mount({ story: 'components/Button/Primary' })` в консоли DevTools — именно это и делает фикстура `mount`. Если история не найдена или при рендеринге возникает ошибка, промис `window.mount` отклоняется, а вызов `mount()` в тесте выбрасывает исключение с реальной трассировкой стека. Чтобы просматривать галерею без консоли, добавьте в неё необязательную индексную страницу со списком всех обнаруженных историй.
 
-  // тестируйте как обычно, ваш обработчик активен
-  // ...
-});
-```
+## Миграция с экспериментальных пакетов {/* #migration-from-the-experimental-packages */}
 
-## Часто задаваемые вопросы {#frequently-asked-questions}
+Экспериментальные пакеты компилировали JSX в файле теста и передавали его в браузер. Подход с галереей переносит сценарий в экспортируемую историю, которая выполняется непосредственно в браузере. Вот как соотносятся эти концепции:
 
-### В чем разница между `@playwright/test` и `@playwright/experimental-ct-{react,svelte,vue}`? {#whats-the-difference-between-playwrighttest-and-playwrightexperimental-ct}
+| `@playwright/experimental-ct-*` | Галерея историй |
+|---|---|
+| `mount(<Button onClick={spy} />)` | История с состоянием: история предоставляет `onClick` и записывает результат в скрытое поле ввода; тест проверяет его с помощью `toHaveValue()` |
+| Обычные данные в пропсах из теста | По сути без изменений: `mount(id, props)` |
+| Дочерние JSX-элементы / слоты из теста | Отдельный экспорт истории для каждой композиции (Vue: файл `.story.vue` для сценариев с активным использованием слотов) |
+| `component.update(<Button count={2} />)` | `component.update({ count: 2 })` |
+| `component.unmount()` | `component.unmount()` |
+| Хуки `beforeMount` / `afterMount` | Тело функции `window.mount` галереи (глобально) или декораторы историй (для отдельных историй) |
+| Различные значения `hooksConfig` для отдельных тестов | Пропсы: `mount('App/Routing', { route: '/dashboard' })`, которые интерпретирует история |
+| Фикстура `router` / обработчики MSW в Node.js | [page.route()](/api/class-page.mdx#page-route) в тесте или MSW `setupWorker` внутри истории |
+| `playwright/index.html` (стили, тема) | Файл `index.html` галереи и импорты её входного модуля |
+| `ctViteConfig`, `ctPort`, `ctTemplateDir` | Больше не нужны — галерея работает через ваш собственный сервер разработки; порт задаётся в `webServer` и `baseURL` |
+| `defineConfig` из пакета ct | Обычный `defineConfig` из `@playwright/test` |
 
-```js
-test('…', async ({ mount, page, context }) => {
-  // …
-});
-```
+Миграция типичного теста выглядит так:
 
-`@playwright/experimental-ct-{react,svelte,vue}` оборачивает `@playwright/test`, чтобы предоставить дополнительную встроенную фикстуру, специфичную для тестирования компонентов, под названием `mount`:
-
-<Tabs groupId="js-framework" defaultValue="react" values={[ {label: 'React', value: 'react'}, {label: 'Svelte', value: 'svelte'}, {label: 'Vue', value: 'vue'}, ] }>
-
-<TabItem value="react">
-
-```js
+```js title="До: button.spec.tsx"
 import { test, expect } from '@playwright/experimental-ct-react';
-import HelloWorld from './HelloWorld';
+import Button from '../src/components/Button';
 
-test.use({ viewport: { width: 500, height: 500 } });
-
-test('должен работать', async ({ mount }) => {
-  const component = await mount(<HelloWorld msg="greetings" />);
-  await expect(component).toContainText('Greetings');
+test('counts clicks', async ({ mount }) => {
+  let clicks = 0;
+  const component = await mount(<Button title='Submit' onClick={() => ++clicks} />);
+  await component.getByRole('button').click();
+  expect(clicks).toBe(1);
 });
 ```
 
-</TabItem>
+```js title="После: src/components/Button.story.tsx"
+import { useState } from 'react';
+import { Button } from './Button';
 
-<TabItem value="vue">
+export const CountsClicks = () => {
+  const [clicks, setClicks] = useState(0);
+  return <>
+    <Button title='Submit' onClick={() => setClicks(count => count + 1)} />
+    <form hidden><input data-testid='click-count' readOnly value={String(clicks)} /></form>
+  </>;
+};
+```
 
-```js
-import { test, expect } from '@playwright/experimental-ct-vue';
-import HelloWorld from './HelloWorld.vue';
+```js title="После: tests/components/button.spec.ts"
+import { test, expect } from '@playwright/test';
 
-test.use({ viewport: { width: 500, height: 500 } });
-
-test('должен работать', async ({ mount }) => {
-  const component = await mount(HelloWorld, {
-    props: {
-      msg: 'Greetings',
-    },
-  });
-  await expect(component).toContainText('Greetings');
+test('counts clicks', async ({ mount }) => {
+  const component = await mount('components/Button/CountsClicks');
+  await component.getByRole('button').click();
+  await expect(component.getByTestId('click-count')).toHaveValue('1');
 });
 ```
 
-</TabItem>
+Выполняйте миграцию постепенно: оставаясь на зафиксированной версии Playwright 1.62, настройте галерею и проект `components` параллельно со старым проектом CT, переносите тесты по одному, затем удалите зависимость `@playwright/experimental-ct-*` вместе с `playwright/index.html`, `playwright/index.ts` и `playwright/.cache` и обновите Playwright.
 
-<TabItem value="svelte">
+На что стоит обратить внимание:
+- **Идентификаторы историй — это строки.** Переименование или перемещение истории приводит к ошибкам в тестах во время выполнения, а не компиляции. Использование `mount<typeof Story>` как минимум связывает типы пропсов с историей на этапе компиляции.
+- **JSX в отдельных тестах больше не используется.** Если раньше тесты создавали разные JSX-деревья, теперь для каждой композиции нужен отдельный экспорт истории — в этом и заключается смысл: любая композиция, которую стоит тестировать, заслуживает собственного имени и проверки.
 
-```js
-import { test, expect } from '@playwright/experimental-ct-svelte';
-import HelloWorld from './HelloWorld.svelte';
+## Часто задаваемые вопросы
 
-test.use({ viewport: { width: 500, height: 500 } });
+### Как получить доступ к методам компонента или его экземпляру?
 
-test('должен работать', async ({ mount }) => {
-  const component = await mount(HelloWorld, {
-    props: {
-      msg: 'Greetings',
-    },
-  });
-  await expect(component).toContainText('Greetings');
-});
-```
+Обращение к внутренним методам компонента или его экземпляру из кода теста не рекомендуется и не поддерживается. Вместо этого сосредоточьтесь на наблюдении за компонентом и взаимодействии с ним с точки зрения пользователя: нажимайте на него, проверяйте страницу и отражайте внутренние эффекты в DOM с помощью истории. Тесты становятся менее хрупкими и более полезными, когда не зависят от деталей реализации. Если тест завершается с ошибкой при проверке с точки зрения пользователя, скорее всего, автоматизированный тест обнаружил настоящую ошибку.
 
-</TabItem>
+### Можно ли продолжать использовать плагины сборщика, алиасы и настройки CSS?
 
-</Tabs>
+Да — это основной принцип такого подхода. Галерея обслуживается вашим собственным сервером разработки, поэтому истории могут отображать всё, что может отображать ваше приложение. Не нужно синхронизировать вторую конфигурацию сборщика.
 
-Кроме того, он добавляет некоторые параметры конфигурации, которые вы можете использовать в вашем `playwright-ct.config.{ts,js}`.
+### А как насчёт других фреймворков, кроме React и Vue?
 
-Наконец, под капотом, каждый тест повторно использует фикстуры `context` и `page` в качестве оптимизации скорости для тестирования компонентов. Он сбрасывает их между каждым тестом, так что это должно быть функционально эквивалентно гарантии `@playwright/test`, что вы получаете новую, изолированную фикстуру `context` и `page` для каждого теста.
-
-### У меня есть проект, который уже использует Vite. Могу ли я повторно использовать конфигурацию? {#i-have-a-project-that-already-uses-vite-can-i-reuse-the-config}
-
-На данный момент Playwright не зависит от сборщика, поэтому он не использует вашу существующую конфигурацию Vite. Ваша конфигурация может содержать много вещей, которые мы не сможем использовать повторно. Поэтому на данный момент вы можете скопировать ваши сопоставления путей и другие настройки высокого уровня в свойство `ctViteConfig` конфигурации Playwright.
-
-```js
-import { defineConfig } from '@playwright/experimental-ct-react';
-
-export default defineConfig({
-  use: {
-    ctViteConfig: {
-      // ...
-    },
-  },
-});
-```
-
-Вы можете указать плагины через конфигурацию Vite для тестирования настроек. Обратите внимание, что как только вы начнете указывать плагины, вы несете ответственность за указание плагина фреймворка, например, `vue()` в этом случае:
-
-```js
-import { defineConfig, devices } from '@playwright/experimental-ct-vue';
-
-import { resolve } from 'path';
-import vue from '@vitejs/plugin-vue';
-import AutoImport from 'unplugin-auto-import/vite';
-import Components from 'unplugin-vue-components/vite';
-
-export default defineConfig({
-  testDir: './tests/component',
-  use: {
-    trace: 'on-first-retry',
-    ctViteConfig: {
-      plugins: [
-        vue(),
-        AutoImport({
-          imports: [
-            'vue',
-            'vue-router',
-            '@vueuse/head',
-            'pinia',
-            {
-              '@/store': ['useStore'],
-            },
-          ],
-          dts: 'src/auto-imports.d.ts',
-          eslintrc: {
-            enabled: true,
-          },
-        }),
-        Components({
-          dirs: ['src/components'],
-          extensions: ['vue'],
-        }),
-      ],
-      resolve: {
-        alias: {
-          '@': resolve(__dirname, './src'),
-        },
-      },
-    },
-  },
-});
-```
-
-### Как использовать импорты CSS? {#how-do-i-use-css-imports}
-
-Если у вас есть компонент, который импортирует CSS, Vite обработает это автоматически. Вы также можете использовать препроцессоры CSS, такие как Sass, Less или Stylus, и Vite обработает их также без дополнительной конфигурации. Однако соответствующий препроцессор CSS должен быть установлен.
-
-Vite имеет жесткое требование, чтобы все модули CSS назывались `*.module.[css extension]`. Если у вас есть пользовательская конфигурация сборки для вашего проекта и есть импорты в виде `import styles from 'styles.css'`, вы должны переименовать ваши файлы, чтобы правильно указать, что они должны обрабатываться как модули. Вы также можете написать плагин Vite, чтобы обработать это за вас.
-
-Проверьте [документацию Vite](https://vite.dev/guide/features#css) для получения более подробной информации.
-
-### Как я могу тестировать компоненты, использующие Pinia? {#how-can-i-test-components-that-uses-pinia}
-
-Pinia должна быть инициализирована в `playwright/index.{js,ts,jsx,tsx}`. Если вы сделаете это внутри хука `beforeMount`, `initialState` может быть перезаписано на основе каждого теста:
-
-```js title="playwright/index.ts"
-import { beforeMount, afterMount } from '@playwright/experimental-ct-vue/hooks';
-import { createTestingPinia } from '@pinia/testing';
-import type { StoreState } from 'pinia';
-import type { useStore } from '../src/store';
-
-export type HooksConfig = {
-  store?: StoreState<ReturnType<typeof useStore>>;
-}
-
-beforeMount<HooksConfig>(async ({ hooksConfig }) => {
-  createTestingPinia({
-    initialState: hooksConfig?.store,
-    /**
-     * Используйте перехват http для мокирования вызовов API вместо этого:
-     * https://playwright.dev/docs/mock#mock-api-requests
-     */
-    stubActions: false,
-    createSpy(args) {
-      console.log('spy', args)
-      return () => console.log('spy-returns')
-    },
-  });
-});
-```
-
-```js title="src/pinia.spec.ts"
-import { test, expect } from '@playwright/experimental-ct-vue';
-import type { HooksConfig } from '../playwright';
-import Store from './Store.vue';
-
-test('переопределение initialState', async ({ mount }) => {
-  const component = await mount<HooksConfig>(Store, {
-    hooksConfig: {
-      store: { name: 'override initialState' }
-    }
-  });
-  await expect(component).toContainText('override initialState');
-});
-```
-
-### Как получить доступ к методам компонента или его экземпляру? {#how-do-i-access-the-components-methods-or-its-instance}
-
-Доступ к внутренним методам компонента или его экземпляру в тестовом коде не рекомендуется и не поддерживается. Вместо этого сосредоточьтесь на наблюдении и взаимодействии с компонентом с точки зрения пользователя, обычно путем клика или проверки видимости чего-либо на странице. Тесты становятся менее хрупкими и более ценными, когда они избегают взаимодействия с внутренними деталями реализации, такими как экземпляр компонента или его методы. Имейте в виду, что если тест не проходит при запуске с точки зрения пользователя, это, вероятно, означает, что автоматизированный тест обнаружил реальную ошибку в вашем коде.
+Попросите своего ИИ-агента для программирования реализовать контракт галереи для вашего фреймворка: находить компонент по идентификатору истории, отображать его в `#root` и повторно использовать корневой узел между вызовами, чтобы `update()` сохранял состояние. Фикстура `mount` не знает, какой фреймворк используется на другой стороне, и не зависит от него.
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -875,10 +359,11 @@ test('переопределение initialState', async ({ mount }) => {
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -897,6 +382,7 @@ test('переопределение initialState', async ({ mount }) => {
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -904,9 +390,18 @@ test('переопределение initialState', async ({ mount }) => {
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -924,6 +419,7 @@ test('переопределение initialState', async ({ mount }) => {
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -936,6 +432,7 @@ test('переопределение initialState', async ({ mount }) => {
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -957,6 +454,7 @@ test('переопределение initialState', async ({ mount }) => {
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

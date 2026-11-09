@@ -31,20 +31,20 @@ export default defineConfig({
 
 | Свойство | Описание |
 | :- | :- |
-| [testConfig.webServer](/api/class-testconfig.mdx#test-config-web-server) | Запускает dev-веб‑сервер (или несколько) во время тестов. |
-| `command`| Команда shell для запуска локального dev-сервера вашего приложения. |
-| `cwd` | Текущая рабочая директория запущенного процесса; по умолчанию — директория файла конфигурации. |
-| `env` | Переменные окружения для команды. По умолчанию наследуются из `process.env`, дополнительно добавляется `PLAYWRIGHT_TEST=1`. |
-| `gracefulShutdown` | Как завершать процесс. Если не указано, группа процессов принудительно завершается с помощью `SIGKILL`. Если задано `{ signal: 'SIGTERM', timeout: 500 }`, группе процессов отправляется сигнал `SIGTERM`, а затем — `SIGKILL`, если она не завершится в течение 500 мс. В качестве сигнала также можно использовать `SIGINT`. Таймаут `0` означает, что `SIGKILL` отправлен не будет. Windows не поддерживает сигналы `SIGTERM` и `SIGINT`, поэтому на Windows эта опция игнорируется. Обратите внимание: для остановки Docker-контейнера требуется `SIGTERM`. |
-| `ignoreHTTPSErrors` | Игнорировать ли ошибки HTTPS при обращении к `url`. По умолчанию `false`. |
-| `name` | Задаёт пользовательское имя для веб‑сервера. Это имя будет добавляться в начало сообщений логов. По умолчанию `[WebServer]`. |
-| `port` | **Устарело**. Используйте `url`. Порт, на котором ожидается HTTP-сервер. Playwright будет ждать, пока сервер начнёт принимать подключения. Нужно указать либо `port`, либо `url`. |
-| `reuseExistingServer`| Если `true`, будет переиспользован уже запущенный сервер на `port` или `url`, если он доступен. Если на `port` или `url` ничего не запущено, будет выполнена команда для старта нового сервера. Если `false`, будет выброшена ошибка, если какой‑то процесс уже слушает `port` или `url`. Обычно это задают как `!process.env.CI`, чтобы при локальном запуске тестов можно было использовать локальный dev-сервер. |
-| `stderr` | Пробрасывать ли stderr команды в stderr процесса или игнорировать его. По умолчанию `"pipe"`. |
-| `stdout` | Если `"pipe"`, stdout команды будет пробрасываться в stdout процесса. Если `"ignore"`, stdout команды будет игнорироваться. По умолчанию `"ignore"`. |
-| `timeout` | Сколько времени ждать запуска процесса и его доступности, в миллисекундах. По умолчанию 60000. |
-| `url`| URL вашего HTTP-сервера, который должен вернуть статус 2xx, 3xx, 400, 401, 402 или 403, когда сервер будет готов принимать подключения. Нужно указать либо `port`, либо `url`. |
-| `wait` | Считать команду запущенной только после того, как появится указанный вывод. Принимает объект с необязательными регулярными выражениями `stdout` и/или `stderr`. Именованные группы захвата в regex сохраняются в переменные окружения; например, `/Listening on port (?<my_server_port>\\d+)/` сохранит номер порта в `process.env['MY_SERVER_PORT']`. |
+| [testConfig.webServer](/api/class-testconfig.mdx#test-config-web-server) | Запуск одного или нескольких веб-серверов для разработки во время выполнения тестов. |
+| `command`| Команда оболочки для запуска локального сервера разработки вашего приложения. |
+| `cwd` | Текущий рабочий каталог запускаемого процесса. По умолчанию используется каталог файла конфигурации. |
+| `env` | Переменные окружения для команды. По умолчанию наследуются переменные из `process.env` с добавлением `PLAYWRIGHT_TEST=1`. |
+| `gracefulShutdown` | Способ завершения процесса. Если параметр не указан, группа процессов принудительно завершается сигналом `SIGKILL`. Если задано `{ signal: 'SIGTERM', timeout: 500 }`, группе процессов отправляется сигнал `SIGTERM`, а затем — `SIGKILL`, если она не завершится в течение 500 мс. Вместо `SIGTERM` также можно использовать сигнал `SIGINT`. Тайм-аут `0` означает, что сигнал `SIGKILL` не будет отправлен. Windows не поддерживает сигналы `SIGTERM` и `SIGINT`, поэтому в Windows этот параметр игнорируется. Обратите внимание, что для завершения работы контейнера Docker требуется `SIGTERM`. |
+| `ignoreHTTPSErrors` | Игнорировать ли ошибки HTTPS при обращении к `url`. По умолчанию — `false`. |
+| `name` | Задает пользовательское имя веб-сервера. Это имя будет добавляться в начало сообщений журнала. По умолчанию — `[WebServer]`. |
+| `port` | **Устарело**. Используйте `url` вместо этого параметра. Порт, на котором ожидается запуск вашего HTTP-сервера. Выполнение будет ожидать, пока сервер не начнет принимать соединения. Необходимо указать либо `port`, либо `url`. |
+| `reuseExistingServer`| Если задано `true`, уже работающий сервер на указанном `port` или по указанному `url` будет использован повторно, если он доступен. Если на этом `port` или по этому `url` сервер не запущен, будет выполнена команда для запуска нового сервера. Если задано `false`, будет выброшено исключение, если существующий процесс уже принимает соединения на указанном `port` или по указанному `url`. Обычно этому параметру следует задавать значение `!process.env.CI`, чтобы разрешить использование локального сервера разработки при локальном запуске тестов. |
+| `stderr` | Перенаправлять ли стандартный поток ошибок команды в стандартный поток ошибок процесса или игнорировать его. По умолчанию — `"pipe"`. |
+| `stdout` | Если задано `"pipe"`, стандартный поток вывода команды перенаправляется в стандартный поток вывода процесса. Если задано `"ignore"`, стандартный поток вывода команды игнорируется. По умолчанию — `"ignore"`. |
+| `timeout` | Время ожидания запуска процесса и его готовности к работе в миллисекундах. По умолчанию — 60000. |
+| `url`| URL вашего HTTP-сервера, который должен возвращать код состояния 2xx, 3xx, 400, 401, 402 или 403, когда сервер готов принимать соединения. Необходимо указать либо `port`, либо `url`. Если указаны и `url`, и `wait`, сервер считается запущенным, когда выполнено хотя бы одно из условий. |
+| `wait` | Считать команду запущенной только после появления заданного вывода. Принимает объект с необязательными регулярными выражениями `stdout` и/или `stderr`. Именованные группы захвата в регулярном выражении сохраняются в переменных окружения. Например, `/Listening on port (?<my_server_port>\d+)/` сохранит номер порта в `process.env['MY_SERVER_PORT']`. Если указаны и `url`, и `wait`, сервер считается запущенным, когда выполнено хотя бы одно из условий. |
 
 ## Добавление таймаута для сервера {#adding-a-server-timeout}
 
@@ -132,11 +132,6 @@ export default defineConfig({
 ```
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -149,10 +144,11 @@ export default defineConfig({
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -171,6 +167,7 @@ export default defineConfig({
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -178,9 +175,18 @@ export default defineConfig({
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -198,6 +204,7 @@ export default defineConfig({
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -210,6 +217,7 @@ export default defineConfig({
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -231,6 +239,7 @@ export default defineConfig({
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

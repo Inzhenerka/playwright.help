@@ -32,7 +32,7 @@ npx tsc -p tsconfig.json --noEmit -w
 
 ## tsconfig.json {#tsconfigjson}
 
-Playwright будет использовать `tsconfig.json` для каждого загружаемого исходного файла. Обратите внимание, что Playwright **поддерживает только** следующие опции tsconfig: `allowJs`, `baseUrl`, `paths` и `references`.
+Playwright использует `tsconfig.json` для каждого загружаемого исходного файла. Обратите внимание, что Playwright **поддерживает только** следующие параметры tsconfig: `allowJs`, `baseUrl`, `paths`, `jsx`, `jsxFactory`, `jsxFragmentFactory`, `jsxImportSource`, `useDefineForClassFields`, `references` и `extends`. Параметр `target` используется только для определения значения `useDefineForClassFields`.
 
 Мы рекомендуем настроить отдельный `tsconfig.json` в директории тестов, чтобы вы могли изменить некоторые предпочтения специально для тестов. Вот пример структуры директорий.
 
@@ -51,16 +51,15 @@ playwright.config.ts
 
 ### Маппинг путей в tsconfig {#tsconfig-path-mapping}
 
-Playwright поддерживает [маппинг путей](https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping), объявленный в `tsconfig.json`. Убедитесь, что `baseUrl` также установлен.
+Playwright поддерживает [сопоставление путей](https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping), объявленное в файле `tsconfig.json`.
 
 Вот пример `tsconfig.json`, который работает с Playwright:
 
 ```json title="tsconfig.json"
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
-      "@myhelper/*": ["packages/myhelper/*"] // Это отображение относительно "baseUrl".
+"@myhelper/*": ["packages/myhelper/*"] // Этот путь задаётся относительно файла tsconfig.
     }
   }
 }
@@ -78,7 +77,34 @@ test('example', async ({ page }) => {
 });
 ```
 
-### Разрешение tsconfig {#tsconfig-resolution}
+### Параметры JSX в tsconfig {/* #tsconfig-jsx-options */}
+
+Playwright компилирует JSX в файлах `.tsx` и `.jsx` в соответствии с параметрами `jsx`, `jsxFactory`, `jsxFragmentFactory` и `jsxImportSource` в `tsconfig.json`. Если параметр `jsx` не указан или имеет значение `preserve` либо `react-native`, Playwright использует автоматическую среду выполнения из `react/jsx-runtime`.
+
+```json title="tsconfig.json"
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact"
+  }
+}
+```
+
+### Поля классов в tsconfig {/* #tsconfig-class-fields */}
+
+Playwright компилирует поля классов TypeScript в соответствии с параметром `useDefineForClassFields` в `tsconfig.json`. Как и в `tsc`, если этот параметр не указан, он включён для целевых версий `ES2022` и более поздних, а также когда параметр `target` не указан.
+
+При включённом параметре `useDefineForClassFields` поля классов следуют семантике JavaScript, поэтому инициализаторы полей выполняются до тела конструктора и не могут обращаться к свойствам, объявленным через параметры конструктора. Отключите этот параметр, чтобы сохранить прежнюю семантику TypeScript.
+
+```json title="tsconfig.json"
+{
+  "compilerOptions": {
+    "useDefineForClassFields": false
+  }
+}
+```
+
+### Разрешение tsconfig
 
 По умолчанию Playwright будет искать ближайший tsconfig для каждого импортированного файла, поднимаясь по структуре директорий и ища `tsconfig.json` или `jsconfig.json`. Таким образом, вы можете создать файл `tests/tsconfig.json`, который будет использоваться только для ваших тестов, и Playwright автоматически его подхватит.
 
@@ -140,11 +166,6 @@ export default defineConfig({
 Затем `npm run test` соберет тесты и запустит их.
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -157,10 +178,11 @@ export default defineConfig({
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -179,6 +201,7 @@ export default defineConfig({
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -186,9 +209,18 @@ export default defineConfig({
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -206,6 +238,7 @@ export default defineConfig({
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -218,6 +251,7 @@ export default defineConfig({
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -239,6 +273,7 @@ export default defineConfig({
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

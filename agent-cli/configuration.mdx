@@ -1,0 +1,303 @@
+---
+title: "Конфигурация"
+---
+
+# Конфигурация
+
+## Режимы с окном браузера и без него
+
+По умолчанию CLI запускает браузер **без графического интерфейса (headless)**. Чтобы увидеть окно браузера:
+
+```bash
+playwright-cli open https://playwright.dev --headed
+```
+
+## Выбор браузера
+
+```bash
+playwright-cli open --browser=chrome     # Google Chrome (по умолчанию)
+playwright-cli open --browser=firefox    # Mozilla Firefox
+playwright-cli open --browser=webkit     # WebKit (движок Safari)
+playwright-cli open --browser=msedge     # Microsoft Edge
+```
+
+## Эмуляция устройств
+
+```bash
+# Эмуляция стандартного мобильного устройства: Pixel 10 для Chromium, iPhone 17 для WebKit
+playwright-cli open --mobile
+
+# Эмуляция устройства по имени из реестра устройств Playwright
+playwright-cli open --device="iPhone 15"
+```
+
+Параметр `--mobile` стоит использовать по умолчанию, если подходит мобильная версия страницы: мобильные страницы
+обычно легче, поэтому их снимки меньше и требуют меньше затрат на обработку.
+
+## Режимы профиля
+
+### В памяти (по умолчанию)
+
+Файлы cookie и данные хранилищ сохраняются между командами, но теряются при закрытии браузера:
+
+```bash
+playwright-cli open https://example.com
+```
+
+### Постоянный
+
+Профиль сохраняется на диск и сохраняется между перезапусками браузера:
+
+```bash
+playwright-cli open https://example.com --persistent
+```
+
+### Пользовательский каталог профиля
+
+```bash
+playwright-cli open https://example.com --profile=./my-profile
+```
+
+### Изолированный
+
+Явное указание режима хранения в памяти — эквивалентно режиму по умолчанию, но может быть задано в файле конфигурации:
+
+```json
+{
+  "browser": { "isolated": true }
+}
+```
+
+## Файл конфигурации
+
+Для расширенных настроек используйте файл конфигурации:
+
+```bash
+playwright-cli open example.com --config=path/to/config.json
+```
+
+Конфигурация объединяется из четырёх источников, каждый из которых переопределяет предыдущий:
+
+1. `~/.playwright/cli.config.json` — глобальные настройки по умолчанию для всех рабочих пространств
+2. `.playwright/cli.config.json` в рабочем пространстве — загружается автоматически при наличии; переопределяется явно указанным параметром `--config`
+3. Переменные окружения `PLAYWRIGHT_MCP_*`
+4. Параметры командной строки, такие как `--browser`, `--headed`, `--device`, `--profile`
+
+### Полная схема конфигурации
+
+```typescript
+{
+  browser?: {
+    browserName?: 'chromium' | 'firefox' | 'webkit';
+    isolated?: boolean;            // хранить профиль в памяти
+    userDataDir?: string;
+    launchOptions?: {
+      channel?: string;            // 'chrome', 'msedge', ...
+      headless?: boolean;
+      executablePath?: string;
+      args?: string[];
+      chromiumSandbox?: boolean;
+      slowMo?: number;
+      timeout?: number;
+      proxy?: {
+        server: string;            // например, "http://myproxy:3128"
+        bypass?: string;           // например, ".com,chromium.org"
+        username?: string;
+        password?: string;
+      };
+    };
+    contextOptions?: {
+      viewport?: { width: number; height: number };
+      locale?: string;
+      timezoneId?: string;
+      userAgent?: string;
+      colorScheme?: 'light' | 'dark' | 'no-preference';
+      storageState?: string;
+      permissions?: string[];      // например, ['geolocation', 'clipboard-read']
+      ignoreHTTPSErrors?: boolean;
+      serviceWorkers?: 'allow' | 'block';
+    };
+    cdpEndpoint?: string;
+    cdpHeaders?: Record<string, string>;
+    cdpTimeout?: number;           // по умолчанию 30000, 0 отключает тайм-аут
+    remoteEndpoint?: string | { endpoint: string, headers?, slowMo?, timeout? };
+    initPage?: string[];           // файлы TypeScript для настройки страницы
+    initScript?: string[];         // файлы JavaScript для инициализации страницы
+  };
+  extension?: boolean;
+  server?: {
+    port?: number;
+    host?: string;
+    allowedHosts?: string[];
+  };
+  capabilities?: string[];         // возможности инструментов MCP; CLI включает их все
+  saveSession?: boolean;
+  sharedBrowserContext?: boolean;
+  outputDir?: string;
+  outputMaxSize?: number;          // порог удаления выходных файлов, в байтах
+  console?: { level?: 'error' | 'warning' | 'info' | 'debug' };
+  network?: {
+    allowedOrigins?: string[];     // например, ["https://api.example.com", "http://localhost:*"]
+    blockedOrigins?: string[];
+  };
+  secrets?: Record<string, string>;
+  testIdAttribute?: string;        // по умолчанию: "data-testid"
+  timeouts?: {
+    action?: number;               // по умолчанию: 5000 мс
+    navigation?: number;           // по умолчанию: 60000 мс
+    expect?: number;               // по умолчанию: 5000 мс
+    settle?: number;               // по умолчанию: 500 мс
+  };
+  imageResponses?: 'allow' | 'omit';
+  snapshot?: {
+    mode?: 'full' | 'none';
+    boxes?: boolean;               // включать [box=x,y,width,height] в снимки
+  };
+  allowUnrestrictedFileAccess?: boolean;
+  codegen?: 'typescript' | 'python' | 'java' | 'csharp' | 'none';
+}
+```
+
+### Примеры конфигурации
+
+**Локальная разработка:**
+```json
+{
+  "browser": {
+    "launchOptions": { "headless": false }
+  }
+}
+```
+
+**Среда CI:**
+```json
+{
+  "browser": {
+    "launchOptions": { "headless": true },
+    "contextOptions": { "viewport": { "width": 1280, "height": 720 } }
+  },
+  "outputDir": "./test-output"
+}
+```
+
+**Работа через прокси:**
+```json
+{
+  "browser": {
+    "launchOptions": {
+      "proxy": {
+        "server": "http://proxy.corp.example.com:8080",
+        "bypass": "localhost,*.internal.com"
+      }
+    }
+  }
+}
+```
+
+**Эмуляция устройств:**
+```json
+{
+  "browser": {
+    "contextOptions": {
+      "viewport": { "width": 375, "height": 812 },
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)..."
+    }
+  }
+}
+```
+
+**Скрипты инициализации:**
+```json
+{
+  "browser": {
+    "initScript": ["./setup.js"],
+    "initPage": ["./setup-page.ts"]
+  }
+}
+```
+
+## Вывод итоговой конфигурации
+
+Просмотрите итоговую конфигурацию после объединения параметров CLI, переменных окружения и файлов конфигурации:
+
+```bash
+playwright-cli config-print
+```
+
+## Расширение браузера
+
+Подключитесь к существующим вкладкам браузера вместо запуска нового браузера:
+
+```bash
+playwright-cli attach --extension
+```
+
+Подробнее см. в разделе [Подключение](./commands/attach.mdx).
+
+## Переменные окружения
+
+| Переменная | Описание |
+|----------|-------------|
+| `PLAYWRIGHT_CLI_SESSION` | Имя сеанса по умолчанию |
+| `PLAYWRIGHT_MCP_ALLOWED_HOSTS` | Разрешённые хосты для сервера (через запятую) |
+| `PLAYWRIGHT_MCP_ALLOWED_ORIGINS` | Источники (origins), к которым браузер может отправлять запросы (через точку с запятой) |
+| `PLAYWRIGHT_MCP_ALLOW_UNRESTRICTED_FILE_ACCESS` | Разрешить доступ к файлам за пределами рабочего пространства |
+| `PLAYWRIGHT_MCP_BLOCKED_ORIGINS` | Источники (origins), которые нужно блокировать (через точку с запятой) |
+| `PLAYWRIGHT_MCP_BLOCK_SERVICE_WORKERS` | Блокировать сервис-воркеры |
+| `PLAYWRIGHT_MCP_BROWSER` | Используемый браузер (chrome, firefox, webkit, msedge, ...) |
+| `PLAYWRIGHT_MCP_CAPS` | Включить возможности (через запятую) |
+| `PLAYWRIGHT_MCP_CDP_ENDPOINT` | Адрес конечной точки CDP |
+| `PLAYWRIGHT_MCP_CDP_HEADERS` | Заголовки, отправляемые с запросом подключения по CDP |
+| `PLAYWRIGHT_MCP_CDP_TIMEOUT` | Тайм-аут подключения по CDP (мс) |
+| `PLAYWRIGHT_MCP_CODEGEN` | Язык генерации кода |
+| `PLAYWRIGHT_MCP_CONFIG` | Путь к файлу конфигурации |
+| `PLAYWRIGHT_MCP_CONSOLE_LEVEL` | Уровень сообщений консоли |
+| `PLAYWRIGHT_MCP_DEVICE` | Эмулируемое устройство |
+| `PLAYWRIGHT_MCP_EXECUTABLE_PATH` | Пользовательский путь к исполняемому файлу браузера |
+| `PLAYWRIGHT_MCP_EXTENSION` | Подключаться через расширение браузера |
+| `PLAYWRIGHT_MCP_GRANT_PERMISSIONS` | Разрешения браузера (через запятую) |
+| `PLAYWRIGHT_MCP_HEADLESS` | Запускать без графического интерфейса |
+| `PLAYWRIGHT_MCP_HOST` | Хост, к которому привязывается сервер |
+| `PLAYWRIGHT_MCP_IGNORE_HTTPS_ERRORS` | Игнорировать ошибки HTTPS |
+| `PLAYWRIGHT_MCP_IMAGE_RESPONSES` | `allow` или `omit` |
+| `PLAYWRIGHT_MCP_INIT_PAGE` | TypeScript для инициализации страницы |
+| `PLAYWRIGHT_MCP_INIT_SCRIPT` | JavaScript для инициализации страницы |
+| `PLAYWRIGHT_MCP_ISOLATED` | Профиль в памяти |
+| `PLAYWRIGHT_MCP_MOBILE` | Эмулировать стандартное мобильное устройство |
+| `PLAYWRIGHT_MCP_OUTPUT_DIR` | Каталог выходных файлов |
+| `PLAYWRIGHT_MCP_OUTPUT_MAX_SIZE` | Порог удаления выходных файлов (байты) |
+| `PLAYWRIGHT_MCP_PORT` | Порт сервера |
+| `PLAYWRIGHT_MCP_PROFILE_DIR_NAME` | Имя каталога профиля для режима расширения |
+| `PLAYWRIGHT_MCP_PROXY_BYPASS` | Домены, для которых прокси не используется |
+| `PLAYWRIGHT_MCP_PROXY_SERVER` | URL-адрес прокси-сервера |
+| `PLAYWRIGHT_MCP_REMOTE_HEADERS` | Заголовки для запроса подключения к удалённой конечной точке |
+| `PLAYWRIGHT_MCP_SANDBOX` | Включить или отключить песочницу Chromium |
+| `PLAYWRIGHT_MCP_SECRETS_FILE` | Файл секретов (dotenv) |
+| `PLAYWRIGHT_MCP_STORAGE_STATE` | Файл состояния хранилища |
+| `PLAYWRIGHT_MCP_TEST_ID_ATTRIBUTE` | Атрибут идентификатора для тестирования |
+| `PLAYWRIGHT_MCP_TIMEOUT_ACTION` | Тайм-аут действия (мс) |
+| `PLAYWRIGHT_MCP_TIMEOUT_NAVIGATION` | Тайм-аут навигации (мс) |
+| `PLAYWRIGHT_MCP_TIMEOUT_SETTLE` | Тайм-аут ожидания стабилизации после действия (мс) |
+| `PLAYWRIGHT_MCP_USER_AGENT` | Пользовательское значение user agent |
+| `PLAYWRIGHT_MCP_USER_DATA_DIR` | Каталог профиля |
+| `PLAYWRIGHT_MCP_VIEWPORT_SIZE` | Размер области просмотра (например, "1280x720") |
+
+## Все параметры команд open и attach
+
+```bash
+playwright-cli open [url]                          # открыть браузер
+playwright-cli open --headed                       # показать окно браузера
+playwright-cli open --browser=firefox              # использовать определённый браузер
+playwright-cli open --mobile                       # эмулировать стандартное мобильное устройство
+playwright-cli open --device="iPhone 15"           # эмулировать устройство по имени
+playwright-cli open --persistent                   # сохранять профиль на диск
+playwright-cli open --profile=<path>               # использовать пользовательский каталог профиля
+playwright-cli open --config=file.json             # использовать файл конфигурации
+
+playwright-cli attach [name]                       # подключиться к привязанному браузеру по имени
+playwright-cli attach --extension                  # подключиться через расширение
+playwright-cli attach --cdp=chrome                 # подключиться к запущенному каналу браузера
+playwright-cli attach --cdp=<url>                  # подключиться через конечную точку CDP
+playwright-cli attach --endpoint=<url>             # подключиться к серверу Playwright
+playwright-cli attach --config=file.json           # использовать файл конфигурации
+```

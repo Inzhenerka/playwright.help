@@ -204,7 +204,7 @@ await page.route_web_socket("/ws", handler)
 
 ## Methods
 
-### close {#web-socket-route-close}
+### close {/* #web-socket-route-close */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.close</x-search>
 
@@ -230,7 +230,7 @@ web_socket_route.close(**kwargs)
 
 ---
 
-### on_close {#web-socket-route-on-close}
+### on_close {/* #web-socket-route-on-close */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.on_close</x-search>
 
@@ -245,13 +245,13 @@ web_socket_route.on_close(handler)
 ```
 
 **Arguments**
-- `handler` [Callable]\[[int] | [undefined]\]:[Promise]\[[Any]\] | [Any]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-close-option-handler"/><a href="#web-socket-route-on-close-option-handler" class="list-anchor">#</a>
+- `handler` [Callable]\[[int] | [undefined], [str] | [undefined]\]:[Promise]\[[Any]\] | [Any]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-close-option-handler"/><a href="#web-socket-route-on-close-option-handler" class="list-anchor">#</a>
   
   Function that will handle WebSocket closure. Received an optional [close code](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#code) and an optional [close reason](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason).
 
 ---
 
-### on_message {#web-socket-route-on-message}
+### on_message {/* #web-socket-route-on-message */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.on_message</x-search>
 
@@ -270,13 +270,13 @@ web_socket_route.on_message(handler)
 ```
 
 **Arguments**
-- `handler` [Callable]\[[str]\]:[Promise]\[[Any]\] | [Any]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-message-option-handler"/><a href="#web-socket-route-on-message-option-handler" class="list-anchor">#</a>
+- `handler` [Callable]\[[str] | [bytes]\]:[Promise]\[[Any]\] | [Any]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-message-option-handler"/><a href="#web-socket-route-on-message-option-handler" class="list-anchor">#</a>
   
   Function that will handle messages.
 
 ---
 
-### send {#web-socket-route-send}
+### send {/* #web-socket-route-send */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.send</x-search>
 
@@ -297,7 +297,7 @@ web_socket_route.send(message)
 
 ## Properties
 
-### connect_to_server {#web-socket-route-connect-to-server}
+### connect_to_server {/* #web-socket-route-connect-to-server */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.connect_to_server</x-search>
 
@@ -320,7 +320,58 @@ web_socket_route.connect_to_server
 
 ---
 
-### url {#web-socket-route-url}
+### protocols {/* #web-socket-route-protocols */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>webSocketRoute.protocols</x-search>
+
+The list of WebSocket subprotocols requested by the page, as passed via the second argument to the [`WebSocket` constructor](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket). Corresponds to the `Sec-WebSocket-Protocol` request header.
+
+Returns an empty array if no protocols were specified.
+
+**Usage**
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+def handler(ws: WebSocketRoute):
+  if "chat.v2" in ws.protocols:
+    ws.on_message(lambda message: ws.send(f"v2:{message}"))
+  else:
+    ws.close(code=1002, reason="Unsupported protocol")
+
+page.route_web_socket("wss://example.com/ws", handler)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async def handler(ws: WebSocketRoute):
+  if "chat.v2" in ws.protocols:
+    ws.on_message(lambda message: ws.send(f"v2:{message}"))
+  else:
+    await ws.close(code=1002, reason="Unsupported protocol")
+
+await page.route_web_socket("wss://example.com/ws", handler)
+```
+
+</TabItem>
+</Tabs>
+
+**Returns**
+- [List]\[[str]\]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-protocols-return"/><a href="#web-socket-route-protocols-return" class="list-anchor">#</a>
+
+---
+
+### url {/* #web-socket-route-url */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.url</x-search>
 
@@ -346,11 +397,15 @@ web_socket_route.url
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [Error]: /api/class-error.mdx "Error"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
@@ -364,14 +419,17 @@ web_socket_route.url
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

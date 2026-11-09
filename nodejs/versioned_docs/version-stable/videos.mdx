@@ -53,17 +53,11 @@ await context.close();
 </TabItem>
 </Tabs>
 
-Вы также можете указать размер видео. Размер видео по умолчанию соответствует размеру области просмотра, уменьшенному для соответствия 800x800. Видео области просмотра помещается в верхний левый угол выходного видео, уменьшенное по размеру, если это необходимо. Возможно, вам потребуется установить размер области просмотра, чтобы он соответствовал желаемому размеру видео.
+Вы также можете указать размер видео и настройки аннотаций. По умолчанию размер видео соответствует размеру области просмотра, уменьшенному с сохранением пропорций так, чтобы он вписывался в 800x800. Изображение области просмотра размещается в левом верхнем углу выходного видео и при необходимости уменьшается, чтобы поместиться в него. Возможно, вам потребуется настроить размер области просмотра в соответствии с желаемым размером видео.
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="test"
-  values={[
-    {label: 'Тест', value: 'test'},
-    {label: 'Библиотека', value: 'library'}
-  ]
-}>
-<TabItem value="test">
+Если указано `show: { actions }`, каждое действие будет визуально выделено в видео с помощью контура элемента и субтитра с названием действия. Необязательное свойство `duration` определяет, как долго отображается каждая аннотация (по умолчанию — `500` мс).
+
+Если указано `show: { test }`, в видео будут добавлены аннотации с информацией о текущем тесте с настраиваемым уровнем детализации `level`.
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -71,28 +65,25 @@ export default defineConfig({
   use: {
     video: {
       mode: 'on-first-retry',
-      size: { width: 640, height: 480 }
-    }
+      size: { width: 640, height: 480 },
+      show: {
+        actions: {
+          duration: 500,
+          position: 'top-right',
+          fontSize: 14,
+        },
+        test: {
+          level: 'step',
+          position: 'top-left',
+          fontSize: 12,
+        }
+      },
+    },
   },
 });
 ```
 
-</TabItem>
-<TabItem value="library">
-
-```js
-const context = await browser.newContext({
-  recordVideo: {
-    dir: 'videos/',
-    size: { width: 640, height: 480 },
-  }
-});
-```
-
-</TabItem>
-</Tabs>
-
-Для сценариев с несколькими страницами вы можете получить доступ к файлу видео, связанному со страницей, через [page.video()](/api/class-page.mdx#page-video).
+В сценариях с несколькими страницами вы можете получить доступ к видеофайлу, связанному со страницей, с помощью [page.video()](/api/class-page.mdx#page-video).
 
 ```js
 const path = await page.video().path();
@@ -103,11 +94,6 @@ const path = await page.video().path();
 :::
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -120,10 +106,11 @@ const path = await page.video().path();
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -142,6 +129,7 @@ const path = await page.video().path();
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -149,9 +137,18 @@ const path = await page.video().path();
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -169,6 +166,7 @@ const path = await page.video().path();
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -181,6 +179,7 @@ const path = await page.video().path();
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -202,6 +201,7 @@ const path = await page.video().path();
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги изображений"

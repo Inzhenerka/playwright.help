@@ -1,0 +1,168 @@
+---
+title: "Тестирование и проверки"
+---
+
+# Тестирование и проверки
+
+Проверяйте состояние страницы и генерируйте локаторы Playwright. Требуется [возможность](../capabilities.mdx) **testing**.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--caps=testing"]
+    }
+  }
+}
+```
+
+Каждый инструмент проверки возвращает `Done` при успешном выполнении и сообщение об ошибке при неудаче, а также записывает соответствующую
+строку `expect(...)` в сгенерированный код, чтобы последовательность успешно выполненных действий можно было объединить в тест.
+
+## Проверка элементов
+
+### browser_verify_element_visible
+
+Проверяет, что элемент виден на странице, выполняя поиск по роли и доступному имени во всех фреймах.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `role` | string | да | Роль элемента (ROLE), указанная в снимке: `- {ROLE} "Accessible Name":` |
+| `accessibleName` | string | да | Доступное имя элемента (ACCESSIBLE_NAME), указанное в снимке: `- role "{ACCESSIBLE_NAME}"` |
+
+```txt
+→ browser_verify_element_visible { role: "heading", accessibleName: "Dashboard" }
+  Done
+  // Сгенерировано: await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+
+→ browser_verify_element_visible { role: "button", accessibleName: "Submit" }
+  Элемент с ролью "button" и доступным именем "Submit" не найден
+```
+
+### browser_verify_text_visible
+
+Проверяет, что текст виден на странице. Предпочитайте `browser_verify_element_visible`, если у элемента есть роль и имя.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `text` | string | да | Проверяемый текст (TEXT), указанный в снимке: `- role "Accessible Name": {TEXT}` или `- text: {TEXT}` |
+
+```txt
+→ browser_verify_text_visible { text: "3 items left" }
+  Done
+```
+
+### browser_verify_list_visible
+
+Проверяет, что список содержит ожидаемые элементы.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `target` | string | да | Идентификатор элемента списка |
+| `element` | string | да | Описание списка в понятной человеку форме |
+| `items` | string[] | да | Элементы, наличие которых нужно проверить |
+
+```txt
+→ browser_verify_list_visible {
+    element: "Todo list", target: "e8",
+    items: ["Buy groceries", "Walk the dog", "Read a book"]
+  }
+  Done
+```
+
+### browser_verify_value
+
+Проверяет значение элемента формы.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `type` | string | да | `textbox`, `checkbox`, `radio`, `combobox` или `slider` |
+| `target` | string | да | Идентификатор элемента из снимка страницы |
+| `element` | string | да | Описание элемента в понятной человеку форме |
+| `value` | string | да | Проверяемое значение. Для флажка или радиокнопки используйте `"true"` / `"false"` |
+
+```txt
+→ browser_verify_value { type: "textbox", element: "Email", target: "e3", value: "alice@example.com" }
+  Done
+
+→ browser_verify_value { type: "checkbox", element: "Accept terms", target: "e9", value: "true" }
+  Done
+```
+
+## Генерация кода теста
+
+### browser_generate_locator
+
+Генерирует локатор Playwright для элемента. Это полезно при преобразовании исследовательской автоматизации в файлы тестов.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `target` | string | да | Идентификатор элемента или селектор |
+
+```txt
+→ browser_generate_locator { target: "e15" }
+  getByRole('button', { name: 'Submit' })
+
+→ browser_generate_locator { target: "e3" }
+  getByLabel('Email')
+```
+
+## Рабочий процесс: от исследовательского тестирования к коду теста
+
+Каждый ответ инструмента включает код Playwright для выполненного действия на языке, заданном параметром
+`--codegen` (`typescript` по умолчанию; также доступны `python`, `java`, `csharp` или `none`).
+
+```txt
+→ browser_navigate { url: "https://demo.playwright.dev/todomvc" }
+→ browser_type { target: "e5", text: "Buy groceries", submit: true }
+  // Сгенерировано: await page.getByPlaceholder('What needs to be done?').fill('Buy groceries');
+  // Сгенерировано: await page.getByPlaceholder('What needs to be done?').press('Enter');
+
+→ browser_verify_text_visible { text: "Buy groceries" }
+  // Сгенерировано: await expect(page.getByText('Buy groceries')).toBeVisible();
+
+→ browser_click { target: "e10" }
+  // Сгенерировано: await page.getByRole('checkbox', { name: 'Toggle Todo' }).click();
+
+→ browser_verify_text_visible { text: "0 items left" }
+  // Сгенерировано: await expect(page.getByText('0 items left')).toBeVisible();
+```
+
+Сгенерированный код можно объединить в тест Playwright:
+
+```typescript
+test('add and complete todo', async ({ page }) => {
+  await page.goto('https://demo.playwright.dev/todomvc');
+  await page.getByPlaceholder('What needs to be done?').fill('Buy groceries');
+  await page.getByPlaceholder('What needs to be done?').press('Enter');
+  await expect(page.getByText('Buy groceries')).toBeVisible();
+  await page.getByRole('checkbox', { name: 'Toggle Todo' }).click();
+  await expect(page.getByText('0 items left')).toBeVisible();
+});
+```
+
+## Рабочий процесс: тестирование валидации формы
+
+```txt
+→ browser_navigate { url: "https://app.example.com/register" }
+→ browser_click { target: "e9" }   // Отправка пустой формы
+→ browser_verify_text_visible { text: "Email is required" }
+  Done
+
+→ browser_type { target: "e3", text: "not-an-email" }
+→ browser_click { target: "e9" }
+→ browser_verify_text_visible { text: "Please enter a valid email" }
+  Done
+
+→ browser_fill_form {
+    fields: [
+      { name: "Email",            target: "e3", type: "textbox", value: "alice@example.com" },
+      { name: "Password",         target: "e5", type: "textbox", value: "password123" },
+      { name: "Confirm password", target: "e7", type: "textbox", value: "password456" }
+    ]
+  }
+→ browser_click { target: "e9" }
+→ browser_verify_text_visible { text: "Passwords do not match" }
+  Done
+```

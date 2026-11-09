@@ -41,7 +41,24 @@ export default defineConfig({
 });
 ```
 
-## Конфигурации CI {#ci-configurations}
+## Глобальный тайм-аут
+
+Всегда задавайте [глобальный тайм-аут](./test-timeouts.mdx#global-timeout) в CI. По умолчанию время выполнения тестового прогона не ограничено, поэтому, если набор тестов зависнет или время его выполнения постепенно превысит лимит задания вашего CI-провайдера, CI-раннер принудительно завершит прогон, не дождавшись его окончания, и отчёт о тестировании не будет сформирован.
+
+Если задан параметр [testConfig.globalTimeout](/api/class-testconfig.mdx#test-config-global-timeout), Playwright самостоятельно останавливает прогон.
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  // Завершить прогон с ошибкой через час, чтобы репортёры всё же сформировали отчёт.
+  globalTimeout: 60 * 60 * 1000,
+});
+```
+
+Поэтому в приведённых ниже примерах не задаётся тайм-аут на уровне задания, такой как `timeout-minutes` в GitHub Actions. Если вы всё же добавите его, задайте значение с достаточным запасом относительно `globalTimeout`, чтобы Playwright всегда останавливал прогон первым.
+
+## Конфигурации CI
 
 [Командные инструменты](./browsers#install-system-dependencies) могут быть использованы для установки всех зависимостей операционной системы в CI.
 
@@ -60,10 +77,9 @@ on:
     branches: [ main, master ]
 jobs:
   test:
-    timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - uses: actions/setup-node@v6
       with:
         node-version: lts/*
@@ -101,10 +117,10 @@ jobs:
     name: 'Playwright Tests'
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.57.0-noble
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
       options: --user 1001
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: lts/*
@@ -124,11 +140,10 @@ on:
   deployment_status:
 jobs:
   test:
-    timeout-minutes: 60
     runs-on: ubuntu-latest
     if: github.event.deployment_status.state == 'success'
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - uses: actions/setup-node@v6
       with:
         node-version: lts/*
@@ -146,7 +161,7 @@ jobs:
 
 Большие наборы тестов могут выполняться очень долго. Выполнив предварительный запуск тестов с флагом `--only-changed`, вы можете сначала запустить тестовые файлы, которые, вероятно, не пройдут. Это обеспечит более быструю обратную связь и немного снизит потребление CI при работе над Pull Requests. Чтобы обнаружить тестовые файлы, затронутые вашим изменением, `--only-changed` анализирует граф зависимостей вашего набора тестов. Это эвристика и может пропустить тесты, поэтому важно всегда запускать полный набор тестов после предварительного запуска.
 
-```yml title=".github/workflows/playwright.yml" {24-26}
+```yml title=".github/workflows/playwright.yml" {23-25}
 name: Playwright Tests
 on:
   push:
@@ -155,10 +170,9 @@ on:
     branches: [ main, master ]
 jobs:
   test:
-    timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         # Принудительно выполнить полную проверку, чтобы мы могли ссылаться на $GITHUB_BASE_REF.
         # Подробнее см. на https://github.com/actions/checkout.
@@ -171,7 +185,7 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run changed Playwright tests
-      run: npx playwright test --only-changed=$GITHUB_BASE_REF
+      run: npx playwright test --only-changed=origin/$GITHUB_BASE_REF
       if: github.event_name == 'pull_request'
     - name: Run Playwright tests
       run: npx playwright test
@@ -335,7 +349,7 @@ trigger:
 
 pool:
   vmImage: ubuntu-latest
-container: mcr.microsoft.com/playwright:v1.57.0-noble
+container: mcr.microsoft.com/playwright:v1.64.1-noble
 
 steps:
 - task: UseNode@1
@@ -359,7 +373,7 @@ steps:
 executors:
   pw-noble-development:
     docker:
-      - image: mcr.microsoft.com/playwright:v1.57.0-noble
+      - image: mcr.microsoft.com/playwright:v1.64.1-noble
 ```
 
 Примечание: При использовании определения агента docker вы указываете класс ресурсов, где playwright запускается на уровне 'medium' [здесь](https://circleci.com/docs/configuration-reference?#docker-execution-environment). Поведение Playwright по умолчанию - устанавливать количество рабочих процессов в соответствии с обнаруженным количеством ядер (2 в случае уровня medium). Переопределение количества рабочих процессов на большее значение приведёт к ненужным тайм-аутам и сбоям.
@@ -382,7 +396,7 @@ Jenkins поддерживает Docker-агенты для конвейеров
 
 ```groovy
 pipeline {
-   agent { docker { image 'mcr.microsoft.com/playwright:v1.57.0-noble' } }
+   agent { docker { image 'mcr.microsoft.com/playwright:v1.64.1-noble' } }
    stages {
       stage('e2e-tests') {
          steps {
@@ -399,7 +413,7 @@ pipeline {
 Bitbucket Pipelines может использовать публичные [Docker-образы как среды сборки](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). Чтобы запустить тесты Playwright на Bitbucket, используйте наш публичный Docker-образ ([см. Dockerfile](./docker.mdx)).
 
 ```yml
-image: mcr.microsoft.com/playwright:v1.57.0-noble
+image: mcr.microsoft.com/playwright:v1.64.1-noble
 ```
 
 ### GitLab CI {#gitlab-ci}
@@ -412,7 +426,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.57.0-noble
+  image: mcr.microsoft.com/playwright:v1.64.1-noble
   script:
   ...
 ```
@@ -427,7 +441,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.57.0-noble
+  image: mcr.microsoft.com/playwright:v1.64.1-noble
   parallel: 7
   script:
     - npm ci
@@ -442,7 +456,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.57.0-noble
+  image: mcr.microsoft.com/playwright:v1.64.1-noble
   parallel:
     matrix:
       - PROJECT: ['chromium', 'webkit']
@@ -458,8 +472,8 @@ tests:
 
 ```yml
 steps:
-- name: mcr.microsoft.com/playwright:v1.57.0-noble
-  script: 
+- name: mcr.microsoft.com/playwright:v1.64.1-noble
+  script:
   ...
   env:
   - 'CI=true'
@@ -476,7 +490,7 @@ type: docker
 
 steps:
   - name: test
-    image: mcr.microsoft.com/playwright:v1.57.0-noble
+    image: mcr.microsoft.com/playwright:v1.64.1-noble
     commands:
       - npx playwright test
 ```
@@ -506,11 +520,6 @@ xvfb-run npx playwright test
 ```
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -523,10 +532,11 @@ xvfb-run npx playwright test
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -545,6 +555,7 @@ xvfb-run npx playwright test
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -552,9 +563,18 @@ xvfb-run npx playwright test
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -572,6 +592,7 @@ xvfb-run npx playwright test
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -584,6 +605,7 @@ xvfb-run npx playwright test
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -605,6 +627,7 @@ xvfb-run npx playwright test
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

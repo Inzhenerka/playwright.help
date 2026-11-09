@@ -29,7 +29,7 @@ const { generateTabGroups, renderHTMLCard } = require('./format_utils');
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
 /** @export @typedef {{ name: string, link: string, usages: string[], args: docs.Member[], signatures?: string[] }} FormattedMember */
 
-const commonSnippets = new Set(['txt', 'html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'bash', 'sh', 'ini', 'Dockerfile', 'css', 'markdown']);
+const commonSnippets = new Set(['txt', 'html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'bash', 'sh', 'ini', 'Dockerfile', 'css', 'markdown', 'mermaid']);
 
 /** @typedef {"header"|"link"|"usage"} FormatMode */
 
@@ -74,9 +74,11 @@ class Generator {
     this.generatedFiles = new Set();
     this.formatter = formatter;
 
-    this.documentation = parseApi(path.join(srcDir, 'api'))
-      .mergeWith(parseApi(path.join(srcDir, 'test-api'), path.join(srcDir, 'api', 'params.md')))
-      .mergeWith(parseApi(path.join(srcDir, 'test-reporter-api')));
+    const paramsPath = path.join(srcDir, 'api', 'params.md');
+    const apiDirs = fs.readdirSync(srcDir).filter(name => name === 'api' || name.endsWith('-api'));
+    this.documentation = apiDirs
+      .map(dir => parseApi(path.join(srcDir, dir), dir === 'api' ? undefined : paramsPath))
+      .reduce((acc, doc) => acc.mergeWith(doc));
     this.documentation.filterForLanguage(lang, { csharpOptionOverloadsShortNotation: true });
     this.documentation.setLinkRenderer(item => {
       const { clazz, member, param, option, href } = item;
@@ -237,7 +239,7 @@ ${this.documentation.renderLinksInText(clazz.deprecated)}
         const memberNode = { type: 'h3', children: [], text: '' };
         if (!this.heading2ExplicitId.has(member))
           throw new Error(`Header ${name} needs to have an explicit ID`)
-        memberNode.text = `${name} {#${this.heading2ExplicitId.get(member)}}`;
+        memberNode.text = `${name} {/* #${this.heading2ExplicitId.get(member)} */}`;
 
         const sections = {
           /** @type {MarkdownNode[]} */
@@ -276,7 +278,7 @@ ${this.documentation.renderLinksInText(clazz.deprecated)}
         if (member.deprecated) {
           sections.deprecation.push({
             type: 'text',
-            text: `:::warning Deprecated
+            text: `:::warning[Deprecated]
 
 ${this.documentation.renderLinksInText(member.deprecated)}
 
@@ -319,7 +321,11 @@ ${this.documentation.renderLinksInText(member.discouraged)}
 
           sections.arguments.push(...args.map(a => {
             const name = this.formatter.formatParamName?.(a.alias) || a.alias;
-            return this.renderProperty(name, a, a.spec, 'in', false, !a.required);
+            try {
+              return this.renderProperty(name, a, a.spec, 'in', false, !a.required);
+            } catch (e) {
+              throw new Error(`While rendering ${member.clazz.name}.${member.name}, property ${a.alias}\n-------\n${md.render(a.spec || [])}\n------\n`, { cause: e });
+            }
           }));
         }
 
@@ -337,7 +343,11 @@ ${this.documentation.renderLinksInText(member.discouraged)}
             text: '**' + name + '**',
           });
 
-          sections.return.push(this.renderProperty('', member, undefined, 'out', member.async, false));
+          try {
+            sections.return.push(this.renderProperty('', member, undefined, 'out', member.async, false));
+          } catch (e) {
+            throw new Error(`While rendering ${member.clazz.name}.${member.name}, property\n-------\n${md.render(member.spec)}\n------\n ` + e.message);
+          }
         }
 
         memberNode.children.push(...this.formatComment(sections.version));
@@ -428,7 +438,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
   }
 
   /**
-   * @param {string} content 
+   * @param {string} content
    */
   rewriteImageLinks(content) {
     return content.replaceAll(/!\[(.*)\]\((\.\/images\/.*)\)/g, (match, alt, link) => {

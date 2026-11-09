@@ -44,21 +44,39 @@ const { _electron: electron } = require('playwright');
 })();
 ```
 
-**Поддерживаемые версии Electron:**
-* v12.2.0+
-* v13.4.0+
-* v14+
+**Поддерживаются следующие версии Electron:**
+* v21+
 
 **Известные проблемы:**
 
-Если вы не можете запустить Electron и он заканчивается тайм-аутами во время запуска, попробуйте следующее:
-* Убедитесь, что `nodeCliInspect` ([FuseV1Options.EnableNodeCliInspectArguments](https://www.electronjs.org/docs/latest/tutorial/fuses#nodecliinspect)) не установлен в `false`.
+**Подмена нативных диалоговых окон:**
+
+Playwright не перехватывает вызовы нативного API Electron [dialog](https://www.electronjs.org/docs/latest/api/dialog) (`dialog.showOpenDialog`, `dialog.showSaveDialog`, `dialog.showMessageBox` и т. д.), поскольку эти вызовы выполняются в главном процессе Electron и обращаются напрямую к API операционной системы. Используйте [electronApplication.evaluate()](/api/class-electronapplication.mdx#electron-application-evaluate), чтобы заменить соответствующие методы в главном процессе: это позволит тестам выполняться детерминированно, без отображения интерфейса операционной системы:
+
+```js
+// Подменяем диалог открытия файла, чтобы он всегда возвращал заданный путь.
+await electronApp.evaluate(({ dialog }, filePaths) => {
+  dialog.showOpenDialog = () => Promise.resolve({ canceled: false, filePaths });
+}, ['/path/to/file.txt']);
+
+// Подменяем диалог сохранения файла.
+await electronApp.evaluate(({ dialog }, filePath) => {
+  dialog.showSaveDialog = () => Promise.resolve({ canceled: false, filePath });
+}, '/path/to/saved.txt');
+
+// Подменяем showMessageBox, имитируя нажатие первой кнопки.
+await electronApp.evaluate(({ dialog }) => {
+  dialog.showMessageBox = () => Promise.resolve({ response: 0, checkboxChecked: false });
+});
+```
+
+Подмена сохраняется до закрытия приложения. Синхронные варианты (`showOpenDialogSync`, `showSaveDialogSync`, `showMessageBoxSync`) можно подменить аналогичным образом — просто возвращайте значение напрямую, а не в виде `Promise`.
 
 ---
 
 ## Методы {#methods}
 
-### launch {#electron-launch}
+### launch {/* #electron-launch */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.9</font><x-search>electron.launch</x-search>
 
@@ -78,10 +96,16 @@ await electron.launch(options);
     Указывает, следует ли автоматически загружать все вложения. По умолчанию `true`, при этом все загрузки принимаются.
   - `args` [Array]&lt;[string]&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-args"/><a href="#electron-launch-option-args" class="list-anchor">#</a>
     
-    Дополнительные аргументы, которые передаются приложению при запуске. Обычно здесь передается имя основного скрипта.
+Дополнительные аргументы, передаваемые приложению при запуске. Обычно здесь указывают имя основного скрипта.
+  - `artifactsDir` [string] *(необязательно)* <font size="2">Добавлено в: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-artifacts-dir"/><a href="#electron-launch-option-artifacts-dir" class="list-anchor">#</a>
+    
+    Если указано, артефакты (трассировки, видео, загруженные файлы, HAR-файлы и т. д.) сохраняются в этот каталог. Каталог не очищается при закрытии браузера. Если не указано, используется временный каталог, который очищается при закрытии браузера.
   - `bypassCSP` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-bypass-csp"/><a href="#electron-launch-option-bypass-csp" class="list-anchor">#</a>
     
-    Переключает обход политики безопасности контента страницы. По умолчанию `false`.
+    Включает или отключает обход политики Content-Security-Policy страницы. По умолчанию — `false`.
+  - `chromiumSandbox` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-chromium-sandbox"/><a href="#electron-launch-option-chromium-sandbox" class="list-anchor">#</a>
+    
+    Включает изоляцию Chromium в песочнице. По умолчанию — `false`.
   - `colorScheme` [null] | "light" | "dark" | "no-preference" *(необязательно)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-color-scheme"/><a href="#electron-launch-option-color-scheme" class="list-anchor">#</a>
     
     Эмулирует медиа-функцию [prefers-colors-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme), поддерживаемые значения: `'light'` и `'dark'`. См. [page.emulateMedia()](/api/class-page.mdx#page-emulate-media) для получения дополнительных сведений. Передача `null` сбрасывает эмуляцию на системные настройки по умолчанию. По умолчанию `'light'`.
@@ -106,8 +130,8 @@ await electron.launch(options);
       Долгота от -180 до 180.
     - `accuracy` [number] *(необязательно)*
       
-      Ненегативное значение точности. По умолчанию `0`.
-  - `httpCredentials` [Object] *(необязательно)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-http-credentials"/><a href="#electron-launch-option-http-credentials" class="list-anchor">#</a>
+Неотрицательное значение точности. По умолчанию — `0`.
+  - `httpCredentials` [Object] | [Array]&lt;[Object]&gt; *(необязательно)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-http-credentials"/><a href="#electron-launch-option-http-credentials" class="list-anchor">#</a>
     - `username` [string]
       
       
@@ -121,7 +145,9 @@ await electron.launch(options);
       
       Эта опция применяется только к запросам, отправленным из соответствующего [APIRequestContext], и не влияет на запросы, отправленные из браузера. `'always'` - заголовок `Authorization` с учетными данными базовой аутентификации будет отправлен с каждым API-запросом. `'unauthorized` - учетные данные отправляются только при получении ответа 401 (Unauthorized) с заголовком `WWW-Authenticate`. По умолчанию `'unauthorized'`.
     
-    Учетные данные для [HTTP аутентификации](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Если источник не указан, имя пользователя и пароль отправляются на любые серверы при несанкционированных ответах.
+Учётные данные для [HTTP-аутентификации](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Если источник (origin) не указан, имя пользователя и пароль отправляются любым серверам в ответ на сообщения об отсутствии авторизации.
+    
+    Передайте массив, чтобы использовать разные учётные данные для разных источников. Используется первая запись, соответствующая источнику запроса, а записи без указания источника соответствуют любому запросу.
   - `ignoreHTTPSErrors` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-ignore-https-errors"/><a href="#electron-launch-option-ignore-https-errors" class="list-anchor">#</a>
     
     Указывает, следует ли игнорировать ошибки HTTPS при отправке сетевых запросов. По умолчанию `false`.
@@ -148,12 +174,12 @@ await electron.launch(options);
       
       Шаблон glob или regex для фильтрации запросов, которые сохраняются в HAR. Когда был предоставлен [baseURL](/api/class-browser.mdx#browser-new-context-option-base-url) через параметры контекста, и переданный URL является путем, он объединяется через конструктор [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL). По умолчанию отсутствует.
     
-    Включает запись [HAR](http://www.softwareishard.com/blog/har-12-spec) для всех страниц в файл `recordHar.path`. Если не указано, HAR не записывается. Убедитесь, что вы дождались [browserContext.close()](/api/class-browsercontext.mdx#browser-context-close) для сохранения HAR.
-  - `recordVideo` [Object] *(необязательно)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-record-video"/><a href="#electron-launch-option-record-video" class="list-anchor">#</a>
-    - `dir` [string]
+Включает запись [HAR](http://www.softwareishard.com/blog/har-12-spec) для всех страниц в файл `recordHar.path`. Если параметр не указан, HAR не записывается. Обязательно дождитесь завершения [browserContext.close()](/api/class-browsercontext.mdx#browser-context-close), чтобы HAR был сохранён.
+  - `recordVideo` [Object] *(необязательный)* <font size="2">Добавлено в: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-record-video"/><a href="#electron-launch-option-record-video" class="list-anchor">#</a>
+    - `dir` [string] *(необязательный)*
       
-      Путь к директории для сохранения видео.
-    - `size` [Object] *(необязательно)*
+      Путь к каталогу для сохранения видеозаписей. Если параметр не указан, видеозаписи будут сохранены в `artifactsDir` (см. параметры [browserType.launch()](/api/class-browsertype.mdx#browser-type-launch)).
+    - `size` [Object] *(необязательный)*
       - `width` [number]
         
         Ширина видеофрейма.
@@ -161,7 +187,37 @@ await electron.launch(options);
         
         Высота видеофрейма.
       
-      Необязательные размеры записанных видео. Если не указаны, размер будет равен `viewport`, уменьшенному для соответствия 800x800. Если `viewport` не настроен явно, размер видео по умолчанию составляет 800x450. Фактическое изображение каждой страницы будет уменьшено, если это необходимо, чтобы соответствовать указанному размеру.
+Необязательные размеры записываемых видео. Если они не указаны, размер будет равен размеру `viewport`, уменьшенному с сохранением пропорций так, чтобы вписаться в 800x800. Если `viewport` не настроен явно, размер видео по умолчанию составляет 800x450. Изображение каждой страницы при необходимости будет уменьшено, чтобы вписаться в указанные размеры.
+    - `fps` [number] *(необязательно)*
+      
+      Частота кадров записываемых видео в кадрах в секунду. По умолчанию — `25`. Firefox и WebKit в настоящее время поддерживают запись с частотой до 25 кадров в секунду.
+    - `showActions` [Object] *(необязательно)*
+      - `duration` [number] *(необязательно)*
+        
+        Продолжительность отображения каждой аннотации в миллисекундах. По умолчанию — `500`.
+      - `position` "top-left" | "top" | "top-right" | "bottom-left" | "bottom" | "bottom-right" *(необязательно)*
+        
+        Положение заголовка действия, накладываемого поверх изображения. По умолчанию — `"top-right"`.
+      - `fontSize` [number] *(необязательно)*
+        
+        Размер шрифта заголовка действия в пикселях. По умолчанию — `24`. Устарело, используйте вместо этого `style.title`.
+      - `cursor` "none" | "pointer" *(необязательно)*
+        
+        Визуальное оформление курсора, отображаемое для действий с указателем. Значение `"pointer"` (по умолчанию) отображает указатель мыши, который анимированно перемещается от точки предыдущего действия к точке следующего. Значение `"none"` отключает отображение курсора.
+      - `style` [Object] *(необязательно)*
+        - `point` [string] *(необязательно)*
+          
+          CSS-объявления для маркера нулевого размера, расположенного по центру точки действия. Если не указаны, маркер не отображается.
+        - `highlight` [string] *(необязательно)*
+          
+          CSS-объявления для прямоугольной области, покрывающей целевой элемент. Если не указаны, область не отображается.
+        - `title` [string] *(необязательно)*
+          
+          CSS-объявления для заголовка действия.
+        
+        Стили визуального оформления действий.
+      
+      Если указано, включает визуальные аннотации на элементах, с которыми выполняется взаимодействие, во время записи видео.
     
     Включает запись видео для всех страниц в директорию `recordVideo.dir`. Если не указано, видео не записываются. Убедитесь, что вы дождались [browserContext.close()](/api/class-browsercontext.mdx#browser-context-close) для сохранения видео.
   - `timeout` [number] *(необязательно)* <font size="2">Добавлено в: v1.15</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-timeout"/><a href="#electron-launch-option-timeout" class="list-anchor">#</a>
@@ -177,11 +233,6 @@ await electron.launch(options);
 **Возвращает**
 - [Promise]&lt;[ElectronApplication]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-return"/><a href="#electron-launch-return" class="list-anchor">#</a>
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -194,10 +245,11 @@ await electron.launch(options);
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -216,6 +268,7 @@ await electron.launch(options);
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -223,9 +276,18 @@ await electron.launch(options);
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -243,6 +305,7 @@ await electron.launch(options);
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -255,6 +318,7 @@ await electron.launch(options);
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -276,6 +340,7 @@ await electron.launch(options);
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

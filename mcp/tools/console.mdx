@@ -1,0 +1,53 @@
+---
+title: "Консоль"
+---
+
+# Консоль
+
+Получайте доступ к сообщениям консоли браузера для отладки. Инструмент `browser_console_messages` входит в состав **основных** возможностей и доступен всегда.
+
+## browser_console_messages
+
+Возвращает сообщения консоли, собранные для текущей вкладки, предваряя их сводкой с количеством сообщений.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `level` | string | нет | Минимальный уровень: `error`, `warning`, `info` (по умолчанию), `debug`. Каждый уровень включает сообщения более высоких уровней важности |
+| `all` | boolean | нет | Возвращать все сообщения с начала сеанса, а не только с момента последнего перехода на другую страницу. По умолчанию — false |
+| `filename` | string | нет | Сохранить сообщения в файл вместо возврата в виде текста |
+
+```txt
+→ browser_console_messages
+
+  Total messages: 4 (Errors: 1, Warnings: 1)
+
+  [ERROR] Uncaught TypeError: Cannot read property 'map' of undefined @ app.js:42
+  [WARNING] Deprecation: 'window.webkitStorageInfo' is deprecated.
+  [LOG] App initialized in 234ms
+  [LOG] User session restored
+
+→ browser_console_messages { level: "error" }
+
+  Total messages: 4 (Errors: 1, Warnings: 1)
+  Returning 1 messages for level "error"
+
+  [ERROR] Uncaught TypeError: Cannot read property 'map' of undefined @ app.js:42
+```
+
+Ответы инструментов также содержат строку `- New console entries:`, указывающую на сообщения, записанные с момента предыдущего ответа, чтобы LLM могла определить, когда стоит вызвать этот инструмент.
+
+Уровень по умолчанию для всего сеанса можно задать с помощью `--console-level=<level>`.
+
+## Рабочий процесс: отладка некорректно работающей страницы
+
+```txt
+Вы: Страница выглядит некорректно. Проверь консоль на наличие ошибок.
+
+→ browser_console_messages { level: "error" }
+
+  [ERROR] Failed to fetch: GET https://api.example.com/data 404
+  [ERROR] Uncaught Error: API returned 404
+
+→ browser_network_requests { filter: "api" }
+  // Подтвердите, какой запрос завершился ошибкой, затем подмените его ответ или продолжите исследование
+```

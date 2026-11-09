@@ -459,7 +459,7 @@ assertThat(page.locator("x-details")).containsText("Details");
 page.getByRole(AriaRole.LISTITEM)
     .filter(new Locator.FilterOptions().setHasText("Product 2"))
     .getByRole(AriaRole.BUTTON,
-               new Page.GetByRoleOptions().setName("Add to cart"))
+               new Locator.GetByRoleOptions().setName("Add to cart"))
     .click();
 ```
 
@@ -470,7 +470,7 @@ page.getByRole(AriaRole.LISTITEM)
     .filter(new Locator.FilterOptions()
         .setHasText(Pattern.compile("Product 2")))
     .getByRole(AriaRole.BUTTON,
-               new Page.GetByRoleOptions().setName("Add to cart"))
+               new Locator.GetByRoleOptions().setName("Add to cart"))
     .click();
 ```
 
@@ -520,10 +520,10 @@ assertThat(page.getByRole(AriaRole.LISTITEM)
 ```java
 page.getByRole(AriaRole.LISTITEM)
     .filter(new Locator.FilterOptions()
-        .setHas(page.GetByRole(AriaRole.HEADING, new Page.GetByRoleOptions()
+        .setHas(page.getByRole(AriaRole.HEADING, new Page.GetByRoleOptions()
         .setName("Product 2"))))
     .getByRole(AriaRole.BUTTON,
-               new Page.GetByRoleOptions().setName("Add to cart"))
+               new Locator.GetByRoleOptions().setName("Add to cart"))
     .click();
 ```
 
@@ -533,7 +533,7 @@ page.getByRole(AriaRole.LISTITEM)
 assertThat(page
     .getByRole(AriaRole.LISTITEM)
     .filter(new Locator.FilterOptions()
-        .setHas(page.GetByRole(AriaRole.HEADING,
+        .setHas(page.getByRole(AriaRole.HEADING,
                                new Page.GetByRoleOptions().setName("Product 2")))))
     .hasCount(1);
 ```
@@ -545,9 +545,9 @@ assertThat(page
 assertThat(page
     .getByRole(AriaRole.LISTITEM)
     .filter(new Locator.FilterOptions()
-        .setHas(page.GetByRole(AriaRole.LIST)
-                    .GetByRole(AriaRole.HEADING,
-                               new Page.GetByRoleOptions().setName("Product 2")))))
+        .setHas(page.getByRole(AriaRole.LIST)
+                    .getByRole(AriaRole.HEADING,
+                               new Locator.GetByRoleOptions().setName("Product 2")))))
     .hasCount(1);
 ```
 
@@ -583,14 +583,14 @@ product
     .click();
 ```
 
-Вы также можете объединить два локатора, например, чтобы найти кнопку "Save" внутри определенного диалога:
+Вы также можете объединить два локатора с помощью [Locator.within()](/api/class-locator.mdx#locator-within), например, чтобы найти кнопку «Save» внутри определённого диалогового окна:
 
 ```java
 Locator saveButton = page.getByRole(AriaRole.BUTTON,
                                     new Page.GetByRoleOptions().setName("Save"));
 // ...
 Locator dialog = page.getByTestId("settings-dialog");
-dialog.locator(saveButton).click();
+saveButton.within(dialog).click();
 ```
 
 ### Сопоставление двух локаторов одновременно {#matching-two-locators-simultaneously}
@@ -644,10 +644,12 @@ newEmail.click();
 * Это найдет только вторую кнопку, потому что она видима, и затем нажмет на нее.
   
   ```java
-  page.locator("button").filter(new Locator.FilterOptions.setVisible(true)).click();
+  page.locator("button").visible().click();
   ```
   
-## Списки {#lists}
+Чтобы вместо этого находить невидимые элементы, используйте [Locator.filter()](/api/class-locator.mdx#locator-filter) с параметром [setVisible](/api/class-locator.mdx#locator-filter-option-visible), установленным в `false`.
+
+## Списки
 
 ### Подсчет элементов в списке {#count-items-in-a-list}
 
@@ -878,7 +880,7 @@ rowLocator
         .setHas(page.getByRole(
             AriaRole.BUTTON,
             new Page.GetByRoleOptions().setName("Say goodbye"))))
-    .screenshot(new Page.ScreenshotOptions().setPath("screenshot.png"));
+    .screenshot(new Locator.ScreenshotOptions().setPath(Paths.get("screenshot.png")));
 ```
 
 Теперь у вас должен быть файл "screenshot.png" в корневом каталоге вашего проекта.
@@ -948,6 +950,8 @@ page.getByRole(AriaRole.BUTTON).count();
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -969,15 +973,18 @@ page.getByRole(AriaRole.BUTTON).count();
 [RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -990,6 +997,7 @@ page.getByRole(AriaRole.BUTTON).count();
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[BiConsumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html "BiConsumer"
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
@@ -997,6 +1005,7 @@ page.getByRole(AriaRole.BUTTON).count();
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[Integer]: https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html "Integer"
 [long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"

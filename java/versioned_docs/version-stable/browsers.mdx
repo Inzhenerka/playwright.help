@@ -56,7 +56,7 @@ mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="in
 
 ## Настройка браузеров {#configure-browsers}
 
-Playwright может запускать тесты в браузерах Chromium, WebKit и Firefox, а также в брендированных браузерах, таких как Google Chrome и Microsoft Edge. Он также может работать на эмулированных планшетах и мобильных устройствах. См. [реестр параметров устройств](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json) для полного списка выбранных настольных, планшетных и мобильных устройств.
+Playwright позволяет запускать тесты в браузерах Chromium, WebKit и Firefox, а также в фирменных браузерах, таких как Google Chrome и Microsoft Edge. Кроме того, он поддерживает запуск тестов с эмуляцией планшетов и мобильных устройств. Полный список доступных профилей настольных компьютеров, планшетов и мобильных устройств см. в [реестре параметров устройств](https://github.com/microsoft/playwright/blob/main/packages/isomorphic/deviceDescriptorsSource.json).
 
 ### Запуск тестов в разных браузерах {#run-tests-on-different-browsers}
 
@@ -144,6 +144,8 @@ public class Example {
 # только запуск тестов в headless режиме
 mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps --no-shell"
 ```
+
+<ApiAnchor id="google-chrome--microsoft-edge" />
 
 ### Google Chrome и Microsoft Edge {#google-chrome-microsoft-edge}
 
@@ -293,7 +295,7 @@ set NODE_EXTRA_CA_CERTS="C:\certs\root.crt"
 </TabItem>
 </Tabs>
 
-Если ваша сеть медленно подключается к архиву браузеров Playwright, вы можете увеличить время ожидания подключения в миллисекундах с помощью переменной окружения `PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT`:
+Если архив браузера скачивается медленно или скачивание зависает, вы можете увеличить тайм-аут сокета загрузки в миллисекундах с помощью переменной окружения `PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT`. Несмотря на название, это тайм-аут бездействия, а не тайм-аут установления соединения: он ограничивает время, в течение которого при скачивании могут не поступать данные, и по умолчанию составляет 30 секунд:
 
 <Tabs
   groupId="bash-flavor"
@@ -501,7 +503,7 @@ mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="in
 </TabItem>
 </Tabs>
 
-При запуске скриптов Playwright попросите его искать браузеры в общем расположении.
+При запуске скриптов Playwright укажите Playwright искать браузеры в общей папке.
 
 <Tabs
   groupId="bash-flavor"
@@ -541,7 +543,7 @@ Playwright отслеживает пакеты, которым нужны эти
 
 :::note
 
-Разработчики могут включить этот режим, экспортируя `PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers` в своем `.bashrc`.
+Разработчики могут включить этот режим, добавив `export PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers` в свой файл `.bashrc`.
 :::
 
 ### Пропуск загрузки браузеров {#skip-browser-downloads}
@@ -588,7 +590,11 @@ mvn test
 
 Playwright отслеживает клиентов, которые используют его браузеры. Когда больше нет клиентов, которым требуется определенная версия браузера, эта версия удаляется из системы. Таким образом, вы можете безопасно использовать экземпляры Playwright разных версий и в то же время не тратить дисковое пространство на браузеры, которые больше не используются.
 
-Чтобы отказаться от удаления неиспользуемых браузеров, вы можете установить переменную окружения `PLAYWRIGHT_SKIP_BROWSER_GC=1`.
+Чтобы отключить удаление неиспользуемых браузеров, можно задать переменную окружения `PLAYWRIGHT_SKIP_BROWSER_GC=1` или передать параметр `--no-remove` команде установки:
+
+```bash
+mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --no-remove"
+```
 
 ### Список всех установленных браузеров {#list-all-installed-browsers}
 
@@ -623,6 +629,8 @@ mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="un
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -644,15 +652,18 @@ mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="un
 [RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -665,6 +676,7 @@ mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="un
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[BiConsumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html "BiConsumer"
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
@@ -672,6 +684,7 @@ mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="un
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[Integer]: https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html "Integer"
 [long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"

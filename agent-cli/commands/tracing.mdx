@@ -1,0 +1,81 @@
+---
+title: "Трассировка"
+---
+
+# Трассировка
+
+Записывайте трассировки выполнения, которые фиксируют снимки DOM, скриншоты, сетевую активность и сообщения консоли на каждом шаге.
+
+## Команды
+
+```bash
+playwright-cli tracing-start            # начать запись
+playwright-cli tracing-stop             # остановить и сохранить
+```
+
+## Базовая запись
+
+```bash
+playwright-cli tracing-start
+playwright-cli goto https://example.com
+playwright-cli click e5
+playwright-cli fill e3 "test"
+playwright-cli tracing-stop
+```
+
+Обе команды выводят пути к файлам и каталогам, в которые записываются данные:
+
+```txt
+Trace recording stopped.
+[Trace](.playwright-cli/traces/trace-1771097322679.trace)
+[Network log](.playwright-cli/traces/trace-1771097322679.network)
+[Resources](.playwright-cli/traces/resources)
+```
+
+Трассировка записывается в реальном времени — ссылки на файлы появляются сразу после запуска `tracing-start`, поэтому вы можете открыть
+средство просмотра, пока автоматизация ещё выполняется.
+
+| Файл | Содержимое |
+|------|----------|
+| `trace-{timestamp}.trace` | Действия, снимки DOM до и после каждого действия, скриншоты, сообщения консоли, временные характеристики |
+| `trace-{timestamp}.network` | Все запросы и ответы с заголовками, телами и временными характеристиками |
+| `resources/` | Кешированные изображения, шрифты, таблицы стилей и скрипты, необходимые для воспроизведения страницы |
+
+## Просмотр трассировки
+
+```bash
+npx playwright show-trace .playwright-cli/traces/trace-1771097322679.trace
+```
+
+[Trace Viewer](/docs/trace-viewer-intro) показывает временную шкалу всех действий со снимками DOM
+(до и после), скриншотами, сетевыми запросами и ответами, сообщениями консоли и временными характеристиками.
+
+## Рабочий процесс: отладка сценария, завершающегося ошибкой
+
+```bash
+# Начать трассировку
+playwright-cli tracing-start
+
+# Выполнить шаги сценария, в котором возникает ошибка
+playwright-cli goto https://store.example.com/checkout
+playwright-cli fill e10 "4111111111111111"
+playwright-cli click e15
+
+# Проверить, что пошло не так
+playwright-cli snapshot
+# - text: "Payment processing failed"
+
+playwright-cli console error
+# [ERROR] POST /api/payment 422: {"error":"Card number must include expiry"}
+
+# Сохранить трассировку для анализа
+playwright-cli tracing-stop
+```
+
+## Очистка
+
+Трассировки могут занимать значительное пространство на диске:
+
+```bash
+find .playwright-cli/traces -mtime +7 -delete
+```

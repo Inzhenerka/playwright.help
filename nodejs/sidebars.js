@@ -10,10 +10,10 @@ module.exports = {
         { type: 'doc', id: 'running-tests' },
         { type: 'doc', id: 'trace-viewer-intro' },
         { type: 'doc', id: 'ci-intro' },
+        { type: 'doc', id: 'getting-started-vscode' },
       ],
       collapsed: false
     },
-    { type: 'doc', id: 'getting-started-vscode' },
     { type: 'doc', id: 'release-notes' },
     { type: 'doc', id: 'canary-releases' },
     {
@@ -130,6 +130,8 @@ module.exports = {
             { type: 'doc', id: 'api/class-clock' },
             { type: 'doc', id: 'api/class-consolemessage' },
             { type: 'doc', id: 'api/class-coverage' },
+            { type: 'doc', id: 'api/class-credentials' },
+            { type: 'doc', id: 'api/class-debugger' },
             { type: 'doc', id: 'api/class-dialog' },
             { type: 'doc', id: 'api/class-download' },
             { type: 'doc', id: 'api/class-elementhandle' },
@@ -145,14 +147,17 @@ module.exports = {
             { type: 'doc', id: 'api/class-request' },
             { type: 'doc', id: 'api/class-response' },
             { type: 'doc', id: 'api/class-route' },
+            { type: 'doc', id: 'api/class-screencast' },
             { type: 'doc', id: 'api/class-selectors' },
             { type: 'doc', id: 'api/class-timeouterror' },
             { type: 'doc', id: 'api/class-touchscreen' },
             { type: 'doc', id: 'api/class-tracing' },
             { type: 'doc', id: 'api/class-video' },
             { type: 'doc', id: 'api/class-weberror' },
+            { type: 'doc', id: 'api/class-webmcp' },
             { type: 'doc', id: 'api/class-websocket' },
             { type: 'doc', id: 'api/class-websocketroute' },
+            { type: 'doc', id: 'api/class-webstorage' },
             { type: 'doc', id: 'api/class-worker' }
           ],
           collapsed: false

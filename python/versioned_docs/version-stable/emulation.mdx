@@ -12,7 +12,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Устройства {#devices}
 
-Playwright поставляется с [реестром параметров устройств](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json), используя [playwright.devices](/api/class-playwright.mdx#playwright-devices) для выбранных настольных, планшетных и мобильных устройств. Это можно использовать для симуляции поведения браузера для конкретного устройства, такого как user agent, размер экрана, viewport и наличие поддержки touch. Все тесты будут выполняться с указанными параметрами устройства.
+Playwright поставляется с [реестром параметров устройств](https://github.com/microsoft/playwright/blob/main/packages/isomorphic/deviceDescriptorsSource.json), доступным через [playwright.devices](/api/class-playwright.mdx#playwright-devices), для ряда настольных компьютеров, планшетов и мобильных устройств. Его можно использовать для имитации поведения браузера на определённом устройстве, задавая такие параметры, как строка User-Agent, размер экрана, область просмотра и поддержка сенсорного ввода. Все тесты будут выполняться с указанными параметрами устройства.
 
 <Tabs
   groupId="python-flavor"
@@ -61,7 +61,16 @@ asyncio.run(main())
 </TabItem>
 </Tabs>
 
-<img width="458" alt="playwright.dev website emulated for iPhone 13" src="https://user-images.githubusercontent.com/13063165/220411073-76fe59f9-9a2d-463d-8e30-c19a7deca133.png" />
+<img height="1582" width="916" alt="Сайт playwright.dev в режиме эмуляции iPhone 13" src="https://user-images.githubusercontent.com/13063165/220411073-76fe59f9-9a2d-463d-8e30-c19a7deca133.png" />
+
+**Примечание**: Предварительно настроенные устройства предполагают использование определённой платформы. Например, "Desktop Chrome" задаёт строку User-Agent, соответствующую Windows.
+
+Если вы хотите использовать User-Agent, соответствующий платформе, на которой выполняются тесты, рекомендуем сбросить значение свойства UserAgent.
+
+```python
+desktop_chrome = playwright.devices["Desktop Chrome"]
+context = browser.new_context(**desktop_chrome, user_agent=None)
+```
 
 ## Viewport {#viewport}
 
@@ -151,6 +160,8 @@ context = await browser.new_context(
 </TabItem>
 </Tabs>
 
+<ApiAnchor id="locale--timezone" />
+
 ## Локаль и Часовой пояс {#locale-timezone}
 
 Эмулируйте локаль и часовой пояс браузера: их можно задать глобально для всех тестов в конфиге, а затем переопределять для отдельных тестов.
@@ -185,7 +196,7 @@ context = await browser.new_context(
 </TabItem>
 </Tabs>
 
-<img width="1394" alt="Bing in german lang and timezone" src="https://user-images.githubusercontent.com/13063165/220416571-ccc96ab1-44bb-4579-8430-64502fc24a15.png" />
+<img height="1824" width="2788" alt="Bing на немецком языке с соответствующим часовым поясом" src="https://user-images.githubusercontent.com/13063165/220416571-ccc96ab1-44bb-4579-8430-64502fc24a15.png" />
 
 ## Разрешения {#permissions}
 
@@ -305,7 +316,7 @@ context = await browser.new_context(
 </TabItem>
 </Tabs>
 
-<img width="1394" alt="geolocation for italy on bing maps" src="https://user-images.githubusercontent.com/13063165/220417670-bb22d815-f5cd-47c4-8562-0b88165eac27.png" />
+<img height="1824" width="2788" alt="геолокация для Италии на картах Bing" src="https://user-images.githubusercontent.com/13063165/220417670-bb22d815-f5cd-47c4-8562-0b88165eac27.png" />
 
 Измените местоположение позже:
 
@@ -337,7 +348,7 @@ await context.set_geolocation({"longitude": 48.858455, "latitude": 2.294474})
 
 ## Цветовая схема и Медиа {#color-scheme-and-media}
 
-Эмулируйте `"colorScheme"` пользователя. Поддерживаемые значения: 'light' и 'dark'. Вы также можете эмулировать тип медиа с помощью [page.emulate_media()](/api/class-page.mdx#page-emulate-media).
+Эмулирует пользовательскую настройку `"colorScheme"`. Поддерживаемые значения: 'light', 'dark' и 'no-preference'. Вы также можете эмулировать тип медиа с помощью [page.emulate_media()](/api/class-page.mdx#page-emulate-media).
 
 <Tabs
   groupId="python-flavor"
@@ -391,7 +402,49 @@ await page.emulate_media(media='print')
 </TabItem>
 </Tabs>
 
-<img width="1394" alt="playwright web in dark mode" src="https://user-images.githubusercontent.com/13063165/220411638-55d2b051-4678-4da7-9f0b-ed22f5a3c47c.png" />
+<img height="1824" width="2788" alt="сайт Playwright в тёмном режиме" src="https://user-images.githubusercontent.com/13063165/220411638-55d2b051-4678-4da7-9f0b-ed22f5a3c47c.png" />
+
+Параметры `"reducedMotion"`, `"forcedColors"` и `"contrast"` аналогичным образом эмулируют медиафункции `prefers-reduced-motion`, `forced-colors` и `prefers-contrast`. Поддерживаемые значения: `'reduce'` и `'no-preference'` для уменьшения анимации, `'active'` и `'none'` для принудительного применения цветов, а также `'more'` и `'no-preference'` для контрастности. Метод [page.emulate_media()](/api/class-page.mdx#page-emulate-media) изменяет их для отдельной страницы.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Create context with reduced motion, forced colors and more contrast
+context = browser.new_context(
+  reduced_motion='reduce', # or 'no-preference'
+  forced_colors='active', # or 'none'
+  contrast='more' # or 'no-preference'
+)
+
+# Change the media features for the page
+page.emulate_media(reduced_motion='reduce', forced_colors='active', contrast='more')
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Create context with reduced motion, forced colors and more contrast
+context = await browser.new_context(
+  reduced_motion='reduce', # or 'no-preference'
+  forced_colors='active', # or 'none'
+  contrast='more' # or 'no-preference'
+)
+
+# Change the media features for the page
+await page.emulate_media(reduced_motion='reduce', forced_colors='active', contrast='more')
+```
+
+</TabItem>
+</Tabs>
 
 ## User Agent {#user-agent}
 
@@ -457,7 +510,12 @@ context = await browser.new_context(
 </TabItem>
 </Tabs>
 
-## Включен JavaScript {#javascript-enabled}
+:::note
+
+Эмуляция автономного режима влияет только на запросы, которые проходят через стандартный сетевой стек браузера, такие как переходы между страницами, `fetch()`, `XMLHttpRequest` и WebSockets. Она не влияет на трафик WebRTC: установленные соединения `RTCPeerConnection` продолжают отправлять и получать медиаданные по UDP. Чтобы протестировать потерю соединения WebRTC, прервите соединение вне браузера, например остановив TURN-сервер или используя брандмауэр на уровне ОС.
+:::
+
+## Выполнение JavaScript {/* #javascript-enabled */}
 
 Эмуляция пользовательского сценария, когда JavaScript отключен.
 
@@ -500,11 +558,15 @@ context = await browser.new_context(
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [Error]: /api/class-error.mdx "Error"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
@@ -518,14 +580,17 @@ context = await browser.new_context(
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

@@ -39,7 +39,7 @@ const { firefox } = require('playwright');  // Or 'chromium' or 'webkit'.
 
 ## Methods
 
-### addScriptTag {#frame-add-script-tag}
+### addScriptTag {/* #frame-add-script-tag */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.addScriptTag</x-search>
 
@@ -74,7 +74,7 @@ await frame.addScriptTag(options);
 
 ---
 
-### addStyleTag {#frame-add-style-tag}
+### addStyleTag {/* #frame-add-style-tag */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.addStyleTag</x-search>
 
@@ -106,7 +106,7 @@ await frame.addStyleTag(options);
 
 ---
 
-### childFrames {#frame-child-frames}
+### childFrames {/* #frame-child-frames */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.childFrames</x-search>
 
@@ -121,7 +121,7 @@ frame.childFrames();
 
 ---
 
-### content {#frame-content}
+### content {/* #frame-content */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.content</x-search>
 
@@ -131,14 +131,21 @@ Gets the full HTML contents of the frame, including the doctype.
 
 ```js
 await frame.content();
+await frame.content(options);
 ```
+
+**Arguments**
+- `options` [Object] *(optional)*
+  - `includeShadow` [boolean] *(optional)* <font size="2">Added in: v1.64</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-content-option-include-shadow"/><a href="#frame-content-option-include-shadow" class="list-anchor">#</a>
+    
+    When true, contents of open shadow roots are included as [declarative shadow DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM#declaratively_with_html), i.e. `<template shadowrootmode="open">` elements nested inside their host elements. Closed shadow roots are never included. Defaults to `false`.
 
 **Returns**
 - [Promise]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-content-return"/><a href="#frame-content-return" class="list-anchor">#</a>
 
 ---
 
-### dragAndDrop {#frame-drag-and-drop}
+### dragAndDrop {/* #frame-drag-and-drop */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.13</font><x-search>frame.dragAndDrop</x-search>
 
@@ -168,6 +175,12 @@ await frame.dragAndDrop(source, target, options);
     
     
     This option has no effect.
+  - `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-drag-and-drop-option-scroll"/><a href="#frame-drag-and-drop-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-drag-and-drop-option-signal"/><a href="#frame-drag-and-drop-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `sourcePosition` [Object] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-drag-and-drop-option-source-position"/><a href="#frame-drag-and-drop-option-source-position" class="list-anchor">#</a>
     - `x` [number]
       
@@ -202,7 +215,7 @@ await frame.dragAndDrop(source, target, options);
 
 ---
 
-### evaluate {#frame-evaluate}
+### evaluate {/* #frame-evaluate */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.evaluate</x-search>
 
@@ -230,7 +243,7 @@ console.log(await frame.evaluate('1 + 2')); // prints "3"
 [ElementHandle] instances can be passed as an argument to the [frame.evaluate()](/api/class-frame.mdx#frame-evaluate):
 
 ```js
-const bodyHandle = await frame.evaluate('document.body');
+const bodyHandle = await frame.evaluateHandle('document.body');
 const html = await frame.evaluate(([body, suffix]) =>
   body.innerHTML + suffix, [bodyHandle, 'hello'],
 );
@@ -244,13 +257,17 @@ await bodyHandle.dispose();
 - `arg` [EvaluationArgument] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-evaluate-option-arg"/><a href="#frame-evaluate-option-arg" class="list-anchor">#</a>
   
   Optional argument to pass to [pageFunction](/api/class-frame.mdx#frame-evaluate-option-expression).
+- `options` [Object] *(optional)*
+  - `exposeFunctions` [boolean] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-evaluate-option-expose-functions"/><a href="#frame-evaluate-option-expose-functions" class="list-anchor">#</a>
+    
+    When set to `true`, functions passed inside [arg](/api/class-frame.mdx#frame-evaluate-option-arg) are exposed in the page and can be called from the page function. Calling one returns a [Promise] of its result. Under the hood, each function is exposed via [page.exposeFunction()](/api/class-page.mdx#page-expose-function), so it is technically accessible from all frames of the page. Exposed functions are cleared upon the top-level navigation. Defaults to `false`, in which case functions are not serializable and passing one throws an error.
 
 **Returns**
 - [Promise]&lt;[Serializable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-evaluate-return"/><a href="#frame-evaluate-return" class="list-anchor">#</a>
 
 ---
 
-### evaluateHandle {#frame-evaluate-handle}
+### evaluateHandle {/* #frame-evaluate-handle */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.evaluateHandle</x-search>
 
@@ -291,13 +308,17 @@ await resultHandle.dispose();
 - `arg` [EvaluationArgument] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-evaluate-handle-option-arg"/><a href="#frame-evaluate-handle-option-arg" class="list-anchor">#</a>
   
   Optional argument to pass to [pageFunction](/api/class-frame.mdx#frame-evaluate-handle-option-expression).
+- `options` [Object] *(optional)*
+  - `exposeFunctions` [boolean] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-evaluate-handle-option-expose-functions"/><a href="#frame-evaluate-handle-option-expose-functions" class="list-anchor">#</a>
+    
+    When set to `true`, functions passed inside [arg](/api/class-frame.mdx#frame-evaluate-handle-option-arg) are exposed in the page and can be called from the page function. Calling one returns a [Promise] of its result. Under the hood, each function is exposed via [page.exposeFunction()](/api/class-page.mdx#page-expose-function), so it is technically accessible from all frames of the page. Exposed functions are cleared upon the top-level navigation. Defaults to `false`, in which case functions are not serializable and passing one throws an error.
 
 **Returns**
 - [Promise]&lt;[JSHandle]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-evaluate-handle-return"/><a href="#frame-evaluate-handle-return" class="list-anchor">#</a>
 
 ---
 
-### frameElement {#frame-frame-element}
+### frameElement {/* #frame-frame-element */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.frameElement</x-search>
 
@@ -320,11 +341,13 @@ console.log(frame === contentFrame);  // -> true
 
 ---
 
-### frameLocator {#frame-frame-locator}
+### frameLocator {/* #frame-frame-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frame.frameLocator</x-search>
 
 When working with iframes, you can create a frame locator that will enter the iframe and allow selecting elements in that iframe.
+
+When called without [selector](/api/class-frame.mdx#frame-frame-locator-option-selector), the search starts in this frame or in any of the iframes inside it, so that you don't need to locate each iframe first. Note that the rest of the locator is resolved inside a single frame, just like any other locator. If it matches elements inside multiple frames, an error is thrown.
 
 **Usage**
 
@@ -335,17 +358,24 @@ const locator = frame.frameLocator('#my-iframe').getByText('Submit');
 await locator.click();
 ```
 
+Following snippet locates a button, either in the frame or in one of the iframes inside it:
+
+```js
+const locator = frame.frameLocator().getByRole('button');
+await locator.click();
+```
+
 **Arguments**
-- `selector` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-frame-locator-option-selector"/><a href="#frame-frame-locator-option-selector" class="list-anchor">#</a>
+- `selector` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-frame-locator-option-selector"/><a href="#frame-frame-locator-option-selector" class="list-anchor">#</a>
   
-  A selector to use when resolving DOM element.
+  A selector that matches the frame element. When not specified, locator is matched in this frame or in any of the iframes inside it.
 
 **Returns**
 - [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-frame-locator-return"/><a href="#frame-frame-locator-return" class="list-anchor">#</a>
 
 ---
 
-### getByAltText {#frame-get-by-alt-text}
+### getByAltText {/* #frame-get-by-alt-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByAltText</x-search>
 
@@ -377,7 +407,7 @@ await page.getByAltText('Playwright logo').click();
 
 ---
 
-### getByLabel {#frame-get-by-label}
+### getByLabel {/* #frame-get-by-label */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByLabel</x-search>
 
@@ -412,7 +442,7 @@ await page.getByLabel('Password').fill('secret');
 
 ---
 
-### getByPlaceholder {#frame-get-by-placeholder}
+### getByPlaceholder {/* #frame-get-by-placeholder */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByPlaceholder</x-search>
 
@@ -448,7 +478,7 @@ await page
 
 ---
 
-### getByRole {#frame-get-by-role}
+### getByRole {/* #frame-get-by-role */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByRole</x-search>
 
@@ -467,7 +497,7 @@ Consider the following DOM structure.
 <button>Submit</button>
 ```
 
-You can locate each element by it's implicit role:
+You can locate each element by its implicit role:
 
 ```js
 await expect(page.getByRole('heading', { name: 'Sign up' })).toBeVisible();
@@ -487,6 +517,11 @@ await page.getByRole('button', { name: /submit/i }).click();
     An attribute that is usually set by `aria-checked` or native `<input type=checkbox>` controls.
     
     Learn more about [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
+  - `description` [string] | [RegExp] *(optional)* <font size="2">Added in: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-get-by-role-option-description"/><a href="#frame-get-by-role-option-description" class="list-anchor">#</a>
+    
+    Option to match the [accessible description](https://w3c.github.io/accname/#dfn-accessible-description). By default, matching is case-insensitive and searches for a substring, use [exact](/api/class-frame.mdx#frame-get-by-role-option-exact) to control this behavior.
+    
+    Learn more about [accessible description](https://w3c.github.io/accname/#dfn-accessible-description).
   - `disabled` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-get-by-role-option-disabled"/><a href="#frame-get-by-role-option-disabled" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-disabled` or `disabled`.
@@ -498,7 +533,7 @@ await page.getByRole('button', { name: /submit/i }).click();
     
   - `exact` [boolean] *(optional)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-get-by-role-option-exact"/><a href="#frame-get-by-role-option-exact" class="list-anchor">#</a>
     
-    Whether [name](/api/class-frame.mdx#frame-get-by-role-option-name) is matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when [name](/api/class-frame.mdx#frame-get-by-role-option-name) is a regular expression. Note that exact match still trims whitespace.
+    Whether [name](/api/class-frame.mdx#frame-get-by-role-option-name) and [description](/api/class-frame.mdx#frame-get-by-role-option-description) are matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when the value is a regular expression. Note that exact match still trims whitespace.
   - `expanded` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-get-by-role-option-expanded"/><a href="#frame-get-by-role-option-expanded" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-expanded`.
@@ -541,7 +576,7 @@ Many html elements have an implicitly [defined role](https://w3c.github.io/html-
 
 ---
 
-### getByTestId {#frame-get-by-test-id}
+### getByTestId {/* #frame-get-by-test-id */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByTestId</x-search>
 
@@ -555,7 +590,7 @@ Consider the following DOM structure.
 <button data-testid="directions">Itinéraire</button>
 ```
 
-You can locate the element by it's test id:
+You can locate the element by its test id:
 
 ```js
 await page.getByTestId('directions').click();
@@ -586,7 +621,7 @@ export default defineConfig({
 
 ---
 
-### getByText {#frame-get-by-text}
+### getByText {/* #frame-get-by-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByText</x-search>
 
@@ -642,7 +677,7 @@ Input elements of the type `button` and `submit` are matched by their `value` in
 
 ---
 
-### getByTitle {#frame-get-by-title}
+### getByTitle {/* #frame-get-by-title */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByTitle</x-search>
 
@@ -676,7 +711,7 @@ await expect(page.getByTitle('Issues count')).toHaveText('25 issues');
 
 ---
 
-### goto {#frame-goto}
+### goto {/* #frame-goto */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.goto</x-search>
 
@@ -715,6 +750,9 @@ await frame.goto(url, options);
   - `referer` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-goto-option-referer"/><a href="#frame-goto-option-referer" class="list-anchor">#</a>
     
     Referer header value. If provided it will take preference over the referer header value set by [page.setExtraHTTPHeaders()](/api/class-page.mdx#page-set-extra-http-headers).
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-goto-option-signal"/><a href="#frame-goto-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-goto-option-timeout"/><a href="#frame-goto-option-timeout" class="list-anchor">#</a>
     
     Maximum operation time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `navigationTimeout` option in the config, or by using the [browserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -731,7 +769,7 @@ await frame.goto(url, options);
 
 ---
 
-### isDetached {#frame-is-detached}
+### isDetached {/* #frame-is-detached */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.isDetached</x-search>
 
@@ -748,7 +786,7 @@ frame.isDetached();
 
 ---
 
-### isEnabled {#frame-is-enabled}
+### isEnabled {/* #frame-is-enabled */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.isEnabled</x-search>
 
@@ -766,6 +804,9 @@ await frame.isEnabled(selector, options);
   
   A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used.
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-is-enabled-option-signal"/><a href="#frame-is-enabled-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-is-enabled-option-strict"/><a href="#frame-is-enabled-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -778,7 +819,7 @@ await frame.isEnabled(selector, options);
 
 ---
 
-### locator {#frame-locator}
+### locator {/* #frame-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>frame.locator</x-search>
 
@@ -824,7 +865,7 @@ frame.locator(selector, options);
 
 ---
 
-### name {#frame-name}
+### name {/* #frame-name */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.name</x-search>
 
@@ -848,7 +889,7 @@ frame.name();
 
 ---
 
-### page {#frame-page}
+### page {/* #frame-page */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.page</x-search>
 
@@ -865,7 +906,7 @@ frame.page();
 
 ---
 
-### parentFrame {#frame-parent-frame}
+### parentFrame {/* #frame-parent-frame */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.parentFrame</x-search>
 
@@ -882,7 +923,7 @@ frame.parentFrame();
 
 ---
 
-### setContent {#frame-set-content}
+### setContent {/* #frame-set-content */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.setContent</x-search>
 
@@ -900,6 +941,9 @@ await frame.setContent(html, options);
   
   HTML markup to assign to the page.
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-set-content-option-signal"/><a href="#frame-set-content-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-set-content-option-timeout"/><a href="#frame-set-content-option-timeout" class="list-anchor">#</a>
     
     Maximum operation time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `navigationTimeout` option in the config, or by using the [browserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -916,7 +960,7 @@ await frame.setContent(html, options);
 
 ---
 
-### title {#frame-title}
+### title {/* #frame-title */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.title</x-search>
 
@@ -933,7 +977,7 @@ await frame.title();
 
 ---
 
-### url {#frame-url}
+### url {/* #frame-url */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.url</x-search>
 
@@ -950,7 +994,7 @@ frame.url();
 
 ---
 
-### waitForFunction {#frame-wait-for-function}
+### waitForFunction {/* #frame-wait-for-function */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.waitForFunction</x-search>
 
@@ -991,6 +1035,9 @@ await frame.waitForFunction(selector => !!document.querySelector(selector), sele
   - `polling` [number] | "raf" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-function-option-polling"/><a href="#frame-wait-for-function-option-polling" class="list-anchor">#</a>
     
     If [polling](/api/class-frame.mdx#frame-wait-for-function-option-polling) is `'raf'`, then [pageFunction](/api/class-frame.mdx#frame-wait-for-function-option-expression) is constantly executed in `requestAnimationFrame` callback. If [polling](/api/class-frame.mdx#frame-wait-for-function-option-polling) is a number, then it is treated as an interval in milliseconds at which the function would be executed. Defaults to `raf`.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-function-option-signal"/><a href="#frame-wait-for-function-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-function-option-timeout"/><a href="#frame-wait-for-function-option-timeout" class="list-anchor">#</a>
     
     Maximum time to wait for in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -1000,7 +1047,7 @@ await frame.waitForFunction(selector => !!document.querySelector(selector), sele
 
 ---
 
-### waitForLoadState {#frame-wait-for-load-state}
+### waitForLoadState {/* #frame-wait-for-load-state */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.waitForLoadState</x-search>
 
@@ -1028,6 +1075,9 @@ await frame.waitForLoadState(); // Waits for 'load' state by default.
   * `'domcontentloaded'` - wait for the `DOMContentLoaded` event to be fired.
   * `'networkidle'` - **DISCOURAGED** wait until there are no network connections for at least `500` ms. Don't use this method for testing, rely on web assertions to assess readiness instead.
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-load-state-option-signal"/><a href="#frame-wait-for-load-state-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the waiting using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the waiting will be aborted and the operation will throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-load-state-option-timeout"/><a href="#frame-wait-for-load-state-option-timeout" class="list-anchor">#</a>
     
     Maximum operation time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `navigationTimeout` option in the config, or by using the [browserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -1037,7 +1087,7 @@ await frame.waitForLoadState(); // Waits for 'load' state by default.
 
 ---
 
-### waitForURL {#frame-wait-for-url}
+### waitForURL {/* #frame-wait-for-url */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>frame.waitForURL</x-search>
 
@@ -1051,10 +1101,13 @@ await frame.waitForURL('**/target.html');
 ```
 
 **Arguments**
-- `url` [string] | [RegExp] | [function]\([URL]\):[boolean]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-url-option-url"/><a href="#frame-wait-for-url-option-url" class="list-anchor">#</a>
+- `url` [string] | [RegExp] | [URLPattern] | [function]\([URL]\):[boolean]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-url-option-url"/><a href="#frame-wait-for-url-option-url" class="list-anchor">#</a>
   
-  A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+  A glob pattern, regex pattern, URL pattern, or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-url-option-signal"/><a href="#frame-wait-for-url-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the waiting using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the waiting will be aborted and the operation will throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-url-option-timeout"/><a href="#frame-wait-for-url-option-timeout" class="list-anchor">#</a>
     
     Maximum operation time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `navigationTimeout` option in the config, or by using the [browserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -1071,9 +1124,28 @@ await frame.waitForURL('**/target.html');
 
 ---
 
+## Properties
+
+### webmcp {/* #frame-webmcp */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>frame.webmcp</x-search>
+
+Tools that the frame registers through the experimental [WebMCP](https://webmachinelearning.github.io/webmcp/) browser API. See [WebMCP] for details.
+
+**Usage**
+
+```js
+frame.webmcp
+```
+
+**Type**
+- [WebMCP]
+
+---
+
 ## Deprecated
 
-### $ {#frame-query-selector}
+### $ {/* #frame-query-selector */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>frame.$</x-search>
 
@@ -1114,7 +1186,7 @@ await frame.$(selector, options);
 
 ---
 
-### $$ {#frame-query-selector-all}
+### $$ {/* #frame-query-selector-all */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>frame.$$</x-search>
 
@@ -1150,7 +1222,7 @@ await frame.$$(selector);
 
 ---
 
-### $eval {#frame-eval-on-selector}
+### $eval {/* #frame-eval-on-selector */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>frame.$eval</x-search>
 
@@ -1195,7 +1267,7 @@ const html = await frame.$eval('.main-container', (e, suffix) => e.outerHTML + s
 
 ---
 
-### $$eval {#frame-eval-on-selector-all}
+### $$eval {/* #frame-eval-on-selector-all */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>frame.$$eval</x-search>
 
@@ -1234,7 +1306,7 @@ const divsCounts = await frame.$$eval('div', (divs, min) => divs.length >= min, 
 
 ---
 
-### check {#frame-check}
+### check {/* #frame-check */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.check</x-search>
 
@@ -1286,6 +1358,12 @@ await frame.check(selector, options);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-check-option-scroll"/><a href="#frame-check-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-check-option-signal"/><a href="#frame-check-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-check-option-strict"/><a href="#frame-check-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1301,7 +1379,7 @@ await frame.check(selector, options);
 
 ---
 
-### click {#frame-click}
+### click {/* #frame-click */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.click</x-search>
 
@@ -1364,6 +1442,12 @@ await frame.click(selector, options);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-click-option-scroll"/><a href="#frame-click-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-click-option-signal"/><a href="#frame-click-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-click-option-strict"/><a href="#frame-click-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1379,7 +1463,7 @@ await frame.click(selector, options);
 
 ---
 
-### dblclick {#frame-dblclick}
+### dblclick {/* #frame-dblclick */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.dblclick</x-search>
 
@@ -1443,6 +1527,12 @@ await frame.dblclick(selector, options);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-dblclick-option-scroll"/><a href="#frame-dblclick-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-dblclick-option-signal"/><a href="#frame-dblclick-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-dblclick-option-strict"/><a href="#frame-dblclick-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1458,7 +1548,7 @@ await frame.dblclick(selector, options);
 
 ---
 
-### dispatchEvent {#frame-dispatch-event}
+### dispatchEvent {/* #frame-dispatch-event */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.dispatchEvent</x-search>
 
@@ -1510,6 +1600,9 @@ await frame.dispatchEvent('#source', 'dragstart', { dataTransfer });
   
   Optional event-specific initialization properties.
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-dispatch-event-option-signal"/><a href="#frame-dispatch-event-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-dispatch-event-option-strict"/><a href="#frame-dispatch-event-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1522,7 +1615,7 @@ await frame.dispatchEvent('#source', 'dragstart', { dataTransfer });
 
 ---
 
-### fill {#frame-fill}
+### fill {/* #frame-fill */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.fill</x-search>
 
@@ -1565,6 +1658,9 @@ await frame.fill(selector, value, options);
     
     
     This option has no effect.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-fill-option-signal"/><a href="#frame-fill-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-fill-option-strict"/><a href="#frame-fill-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1577,7 +1673,7 @@ await frame.fill(selector, value, options);
 
 ---
 
-### focus {#frame-focus}
+### focus {/* #frame-focus */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.focus</x-search>
 
@@ -1602,6 +1698,9 @@ await frame.focus(selector, options);
   
   A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used.
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-focus-option-signal"/><a href="#frame-focus-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-focus-option-strict"/><a href="#frame-focus-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1614,7 +1713,7 @@ await frame.focus(selector, options);
 
 ---
 
-### getAttribute {#frame-get-attribute}
+### getAttribute {/* #frame-get-attribute */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.getAttribute</x-search>
 
@@ -1642,6 +1741,9 @@ await frame.getAttribute(selector, name, options);
   
   Attribute name to get the value for.
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-get-attribute-option-signal"/><a href="#frame-get-attribute-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-get-attribute-option-strict"/><a href="#frame-get-attribute-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1654,7 +1756,7 @@ await frame.getAttribute(selector, name, options);
 
 ---
 
-### hover {#frame-hover}
+### hover {/* #frame-hover */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.hover</x-search>
 
@@ -1707,6 +1809,12 @@ await frame.hover(selector, options);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-hover-option-scroll"/><a href="#frame-hover-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-hover-option-signal"/><a href="#frame-hover-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-hover-option-strict"/><a href="#frame-hover-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1722,7 +1830,7 @@ await frame.hover(selector, options);
 
 ---
 
-### innerHTML {#frame-inner-html}
+### innerHTML {/* #frame-inner-html */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.innerHTML</x-search>
 
@@ -1747,6 +1855,9 @@ await frame.innerHTML(selector, options);
   
   A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used.
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-inner-html-option-signal"/><a href="#frame-inner-html-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-inner-html-option-strict"/><a href="#frame-inner-html-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1759,7 +1870,7 @@ await frame.innerHTML(selector, options);
 
 ---
 
-### innerText {#frame-inner-text}
+### innerText {/* #frame-inner-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.innerText</x-search>
 
@@ -1784,6 +1895,9 @@ await frame.innerText(selector, options);
   
   A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used.
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-inner-text-option-signal"/><a href="#frame-inner-text-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-inner-text-option-strict"/><a href="#frame-inner-text-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1796,7 +1910,7 @@ await frame.innerText(selector, options);
 
 ---
 
-### inputValue {#frame-input-value}
+### inputValue {/* #frame-input-value */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.13</font><x-search>frame.inputValue</x-search>
 
@@ -1823,6 +1937,9 @@ await frame.inputValue(selector, options);
   
   A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used.
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-input-value-option-signal"/><a href="#frame-input-value-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-input-value-option-strict"/><a href="#frame-input-value-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1835,7 +1952,7 @@ await frame.inputValue(selector, options);
 
 ---
 
-### isChecked {#frame-is-checked}
+### isChecked {/* #frame-is-checked */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.isChecked</x-search>
 
@@ -1860,6 +1977,9 @@ await frame.isChecked(selector, options);
   
   A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used.
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-is-checked-option-signal"/><a href="#frame-is-checked-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-is-checked-option-strict"/><a href="#frame-is-checked-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1872,7 +1992,7 @@ await frame.isChecked(selector, options);
 
 ---
 
-### isDisabled {#frame-is-disabled}
+### isDisabled {/* #frame-is-disabled */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.isDisabled</x-search>
 
@@ -1897,6 +2017,9 @@ await frame.isDisabled(selector, options);
   
   A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used.
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-is-disabled-option-signal"/><a href="#frame-is-disabled-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-is-disabled-option-strict"/><a href="#frame-is-disabled-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1909,7 +2032,7 @@ await frame.isDisabled(selector, options);
 
 ---
 
-### isEditable {#frame-is-editable}
+### isEditable {/* #frame-is-editable */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.isEditable</x-search>
 
@@ -1934,6 +2057,9 @@ await frame.isEditable(selector, options);
   
   A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used.
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-is-editable-option-signal"/><a href="#frame-is-editable-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-is-editable-option-strict"/><a href="#frame-is-editable-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1946,7 +2072,7 @@ await frame.isEditable(selector, options);
 
 ---
 
-### isHidden {#frame-is-hidden}
+### isHidden {/* #frame-is-hidden */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.isHidden</x-search>
 
@@ -1986,7 +2112,7 @@ await frame.isHidden(selector, options);
 
 ---
 
-### isVisible {#frame-is-visible}
+### isVisible {/* #frame-is-visible */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.isVisible</x-search>
 
@@ -2026,7 +2152,7 @@ await frame.isVisible(selector, options);
 
 ---
 
-### press {#frame-press}
+### press {/* #frame-press */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.press</x-search>
 
@@ -2075,6 +2201,9 @@ await frame.press(selector, key, options);
     
     
     Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-press-option-signal"/><a href="#frame-press-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-press-option-strict"/><a href="#frame-press-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -2087,7 +2216,7 @@ await frame.press(selector, key, options);
 
 ---
 
-### selectOption {#frame-select-option}
+### selectOption {/* #frame-select-option */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.selectOption</x-search>
 
@@ -2116,7 +2245,7 @@ frame.selectOption('select#colors', 'blue');
 frame.selectOption('select#colors', { label: 'Blue' });
 
 // multiple selection
-frame.selectOption('select#colors', 'red', 'green', 'blue');
+frame.selectOption('select#colors', ['red', 'green', 'blue']);
 ```
 
 **Arguments**
@@ -2147,6 +2276,9 @@ frame.selectOption('select#colors', 'red', 'green', 'blue');
     
     
     This option has no effect.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-select-option-option-signal"/><a href="#frame-select-option-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-select-option-option-strict"/><a href="#frame-select-option-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -2159,7 +2291,7 @@ frame.selectOption('select#colors', 'red', 'green', 'blue');
 
 ---
 
-### setChecked {#frame-set-checked}
+### setChecked {/* #frame-set-checked */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>frame.setChecked</x-search>
 
@@ -2215,6 +2347,12 @@ await frame.setChecked(selector, checked, options);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-set-checked-option-scroll"/><a href="#frame-set-checked-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-set-checked-option-signal"/><a href="#frame-set-checked-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-set-checked-option-strict"/><a href="#frame-set-checked-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -2230,7 +2368,7 @@ await frame.setChecked(selector, checked, options);
 
 ---
 
-### setInputFiles {#frame-set-input-files}
+### setInputFiles {/* #frame-set-input-files */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.setInputFiles</x-search>
 
@@ -2275,6 +2413,9 @@ await frame.setInputFiles(selector, files, options);
     
     
     This option has no effect.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-set-input-files-option-signal"/><a href="#frame-set-input-files-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-set-input-files-option-strict"/><a href="#frame-set-input-files-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -2287,7 +2428,7 @@ await frame.setInputFiles(selector, files, options);
 
 ---
 
-### tap {#frame-tap}
+### tap {/* #frame-tap */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.tap</x-search>
 
@@ -2345,6 +2486,12 @@ await frame.tap(selector, options);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-tap-option-scroll"/><a href="#frame-tap-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-tap-option-signal"/><a href="#frame-tap-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-tap-option-strict"/><a href="#frame-tap-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -2360,7 +2507,7 @@ await frame.tap(selector, options);
 
 ---
 
-### textContent {#frame-text-content}
+### textContent {/* #frame-text-content */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.textContent</x-search>
 
@@ -2385,6 +2532,9 @@ await frame.textContent(selector, options);
   
   A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used.
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-text-content-option-signal"/><a href="#frame-text-content-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-text-content-option-strict"/><a href="#frame-text-content-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -2397,11 +2547,11 @@ await frame.textContent(selector, options);
 
 ---
 
-### type {#frame-type}
+### type {/* #frame-type */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.type</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 In most cases, you should use [locator.fill()](/api/class-locator.mdx#locator-fill) instead. You only need to press keys one by one if there is special keyboard handling on the page - in this case use [locator.pressSequentially()](/api/class-locator.mdx#locator-press-sequentially).
 
@@ -2433,6 +2583,9 @@ To press a special key, like `Control` or `ArrowDown`, use [keyboard.press()](/a
     
     
     This option has no effect.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-type-option-signal"/><a href="#frame-type-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-type-option-strict"/><a href="#frame-type-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -2445,7 +2598,7 @@ To press a special key, like `Control` or `ArrowDown`, use [keyboard.press()](/a
 
 ---
 
-### uncheck {#frame-uncheck}
+### uncheck {/* #frame-uncheck */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.uncheck</x-search>
 
@@ -2497,6 +2650,12 @@ await frame.uncheck(selector, options);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-uncheck-option-scroll"/><a href="#frame-uncheck-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-uncheck-option-signal"/><a href="#frame-uncheck-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-uncheck-option-strict"/><a href="#frame-uncheck-option-strict" class="list-anchor">#</a>
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -2512,11 +2671,11 @@ await frame.uncheck(selector, options);
 
 ---
 
-### waitForNavigation {#frame-wait-for-navigation}
+### waitForNavigation {/* #frame-wait-for-navigation */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.waitForNavigation</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 This method is inherently racy, please use [frame.waitForURL()](/api/class-frame.mdx#frame-wait-for-url) instead.
 
@@ -2542,12 +2701,15 @@ Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/Hist
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-signal"/><a href="#frame-wait-for-navigation-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the waiting using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the waiting will be aborted and the operation will throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-timeout"/><a href="#frame-wait-for-navigation-option-timeout" class="list-anchor">#</a>
     
     Maximum operation time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `navigationTimeout` option in the config, or by using the [browserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-  - `url` [string] | [RegExp] | [function]\([URL]\):[boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-url"/><a href="#frame-wait-for-navigation-option-url" class="list-anchor">#</a>
+  - `url` [string] | [RegExp] | [URLPattern] | [function]\([URL]\):[boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-url"/><a href="#frame-wait-for-navigation-option-url" class="list-anchor">#</a>
     
-    A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+    A glob pattern, regex pattern, URL pattern, or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
   - `waitUntil` "load" | "domcontentloaded" | "networkidle" | "commit" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-wait-until"/><a href="#frame-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
     
     When to consider operation succeeded, defaults to `load`. Events can be either:
@@ -2561,7 +2723,7 @@ Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/Hist
 
 ---
 
-### waitForSelector {#frame-wait-for-selector}
+### waitForSelector {/* #frame-wait-for-selector */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.waitForSelector</x-search>
 
@@ -2605,6 +2767,9 @@ const { chromium } = require('playwright');  // Or 'firefox' or 'webkit'.
   
   A selector to query for.
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-selector-option-signal"/><a href="#frame-wait-for-selector-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `state` "attached" | "detached" | "visible" | "hidden" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-selector-option-state"/><a href="#frame-wait-for-selector-option-state" class="list-anchor">#</a>
     
     Defaults to `'visible'`. Can be either:
@@ -2624,7 +2789,7 @@ const { chromium } = require('playwright');  // Or 'firefox' or 'webkit'.
 
 ---
 
-### waitForTimeout {#frame-wait-for-timeout}
+### waitForTimeout {/* #frame-wait-for-timeout */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.waitForTimeout</x-search>
 
@@ -2654,11 +2819,6 @@ await frame.waitForTimeout(timeout);
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-timeout-return"/><a href="#frame-wait-for-timeout-return" class="list-anchor">#</a>
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -2671,10 +2831,11 @@ await frame.waitForTimeout(timeout);
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -2693,6 +2854,7 @@ await frame.waitForTimeout(timeout);
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -2700,9 +2862,18 @@ await frame.waitForTimeout(timeout);
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -2720,6 +2891,7 @@ await frame.waitForTimeout(timeout);
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -2732,6 +2904,7 @@ await frame.waitForTimeout(timeout);
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -2753,6 +2926,7 @@ await frame.waitForTimeout(timeout);
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"

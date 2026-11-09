@@ -56,7 +56,7 @@ playwright install --with-deps chromium
 
 ## Настройка браузеров {#configure-browsers}
 
-Playwright может запускать тесты в браузерах Chromium, WebKit и Firefox, а также в брендированных браузерах, таких как Google Chrome и Microsoft Edge. Он также может работать на эмулированных планшетах и мобильных устройствах. См. [реестр параметров устройств](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json) для полного списка выбранных настольных, планшетных и мобильных устройств.
+Playwright может запускать тесты в браузерах Chromium, WebKit и Firefox, а также в фирменных браузерах, таких как Google Chrome и Microsoft Edge. Он также поддерживает запуск тестов на эмулируемых планшетах и мобильных устройствах. Полный список доступных настольных компьютеров, планшетов и мобильных устройств приведён в [реестре параметров устройств](https://github.com/microsoft/playwright/blob/main/packages/isomorphic/deviceDescriptorsSource.json).
 
 ### Запуск тестов в разных браузерах {#run-tests-on-different-browsers}
 
@@ -117,6 +117,8 @@ pytest test_login.py --browser-channel chromium
 # только запуск тестов в headless режиме
 playwright install --with-deps --no-shell
 ```
+
+<ApiAnchor id="google-chrome--microsoft-edge" />
 
 ### Google Chrome и Microsoft Edge {#google-chrome-microsoft-edge}
 
@@ -273,7 +275,7 @@ set NODE_EXTRA_CA_CERTS="C:\certs\root.crt"
 </TabItem>
 </Tabs>
 
-Если ваша сеть медленно подключается к архиву браузеров Playwright, вы можете увеличить время ожидания подключения в миллисекундах с помощью переменной окружения `PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT`:
+Если архив браузера скачивается медленно или скачивание зависает, вы можете увеличить тайм-аут сокета скачивания в миллисекундах с помощью переменной окружения `PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT`. Несмотря на название, эта переменная задаёт тайм-аут бездействия, а не тайм-аут установления соединения: она ограничивает время, в течение которого скачивание может продолжаться без получения данных. По умолчанию это время составляет 30 секунд:
 
 <Tabs
   groupId="bash-flavor"
@@ -496,7 +498,7 @@ playwright install
 </TabItem>
 </Tabs>
 
-При запуске скриптов Playwright, попросите его искать браузеры в общем месте.
+При запуске скриптов Playwright укажите Playwright искать браузеры в общем расположении.
 
 <Tabs
   groupId="bash-flavor"
@@ -537,14 +539,18 @@ Playwright отслеживает пакеты, которым нужны эти
 
 :::note
 
-Разработчики могут включить этот режим, экспортируя `PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers` в своем `.bashrc`.
+Разработчики могут включить этот режим, добавив `export PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers` в свой файл `.bashrc`.
 :::
 
 ### Удаление устаревших браузеров {#stale-browser-removal}
 
 Playwright отслеживает клиентов, которые используют его браузеры. Когда больше нет клиентов, которым требуется определенная версия браузера, эта версия удаляется из системы. Таким образом, вы можете безопасно использовать экземпляры Playwright разных версий и при этом не тратить дисковое пространство на браузеры, которые больше не используются.
 
-Чтобы отказаться от удаления неиспользуемых браузеров, вы можете установить переменную окружения `PLAYWRIGHT_SKIP_BROWSER_GC=1`.
+Чтобы отключить удаление неиспользуемых браузеров, можно задать переменную окружения `PLAYWRIGHT_SKIP_BROWSER_GC=1` или передать параметр `--no-remove` команде установки:
+
+```bash
+playwright install --no-remove
+```
 
 ### Список всех установленных браузеров {#list-all-installed-browsers}
 
@@ -579,11 +585,15 @@ playwright uninstall --all
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [Error]: /api/class-error.mdx "Error"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
@@ -597,14 +607,17 @@ playwright uninstall --all
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

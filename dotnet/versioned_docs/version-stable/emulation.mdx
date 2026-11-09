@@ -12,7 +12,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Устройства {#devices}
 
-Playwright поставляется с [реестром параметров устройств](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json), используя [Playwright.Devices](/api/class-playwright.mdx#playwright-devices) для выбранных настольных, планшетных и мобильных устройств. Это можно использовать для симуляции поведения браузера для конкретного устройства, такого как user agent, размер экрана, viewport и наличие сенсорного ввода. Все тесты будут выполняться с указанными параметрами устройства.
+Playwright поставляется с [реестром параметров устройств](https://github.com/microsoft/playwright/blob/main/packages/isomorphic/deviceDescriptorsSource.json), доступным через [Playwright.Devices](/api/class-playwright.mdx#playwright-devices), для ряда настольных компьютеров, планшетов и мобильных устройств. Его можно использовать для эмуляции поведения браузера на конкретном устройстве, задавая такие параметры, как user agent, размер экрана, область просмотра и поддержка сенсорного ввода. Все тесты будут выполняться с указанными параметрами устройства.
 
 ```csharp
 using Microsoft.Playwright;
@@ -27,7 +27,17 @@ var iphone13 = playwright.Devices["iPhone 13"];
 await using var context = await browser.NewContextAsync(iphone13);
 ```
 
-<img width="458" alt="веб-сайт playwright.dev, эмулированный для iPhone 13" src="https://user-images.githubusercontent.com/13063165/220411073-76fe59f9-9a2d-463d-8e30-c19a7deca133.png" />
+<img height="1582" width="916" alt="Сайт playwright.dev в режиме эмуляции iPhone 13" src="https://user-images.githubusercontent.com/13063165/220411073-76fe59f9-9a2d-463d-8e30-c19a7deca133.png" />
+
+**Примечание**: Предварительно настроенные устройства предполагают использование определённой платформы. Например, "Desktop Chrome" задаёт строку User-Agent, соответствующую Windows.
+
+Если вы хотите использовать User-Agent, соответствующий платформе, на которой выполняются тесты, рекомендуем сбросить значение свойства UserAgent.
+
+```csharp
+var desktopChrome = playwright.Devices["Desktop Chrome"];
+desktopChrome.UserAgent = null;
+var context = await browser.NewContextAsync(desktopChrome);
+```
 
 ## Viewport {#viewport}
 
@@ -66,6 +76,8 @@ await using var context = await browser.NewContextAsync(new()
 });
 ```
 
+<ApiAnchor id="locale--timezone" />
+
 ## Локаль и Часовой пояс {#locale-timezone}
 
 Эмулируйте Locale и Timezone браузера: их можно задать глобально для всех тестов в конфиге, а затем переопределять для отдельных тестов.
@@ -78,7 +90,7 @@ await using var context = await browser.NewContextAsync(new()
 });
 ```
 
-<img width="1394" alt="Bing на немецком языке и с немецким часовым поясом" src="https://user-images.githubusercontent.com/13063165/220416571-ccc96ab1-44bb-4579-8430-64502fc24a15.png" />
+<img height="1824" width="2788" alt="Bing на немецком языке с соответствующим часовым поясом" src="https://user-images.githubusercontent.com/13063165/220416571-ccc96ab1-44bb-4579-8430-64502fc24a15.png" />
 
 ## Разрешения {#permissions}
 
@@ -108,7 +120,7 @@ await using var context = await browser.NewContextAsync(new()
 });
 ```
 
-<img width="1394" alt="геолокация для Италии в Bing Maps" src="https://user-images.githubusercontent.com/13063165/220417670-bb22d815-f5cd-47c4-8562-0b88165eac27.png" />
+<img height="1824" width="2788" alt="геолокация для Италии на картах Bing" src="https://user-images.githubusercontent.com/13063165/220417670-bb22d815-f5cd-47c4-8562-0b88165eac27.png" />
 
 Измените местоположение позже:
 
@@ -120,7 +132,7 @@ await context.SetGeolocationAsync(new Geolocation() { Longitude = 48.858455, Lat
 
 ## Цветовая схема и Медиа {#color-scheme-and-media}
 
-Эмулируйте `"colorScheme"` пользователя. Поддерживаемые значения: 'light' и 'dark'. Вы также можете эмулировать тип медиа с помощью [Page.EmulateMediaAsync()](/api/class-page.mdx#page-emulate-media).
+Эмулирует пользовательскую настройку `"colorScheme"`. Поддерживаемые значения: 'light', 'dark' и 'no-preference'. Вы также можете эмулировать тип медиа с помощью [Page.EmulateMediaAsync()](/api/class-page.mdx#page-emulate-media).
 
 ```csharp
 // Создать контекст с темным режимом
@@ -148,7 +160,27 @@ await page.EmulateMediaAsync(new()
 });
 ```
 
-<img width="1394" alt="веб-версия Playwright в тёмном режиме" src="https://user-images.githubusercontent.com/13063165/220411638-55d2b051-4678-4da7-9f0b-ed22f5a3c47c.png" />
+<img height="1824" width="2788" alt="сайт Playwright в тёмном режиме" src="https://user-images.githubusercontent.com/13063165/220411638-55d2b051-4678-4da7-9f0b-ed22f5a3c47c.png" />
+
+Параметры `"reducedMotion"`, `"forcedColors"` и `"contrast"` аналогичным образом эмулируют медиафункции `prefers-reduced-motion`, `forced-colors` и `prefers-contrast`. Поддерживаемые значения: `'reduce'` и `'no-preference'` для уменьшения анимации, `'active'` и `'none'` для принудительного применения цветов, а также `'more'` и `'no-preference'` для контрастности. Метод [Page.EmulateMediaAsync()](/api/class-page.mdx#page-emulate-media) изменяет их для отдельной страницы.
+
+```csharp
+// Создание контекста с уменьшенной анимацией, принудительным применением цветов и повышенной контрастностью
+await using var context = await browser.NewContextAsync(new()
+{
+    ReducedMotion = ReducedMotion.Reduce, // или NoPreference
+    ForcedColors = ForcedColors.Active, // или None
+    Contrast = Contrast.More // или NoPreference
+});
+
+// Изменение медиафункций для страницы
+await page.EmulateMediaAsync(new()
+{
+    ReducedMotion = ReducedMotion.Reduce,
+    ForcedColors = ForcedColors.Active,
+    Contrast = Contrast.More
+});
+```
 
 ## User Agent {#user-agent}
 
@@ -166,7 +198,11 @@ var context = await browser.NewContextAsync(new() { UserAgent = "My User Agent" 
 var context = await browser.NewContextAsync(new() { Offline = true });
 ```
 
-## Включение JavaScript {#javascript-enabled}
+:::note
+Эмуляция автономного режима влияет только на запросы, проходящие через стандартный сетевой стек браузера, такие как навигация по страницам, `fetch()`, `XMLHttpRequest` и WebSockets. Она не влияет на трафик WebRTC: установленные соединения `RTCPeerConnection` продолжают отправлять и получать медиаданные по UDP. Чтобы протестировать потерю соединения WebRTC, прервите соединение вне браузера, например остановив TURN-сервер или используя брандмауэр на уровне операционной системы.
+:::
+
+## Включение JavaScript {/* #javascript-enabled */}
 
 Эмулируйте сценарий пользователя, где JavaScript отключен.
 
@@ -185,6 +221,8 @@ var context = await browser.NewContextAsync(new() { JavaScriptEnabled = false })
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -204,15 +242,18 @@ var context = await browser.NewContextAsync(new() { JavaScriptEnabled = false })
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

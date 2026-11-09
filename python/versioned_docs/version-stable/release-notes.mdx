@@ -7,7 +7,572 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Версия 1.56 {#version-156}
+import LiteYouTube from '@site/src/components/LiteYouTube';
+
+## Версия 1.65
+
+### 🧾 Код локатора на Python
+
+Локатор, полученный с помощью [locator.normalize()](/api/class-locator.mdx#locator-normalize), теперь преобразуется в строку с кодом Python. Используйте его вместе с [page.get_by_ref()](/api/class-page.mdx#page-get-by-ref), чтобы преобразовать элемент, выбранный агентом из [page.aria_snapshot()](/api/class-page.mdx#page-aria-snapshot) в режиме `"ai"`, в код для вашего теста:
+
+```python
+normalized = page.get_by_ref("e2").normalize()
+print(str(normalized))
+# get_by_role("button", name="Submit")
+```
+
+### Новые API
+- Новый параметр [timeout](/api/class-cdpsession.mdx#cdp-session-send-option-timeout) в [cdp_session.send()](/api/class-cdpsession.mdx#cdp-session-send).
+
+### Критические изменения ⚠️
+- Действия, такие как [locator.click()](/api/class-locator.mdx#locator-click), [locator.check()](/api/class-locator.mdx#locator-check), [locator.tap()](/api/class-locator.mdx#locator-tap), [locator.fill()](/api/class-locator.mdx#locator-fill), [locator.clear()](/api/class-locator.mdx#locator-clear) и [locator.select_option()](/api/class-locator.mdx#locator-select-option), теперь ожидают, пока элемент [перестанет быть инертным](./actionability.mdx#not-inert). Действие над элементом с атрибутом `inert` или внутри такого элемента теперь завершается по тайм-ауту, если элемент остаётся инертным.
+- Сопоставление файлов cookie теперь соответствует RFC 6265. При передаче URL методы [browser_context.cookies()](/api/class-browsercontext.mdx#browser-context-cookies) и [api_request_context.cookies()](/api/class-apirequestcontext.mdx#api-request-context-cookies) больше не возвращают файлы cookie, предназначенные только для конкретного хоста, для поддоменов или файлы cookie с `Path=/api` для `/apiv2`, а файл cookie с `Path=/foo/` не соответствует `/foo`. [APIRequestContext] отправляет файл cookie без имени как `Cookie: x` вместо `Cookie: =x` и сохраняет `Set-Cookie: token` как файл cookie без имени.
+- Учётные данные прокси больше не отправляются веб-сайтам. Учётные данные из параметра [proxy](/api/class-browsertype.mdx#browser-type-launch-option-proxy) теперь используются только для ответа на запросы аутентификации прокси. Для аутентификации на веб-сайте используйте [http_credentials](/api/class-browser.mdx#browser-new-context-option-http-credentials).
+- Текст, который браузер не отображает, например текст, не назначенный слоту, или текст непосредственно внутри закрытого `<details>`, больше не включается в доступные имена и ARIA-снимки. Это может изменить результаты [page.get_by_role()](/api/class-page.mdx#page-get-by-role) с указанием имени, [locator.aria_snapshot()](/api/class-locator.mdx#locator-aria-snapshot) и [expect(locator).to_match_aria_snapshot()](/api/class-locatorassertions.mdx#locator-assertions-to-match-aria-snapshot).
+- Строковые значения параметра `params` в запросах [APIRequestContext] теперь добавляются к уже имеющейся в URL строке запроса, а не заменяют её.
+
+### Версии браузеров
+- Chromium 158.0.8127.18
+- Mozilla Firefox 159.0
+- WebKit 27.2
+
+Эта версия также была протестирована со следующими стабильными каналами:
+- Google Chrome 157
+- Microsoft Edge 156
+
+## Версия 1.64
+
+### 🧰 WebMCP
+
+Новые [page.webmcp](/api/class-page.mdx#page-webmcp) и [frame.webmcp](/api/class-frame.mdx#frame-webmcp) предоставляют доступ к инструментам, которые страница регистрирует через экспериментальный браузерный API [WebMCP](https://webmachinelearning.github.io/webmcp/), чтобы вы могли тестировать их, как любую другую часть приложения:
+
+```python
+browser = chromium.launch(args=["--enable-features=WebMCP"])
+page = browser.new_page()
+page.goto("https://example.com")
+
+for tool in page.webmcp.tools():
+    print(tool["name"], tool["description"])
+
+result = page.webmcp.call_tool("add", {"a": 2, "b": 40})
+print(result["content"][0]["text"])  # "42"
+```
+
+[Playwright MCP](./getting-started-mcp.mdx) также поддерживает WebMCP по умолчанию: инструменты, определённые страницей, предоставляются агенту под именами `webmcp_<tool>`. Для отключения передайте `--no-webmcp`.
+
+[`playwright-cli`](./getting-started-cli.mdx) также предоставляет к ним доступ:
+
+```bash
+playwright-cli webmcp-list
+playwright-cli webmcp-call search_catalog --params '{"query":"cats"}'
+```
+
+### 🎬 Улучшенная видеозапись
+
+Теперь видео можно записывать с пользовательской частотой кадров, а оформление действий задаётся с помощью обычного CSS:
+
+```python
+page.screencast.start(path="video.webm", size={"width": 1920, "height": 1080}, fps=60)
+page.screencast.show_actions(
+    style={
+        "point": "width: 20px; height: 20px; border-radius: 50%; background: red",
+        "highlight": "outline: 2px solid #333; background: rgba(0, 128, 255, .15)",
+        "title": "font-size: 16px",
+    }
+)
+```
+
+- Новый параметр [record_video_fps](/api/class-browser.mdx#browser-new-context-option-record-video-fps) и новый параметр [fps](/api/class-screencast.mdx#screencast-start-option-fps) в [screencast.start()](/api/class-screencast.mdx#screencast-start). Firefox и WebKit в настоящее время записывают до 25 кадров в секунду.
+- Новый параметр [style](/api/class-screencast.mdx#screencast-show-actions-option-style) принимает CSS-объявления для маркера `point`, подсветки целевого элемента `highlight` и заголовка действия `title`. Он заменяет параметр `font_size`, который теперь считается устаревшим.
+- Курсор остаётся видимым в точке последнего действия, сохраняется при переходах между страницами и перемещается по естественной траектории с плавным ускорением и замедлением.
+- Видео кодируются с помощью VP9 вместо VP8, что снижает нагрузку на процессор и создаёт файлы меньшего размера с тем же или более высоким качеством.
+- Все параметры видео также доступны в [Playwright MCP](./getting-started-mcp.mdx) и [`playwright-cli`](./getting-started-cli.mdx).
+
+### 🪆 Locator.within()
+
+Новый [locator.within()](/api/class-locator.mdx#locator-within) объединяет два уже имеющихся локатора в естественном порядке чтения — «эта кнопка внутри того диалогового окна»:
+
+```python
+save_button = page.get_by_role("button", name="Save")
+dialog = page.get_by_test_id("settings-dialog")
+
+save_button.within(dialog).click()
+```
+
+Относительные локаторы, такие как [locator.nth()](/api/class-locator.mdx#locator-nth) или [locator.first](/api/class-locator.mdx#locator-first), разрешаются отдельно внутри каждого родительского элемента, что упрощает запросы для выбора столбцов:
+
+```python
+# Третья ячейка каждой строки, а не третья ячейка таблицы.
+third_column = page.get_by_role("cell").nth(2).within(page.get_by_role("row"))
+expect(third_column).to_have_text(["Apple", "Banana", "Cherry"])
+```
+
+### Новые API
+- Новый [page.get_by_ref()](/api/class-page.mdx#page-get-by-ref) находит элемент по его ARIA-ссылке, например `e2`, которую возвращает [page.aria_snapshot()](/api/class-page.mdx#page-aria-snapshot) в режиме `"ai"`.
+- Новый параметр [include_shadow](/api/class-page.mdx#page-content-option-include-shadow) в [page.content()](/api/class-page.mdx#page-content) и [frame.content()](/api/class-frame.mdx#frame-content) сериализует открытые теневые корни в виде [декларативного теневого DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM#declaratively_with_html).
+- Новый параметр [sign_count](/api/class-credentials.mdx#credentials-create-option-sign-count) задаёт начальное значение счётчика подписей для виртуальных учётных данных. [credentials.create()](/api/class-credentials.mdx#credentials-create) и [credentials.get()](/api/class-credentials.mdx#credentials-get) возвращают текущее значение `sign_count`, которое сохраняется и восстанавливается вместе с учётными данными в состоянии хранилища.
+- Новые [api_request_context.add_cookies()](/api/class-apirequestcontext.mdx#api-request-context-add-cookies), [api_request_context.cookies()](/api/class-apirequestcontext.mdx#api-request-context-cookies) и [api_request_context.clear_cookies()](/api/class-apirequestcontext.mdx#api-request-context-clear-cookies) управляют файлами cookie контекста запросов аналогично методам [BrowserContext]:
+  
+  ```python
+  request.add_cookies(
+      [{"name": "session-id", "value": "42", "url": "https://example.com"}]
+  )
+  print(request.cookies("https://example.com"))
+  request.clear_cookies(name="session-id")
+  ```
+  
+### Критические изменения ⚠️
+- Элементы внутри скрытых iframe считаются скрытыми. Элементы внутри невидимого iframe, например с `visibility: hidden`, теперь считаются скрытыми при выполнении действий, а также при вызовах [locator.is_visible()](/api/class-locator.mdx#locator-is-visible) и [expect(locator).to_be_visible()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible).
+
+### Версии браузеров
+- Chromium 156.0.8078.4
+- Mozilla Firefox 157.0
+- WebKit 27.2
+
+Эта версия также была протестирована со следующими стабильными каналами:
+- Google Chrome 155
+- Microsoft Edge 155
+
+## Версия 1.63
+
+### 🪟 Поиск в разных фреймах
+
+[page.frame_locator()](/api/class-page.mdx#page-frame-locator) и [frame.frame_locator()](/api/class-frame.mdx#frame-frame-locator), вызванные без селектора, выполняют поиск в любом фрейме поддерева, поэтому сначала находить iframe больше не требуется:
+
+```python
+# Находит кнопку в любом фрейме на странице.
+page.frame_locator().get_by_role("button").click()
+```
+
+Оставшаяся часть локатора разрешается внутри одного фрейма, как и обычный локатор; если совпадающие элементы найдены в нескольких фреймах, возникает ошибка.
+
+### 👁️ Локаторы только для видимых элементов
+
+Новый [locator.visible](/api/class-locator.mdx#locator-visible) возвращает локатор, соответствующий только видимым элементам. Его рекомендуется использовать вместо CSS-псевдокласса `:visible`:
+
+```python
+page.locator("button").visible.click()
+```
+
+### 🖼️ ARIA-снимки и снимки экрана в трассировках
+
+Новые параметры [aria_snapshots](/api/class-tracing.mdx#tracing-start-option-aria-snapshots) и [screen_snapshots](/api/class-tracing.mdx#tracing-start-option-screen-snapshots) метода [tracing.start()](/api/class-tracing.mdx#tracing-start) сохраняют ARIA-снимок и снимок экрана страницы при каждом действии:
+
+```python
+context.tracing.start(snapshots=True, aria_snapshots=True, screen_snapshots=True)
+```
+
+Если ARIA-снимки и снимки экрана записаны, новый режим **Display Aria** в просмотрщике трассировок показывает снимок экрана действия рядом с ARIA-снимком, а при наведении на ARIA-узел он подсвечивается на снимке экрана.
+
+### Новые API
+
+#### Браузер и контекст
+- [http_credentials](/api/class-browser.mdx#browser-new-context-option-http-credentials) теперь также принимает массив учётных данных. Используется первая запись, соответствующая источнику запроса, а записи без указания источника соответствуют любому запросу.
+- Новый параметр [opfs](/api/class-browsercontext.mdx#browser-context-storage-state-option-opfs) включает [закрытую файловую систему источника](https://developer.mozilla.org/en-US/docs/Web/API/File_System_API/Origin_private_file_system) в состояние хранилища, позволяя сохранять её и восстанавливать в последующих контекстах.
+- Новые события [page.on("dialogclosed")](/api/class-page.mdx#page-event-dialog-closed) и [browser_context.on("dialogclosed")](/api/class-browsercontext.mdx#browser-context-event-dialog-closed) генерируются, когда диалоговое окно JavaScript принимается, отклоняется или закрывается пользователем.
+
+#### Командная строка
+- `playwright install --no-remove` сохраняет браузеры других установок Playwright вместо их удаления.
+- `playwright codegen --http-credentials` записывает действия на страницах, защищённых HTTP-аутентификацией.
+
+### Объявления
+* ⚠️ Ubuntu 20.04 больше не поддерживается.
+* 🐧 На Linux arm64 Playwright теперь загружает сборку Chromium [Chrome for Testing](https://developer.chrome.com/blog/chrome-for-testing) — ту же сборку, которая используется на всех остальных платформах.
+
+### Версии браузеров
+- Chromium 153.0.8010.12
+- Mozilla Firefox 155.0
+- WebKit 26.6
+
+Эта версия также была протестирована со следующими стабильными каналами:
+- Google Chrome 153
+- Microsoft Edge 153
+
+## Версия 1.62
+
+### 🖼️ Снимки экрана в формате WebP
+
+[page.screenshot()](/api/class-page.mdx#page-screenshot) и [locator.screenshot()](/api/class-locator.mdx#locator-screenshot) теперь могут создавать снимки экрана в формате WebP — Playwright определяет формат по расширению файла `.webp`, либо вы можете явно задать `type`. Качество `100` (по умолчанию) обеспечивает сжатие без потерь, а при меньших значениях используется сжатие с потерями:
+
+```python
+page.screenshot(path="homepage.webp", quality=50)
+```
+
+### Новые API
+- Новый параметр `scroll` (`"auto"` | `"none"`) в действиях позволяет отключить автоматическую прокрутку Playwright для появления элемента в области видимости.
+- Новый [locator.wait_for_function()](/api/class-locator.mdx#locator-wait-for-function) ожидает, пока функция, вызываемая с соответствующим элементом, не вернёт значение, приводимое к истине.
+- Новый [api_response.timing](/api/class-apiresponse.mdx#api-response-timing) возвращает информацию о временных характеристиках загрузки ресурса для ответа API.
+
+### Объявления
+* 📋 В режиме без графического интерфейса буфер обмена теперь изолирован от операционной системы, поэтому тесты, использующие `navigator.clipboard`, больше не читают и не перезаписывают буфер обмена компьютера, на котором выполняются.
+* ⚠️ Debian 11 больше не поддерживается.
+
+### Версии браузеров
+- Chromium 151.0.7922.34
+- Mozilla Firefox 153.0
+- WebKit 26.5
+
+Эта версия также была протестирована со следующими стабильными каналами:
+- Google Chrome 151
+- Microsoft Edge 151
+
+## Версия 1.61
+
+### 🔑 Ключи доступа WebAuthn
+
+Новый виртуальный аутентификатор [Credentials], доступный через [browser_context.credentials](/api/class-browsercontext.mdx#browser-context-credentials), позволяет тестам регистрировать ключи доступа и отвечать на запросы `navigator.credentials.create()` / `navigator.credentials.get()` на странице — без реального аппаратного ключа, во всех браузерах:
+
+```python
+context = browser.new_context()
+
+# Добавьте ключ доступа, подготовленный сервером для тестового пользователя.
+context.credentials.create("example.com",
+    id=credential_id,
+    user_handle=user_handle,
+    private_key=private_key,
+    public_key=public_key,
+)
+context.credentials.install()
+
+page = context.new_page()
+page.goto("https://example.com/login")
+# На вызов navigator.credentials.get() страницы поступает ответ с добавленным ключом доступа.
+```
+
+Вы также можете позволить приложению один раз зарегистрировать ключ доступа в подготовительном тесте, прочитать его с помощью [credentials.get()](/api/class-credentials.mdx#credentials-get) и добавить его в последующие тесты — подробности см. в [Credentials].
+
+### 🗃️ Web Storage
+
+Новый API [WebStorage], доступный через [page.local_storage](/api/class-page.mdx#page-local-storage) и [page.session_storage](/api/class-page.mdx#page-session-storage), читает и записывает данные в хранилище страницы для текущего источника:
+
+```python
+page.local_storage.set_item("token", "abc")
+token = page.local_storage.get_item("token")
+items = page.session_storage.items()
+```
+
+### Новые API
+- [api_response.security_details()](/api/class-apiresponse.mdx#api-response-security-details) и [api_response.server_addr()](/api/class-apiresponse.mdx#api-response-server-addr) аналогичны браузерным методам [response.security_details()](/api/class-response.mdx#response-security-details) и [response.server_addr()](/api/class-response.mdx#response-server-addr).
+- Новый параметр `artifacts_dir` в [browser_type.connect_over_cdp()](/api/class-browsertype.mdx#browser-type-connect-over-cdp) управляет местом хранения артефактов, таких как трассировки и загрузки, при подключении к уже запущенному браузеру.
+- Новый параметр `cursor` в [screencast.show_actions()](/api/class-screencast.mdx#screencast-show-actions) управляет отображением курсора при действиях указателя.
+- Функция обратного вызова `on_frame` в [screencast.start()](/api/class-screencast.mdx#screencast-start) теперь получает `timestamp` — временную метку момента, когда браузер отобразил кадр.
+
+### 🛠️ Другие улучшения
+- Playwright теперь поддерживает Ubuntu 26.04.
+- Записи HAR и трассировок теперь включают запросы WebSocket.
+
+### Версии браузеров
+- Chromium 149.0.7827.55
+- Mozilla Firefox 151.0
+- WebKit 26.5
+
+Эта версия также была протестирована со следующими стабильными каналами:
+- Google Chrome 149
+- Microsoft Edge 149
+
+## Версия 1.60
+
+### 🌐 Запись HAR через Tracing
+
+[tracing.start_har()](/api/class-tracing.mdx#tracing-start-har) / [tracing.stop_har()](/api/class-tracing.mdx#tracing-stop-har) предоставляют запись HAR как полноценную часть API трассировки с теми же параметрами `content`, `mode` и `url_filter`, что и у `record_har`:
+
+```python
+context.tracing.start_har("trace.har")
+page = context.new_page()
+page.goto("https://playwright.dev")
+context.tracing.stop_har()
+```
+
+### 🪝 API Drop
+
+Новый [locator.drop()](/api/class-locator.mdx#locator-drop) имитирует внешнее перетаскивание файлов или данных, подобных содержимому буфера обмена, на элемент. Playwright отправляет события `dragenter`, `dragover` и `drop` с синтетическим [DataTransfer] в контексте страницы — это работает во всех браузерах и отлично подходит для тестирования областей загрузки:
+
+```python
+page.locator("#dropzone").drop(
+    files={"name": "note.txt", "mime_type": "text/plain", "buffer": b"hello"},
+)
+
+page.locator("#dropzone").drop(
+    data={
+        "text/plain": "hello world",
+        "text/uri-list": "https://example.com",
+    },
+)
+```
+
+### 🎯 ARIA-снимки
+- [expect(page).to_match_aria_snapshot()](/api/class-pageassertions.mdx#page-assertions-to-match-aria-snapshot) теперь работает с [Page], а не только с [Locator] — это эквивалентно проверке для `page.locator("body")`.
+- Новый параметр `boxes` в [locator.aria_snapshot()](/api/class-locator.mdx#locator-aria-snapshot) / [page.aria_snapshot()](/api/class-page.mdx#page-aria-snapshot) добавляет ограничивающий прямоугольник каждого элемента в виде `[box=x,y,width,height]`, что полезно для обработки искусственным интеллектом.
+
+### Новые API
+
+#### Браузер, контекст и страница
+- Событие [browser.on("context")](/api/class-browser.mdx#browser-event-context) — возникает при создании нового контекста в браузере.
+- [BrowserContext] теперь дублирует события жизненного цикла своих страниц: [browser_context.on("download")](/api/class-browsercontext.mdx#browser-context-event-download), [browser_context.on("frameattached")](/api/class-browsercontext.mdx#browser-context-event-frame-attached), [browser_context.on("framedetached")](/api/class-browsercontext.mdx#browser-context-event-frame-detached), [browser_context.on("framenavigated")](/api/class-browsercontext.mdx#browser-context-event-frame-navigated), [browser_context.on("pageclose")](/api/class-browsercontext.mdx#browser-context-event-page-close), [browser_context.on("pageload")](/api/class-browsercontext.mdx#browser-context-event-page-load).
+
+#### Локаторы и проверки
+- Новый параметр `description` в [page.get_by_role()](/api/class-page.mdx#page-get-by-role) / [locator.get_by_role()](/api/class-locator.mdx#locator-get-by-role) / [frame.get_by_role()](/api/class-frame.mdx#frame-get-by-role) / [frame_locator.get_by_role()](/api/class-framelocator.mdx#frame-locator-get-by-role) для сопоставления по [доступному описанию](https://www.w3.org/TR/wai-aria-1.2/#dfn-accessible-description).
+- Новый параметр `pseudo` в [expect(locator).to_have_css()](/api/class-locatorassertions.mdx#locator-assertions-to-have-css) считывает вычисленные стили `::before` или `::after`.
+- Новый параметр `style` в [locator.highlight()](/api/class-locator.mdx#locator-highlight) применяет дополнительный встроенный CSS к слою подсветки, а новый [page.hide_highlight()](/api/class-page.mdx#page-hide-highlight) убирает всю подсветку.
+
+#### Сеть
+- [web_socket_route.protocols](/api/class-websocketroute.mdx#web-socket-route-protocols) возвращает подпротоколы WebSocket, запрошенные страницей.
+- Новый параметр `no_defaults` в [browser_type.connect_over_cdp()](/api/class-browsertype.mdx#browser-type-connect-over-cdp) отключает стандартные переопределения Playwright в контексте по умолчанию (поведение загрузок, эмуляцию фокуса, эмуляцию медиапараметров), чтобы подключение к повседневному браузеру пользователя не нарушало его состояние.
+
+#### Ошибки
+- Новый [web_error.location](/api/class-weberror.mdx#web-error-location) аналогичен [console_message.location](/api/class-consolemessage.mdx#console-message-location).
+- [console_message.location](/api/class-consolemessage.mdx#console-message-location) теперь предоставляет свойства `line` / `column` (`line_number` / `column_number` считаются устаревшими).
+
+### 🛠️ Другие улучшения
+- В просмотрщик трассировок добавлен переключатель форматирования тел запросов и ответов в формате JSON / данных форм на панели сведений о сети.
+
+### Критические изменения ⚠️
+- Удалён давно устаревший параметр `handle` в `BrowserContext.expose_binding` и `Page.expose_binding`.
+
+### Версии браузеров
+- Chromium 148.0.7778.96
+- Mozilla Firefox 150.0.2
+- WebKit 26.4
+
+Эта версия также была протестирована со следующими стабильными каналами:
+- Google Chrome 147
+- Microsoft Edge 147
+
+## Версия 1.59
+
+### 🎬 Скринкаст
+
+Новый API [page.screencast](/api/class-page.mdx#page-screencast) предоставляет единый интерфейс для захвата содержимого страницы со следующими возможностями:
+- Запись скринкастов
+- Аннотации действий
+- Визуальные наложения
+- Захват кадров в реальном времени
+- Видеоподтверждения работы агентов
+
+<center>
+
+<img src="https://raw.githubusercontent.com/microsoft/playwright/main/docs/src/images/release-notes-1.59-screencast-demo.gif" alt="Демонстрация" width="500" height="313" />
+
+</center>
+
+**Запись скринкастов** — записывайте видео с точным управлением началом и остановкой записи в качестве альтернативы параметру [record_video_dir](/api/class-browser.mdx#browser-new-context-option-record-video-dir):
+
+```python
+page.screencast.start(path="video.webm")
+# ... выполните действия ...
+page.screencast.stop()
+```
+
+**Аннотации действий** — включите встроенные визуальные аннотации, которые подсвечивают элементы, с которыми выполняется взаимодействие, и отображают заголовки действий во время записи:
+
+```python
+page.screencast.show_actions(position="top-right")
+```
+
+[screencast.show_actions()](/api/class-screencast.mdx#screencast-show-actions) принимает `position` (`'top-left'`, `'top'`, `'top-right'`, `'bottom-left'`, `'bottom'`, `'bottom-right'`), `duration` (длительность каждой аннотации в мс) и `font_size` (в пикселях). Возвращает объект, освобождение которого прекращает отображение действий.
+
+**Визуальные наложения** — добавляйте заголовки глав и пользовательские HTML-наложения поверх страницы для более подробного пояснения происходящего:
+
+```python
+page.screencast.show_chapter("Adding TODOs",
+    description="Type and press enter for each TODO",
+    duration=1000,
+)
+
+page.screencast.show_overlay('<div style="color: red">Recording</div>')
+```
+
+**Захват кадров в реальном времени** — передавайте поток кадров в формате JPEG для собственной обработки: создания миниатюр, предварительного просмотра в реальном времени, компьютерного зрения на основе ИИ и других задач:
+
+```python
+page.screencast.start(
+    on_frame=lambda frame: send_to_vision_model(frame["data"]),
+)
+```
+
+**Видеоподтверждения работы агентов** — агенты программирования могут создавать видеодоказательства своей работы. После выполнения задачи агент может записать демонстрационное видео с подробными аннотациями для проверки человеком:
+
+```python
+page.screencast.start(path="receipt.webm")
+page.screencast.show_actions(position="top-right")
+
+page.screencast.show_chapter("Verifying checkout flow",
+    description="Added coupon code support per ticket #1234",
+)
+
+# Агент выполняет шаги проверки...
+page.locator("#coupon").fill("SAVE20")
+page.locator("#apply-coupon").click()
+expect(page.locator(".discount")).to_contain_text("20%")
+
+page.screencast.show_chapter("Done",
+    description="Coupon applied, discount reflected in total",
+)
+
+page.screencast.stop()
+```
+
+Полученное видео служит подтверждением работы: заголовки глав дают контекст, аннотации действий выделяют каждое взаимодействие, а просмотр наглядной демонстрации занимает меньше времени, чем чтение текстовых журналов.
+
+### 🔍 Снимки и локаторы
+- Метод [page.aria_snapshot()](/api/class-page.mdx#page-aria-snapshot) для получения ARIA-снимка страницы — эквивалентен `page.locator('body').aria_snapshot()`.
+- Параметры `depth` и `mode` в [locator.aria_snapshot()](/api/class-locator.mdx#locator-aria-snapshot).
+- Метод [locator.normalize()](/api/class-locator.mdx#locator-normalize) преобразует локатор в соответствии с рекомендуемыми практиками, такими как использование тестовых идентификаторов и ARIA-ролей.
+- Метод [page.pick_locator()](/api/class-page.mdx#page-pick-locator) включает интерактивный режим, в котором при наведении на элементы они подсвечиваются и отображается соответствующий локатор. Нажмите на элемент, чтобы получить его [Locator]. Используйте [page.cancel_pick_locator()](/api/class-page.mdx#page-cancel-pick-locator) для отмены.
+
+### Новые API
+
+#### Скринкаст
+- [page.screencast](/api/class-page.mdx#page-screencast) предоставляет запись видео, потоковую передачу кадров в реальном времени и управление наложениями.
+- Методы [screencast.start()](/api/class-screencast.mdx#screencast-start) и [screencast.stop()](/api/class-screencast.mdx#screencast-stop) для записи и захвата кадров.
+- Методы [screencast.show_actions()](/api/class-screencast.mdx#screencast-show-actions) и [screencast.hide_actions()](/api/class-screencast.mdx#screencast-hide-actions) для аннотаций действий.
+- Методы [screencast.show_chapter()](/api/class-screencast.mdx#screencast-show-chapter) и [screencast.show_overlay()](/api/class-screencast.mdx#screencast-show-overlay) для визуальных наложений.
+- Методы [screencast.show_overlays()](/api/class-screencast.mdx#screencast-show-overlays) и [screencast.hide_overlays()](/api/class-screencast.mdx#screencast-hide-overlays) для управления видимостью наложений.
+
+#### Хранилище, консоль и ошибки
+- Метод [browser_context.set_storage_state()](/api/class-browsercontext.mdx#browser-context-set-storage-state) очищает существующие файлы cookie, локальное хранилище и IndexedDB для всех источников и задаёт новое состояние хранилища — создавать новый контекст не требуется.
+- Методы [page.clear_console_messages()](/api/class-page.mdx#page-clear-console-messages) и [page.clear_page_errors()](/api/class-page.mdx#page-clear-page-errors) для очистки сохранённых сообщений и ошибок.
+- Параметр `filter` в [page.console_messages()](/api/class-page.mdx#page-console-messages) и [page.page_errors()](/api/class-page.mdx#page-page-errors) управляет тем, какие сообщения возвращаются.
+- Метод [console_message.timestamp](/api/class-consolemessage.mdx#console-message-timestamp).
+
+#### Прочее
+- [browser_context.debugger](/api/class-browsercontext.mdx#browser-context-debugger) предоставляет программное управление отладчиком Playwright.
+- Метод [browser_context.is_closed()](/api/class-browsercontext.mdx#browser-context-is-closed).
+- Метод [request.existing_response](/api/class-request.mdx#request-existing-response) возвращает ответ без ожидания.
+- Метод [response.http_version()](/api/class-response.mdx#response-http-version) возвращает версию HTTP, использованную в ответе.
+- Параметр `live` в [tracing.start()](/api/class-tracing.mdx#tracing-start) для обновления трассировки в реальном времени.
+- Параметр `artifacts_dir` в [browser_type.launch()](/api/class-browsertype.mdx#browser-type-launch) для настройки каталога артефактов.
+
+### 🔗 Взаимодействие с другими инструментами
+
+Новый API [browser.bind()](/api/class-browser.mdx#browser-bind) делает запущенный браузер доступным для подключения из `playwright-cli`, `@playwright/mcp` и других клиентов.
+
+**Привязка браузера** — запустите браузер и привяжите его, чтобы к нему могли подключаться другие клиенты:
+
+```python
+server_info = await browser.bind("my-session",
+    workspace_dir="/my/project",
+)
+```
+
+**Подключение из playwright-cli** — подключитесь к работающему браузеру из вашего любимого агента программирования.
+
+```bash
+playwright-cli attach my-session
+playwright-cli -s my-session snapshot
+```
+
+**Подключение из @playwright/mcp** — или направьте ваш MCP-сервер к работающему браузеру.
+
+```bash
+@playwright/mcp --endpoint=my-session
+```
+
+**Подключение из клиента Playwright** — используйте API для подключения к браузеру. Поддерживается одновременное подключение нескольких клиентов!
+
+```python
+browser = await chromium.connect(server_info["endpoint"])
+```
+
+Передайте параметры `host` и `port` для привязки через WebSocket вместо именованного канала:
+
+```python
+server_info = await browser.bind("my-session",
+    host="localhost",
+    port=0,
+)
+# server_info["endpoint"] — это URL вида ws://
+```
+
+Вызовите [browser.unbind()](/api/class-browser.mdx#browser-unbind), чтобы прекратить принимать новые подключения.
+
+### 📊 Наблюдаемость
+
+Выполните `playwright-cli show`, чтобы открыть панель управления, которая показывает все привязанные браузеры, их состояния и позволяет взаимодействовать с ними:
+- Наблюдайте за действиями вашего агента в фоновых браузерах
+- Открывайте сеансы для ручного вмешательства
+- Открывайте DevTools для исследования страниц фоновых браузеров.
+
+<center>
+
+<img src="https://raw.githubusercontent.com/microsoft/playwright/main/docs/src/images/release-notes-1.59-dashboard.png" alt="Демонстрация" width="1169" height="835" />
+
+</center>
+- `playwright-cli` автоматически привязывает все свои браузеры, чтобы вы могли видеть, что делают ваши агенты.
+- Передайте переменную окружения `PLAYWRIGHT_DASHBOARD=1`, чтобы видеть все браузеры `@playwright/test` на панели управления.
+
+### Критические изменения ⚠️
+- Удалена поддержка macOS 14 для WebKit. Рекомендуем обновить версию macOS или продолжать использовать более старую версию Playwright.
+
+### Версии браузеров
+- Chromium 147.0.7727.15
+- Mozilla Firefox 148.0.2
+- WebKit 26.4
+
+Эта версия также была протестирована со следующими стабильными каналами:
+- Google Chrome 146
+- Microsoft Edge 146
+
+## Версия 1.58
+
+### Улучшения режима UI и просмотрщика трассировок
+- Новый вариант темы 'system' следует настройке тёмного/светлого режима вашей ОС
+- В редакторах кода теперь доступен поиск (Cmd/Ctrl+F)
+- Панель сведений о сети реорганизована для более удобного использования
+- Ответы JSON теперь автоматически форматируются для удобства чтения
+
+Спасибо [@cpAdm](https://github.com/cpAdm) за вклад в эти улучшения!
+
+### Прочее
+
+[browser_type.connect_over_cdp()](/api/class-browsertype.mdx#browser-type-connect-over-cdp) теперь принимает параметр `is_local`. Значение `True` сообщает Playwright, что он работает на том же хосте, что и CDP-сервер, позволяя применять оптимизации файловой системы.
+
+### Критические изменения ⚠️
+- Удалены селекторы `_react` и `_vue`. Альтернативы см. в [руководстве по локаторам](./locators.mdx).
+- Удалён суффикс движка селекторов `:light`. Вместо него используйте стандартные CSS-селекторы.
+- Удалён параметр `devtools` из [browser_type.launch()](/api/class-browsertype.mdx#browser-type-launch). Вместо него используйте `args=['--auto-open-devtools-for-tabs']`.
+- Удалена поддержка macOS 13 для WebKit. Рекомендуем обновить версию macOS или продолжать использовать более старую версию Playwright.
+
+### Версии браузеров
+- Chromium 145.0.7632.6
+- Mozilla Firefox 146.0.1
+- WebKit 26.0
+
+Эта версия также была протестирована со следующими стабильными каналами:
+- Google Chrome 144
+- Microsoft Edge 144
+
+## Версия 1.57
+
+### Chrome for Testing
+
+Playwright теперь работает на сборках [Chrome for Testing](https://googlechromelabs.github.io/chrome-for-testing/), а не Chromium. В режиме с графическим интерфейсом используется `chrome`, а в режиме без графического интерфейса — `chrome-headless-shell`. Существующие тесты должны продолжить успешно выполняться после обновления до v1.57.
+
+Мы не ожидаем функциональных изменений в результате этого перехода. Самое заметное изменение — новая иконка и заголовок на панели инструментов.
+
+![новый и старый логотип](../images/cft-logo-change.png)
+
+Если вы всё же заметите неожиданное изменение поведения, пожалуйста, [создайте issue](https://github.com/microsoft/playwright/issues/new).
+
+На Arm64 Linux Playwright продолжает использовать Chromium.
+
+### Критическое изменение
+
+После трёх лет в статусе устаревшего API мы удалили `page.accessibility` из нашего API. Если вам нужно тестировать доступность страниц, используйте другие библиотеки, например [Axe](https://www.deque.com/axe/). Интеграция с Axe описана в нашем [руководстве](https://playwright.dev/docs/accessibility-testing) для Node.js.
+
+### Новые API
+- Событие [worker.on("console")](/api/class-worker.mdx#worker-event-console) генерируется, когда JavaScript внутри воркера вызывает один из методов API консоли, например console.log или console.dir. Для ожидания этого события можно использовать [worker.expect_event()](/api/class-worker.mdx#worker-wait-for-event).
+- [locator.description](/api/class-locator.mdx#locator-description) возвращает описание локатора, ранее заданное с помощью [locator.describe()](/api/class-locator.mdx#locator-describe).
+- Новый параметр [steps](/api/class-locator.mdx#locator-click-option-steps) в [locator.click()](/api/class-locator.mdx#locator-click) и [locator.drag_to()](/api/class-locator.mdx#locator-drag-to) настраивает количество событий `mousemove`, генерируемых при перемещении указателя мыши к целевому элементу.
+- Сетевые запросы, отправляемые [Service Workers](./service-workers.mdx#network-events-and-routing), теперь отслеживаются и могут маршрутизироваться через [BrowserContext](./api/class-browsercontext.mdx), только в Chromium. Это поведение можно отключить с помощью переменной окружения `PLAYWRIGHT_DISABLE_SERVICE_WORKER_NETWORK`.
+- Сообщения консоли от Service Workers передаются через [worker.on("console")](/api/class-worker.mdx#worker-event-console). Это поведение можно отключить с помощью переменной окружения `PLAYWRIGHT_DISABLE_SERVICE_WORKER_CONSOLE`.
+
+### Версии браузеров
+- Chromium 143.0.7499.4
+- Mozilla Firefox 144.0.2
+- WebKit 26.0
+
+## Версия 1.56 {/* #version-156 */}
 
 ### Новые API {#new-apis}
 - Новые методы [page.console_messages()](/api/class-page.mdx#page-console-messages) и [page.page_errors()](/api/class-page.mdx#page-page-errors) для получения самых последних сообщений консоли со страницы
@@ -71,6 +636,11 @@ import HTMLCard from '@site/src/components/HTMLCard';
 - Новые шаги в Trace Viewer: ![Новые шаги Trace Viewer](https://github.com/user-attachments/assets/1963ff7d-4070-41be-a79b-4333176921a2)
 - Новый метод [locator.describe()](/api/class-locator.mdx#locator-describe) для описания локатора. Используется в Trace Viewer.
 
+### Обновления Trace Viewer и HTML-отчёта
+- Новые шаги в Trace Viewer:
+  
+  <img src="https://github.com/user-attachments/assets/1963ff7d-4070-41be-a79b-4333176921a2" alt="Новые шаги в Trace Viewer" width="1562" height="1364" />
+- Новый метод [locator.describe()](/api/class-locator.mdx#locator-describe) для добавления описания локатора. Это описание используется в Trace Viewer.
   ```python
   button = page.get_by_test_id("btn-sub").describe("Subscribe button")
   button.click()
@@ -96,7 +666,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
     expect(page.get_by_role('listitem', name='Ship v1.52')).to_contain_class('done')
   ```
   
-- В [Aria Snapshots](./aria-snapshots.mdx) появились два новых свойства: [`/children`](./aria-snapshots.mdx#strict-matching) для строгого сопоставления и `/url` для ссылок.
+- В [ARIA-снимках](./aria-snapshots.mdx) появились два новых свойства: [`/children`](./aria-snapshots.mdx#strict-matching) для строгого сопоставления и [`/url`](./aria-snapshots.mdx#links) для ссылок.
   
   ```python
   expect(locator).to_match_aria_snapshot("""
@@ -303,7 +873,7 @@ page.route_web_socket("/ws", lambda ws: ws.on_message(
 - лучшее отображение параметров строки запроса
 - предварительный просмотр шрифтовых ресурсов
 
-![Вкладка сети теперь имеет фильтры](https://github.com/user-attachments/assets/4bd1b67d-90bd-438b-a227-00b9e86872e2)
+<img src="https://github.com/user-attachments/assets/4bd1b67d-90bd-438b-a227-00b9e86872e2" alt="На вкладке «Сеть» теперь доступны фильтры" width="1712" height="418" />
 
 ### Разное {#miscellaneous-6}
 - `mcr.microsoft.com/playwright/python:v1.47.0` теперь предоставляет образ Playwright на основе Ubuntu 24.04 Noble. Чтобы использовать образ на основе 22.04 jammy, используйте `mcr.microsoft.com/playwright/python:v1.47.0-jammy`.
@@ -565,7 +1135,7 @@ expect(page.get_by_role("heading", name="Light and easy")).to_be_visible()
 
 ### Обновление генератора тестов {#test-generator-update}
 
-![Генератор тестов Playwright](https://github.com/microsoft/playwright/assets/9881434/e8d67e2e-f36d-4301-8631-023948d3e190)
+<img src="https://github.com/microsoft/playwright/assets/9881434/e8d67e2e-f36d-4301-8631-023948d3e190" alt="Генератор тестов Playwright" width="2788" height="1824" />
 
 Новые инструменты для генерации утверждений:
 - Инструмент "Assert visibility" генерирует [expect(locator).to_be_visible()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible).
@@ -620,9 +1190,9 @@ def test_example(page: Page) -> None:
 
 ### Обновления просмотрщика трассировки {#trace-viewer-updates-1}
 
-![Просмотрщик трассировки Playwright](https://github.com/microsoft/playwright/assets/746130/0c41e20d-c54b-4600-8ca8-1cbb6393ddef)
-1. Увеличение диапазона времени.
-1. Переработка панели сети.
+<img src="https://github.com/microsoft/playwright/assets/746130/0c41e20d-c54b-4600-8ca8-1cbb6393ddef" alt="Средство просмотра трассировок Playwright" width="1091" height="722" />
+1. Масштабирование выбранного временного диапазона.
+1. Обновлённый дизайн панели сетевых запросов.
 
 ### Новые API {#new-apis-6}
 - [browser_context.on("weberror")](/api/class-browsercontext.mdx#browser-context-event-web-error)
@@ -889,7 +1459,7 @@ Playwright теперь поддерживает Debian 12 Bookworm на x86_64 
 ### Инструменты Playwright {#playwright-tools}
 * **Живые локаторы в CodeGen.** Генерируйте локатор для любого элемента на странице, используя инструмент "Explore".
 
-![Locator Explorer](https://user-images.githubusercontent.com/9798949/202293514-8e2eade6-c809-4b0a-864b-899dfcee3d84.png)
+<img src="https://user-images.githubusercontent.com/9798949/202293514-8e2eade6-c809-4b0a-864b-899dfcee3d84.png" alt="Locator Explorer" width="1424" height="1096" />
 
 ### Новые API {#new-apis-11}
 - [locator.blur()](/api/class-locator.mdx#locator-blur)
@@ -999,11 +1569,7 @@ page.goto("https://playwright.dev", wait_until="domcontentloaded")
 
 ## Версия 1.24 {#version-124}
 
-<div className="embed-youtube">
-
-<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/9F05o1shxcY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-</div>
+<LiteYouTube id="9F05o1shxcY" title="Playwright 1.24" />
 
 ### 🐂 Поддержка Debian 11 Bullseye {#debian-11-bullseye-support}
 
@@ -1258,10 +1824,9 @@ await page.route("**/*", abort_images_handler)
   submit_button = buttons.filter(has_text="Submit")
   submit_button.click()
   ```
-
 - Codegen теперь поддерживает генерацию тестов Pytest
-
-  ![Graphics](https://user-images.githubusercontent.com/746130/168098384-40784024-6c26-4426-8255-e714862af6fc.png)
+  
+  <img src="https://user-images.githubusercontent.com/746130/168098384-40784024-6c26-4426-8255-e714862af6fc.png" alt="Иллюстрация" width="1424" height="1090" />
 
 ## Версия 1.21 {#version-121}
 
@@ -1508,7 +2073,7 @@ Playwright будет повторно тестировать узел с сел
 
 Playwright 1.17 представляет [локаторы фреймов](./api/class-framelocator) - локатор для iframe на странице. Локаторы фреймов захватывают логику, достаточную для получения `iframe`, а затем нахождения элементов в этом iframe. Локаторы фреймов по умолчанию строгие, будут ждать появления `iframe` и могут использоваться в Web-First утверждениях.
 
-![Graphics](https://user-images.githubusercontent.com/746130/142082759-2170db38-370d-43ec-8d41-5f9941f57d83.png)
+<img src="https://user-images.githubusercontent.com/746130/142082759-2170db38-370d-43ec-8d41-5f9941f57d83.png" alt="Graphics" width="600" height="237" />
 
 Локаторы фреймов могут быть созданы с помощью методов [page.frame_locator()](/api/class-page.mdx#page-frame-locator) или [locator.frame_locator()](/api/class-locator.mdx#locator-frame-locator).
 
@@ -1529,13 +2094,13 @@ Playwright Trace Viewer теперь **доступен онлайн** по ад
 - Новая вкладка метаданных трассы с деталями браузера
 - Снимки теперь имеют адресную строку
 
-![image](https://user-images.githubusercontent.com/746130/141877831-29e37cd1-e574-4bd9-aab5-b13a463bb4ae.png)
+<img src="https://user-images.githubusercontent.com/746130/141877831-29e37cd1-e574-4bd9-aab5-b13a463bb4ae.png" alt="image" width="2230" height="1562" />
 
 ### Обновление HTML отчета {#html-report-update}
 - HTML отчет теперь поддерживает динамическую фильтрацию
 - Отчет теперь представляет собой **один статический HTML файл**, который можно отправить по электронной почте или в виде вложения в Slack.
 
-![image](https://user-images.githubusercontent.com/746130/141877402-e486643d-72c7-4db3-8844-ed2072c5d676.png)
+<img src="https://user-images.githubusercontent.com/746130/141877402-e486643d-72c7-4db3-8844-ed2072c5d676.png" alt="image" width="2494" height="1624" />
 
 ### Поддержка Ubuntu ARM64 и многое другое {#ubuntu-arm64-support-more}
 - Playwright теперь поддерживает **Ubuntu 20.04 ARM64**. Теперь вы можете запускать тесты Playwright внутри Docker на Apple M1 и Raspberry Pi.
@@ -1648,7 +2213,7 @@ locator.click()
 
 Узнайте больше в [документации](./api/class-locator).
 
-#### 🧩 Экспериментальные селекторные движки [**React**](./other-locators.mdx#react-locator) и [**Vue**](./other-locators.mdx#vue-locator) {#experimental-react-and-vue-selector-engines}
+#### 🧩 Экспериментальные движки селекторов [**React**](./other-locators.mdx) и [**Vue**](./other-locators.mdx)
 
 Селекторы React и Vue позволяют выбирать элементы по имени их компонента и/или значениям свойств. Синтаксис очень похож на [селекторы атрибутов](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) и поддерживает все операторы селекторов атрибутов.
 
@@ -1657,7 +2222,7 @@ page.locator("_react=SubmitButton[enabled=true]").click()
 page.locator("_vue=submit-button[enabled=true]").click()
 ```
 
-Узнайте больше в [документации по селекторам React](./other-locators.mdx#react-locator) и [документации по селекторам Vue](./other-locators.mdx#vue-locator).
+Подробнее см. в [документации по селекторам React](./other-locators.mdx) и [документации по селекторам Vue](./other-locators.mdx).
 
 #### ✨ Новые селекторные движки [**`nth`**](./other-locators.mdx#n-th-element-locator) и [**`visible`**](./other-locators.mdx#css-matching-only-visible-elements) {#new-nth-and-visible-selector-engines}
 - [`nth`](./other-locators.mdx#n-th-element-locator) селекторный движок эквивалентен псевдоклассу `:nth-match`, но может быть комбинирован с другими селекторными движками.
@@ -1738,7 +2303,7 @@ playwright show-trace trace.zip
 
 Это откроет следующий графический интерфейс:
 
-![image](https://user-images.githubusercontent.com/746130/121109654-d66c4480-c7c0-11eb-8d4d-eb70d2b03811.png)
+<img src="https://user-images.githubusercontent.com/746130/121109654-d66c4480-c7c0-11eb-8d4d-eb70d2b03811.png" alt="image" width="2424" height="1544" />
 
 👉 Подробнее читайте в [документации по Trace Viewer](./trace-viewer.mdx).
 
@@ -1879,11 +2444,15 @@ playwright show-trace trace.zip
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [Error]: /api/class-error.mdx "Error"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
@@ -1897,14 +2466,17 @@ playwright show-trace trace.zip
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

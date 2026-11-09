@@ -29,7 +29,7 @@ await client.send('Animation.setPlaybackRate', {
 
 ## Методы {#methods}
 
-### detach {#cdp-session-detach}
+### detach {/* #cdp-session-detach */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>cdpSession.detach</x-search>
 
@@ -46,7 +46,7 @@ await cdpSession.detach();
 
 ---
 
-### send {#cdp-session-send}
+### send {/* #cdp-session-send */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено до v1.9</font><x-search>cdpSession.send</x-search>
 
@@ -54,7 +54,7 @@ await cdpSession.detach();
 
 ```js
 await cdpSession.send(method);
-await cdpSession.send(method, params);
+await cdpSession.send(method, params, options);
 ```
 
 **Аргументы**
@@ -63,16 +63,61 @@ await cdpSession.send(method, params);
   Имя метода протокола.
 - `params` [Object] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="cdp-session-send-option-params"/><a href="#cdp-session-send-option-params" class="list-anchor">#</a>
   
-  Необязательные параметры метода.
+Необязательные параметры метода.
+- `options` [Object] *(необязательно)*
+  - `signal` [AbortSignal] *(необязательно)* <font size="2">Добавлено в: v1.65</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="cdp-session-send-option-signal"/><a href="#cdp-session-send-option-signal" class="list-anchor">#</a>
+    
+    Позволяет отменить операцию с помощью [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). Если сигнал отменён, операция будет прервана и завершится с ошибкой.
+  - `timeout` [number] *(необязательно)* <font size="2">Добавлено в: v1.65</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="cdp-session-send-option-timeout"/><a href="#cdp-session-send-option-timeout" class="list-anchor">#</a>
+    
+    Максимальное время ожидания ответа в миллисекундах. По умолчанию — `0`, то есть без ограничения времени ожидания.
 
 **Возвращает**
 - [Promise]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="cdp-session-send-return"/><a href="#cdp-session-send-return" class="list-anchor">#</a>
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
+---
+
+## События
+
+### on('close') {/* #cdp-session-event-close */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.59</font><x-search>cdpSession.on('close')</x-search>
+
+Генерируется при закрытии сессии: либо из-за закрытия целевого объекта, либо в результате вызова `session.detach()`.
+
+**Использование**
+
+```js
+cdpSession.on('close', data => {});
+```
+
+**Данные события**
+- [CDPSession]
+
+---
+
+### on('event') {/* #cdp-session-event-event */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.59</font><x-search>cdpSession.on('event')</x-search>
+
+Генерируется для каждого события CDP, полученного от сессии. Позволяет подписаться сразу на все события CDP, не зная заранее их названий.
+
+**Использование**
+
+```js
+session.on('event', ({ method, params }) => {
+  console.log(`CDP event: ${method}`, params);
+});
+```
+
+**Данные события**
+- [Object]
+  - `method` [string]
+    
+    Название события CDP.
+  - `params` [Object] *(необязательно)*
+    
+    Параметры события CDP.
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -85,10 +130,11 @@ await cdpSession.send(method, params);
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -107,6 +153,7 @@ await cdpSession.send(method, params);
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -114,9 +161,18 @@ await cdpSession.send(method, params);
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -134,6 +190,7 @@ await cdpSession.send(method, params);
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -146,6 +203,7 @@ await cdpSession.send(method, params);
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -167,6 +225,7 @@ await cdpSession.send(method, params);
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

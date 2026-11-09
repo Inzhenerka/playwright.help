@@ -1,0 +1,83 @@
+---
+title: "Навигация"
+---
+
+# Навигация
+
+| Инструмент | Описание |
+|------|-------------|
+| `browser_navigate` | Перейти по указанному URL |
+| `browser_navigate_back` | Вернуться на предыдущую страницу |
+| `browser_close` | Закрыть страницу |
+
+## browser_navigate
+
+Переходит по указанному URL в текущей вкладке. Если ни одна вкладка ещё не открыта, создаётся новая.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `url` | string | да | URL, по которому нужно перейти |
+
+```txt
+Вы: Перейди на https://demo.playwright.dev/todomvc
+
+→ browser_navigate { url: "https://demo.playwright.dev/todomvc" }
+
+  - Page URL: https://demo.playwright.dev/todomvc
+  - Page Title: React • TodoMVC
+
+  - heading "todos" [level=1] [ref=e3]
+  - textbox "What needs to be done?" [ref=e5]
+```
+
+Ответы с кодами состояния вне диапазона 2xx отображаются в ответе в виде `- HTTP status: 402 Payment Required`.
+
+URL со схемами `about:`, `data:` и `javascript:` разрешены. Переходы по URL со схемой `file://` заблокированы, если сервер не запущен с флагом `--allow-unrestricted-file-access`. Дополнительные ограничения на источники (origins) можно задать с помощью `--allowed-origins` / `--blocked-origins`.
+
+## browser_navigate_back
+
+Возвращает на предыдущую страницу в истории браузера.
+
+```txt
+Вы: Вернись на предыдущую страницу.
+
+→ browser_navigate_back
+→ Возвращает снимок предыдущей страницы
+```
+
+## browser_close
+
+Закрывает страницу. Завершается ошибкой, если контекст браузера используется совместно несколькими клиентами (`--shared-browser-context`).
+
+```txt
+→ browser_close
+```
+
+## Перезагрузка и переход вперёд
+
+Чтобы перезагрузить страницу, снова перейдите по тому же URL. Чтобы перейти вперёд по истории браузера или перезагрузить страницу без повторного разрешения URL, используйте `browser_run_code_unsafe`:
+
+```txt
+→ browser_run_code_unsafe { code: "async (page) => { await page.reload(); }" }
+→ browser_run_code_unsafe { code: "async (page) => { await page.goForward(); }" }
+```
+
+## Пример рабочего процесса
+
+```txt
+Вы: Открой приложение TodoMVC, добавь задачу, затем вернись назад,
+    чтобы проверить, сохранилась ли задача.
+
+→ browser_navigate { url: "https://demo.playwright.dev/todomvc" }
+→ browser_type { target: "e5", text: "Buy groceries", submit: true }
+→ browser_navigate { url: "https://example.com" }
+→ browser_navigate_back
+→ browser_snapshot
+
+  - heading "todos" [level=1] [ref=e3]
+  - textbox "What needs to be done?" [ref=e5]
+  - list [ref=e8]:
+    - listitem [ref=e9]:
+      - checkbox "Toggle Todo" [ref=e10]
+      - text: Buy groceries
+```

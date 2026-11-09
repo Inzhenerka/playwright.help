@@ -7,7 +7,587 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Версия 1.56 {#version-156}
+import LiteYouTube from '@site/src/components/LiteYouTube';
+
+## Версия 1.65
+
+### 🧾 Код локатора на C#
+
+Локатор, полученный с помощью [Locator.NormalizeAsync()](/api/class-locator.mdx#locator-normalize), теперь преобразуется в строку с кодом на C#. Используйте его вместе с [Page.GetByRef()](/api/class-page.mdx#page-get-by-ref), чтобы преобразовать элемент, выбранный агентом из снимка [Page.AriaSnapshotAsync()](/api/class-page.mdx#page-aria-snapshot) в режиме `"ai"`, в код для вашего теста:
+
+```csharp
+var normalized = await page.GetByRef("e2").NormalizeAsync();
+Console.WriteLine(normalized.ToString());
+// GetByRole(AriaRole.Button, new() { Name = "Submit" })
+```
+
+### Новые API
+- Новый параметр [Timeout](/api/class-cdpsession.mdx#cdp-session-send-option-timeout) в [CdpSession.SendAsync()](/api/class-cdpsession.mdx#cdp-session-send).
+
+### Критические изменения ⚠️
+- Такие действия, как [Locator.ClickAsync()](/api/class-locator.mdx#locator-click), [Locator.CheckAsync()](/api/class-locator.mdx#locator-check), [Locator.TapAsync()](/api/class-locator.mdx#locator-tap), [Locator.FillAsync()](/api/class-locator.mdx#locator-fill), [Locator.ClearAsync()](/api/class-locator.mdx#locator-clear) и [Locator.SelectOptionAsync()](/api/class-locator.mdx#locator-select-option), теперь ожидают, пока элемент [перестанет быть инертным](./actionability.mdx#not-inert). Действие над элементом с атрибутом `inert` или над элементом внутри него теперь завершается по тайм-ауту, если элемент остаётся инертным.
+- Сопоставление файлов cookie теперь соответствует RFC 6265. При указании URL методы [BrowserContext.CookiesAsync()](/api/class-browsercontext.mdx#browser-context-cookies) и [ApiRequestContext.CookiesAsync()](/api/class-apirequestcontext.mdx#api-request-context-cookies) больше не возвращают файлы cookie, предназначенные только для конкретного хоста, для его поддоменов, а файлы cookie с `Path=/api` — для `/apiv2`; файл cookie с `Path=/foo/` не соответствует `/foo`. [APIRequestContext] отправляет файл cookie без имени как `Cookie: x`, а не `Cookie: =x`, и сохраняет `Set-Cookie: token` как файл cookie без имени.
+- Учётные данные прокси больше не отправляются веб-сайтам. Учётные данные из параметра [Proxy](/api/class-browsertype.mdx#browser-type-launch-option-proxy) теперь используются только в ответ на запросы аутентификации от прокси. Для аутентификации на веб-сайте используйте [HttpCredentials|HttpCredentialsList](/api/class-browser.mdx#browser-new-context-option-http-credentials).
+- Текст, который браузер не отображает, например текст, не назначенный слоту, или текст непосредственно внутри закрытого `<details>`, больше не включается в доступные имена и снимки ARIA. Это может изменить результаты [Page.GetByRole()](/api/class-page.mdx#page-get-by-role) с указанием имени, [Locator.AriaSnapshotAsync()](/api/class-locator.mdx#locator-aria-snapshot) и [Expect(Locator).ToMatchAriaSnapshotAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-match-aria-snapshot).
+- Параметр `ParamsString` в запросах [APIRequestContext] теперь добавляется к уже существующей строке запроса URL, а не заменяет её.
+
+### Версии браузеров
+- Chromium 158.0.8127.18
+- Mozilla Firefox 159.0
+- WebKit 27.2
+
+Эта версия также протестирована со следующими стабильными каналами:
+- Google Chrome 157
+- Microsoft Edge 156
+
+## Версия 1.64
+
+### 🧰 WebMCP
+
+Новые [Page.Webmcp](/api/class-page.mdx#page-webmcp) и [Frame.Webmcp](/api/class-frame.mdx#frame-webmcp) предоставляют доступ к инструментам, которые страница регистрирует через экспериментальный браузерный API [WebMCP](https://webmachinelearning.github.io/webmcp/), позволяя тестировать их так же, как любую другую часть приложения:
+
+```csharp
+var browser = await playwright.Chromium.LaunchAsync(new() { Args = new[] { "--enable-features=WebMCP" } });
+var page = await browser.NewPageAsync();
+await page.GotoAsync("https://example.com");
+
+foreach (var tool in await page.Webmcp.ToolsAsync())
+    Console.WriteLine($"{tool.Name}: {tool.Description}");
+
+var result = await page.Webmcp.CallToolAsync("add", new { a = 2, b = 40 });
+Console.WriteLine(result?.GetProperty("content")[0].GetProperty("text")); // "42"
+```
+
+[Playwright MCP](./getting-started-mcp.mdx) также поддерживает WebMCP по умолчанию: инструменты, определённые страницей, предоставляются агенту под именами `webmcp_<tool>`. Чтобы отключить эту возможность, передайте `--no-webmcp`.
+
+[`playwright-cli`](./getting-started-cli.mdx) также предоставляет к ним доступ:
+
+```bash
+playwright-cli webmcp-list
+playwright-cli webmcp-call search_catalog --params '{"query":"cats"}'
+```
+
+### 🎬 Улучшенная запись видео
+
+Теперь видео можно записывать с пользовательской частотой кадров, а визуальное оформление действий настраивается с помощью обычного CSS:
+
+```csharp
+await page.Screencast.StartAsync(new()
+{
+    Path = "video.webm",
+    Size = new() { Width = 1920, Height = 1080 },
+    Fps = 60,
+});
+await page.Screencast.ShowActionsAsync(new()
+{
+    Style = new()
+    {
+        Point = "width: 20px; height: 20px; border-radius: 50%; background: red",
+        Highlight = "outline: 2px solid #333; background: rgba(0, 128, 255, .15)",
+        Title = "font-size: 16px",
+    },
+});
+```
+
+- Новый параметр [RecordVideoFps](/api/class-browser.mdx#browser-new-context-option-record-video-fps) и новый параметр [Fps](/api/class-screencast.mdx#screencast-start-option-fps) в [Screencast.StartAsync()](/api/class-screencast.mdx#screencast-start). Firefox и WebKit в настоящее время записывают до 25 кадров в секунду.
+- Новый параметр [Style](/api/class-screencast.mdx#screencast-show-actions-option-style) принимает CSS-объявления для маркера `point`, подсветки целевого элемента `highlight` и заголовка действия `title`. Он заменяет параметр `FontSize`, который теперь объявлен устаревшим.
+- Курсор остаётся видимым в точке последнего действия, сохраняется при переходах между страницами и перемещается по естественной траектории с плавным ускорением и замедлением.
+- Видео кодируются с помощью VP9 вместо VP8, что снижает нагрузку на процессор и создаёт файлы меньшего размера с таким же или лучшим качеством.
+- Все параметры видео также доступны в [Playwright MCP](./getting-started-mcp.mdx) и [`playwright-cli`](./getting-started-cli.mdx).
+
+### 🪆 Locator.within()
+
+Новый метод [Locator.Within()](/api/class-locator.mdx#locator-within) объединяет два уже имеющихся локатора, сохраняя естественный порядок чтения — «эта кнопка внутри того диалогового окна»:
+
+```csharp
+var saveButton = page.GetByRole(AriaRole.Button, new() { Name = "Save" });
+var dialog = page.GetByTestId("settings-dialog");
+
+await saveButton.Within(dialog).ClickAsync();
+```
+
+Относительные локаторы, такие как [Locator.Nth()](/api/class-locator.mdx#locator-nth) или [Locator.First](/api/class-locator.mdx#locator-first), разрешаются отдельно внутри каждого родительского элемента, что упрощает запросы для выбора столбцов:
+
+```csharp
+// Третья ячейка каждой строки, а не третья ячейка таблицы.
+var thirdColumn = page.GetByRole(AriaRole.Cell).Nth(2).Within(page.GetByRole(AriaRole.Row));
+await Expect(thirdColumn).ToHaveTextAsync(new[] { "Apple", "Banana", "Cherry" });
+```
+
+### Новые API
+- Новый метод [Page.GetByRef()](/api/class-page.mdx#page-get-by-ref) находит элемент по его ссылке ARIA, например `e2`, возвращаемой [Page.AriaSnapshotAsync()](/api/class-page.mdx#page-aria-snapshot) в режиме `"ai"`.
+- Новый параметр [IncludeShadow](/api/class-page.mdx#page-content-option-include-shadow) в [Page.ContentAsync()](/api/class-page.mdx#page-content) и [Frame.ContentAsync()](/api/class-frame.mdx#frame-content) сериализует открытые теневые корни в виде [декларативного теневого DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM#declaratively_with_html).
+- Новый параметр [SignCount](/api/class-credentials.mdx#credentials-create-option-sign-count) задаёт начальное значение счётчика подписей для виртуальных учётных данных. [Credentials.CreateAsync()](/api/class-credentials.mdx#credentials-create) и [Credentials.GetAsync()](/api/class-credentials.mdx#credentials-get) возвращают текущее значение `SignCount`, которое сохраняется и восстанавливается вместе с учётными данными в состоянии хранилища.
+- Новые методы [ApiRequestContext.AddCookiesAsync()](/api/class-apirequestcontext.mdx#api-request-context-add-cookies), [ApiRequestContext.CookiesAsync()](/api/class-apirequestcontext.mdx#api-request-context-cookies) и [ApiRequestContext.ClearCookiesAsync()](/api/class-apirequestcontext.mdx#api-request-context-clear-cookies) управляют файлами cookie контекста запросов, аналогично методам [BrowserContext]:
+  
+  ```csharp
+  await request.AddCookiesAsync(new[]
+  {
+      new Cookie { Name = "session-id", Value = "42", Url = "https://example.com" },
+  });
+  Console.WriteLine(await request.CookiesAsync("https://example.com"));
+  await request.ClearCookiesAsync(new() { Name = "session-id" });
+  ```
+  
+### Критические изменения ⚠️
+- Элементы внутри скрытых iframe считаются скрытыми. Элементы внутри невидимого iframe, например с `visibility: hidden`, теперь считаются скрытыми при выполнении действий, а также методами [Locator.IsVisibleAsync()](/api/class-locator.mdx#locator-is-visible) и [Expect(Locator).ToBeVisibleAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible).
+
+### Версии браузеров
+- Chromium 156.0.8078.4
+- Mozilla Firefox 157.0
+- WebKit 27.2
+
+Эта версия также протестирована со следующими стабильными каналами:
+- Google Chrome 155
+- Microsoft Edge 155
+
+## Версия 1.63
+
+### 🪟 Поиск элементов в разных фреймах
+
+Методы [Page.FrameLocator()](/api/class-page.mdx#page-frame-locator) и [Frame.FrameLocator()](/api/class-frame.mdx#frame-frame-locator), вызванные без селектора, выполняют поиск в любом фрейме поддерева, поэтому предварительно находить iframe больше не требуется:
+
+```csharp
+// Находит кнопку в любом фрейме на странице.
+await page.FrameLocator().GetByRole(AriaRole.Button).ClickAsync();
+```
+
+Оставшаяся часть локатора разрешается внутри одного фрейма, как и обычный локатор; если подходящие элементы найдены в нескольких фреймах, возникает ошибка.
+
+### 👁️ Локаторы только для видимых элементов
+
+Новое свойство [Locator.Visible](/api/class-locator.mdx#locator-visible) возвращает локатор, соответствующий только видимым элементам. Его рекомендуется использовать вместо CSS-псевдокласса `:visible`:
+
+```csharp
+await page.Locator("button").Visible.ClickAsync();
+```
+
+### 🖼️ Снимки ARIA и экрана в трассировках
+
+Новые параметры [AriaSnapshots](/api/class-tracing.mdx#tracing-start-option-aria-snapshots) и [ScreenSnapshots](/api/class-tracing.mdx#tracing-start-option-screen-snapshots) метода [Tracing.StartAsync()](/api/class-tracing.mdx#tracing-start) сохраняют снимок ARIA и скриншот страницы при каждом действии:
+
+```csharp
+await context.Tracing.StartAsync(new()
+{
+  Snapshots = true,
+  AriaSnapshots = true,
+  ScreenSnapshots = true
+});
+```
+
+Если снимки ARIA и экрана записаны, новый режим **Display Aria** в просмотрщике трассировок отображает скриншот действия рядом со снимком ARIA, а при наведении на узел ARIA подсвечивает его на скриншоте.
+
+### Новые API
+
+#### Браузер и контекст
+- Параметр [HttpCredentials|HttpCredentialsList](/api/class-browser.mdx#browser-new-context-option-http-credentials) теперь также принимает массив учётных данных. Используется первая запись, соответствующая источнику запроса; записи без указания источника соответствуют любому запросу.
+- Новый параметр [Opfs](/api/class-browsercontext.mdx#browser-context-storage-state-option-opfs) включает [приватную файловую систему источника](https://developer.mozilla.org/en-US/docs/Web/API/File_System_API/Origin_private_file_system) в состояние хранилища, позволяя сохранять её и восстанавливать в последующих контекстах.
+- Новые события [Page.DialogClosed](/api/class-page.mdx#page-event-dialog-closed) и [BrowserContext.DialogClosed](/api/class-browsercontext.mdx#browser-context-event-dialog-closed) возникают, когда диалоговое окно JavaScript подтверждено, отклонено или закрыто пользователем.
+
+#### Командная строка
+- `pwsh bin/Debug/netX/playwright.ps1 install --no-remove` сохраняет браузеры других установок Playwright вместо их удаления.
+- `pwsh bin/Debug/netX/playwright.ps1 codegen --http-credentials` записывает действия на страницах, защищённых HTTP-аутентификацией.
+
+### Объявления
+* ⚠️ Ubuntu 20.04 больше не поддерживается.
+* 🐧 На Linux arm64 Playwright теперь загружает сборку Chromium [Chrome for Testing](https://developer.chrome.com/blog/chrome-for-testing) — ту же сборку, которая используется на всех остальных платформах.
+
+### Версии браузеров
+- Chromium 153.0.8010.12
+- Mozilla Firefox 155.0
+- WebKit 26.6
+
+Эта версия также протестирована со следующими стабильными каналами:
+- Google Chrome 153
+- Microsoft Edge 153
+
+## Версия 1.62
+
+### 🖼️ Скриншоты WebP
+
+Методы [Page.ScreenshotAsync()](/api/class-page.mdx#page-screenshot) и [Locator.ScreenshotAsync()](/api/class-locator.mdx#locator-screenshot) теперь позволяют делать скриншоты в формате WebP — Playwright определяет формат по расширению файла `.webp`, либо его можно явно задать с помощью `type`. При качестве `100` (по умолчанию) используется сжатие без потерь, а при меньших значениях — сжатие с потерями:
+
+```csharp
+await page.ScreenshotAsync(new() { Path = "homepage.webp", Quality = 50 });
+```
+
+### Новые API
+- Новый параметр `scroll` (`"auto"` | `"none"`) для действий позволяет отключить автоматическую прокрутку Playwright, помещающую элемент в область видимости.
+- Новый метод [Locator.WaitForFunctionAsync()](/api/class-locator.mdx#locator-wait-for-function) ожидает, пока функция, вызываемая с соответствующим элементом, не вернёт истинностное значение.
+- Новое свойство [ApiResponse.Timing](/api/class-apiresponse.mdx#api-response-timing) возвращает информацию о временных характеристиках загрузки ресурса для ответа API.
+
+### Объявления
+* 📋 Буфер обмена теперь изолирован от операционной системы в режиме headless, поэтому тесты, использующие `navigator.clipboard`, больше не читают и не перезаписывают буфер обмена компьютера, на котором выполняются.
+* ⚠️ Debian 11 больше не поддерживается.
+
+### Версии браузеров
+- Chromium 151.0.7922.34
+- Mozilla Firefox 153.0
+- WebKit 26.5
+
+Эта версия также протестирована со следующими стабильными каналами:
+- Google Chrome 151
+- Microsoft Edge 151
+
+## Версия 1.61
+
+### 🔑 Ключи доступа WebAuthn
+
+Новый виртуальный аутентификатор [Credentials], доступный через [BrowserContext.Credentials](/api/class-browsercontext.mdx#browser-context-credentials), позволяет тестам регистрировать ключи доступа и отвечать на процедуры `navigator.credentials.create()` / `navigator.credentials.get()` на странице — без настоящего аппаратного ключа и во всех браузерах:
+
+```csharp
+var context = await browser.NewContextAsync();
+
+// Добавляем ключ доступа, подготовленный серверной частью для тестового пользователя.
+await context.Credentials.CreateAsync("example.com", new()
+{
+    Id = credentialId,
+    UserHandle = userHandle,
+    PrivateKey = privateKey,
+    PublicKey = publicKey,
+});
+await context.Credentials.InstallAsync();
+
+var page = await context.NewPageAsync();
+await page.GotoAsync("https://example.com/login");
+// Вызов navigator.credentials.get() на странице получает добавленный ключ доступа.
+```
+
+Также можно позволить приложению один раз зарегистрировать ключ доступа в подготовительном тесте, прочитать его с помощью [Credentials.GetAsync()](/api/class-credentials.mdx#credentials-get) и добавить в последующие тесты — подробности см. в [Credentials].
+
+### 🗃️ Веб-хранилище
+
+Новый API [WebStorage], доступный через [Page.LocalStorage](/api/class-page.mdx#page-local-storage) и [Page.SessionStorage](/api/class-page.mdx#page-session-storage), позволяет читать и записывать данные хранилища страницы для текущего источника:
+
+```csharp
+await page.LocalStorage.SetItemAsync("token", "abc");
+var token = await page.LocalStorage.GetItemAsync("token");
+var items = await page.SessionStorage.ItemsAsync();
+```
+
+### Новые API
+- Методы [ApiResponse.SecurityDetailsAsync()](/api/class-apiresponse.mdx#api-response-security-details) и [ApiResponse.ServerAddrAsync()](/api/class-apiresponse.mdx#api-response-server-addr) аналогичны браузерным методам [Response.SecurityDetailsAsync()](/api/class-response.mdx#response-security-details) и [Response.ServerAddrAsync()](/api/class-response.mdx#response-server-addr).
+- Новый параметр `ArtifactsDir` в [BrowserType.ConnectOverCDPAsync()](/api/class-browsertype.mdx#browser-type-connect-over-cdp) определяет, где сохраняются артефакты, такие как трассировки и загрузки, при подключении к уже запущенному браузеру.
+- Новый параметр `Cursor` в [Screencast.ShowActionsAsync()](/api/class-screencast.mdx#screencast-show-actions) управляет визуальным оформлением курсора для действий с указателем.
+- Обратный вызов `OnFrame` в [Screencast.StartAsync()](/api/class-screencast.mdx#screencast-start) теперь получает `Timestamp` — временную метку момента, когда браузер отобразил кадр.
+
+### 🛠️ Другие улучшения
+- Playwright теперь поддерживает Ubuntu 26.04.
+- Записи HAR и трассировок теперь включают запросы WebSocket.
+
+### Версии браузеров
+- Chromium 149.0.7827.55
+- Mozilla Firefox 151.0
+- WebKit 26.5
+
+Эта версия также протестирована со следующими стабильными каналами:
+- Google Chrome 149
+- Microsoft Edge 149
+
+## Версия 1.60
+
+### 🌐 Запись HAR через Tracing
+
+Методы [Tracing.StartHarAsync()](/api/class-tracing.mdx#tracing-start-har) / [Tracing.StopHarAsync()](/api/class-tracing.mdx#tracing-stop-har) предоставляют запись HAR как полноценную часть API трассировки с теми же параметрами `Content`, `Mode` и `UrlFilter`, что и у `RecordHar`:
+
+```csharp
+await context.Tracing.StartHarAsync("trace.har");
+var page = await context.NewPageAsync();
+await page.GotoAsync("https://playwright.dev");
+await context.Tracing.StopHarAsync();
+```
+
+### 🪝 API Drop
+
+Новый метод [Locator.DropAsync()](/api/class-locator.mdx#locator-drop) имитирует внешнее перетаскивание файлов или данных, подобных содержимому буфера обмена, на элемент. Playwright отправляет события `dragenter`, `dragover` и `drop` с синтетическим [DataTransfer] в контексте страницы — это работает во всех браузерах и отлично подходит для тестирования областей загрузки файлов:
+
+```csharp
+await page.Locator("#dropzone").DropAsync(new() {
+    Files = new FilePayload() {
+        Name = "note.txt",
+        MimeType = "text/plain",
+        Buffer = Encoding.UTF8.GetBytes("hello"),
+    },
+});
+
+await page.Locator("#dropzone").DropAsync(new() {
+    Data = new Dictionary<string, string> {
+        ["text/plain"] = "hello world",
+        ["text/uri-list"] = "https://example.com",
+    },
+});
+```
+
+### 🎯 Снимки ARIA
+- Метод [Expect(Page).ToMatchAriaSnapshotAsync()](/api/class-pageassertions.mdx#page-assertions-to-match-aria-snapshot) теперь работает с [Page], а не только с [Locator], что эквивалентно проверке для `Page.Locator("body")`.
+- Новый параметр `Boxes` в [Locator.AriaSnapshotAsync()](/api/class-locator.mdx#locator-aria-snapshot) / [Page.AriaSnapshotAsync()](/api/class-page.mdx#page-aria-snapshot) добавляет ограничивающий прямоугольник каждого элемента в формате `[box=x,y,width,height]`, что полезно при обработке с помощью ИИ.
+
+### Новые API
+
+#### Браузер, контекст и страница
+- Событие [Browser.Context](/api/class-browser.mdx#browser-event-context) возникает при создании нового контекста в браузере.
+- [BrowserContext] теперь также передаёт события жизненного цикла своих страниц: [BrowserContext.Download](/api/class-browsercontext.mdx#browser-context-event-download), [BrowserContext.FrameAttached](/api/class-browsercontext.mdx#browser-context-event-frame-attached), [BrowserContext.FrameDetached](/api/class-browsercontext.mdx#browser-context-event-frame-detached), [BrowserContext.FrameNavigated](/api/class-browsercontext.mdx#browser-context-event-frame-navigated), [BrowserContext.PageClose](/api/class-browsercontext.mdx#browser-context-event-page-close), [BrowserContext.PageLoad](/api/class-browsercontext.mdx#browser-context-event-page-load).
+
+#### Локаторы и проверки
+- Новый параметр `Description` в [Page.GetByRole()](/api/class-page.mdx#page-get-by-role) / [Locator.GetByRole()](/api/class-locator.mdx#locator-get-by-role) / [Frame.GetByRole()](/api/class-frame.mdx#frame-get-by-role) / [FrameLocator.GetByRole()](/api/class-framelocator.mdx#frame-locator-get-by-role) для сопоставления по [доступному описанию](https://www.w3.org/TR/wai-aria-1.2/#dfn-accessible-description).
+- Новый параметр `Pseudo` в [Expect(Locator).ToHaveCSSAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-css) позволяет читать вычисленные стили `::before` или `::after`.
+- Новый параметр `Style` в [Locator.HighlightAsync()](/api/class-locator.mdx#locator-highlight) применяет дополнительные встроенные CSS-стили к слою подсветки; новый метод [Page.HideHighlightAsync()](/api/class-page.mdx#page-hide-highlight) убирает всю подсветку.
+
+#### Сеть
+- Свойство [WebSocketRoute.Protocols](/api/class-websocketroute.mdx#web-socket-route-protocols) возвращает подпротоколы WebSocket, запрошенные страницей.
+- Новый параметр `NoDefaults` в [BrowserType.ConnectOverCDPAsync()](/api/class-browsertype.mdx#browser-type-connect-over-cdp) отключает стандартные переопределения Playwright для контекста по умолчанию (поведение загрузок, эмуляцию фокуса, эмуляцию медиа), чтобы подключение к браузеру, которым пользователь пользуется повседневно, не нарушало его состояние.
+
+#### Ошибки
+- Новое свойство [WebError.Location](/api/class-weberror.mdx#web-error-location) аналогично [ConsoleMessage.Location](/api/class-consolemessage.mdx#console-message-location).
+
+### 🛠️ Другие улучшения
+- В просмотрщике трассировок на панели сведений о сети добавлен переключатель форматирования тел запросов и ответов в формате JSON или данных форм.
+
+### Критические изменения ⚠️
+- Удалён давно объявленный устаревшим параметр `Handle` в `BrowserContext.ExposeBindingAsync` и `Page.ExposeBindingAsync`.
+
+### Версии браузеров
+- Chromium 148.0.7778.96
+- Mozilla Firefox 150.0.2
+- WebKit 26.4
+
+Эта версия также протестирована со следующими стабильными каналами:
+- Google Chrome 147
+- Microsoft Edge 147
+
+## Версия 1.59
+
+### 🎬 Запись экрана
+
+Новый API [Page.Screencast](/api/class-page.mdx#page-screencast) предоставляет единый интерфейс для захвата содержимого страницы со следующими возможностями:
+- Запись видео с экрана
+- Аннотации действий
+- Визуальные наложения
+- Захват кадров в реальном времени
+- Видеоотчёты о работе агентов
+
+<center>
+
+<img src="https://raw.githubusercontent.com/microsoft/playwright/main/docs/src/images/release-notes-1.59-screencast-demo.gif" alt="Демонстрация" width="500" height="313" />
+
+</center>
+
+**Запись видео с экрана** — записывайте видео с точным управлением запуском и остановкой в качестве альтернативы параметру [RecordVideoDir](/api/class-browser.mdx#browser-new-context-option-record-video-dir):
+
+```csharp
+await page.Screencast.StartAsync(new() { Path = "video.webm" });
+// ... выполняем действия ...
+await page.Screencast.StopAsync();
+```
+
+**Аннотации действий** — включайте встроенные визуальные аннотации, которые подсвечивают элементы, с которыми выполняется взаимодействие, и отображают заголовки действий во время записи:
+
+```csharp
+await page.Screencast.ShowActionsAsync(new() { Position = "top-right" });
+```
+
+Метод `ShowActionsAsync` принимает параметры `Position` (`"top-left"`, `"top"`, `"top-right"`, `"bottom-left"`, `"bottom"`, `"bottom-right"`), `Duration` (мс на аннотацию) и `FontSize` (пиксели). Он возвращает объект, освобождение которого прекращает отображение действий.
+
+**Визуальные наложения** — добавляйте заголовки глав и пользовательские HTML-наложения поверх страницы, чтобы сделать пояснения более наглядными:
+
+```csharp
+await page.Screencast.ShowChapterAsync("Adding TODOs", new() {
+    Description = "Type and press enter for each TODO",
+    Duration = 1000,
+});
+
+await page.Screencast.ShowOverlayAsync("<div style=\"color: red\">Recording</div>");
+```
+
+**Захват кадров в реальном времени** — передавайте поток кадров в формате JPEG для пользовательской обработки: создания миниатюр, предварительного просмотра в реальном времени, анализа изображений с помощью ИИ и многого другого:
+
+```csharp
+await page.Screencast.StartAsync(new() {
+    OnFrame = frame => SendToVisionModel(frame.Data),
+});
+```
+
+**Видеоотчёты о работе агентов** — агенты программирования могут создавать видеоподтверждения своей работы. Завершив задачу, агент может записать демонстрационное видео с подробными аннотациями для проверки человеком:
+
+```csharp
+await page.Screencast.StartAsync(new() { Path = "receipt.webm" });
+await page.Screencast.ShowActionsAsync(new() { Position = "top-right" });
+
+await page.Screencast.ShowChapterAsync("Verifying checkout flow", new() {
+    Description = "Added coupon code support per ticket #1234",
+});
+
+// Агент выполняет шаги проверки...
+await page.Locator("#coupon").FillAsync("SAVE20");
+await page.Locator("#apply-coupon").ClickAsync();
+await Expect(page.Locator(".discount")).ToContainTextAsync("20%");
+
+await page.Screencast.ShowChapterAsync("Done", new() {
+    Description = "Coupon applied, discount reflected in total",
+});
+
+await page.Screencast.StopAsync();
+```
+
+Полученное видео служит подтверждением выполнения работы: заголовки глав дают контекст, аннотации действий выделяют каждое взаимодействие, а просмотр наглядной демонстрации занимает меньше времени, чем чтение текстовых журналов.
+
+### 🔍 Снимки и локаторы
+- Метод [Page.AriaSnapshotAsync()](/api/class-page.mdx#page-aria-snapshot) для создания снимка ARIA страницы — эквивалент `Page.Locator("body").AriaSnapshotAsync()`.
+- Параметры `Depth` и `Mode` в [Locator.AriaSnapshotAsync()](/api/class-locator.mdx#locator-aria-snapshot).
+- Метод [Locator.NormalizeAsync()](/api/class-locator.mdx#locator-normalize) преобразует локатор в соответствии с рекомендуемыми практиками, например с использованием тестовых идентификаторов и ролей ARIA.
+- Метод [Page.PickLocatorAsync()](/api/class-page.mdx#page-pick-locator) включает интерактивный режим, в котором наведение на элементы подсвечивает их и показывает соответствующий локатор. Нажмите на элемент, чтобы получить его [Locator]. Для отмены используйте [Page.CancelPickLocatorAsync()](/api/class-page.mdx#page-cancel-pick-locator).
+
+### Новые API
+
+#### Запись экрана
+- [Page.Screencast](/api/class-page.mdx#page-screencast) предоставляет запись видео, потоковую передачу кадров в реальном времени и управление наложениями.
+- Методы [Screencast.StartAsync()](/api/class-screencast.mdx#screencast-start) и [Screencast.StopAsync()](/api/class-screencast.mdx#screencast-stop) для записи видео и захвата кадров.
+- Методы [Screencast.ShowActionsAsync()](/api/class-screencast.mdx#screencast-show-actions) и [Screencast.HideActionsAsync()](/api/class-screencast.mdx#screencast-hide-actions) для аннотаций действий.
+- Методы [Screencast.ShowChapterAsync()](/api/class-screencast.mdx#screencast-show-chapter) и [Screencast.ShowOverlayAsync()](/api/class-screencast.mdx#screencast-show-overlay) для визуальных наложений.
+- Методы [Screencast.ShowOverlaysAsync()](/api/class-screencast.mdx#screencast-show-overlays) и [Screencast.HideOverlaysAsync()](/api/class-screencast.mdx#screencast-hide-overlays) для управления видимостью наложений.
+
+#### Хранилище, консоль и ошибки
+- Метод [BrowserContext.SetStorageStateAsync()](/api/class-browsercontext.mdx#browser-context-set-storage-state) очищает существующие файлы cookie, локальное хранилище и IndexedDB для всех источников и устанавливает новое состояние хранилища — без необходимости создавать новый контекст.
+- Методы [Page.ClearConsoleMessagesAsync()](/api/class-page.mdx#page-clear-console-messages) и [Page.ClearPageErrorsAsync()](/api/class-page.mdx#page-clear-page-errors) для очистки сохранённых сообщений и ошибок.
+- Параметр `Filter` в [Page.ConsoleMessagesAsync()](/api/class-page.mdx#page-console-messages) и [Page.PageErrorsAsync()](/api/class-page.mdx#page-page-errors) определяет, какие сообщения возвращаются.
+- Метод [ConsoleMessage.Timestamp](/api/class-consolemessage.mdx#console-message-timestamp).
+
+#### Прочее
+- [BrowserContext.Debugger](/api/class-browsercontext.mdx#browser-context-debugger) предоставляет программное управление отладчиком Playwright.
+- Метод [BrowserContext.IsClosed](/api/class-browsercontext.mdx#browser-context-is-closed).
+- Метод [Request.ExistingResponse](/api/class-request.mdx#request-existing-response) возвращает ответ без ожидания.
+- Метод [Response.HttpVersionAsync()](/api/class-response.mdx#response-http-version) возвращает версию HTTP, используемую в ответе.
+- Параметр `Live` в [Tracing.StartAsync()](/api/class-tracing.mdx#tracing-start) для обновления трассировки в реальном времени.
+- Параметр `ArtifactsDir` в [BrowserType.LaunchAsync()](/api/class-browsertype.mdx#browser-type-launch) для настройки каталога артефактов.
+
+### 🔗 Совместная работа с другими инструментами
+
+Новый API [Browser.BindAsync()](/api/class-browser.mdx#browser-bind) делает запущенный браузер доступным для подключения из `playwright-cli`, `@playwright/mcp` и других клиентов.
+
+**Привязка браузера** — запустите браузер и выполните привязку, чтобы другие клиенты могли подключаться:
+
+```csharp
+var serverInfo = await browser.BindAsync("my-session", new() {
+    WorkspaceDir = "/my/project",
+});
+```
+
+**Подключение из playwright-cli** — подключитесь к работающему браузеру из вашего любимого агента программирования.
+
+```bash
+playwright-cli attach my-session
+playwright-cli -s my-session snapshot
+```
+
+**Подключение из @playwright/mcp** — или укажите вашему MCP-серверу работающий браузер.
+
+```bash
+@playwright/mcp --endpoint=my-session
+```
+
+**Подключение из клиента Playwright** — используйте API для подключения к браузеру. Поддерживается одновременное подключение нескольких клиентов!
+
+```csharp
+var browser = await chromium.ConnectAsync(serverInfo.Endpoint);
+```
+
+Передайте параметры `Host` и `Port`, чтобы выполнить привязку через WebSocket вместо именованного канала:
+
+```csharp
+var serverInfo = await browser.BindAsync("my-session", new() {
+    Host = "localhost",
+    Port = 0,
+});
+// serverInfo.Endpoint — это URL вида ws://
+```
+
+Вызовите [Browser.UnbindAsync()](/api/class-browser.mdx#browser-unbind), чтобы прекратить приём новых подключений.
+
+### 📊 Наблюдаемость
+
+Выполните `playwright-cli show`, чтобы открыть панель управления, которая отображает все привязанные браузеры, их состояния и позволяет взаимодействовать с ними:
+- Наблюдайте за тем, что ваш агент делает в фоновых браузерах
+- Открывайте сеансы для ручного вмешательства
+- Открывайте DevTools для исследования страниц в фоновых браузерах.
+
+<center>
+
+<img src="https://raw.githubusercontent.com/microsoft/playwright/main/docs/src/images/release-notes-1.59-dashboard.png" alt="Демонстрация" width="1169" height="835" />
+
+</center>
+- `playwright-cli` автоматически привязывает все свои браузеры, чтобы вы могли наблюдать за действиями агентов.
+- Задайте переменную окружения `PLAYWRIGHT_DASHBOARD=1`, чтобы видеть все браузеры `@playwright/test` на панели управления.
+
+### Критические изменения ⚠️
+- Удалена поддержка macOS 14 для WebKit. Рекомендуем обновить версию macOS или продолжить использовать более старую версию Playwright.
+
+### Версии браузеров
+- Chromium 147.0.7727.15
+- Mozilla Firefox 148.0.2
+- WebKit 26.4
+
+Эта версия также протестирована со следующими стабильными каналами:
+- Google Chrome 146
+- Microsoft Edge 146
+
+## Версия 1.58
+
+### Улучшения режима UI и просмотрщика трассировок
+- Новый вариант темы 'system' следует настройке тёмного или светлого режима вашей ОС
+- В редакторах кода теперь доступен поиск (Cmd/Ctrl+F)
+- Панель сведений о сети реорганизована для большего удобства использования
+- Ответы JSON теперь автоматически форматируются для удобства чтения
+
+Спасибо [@cpAdm](https://github.com/cpAdm) за вклад в эти улучшения!
+
+### Прочее
+
+Метод [BrowserType.ConnectOverCDPAsync()](/api/class-browsertype.mdx#browser-type-connect-over-cdp) теперь принимает параметр `IsLocal`. Если он установлен в `true`, это сообщает Playwright, что он работает на том же хосте, что и сервер CDP, и позволяет включить оптимизации файловой системы.
+
+### Критические изменения ⚠️
+- Удалены селекторы `_react` и `_vue`. Альтернативы см. в [руководстве по локаторам](./locators.mdx).
+- Удалён суффикс движка селекторов `:light`. Вместо него используйте стандартные CSS-селекторы.
+- Удалён параметр `Devtools` из [BrowserType.LaunchAsync()](/api/class-browsertype.mdx#browser-type-launch). Вместо него используйте `Args = new[] { "--auto-open-devtools-for-tabs" }`.
+- Удалена поддержка macOS 13 для WebKit. Рекомендуем обновить версию macOS или продолжить использовать более старую версию Playwright.
+
+### Версии браузеров
+- Chromium 145.0.7632.6
+- Mozilla Firefox 146.0.1
+- WebKit 26.0
+
+Эта версия также протестирована со следующими стабильными каналами:
+- Google Chrome 144
+- Microsoft Edge 144
+
+## Версия 1.57
+
+### Chrome for Testing
+
+Playwright теперь работает на сборках [Chrome for Testing](https://googlechromelabs.github.io/chrome-for-testing/), а не Chromium. В режиме с графическим интерфейсом используется `chrome`, а в режиме headless — `chrome-headless-shell`. Существующие тесты должны продолжить успешно проходить после обновления до версии 1.57.
+
+Мы не ожидаем функциональных изменений в результате этого перехода. Самое заметное изменение — новые значок и заголовок на панели инструментов.
+
+![новый и старый логотип](../images/cft-logo-change.png)
+
+Если вы всё же заметите неожиданное изменение поведения, пожалуйста, [создайте issue](https://github.com/microsoft/playwright/issues/new).
+
+На Arm64 Linux Playwright продолжает использовать Chromium.
+
+### Критическое изменение
+
+Спустя 3 года после объявления устаревшим мы удалили `Page.Accessibility` из нашего API. Если вам нужно тестировать доступность страниц, используйте другие библиотеки, например [Axe](https://www.deque.com/axe/). Интеграция с Axe описана в нашем [руководстве](https://playwright.dev/docs/accessibility-testing) для Node.js.
+
+### Новые API
+- Событие [Worker.Console](/api/class-worker.mdx#worker-event-console) возникает, когда JavaScript внутри worker вызывает один из методов API консоли, например console.log или console.dir.
+- Свойство [Locator.Description](/api/class-locator.mdx#locator-description) возвращает описание локатора, ранее заданное с помощью [Locator.Describe()](/api/class-locator.mdx#locator-describe).
+- Новый параметр [Steps](/api/class-locator.mdx#locator-click-option-steps) в [Locator.ClickAsync()](/api/class-locator.mdx#locator-click) и [Locator.DragToAsync()](/api/class-locator.mdx#locator-drag-to) задаёт количество событий `mousemove`, отправляемых при перемещении указателя мыши к целевому элементу.
+
+### Версии браузеров
+- Chromium 143.0.7499.4
+- Mozilla Firefox 144.0.2
+- WebKit 26.0
+
+## Версия 1.56 {/* #version-156 */}
 
 ### Новые API {#new-apis}
 - Новые методы [Page.ConsoleMessagesAsync()](/api/class-page.mdx#page-console-messages) и [Page.PageErrorsAsync()](/api/class-page.mdx#page-page-errors) для получения самых последних сообщений консоли со страницы
@@ -69,9 +649,11 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Версия 1.53 {#version-153}
 
-### Обновления Trace Viewer и HTML Reporter {#trace-viewer-and-html-reporter-updates}
-- Новые шаги в Trace Viewer: ![New Trace Viewer Steps](https://github.com/user-attachments/assets/1963ff7d-4070-41be-a79b-4333176921a2)
-- Новый метод [Locator.Describe()](/api/class-locator.mdx#locator-describe) для описания локатора. Используется в Trace Viewer.
+### Обновления просмотрщика трассировок и HTML-отчёта
+- Новые шаги в просмотрщике трассировок:
+  
+  <img src="https://github.com/user-attachments/assets/1963ff7d-4070-41be-a79b-4333176921a2" alt="Новые шаги в просмотрщике трассировок" width="1562" height="1364" />
+- Новый метод [Locator.Describe()](/api/class-locator.mdx#locator-describe) для описания локатора. Используется в просмотрщике трассировок.
   
   ```csharp
   var button = Page.GetByTestId("btn-sub").Describe("Subscribe button");
@@ -98,7 +680,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
     await Expect(Page.GetByRole(AriaRole.Listitem, new() { Name = "Ship v1.52" })).ToContainClassAsync("done");
   ```
   
-- [Aria Snapshots](./aria-snapshots.mdx) получили два новых свойства: [`/children`](./aria-snapshots.mdx#strict-matching) для строгого сопоставления и `/url` для ссылок.
+- В [ARIA-снимках](./aria-snapshots.mdx) появились два новых свойства: [`/children`](./aria-snapshots.mdx#strict-matching) для строгого сопоставления и [`/url`](./aria-snapshots.mdx#links) для ссылок.
   
   ```csharp
   await Expect(locator).ToMatchAriaSnapshotAsync(@"
@@ -322,7 +904,7 @@ await page.RouteWebSocketAsync("/ws", ws => {
 - лучшее отображение параметров строки запроса
 - предварительный просмотр шрифтовых ресурсов
 
-![Вкладка сети теперь имеет фильтры](https://github.com/user-attachments/assets/4bd1b67d-90bd-438b-a227-00b9e86872e2)
+<img src="https://github.com/user-attachments/assets/4bd1b67d-90bd-438b-a227-00b9e86872e2" alt="На вкладке «Сеть» теперь есть фильтры" width="1712" height="418" />
 
 ### Разное {#miscellaneous-6}
 - `mcr.microsoft.com/playwright/dotnet:v1.47.0` теперь предоставляет образ Playwright на основе Ubuntu 24.04 Noble. Чтобы использовать образ на основе 22.04 jammy, используйте `mcr.microsoft.com/playwright/dotnet:v1.47.0-jammy`.
@@ -609,7 +1191,7 @@ await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Light and easy" })
 
 ### Обновление генератора тестов {#test-generator-update}
 
-![Генератор тестов Playwright](https://github.com/microsoft/playwright/assets/9881434/e8d67e2e-f36d-4301-8631-023948d3e190)
+<img src="https://github.com/microsoft/playwright/assets/9881434/e8d67e2e-f36d-4301-8631-023948d3e190" alt="Генератор тестов Playwright" width="2788" height="1824" />
 
 Новые инструменты для генерации проверок:
 - Инструмент "Assert visibility" генерирует [Expect(Locator).ToBeVisibleAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible).
@@ -662,9 +1244,9 @@ await Expect(Page.GetByPlaceholder("Search docs")).ToHaveValueAsync("locator");
 
 ### Обновления Trace Viewer {#trace-viewer-updates-1}
 
-![Playwright Trace Viewer](https://github.com/microsoft/playwright/assets/746130/0c41e20d-c54b-4600-8ca8-1cbb6393ddef)
-1. Увеличение временного диапазона.
-1. Переработка панели сети.
+<img src="https://github.com/microsoft/playwright/assets/746130/0c41e20d-c54b-4600-8ca8-1cbb6393ddef" alt="Средство просмотра трассировок Playwright" width="1091" height="722" />
+1. Увеличение масштаба выбранного временного диапазона.
+1. Обновлённый дизайн панели сетевых запросов.
 
 ### Новые API {#new-apis-6}
 - [BrowserContext.WebError](/api/class-browsercontext.mdx#browser-context-event-web-error)
@@ -923,7 +1505,7 @@ Playwright теперь поддерживает Debian 12 Bookworm на x86_64 
 ### Инструменты Playwright {#playwright-tools}
 * **Живые локаторы в CodeGen.** Генерируйте локатор для любого элемента на странице с помощью инструмента "Explore".
 
-![Locator Explorer](https://user-images.githubusercontent.com/9798949/202293757-2e3ec0ac-1feb-4d6f-9935-73e08658b76d.png)
+<img src="https://user-images.githubusercontent.com/9798949/202293757-2e3ec0ac-1feb-4d6f-9935-73e08658b76d.png" alt="Locator Explorer" width="1650" height="1096" />
 
 ### Новые API {#new-apis-11}
 - [Locator.BlurAsync()](/api/class-locator.mdx#locator-blur)
@@ -1062,11 +1644,7 @@ await Page.GotoAsync("https://playwright.dev", new() { WaitUntil = WaitUntilStat
 
 ## Версия 1.24 {#version-124}
 
-<div className="embed-youtube">
-
-<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/9F05o1shxcY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-</div>
+<LiteYouTube id="9F05o1shxcY" title="Playwright 1.24" />
 
 ### 🐂 Поддержка Debian 11 Bullseye {#debian-11-bullseye-support}
 
@@ -1351,7 +1929,7 @@ Playwright будет повторно тестировать узел с сел
 
 Playwright 1.17 представляет [локаторы фреймов](./api/class-framelocator) - локатор для iframe на странице. Локаторы фреймов захватывают логику, достаточную для получения `iframe`, а затем нахождения элементов в этом iframe. Локаторы фреймов по умолчанию строгие, будут ждать появления `iframe` и могут использоваться в Web-First утверждениях.
 
-![Графика](https://user-images.githubusercontent.com/746130/142082759-2170db38-370d-43ec-8d41-5f9941f57d83.png)
+<img src="https://user-images.githubusercontent.com/746130/142082759-2170db38-370d-43ec-8d41-5f9941f57d83.png" alt="Графика" width="600" height="237" />
 
 Локаторы фреймов могут быть созданы с помощью методов [Page.FrameLocator()](/api/class-page.mdx#page-frame-locator) или [Locator.FrameLocator()](/api/class-locator.mdx#locator-frame-locator).
 
@@ -1372,13 +1950,13 @@ Playwright Trace Viewer теперь **доступен онлайн** по ад
 - Новая вкладка метаданных трассировки с деталями браузера
 - Снимки теперь имеют адресную строку
 
-![изображение](https://user-images.githubusercontent.com/746130/141877831-29e37cd1-e574-4bd9-aab5-b13a463bb4ae.png)
+<img src="https://user-images.githubusercontent.com/746130/141877831-29e37cd1-e574-4bd9-aab5-b13a463bb4ae.png" alt="изображение" width="2230" height="1562" />
 
 ### Обновление HTML отчета {#html-report-update}
 - HTML отчет теперь поддерживает динамическую фильтрацию
 - Отчет теперь представляет собой **один статический HTML файл**, который можно отправить по электронной почте или в виде вложения в Slack.
 
-![изображение](https://user-images.githubusercontent.com/746130/141877402-e486643d-72c7-4db3-8844-ed2072c5d676.png)
+<img src="https://user-images.githubusercontent.com/746130/141877402-e486643d-72c7-4db3-8844-ed2072c5d676.png" alt="image" width="2494" height="1624" />
 
 ### Поддержка Ubuntu ARM64 и многое другое {#ubuntu-arm64-support-more}
 - Playwright теперь поддерживает **Ubuntu 20.04 ARM64**. Теперь вы можете запускать тесты Playwright внутри Docker на Apple M1 и Raspberry Pi.
@@ -1486,7 +2064,7 @@ await locator.ClickAsync();
 
 Узнайте больше в [документации](./api/class-locator).
 
-#### 🧩 Экспериментальные [**React**](./other-locators.mdx#react-locator) и [**Vue**](./other-locators.mdx#vue-locator) селекторные движки {#experimental-react-and-vue-selector-engines}
+#### 🧩 Экспериментальные движки селекторов для [**React**](./other-locators.mdx) и [**Vue**](./other-locators.mdx)
 
 Селекторы React и Vue позволяют выбирать элементы по имени их компонента и/или значениям свойств. Синтаксис очень похож на [селекторы атрибутов](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) и поддерживает все операторы селекторов атрибутов.
 
@@ -1495,7 +2073,7 @@ await page.Locator("_react=SubmitButton[enabled=true]").ClickAsync();
 await page.Locator("_vue=submit-button[enabled=true]").ClickAsync();
 ```
 
-Узнайте больше в [документации по селекторам React](./other-locators.mdx#react-locator) и [документации по селекторам Vue](./other-locators.mdx#vue-locator).
+Подробнее см. в [документации по React-селекторам](./other-locators.mdx) и [документации по Vue-селекторам](./other-locators.mdx).
 
 #### ✨ Новые селекторные движки [**`nth`**](./other-locators.mdx#n-th-element-locator) и [**`visible`**](./other-locators.mdx#css-matching-only-visible-elements) {#new-nth-and-visible-selector-engines}
 - [`nth`](./other-locators.mdx#n-th-element-locator) селекторный движок эквивалентен псевдоклассу `:nth-match`, но может быть объединен с другими селекторными движками.
@@ -1570,6 +2148,8 @@ await button.ClickAsync("button >> visible=true");
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -1589,15 +2169,18 @@ await button.ClickAsync("button >> visible=true");
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

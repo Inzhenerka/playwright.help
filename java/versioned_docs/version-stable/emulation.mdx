@@ -45,6 +45,8 @@ BrowserContext context = browser.newContext(new Browser.NewContextOptions()
   .isMobile(false));
 ```
 
+<ApiAnchor id="locale--timezone" />
+
 ## Локаль и Часовой пояс {#locale-timezone}
 
 Эмулируйте Locale и часовой пояс браузера: их можно задать глобально для всех тестов в конфигурации, а затем переопределять для отдельных тестов.
@@ -55,7 +57,7 @@ BrowserContext context = browser.newContext(new Browser.NewContextOptions()
   .setTimezoneId("Europe/Berlin"));
 ```
 
-<img width="1394" alt="Bing на немецком языке и в часовом поясе" src="https://user-images.githubusercontent.com/13063165/220416571-ccc96ab1-44bb-4579-8430-64502fc24a15.png" />
+<img height="1824" width="2788" alt="Bing на немецком языке и в соответствующем часовом поясе" src="https://user-images.githubusercontent.com/13063165/220416571-ccc96ab1-44bb-4579-8430-64502fc24a15.png" />
 
 ## Разрешения {#permissions}
 
@@ -89,7 +91,7 @@ BrowserContext context = browser.newContext(new Browser.NewContextOptions()
   .setPermissions(Arrays.asList("geolocation")));
 ```
 
-<img width="1394" alt="геолокация для Италии на картах Bing" src="https://user-images.githubusercontent.com/13063165/220417670-bb22d815-f5cd-47c4-8562-0b88165eac27.png" />
+<img height="1824" width="2788" alt="геолокация для Италии на картах Bing" src="https://user-images.githubusercontent.com/13063165/220417670-bb22d815-f5cd-47c4-8562-0b88165eac27.png" />
 
 Измените местоположение позже:
 
@@ -101,7 +103,7 @@ context.setGeolocation(new Geolocation(48.858455, 2.294474));
 
 ## Цветовая схема и Медиа {#color-scheme-and-media}
 
-Эмулируйте `"colorScheme"` пользователя. Поддерживаемые значения: 'light' и 'dark'. Вы также можете эмулировать тип медиа с помощью [Page.emulateMedia()](/api/class-page.mdx#page-emulate-media).
+Эмулирует пользовательскую настройку `"colorScheme"`. Поддерживаемые значения: 'light', 'dark' и 'no-preference'. Вы также можете эмулировать тип медиа с помощью [Page.emulateMedia()](/api/class-page.mdx#page-emulate-media).
 
 ```java
 // Создать контекст с темным режимом
@@ -119,7 +121,23 @@ page.emulateMedia(new Page.EmulateMediaOptions().setColorScheme(ColorScheme.DARK
 page.emulateMedia(new Page.EmulateMediaOptions().setMedia(Media.PRINT));
 ```
 
-<img width="1394" alt="playwright web в темном режиме" src="https://user-images.githubusercontent.com/13063165/220411638-55d2b051-4678-4da7-9f0b-ed22f5a3c47c.png" />
+<img height="1824" width="2788" alt="сайт Playwright в тёмном режиме" src="https://user-images.githubusercontent.com/13063165/220411638-55d2b051-4678-4da7-9f0b-ed22f5a3c47c.png" />
+
+Параметры `"reducedMotion"`, `"forcedColors"` и `"contrast"` аналогичным образом эмулируют медиафункции `prefers-reduced-motion`, `forced-colors` и `prefers-contrast`. Поддерживаемые значения: `'reduce'` и `'no-preference'` для уменьшения анимации, `'active'` и `'none'` для принудительных цветов, а также `'more'` и `'no-preference'` для контрастности. Метод [Page.emulateMedia()](/api/class-page.mdx#page-emulate-media) изменяет их для отдельной страницы.
+
+```java
+// Создаём контекст с уменьшенной анимацией, принудительными цветами и повышенной контрастностью
+BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+  .setReducedMotion(ReducedMotion.REDUCE) // или NO_PREFERENCE
+  .setForcedColors(ForcedColors.ACTIVE) // или NONE
+  .setContrast(Contrast.MORE)); // или NO_PREFERENCE
+
+// Изменяем медиафункции для страницы
+page.emulateMedia(new Page.EmulateMediaOptions()
+  .setReducedMotion(ReducedMotion.REDUCE)
+  .setForcedColors(ForcedColors.ACTIVE)
+  .setContrast(Contrast.MORE));
+```
 
 ## User Agent {#user-agent}
 
@@ -139,7 +157,11 @@ BrowserContext context = browser.newContext(new Browser.NewContextOptions()
   .setOffline(true));
 ```
 
-## Включение JavaScript {#javascript-enabled}
+:::note
+Эмуляция автономного режима влияет только на запросы, проходящие через стандартный сетевой стек браузера, такие как переходы между страницами, `fetch()`, `XMLHttpRequest` и WebSockets. Она не влияет на трафик WebRTC: установленные соединения `RTCPeerConnection` продолжают отправлять и получать медиаданные по UDP. Чтобы протестировать потерю соединения WebRTC, прервите соединение вне браузера, например остановив TURN-сервер или используя межсетевой экран на уровне ОС.
+:::
+
+## Включение JavaScript {/* #javascript-enabled */}
 
 Эмулируйте сценарий пользователя, в котором JavaScript отключен.
 
@@ -159,6 +181,8 @@ BrowserContext context = browser.newContext(new Browser.NewContextOptions()
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -180,15 +204,18 @@ BrowserContext context = browser.newContext(new Browser.NewContextOptions()
 [RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -201,6 +228,7 @@ BrowserContext context = browser.newContext(new Browser.NewContextOptions()
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[BiConsumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html "BiConsumer"
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
@@ -208,6 +236,7 @@ BrowserContext context = browser.newContext(new Browser.NewContextOptions()
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[Integer]: https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html "Integer"
 [long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"

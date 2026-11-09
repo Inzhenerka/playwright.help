@@ -458,7 +458,41 @@ await page.route("**/title.html", handle_route)
 </TabItem>
 </Tabs>
 
-## Шаблоны URL с глобами {#glob-url-patterns}
+## Как работает перехват запросов
+
+Маршруты находятся между страницей и сетевым стеком браузера. Обработчик выполняется до того, как сетевой стек обработает запрос: [route.continue_()](/api/class-route.mdx#route-continue) передаёт его дальше, [route.fulfill()](/api/class-route.mdx#route-fulfill) возвращает ответ без обращения к сети, а [route.abort()](/api/class-route.mdx#route-abort) прерывает запрос с ошибкой.
+
+```mermaid
+sequenceDiagram
+  participant Page as Страница
+  participant Playwright
+  participant Network as Сетевой стек
+  participant Server as Сервер
+
+  Page->>Playwright: запрос
+  Note over Playwright: выполняется обработчик маршрута
+  Playwright->>Network: route.continue()
+  Note over Network: добавляет Cookie, Host, Sec-Fetch-*, ...
+  Network->>Server: запрос
+  Server-->>Network: ответ
+  Note over Network: сохраняет файлы cookie
+  Network-->>Playwright: заголовки ответа в том виде, в котором их отправил сервер
+  Network-->>Page: ответ
+```
+
+### Заголовки, которыми управляет сетевой стек
+
+Некоторые заголовки добавляются сетевым стеком непосредственно перед отправкой запроса: `Cookie`, `Host`, `Accept-Encoding`, `Content-Length`, `Sec-Fetch-*` и ряд других. Это граница безопасности: например, файл cookie с атрибутом `HttpOnly` никогда не доступен странице. Поскольку обработчик маршрута выполняется до этого этапа, наличие этих заголовков в [request.headers](/api/class-request.mdx#request-headers) или [request.all_headers()](/api/class-request.mdx#request-all-headers) не гарантируется, и переопределить их нельзя. Заголовок `cookie`, переданный в [route.continue_()](/api/class-route.mdx#route-continue), игнорируется: вместо него используются данные из хранилища файлов cookie браузера.
+
+При обработке ответа сетевой стек уже выполнил свою работу, поэтому [response.all_headers()](/api/class-response.mdx#response-all-headers) возвращает заголовки в точности в том виде, в котором их отправил сервер, включая `Set-Cookie` для файлов cookie с атрибутом `HttpOnly`. Чтобы увидеть точные заголовки запроса, отправленные по сети, наблюдайте за запросом, не перехватывая его с помощью маршрутов: если маршруты не настроены, [request.all_headers()](/api/class-request.mdx#request-all-headers) включает все эти заголовки.
+
+### Перенаправления
+
+Playwright рассматривает запрос и его перенаправления как единое целое. Обработчик вызывается один раз, для исходного запроса, а браузер самостоятельно следует перенаправлению. [response.request](/api/class-response.mdx#response-request) возвращает последний запрос в цепочке, а [request.redirected_from](/api/class-request.mdx#request-redirected-from) позволяет пройти по ней в обратном направлении до перехваченного вами запроса. Заголовки, переданные в [route.continue_()](/api/class-route.mdx#route-continue), применяются на каждом шаге цепочки, за исключением `cookie`, который всегда формируется из хранилища файлов cookie.
+
+Возврат ответа со статусом `3xx` не даёт повторной возможности перехватить запрос. Chromium и Firefox следуют перенаправлению без вызова вашего обработчика, а WebKit отклоняет вызов. Чтобы вернуть другое содержимое, передайте это содержимое в `fulfill`. Чтобы отправить запрос по другому адресу, передайте `url` в [route.continue_()](/api/class-route.mdx#route-continue) или [route.fallback()](/api/class-route.mdx#route-fallback).
+
+## Glob-шаблоны URL
 
 Playwright использует упрощённые glob-шаблоны для сопоставления URL в методах перехвата сети, таких как [page.route()](/api/class-page.mdx#page-route) или [page.expect_response()](/api/class-page.mdx#page-wait-for-response). Эти шаблоны поддерживают базовые подстановочные символы:
 1. Звёздочки:
@@ -514,11 +548,15 @@ page.on("websocket", on_web_socket)
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [Error]: /api/class-error.mdx "Error"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
@@ -532,14 +570,17 @@ page.on("websocket", on_web_socket)
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

@@ -1,0 +1,93 @@
+---
+title: "Отладка тестов"
+---
+
+# Отладка тестов
+
+Используйте CLI для интерактивной отладки сбоев тестов Playwright.
+
+## Подключение к приостановленному тесту
+
+Запустите тест с параметром `--debug=cli`. Сделайте это в фоновом режиме — тест останется приостановленным и будет держать
+браузер открытым, пока вы работаете.
+
+```bash
+PLAYWRIGHT_HTML_OPEN=never npx playwright test tests/checkout.spec.ts --debug=cli
+```
+
+Тест приостанавливается в самом начале и выводит имя сеанса, к которому нужно подключиться:
+
+```txt
+### The test is currently paused at the start
+
+### Debugging Instructions
+- Run "playwright-cli attach tw-a3f19c" to attach to this test
+```
+
+```bash
+playwright-cli attach tw-a3f19c
+```
+
+`PLAYWRIGHT_HTML_OPEN=never` предотвращает автоматическое открытие HTML-отчёта после завершения запуска.
+
+## Исследование страницы
+
+```bash
+playwright-cli snapshot                 # посмотреть текущее состояние
+playwright-cli find "Place order"       # найти один элемент на большой странице
+playwright-cli console error            # проверить наличие ошибок
+playwright-cli requests --filter="/api/"
+playwright-cli eval "() => document.title"
+playwright-cli screenshot --filename=debug-state.png
+```
+
+## Управление выполнением
+
+| Команда | Описание |
+|---------|-------------|
+| `resume` | Продолжить выполнение |
+| `step-over` | Выполнить следующий вызов в тесте без захода внутрь |
+| `pause-at <file>:<line>` | Выполнить тест до указанного места и приостановить его там |
+
+```bash
+playwright-cli pause-at checkout.spec.ts:42
+playwright-cli step-over
+playwright-cli resume
+```
+
+Поскольку тест приостанавливается в самом начале, `pause-at` обычно позволяет быстрее всего приступить к отладке: перейдите
+сразу к строке, в которой, вероятнее всего, возникает проблема.
+
+## Чтение сгенерированного кода
+
+Каждое действие `playwright-cli` выводит эквивалентный код Playwright на TypeScript. Этот код можно вставить
+обратно в тест в качестве исправления — чаще всего требуется обновить локатор или проверку, но причиной также может быть
+настоящая ошибка в приложении. См. раздел [Генерация кода и подсветка](./codegen.mdx).
+
+## Рабочий процесс: исследование нестабильного теста
+
+```bash
+# 1. Запустите падающий тест в фоновом режиме
+PLAYWRIGHT_HTML_OPEN=never npx playwright test tests/checkout.spec.ts --debug=cli
+
+# 2. Подключитесь
+playwright-cli attach tw-a3f19c
+
+# 3. Начните запись трассировки
+playwright-cli tracing-start
+
+# 4. Выполните тест до подозрительной строки
+playwright-cli pause-at tests/checkout.spec.ts:42
+playwright-cli snapshot
+playwright-cli console
+playwright-cli requests
+
+# 5. Исследуйте состояние на шаге, на котором возникает сбой
+playwright-cli screenshot --filename=before-failure.png
+playwright-cli eval "() => document.querySelector('.spinner')?.style.display"
+
+# 6. Сохраните трассировку, затем остановите фоновый запуск теста и запустите его заново
+playwright-cli tracing-stop
+```
+
+Завершив исследование, остановите фоновый запуск теста, а затем запустите тест повторно, чтобы убедиться, что исправление работает.

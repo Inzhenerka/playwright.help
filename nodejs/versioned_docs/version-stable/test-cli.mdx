@@ -70,53 +70,57 @@ npx playwright test --ui
 
 | Опция | Описание |
 | :--- | :--- |
-| `--debug` | Запускает тесты с Playwright Inspector. Сокращение для переменной окружения `PWDEBUG=1` и опций `--timeout=0 --max-failures=1 --headed --workers=1`. |
-| `--headed` | Запускает тесты в браузерах с интерфейсом (по умолчанию: headless). |
-| `-g <grep>` или `--grep <grep>` | Запускает только тесты, соответствующие этому регулярному выражению (по умолчанию: `".*"`). |
-| `--project <project-name...>` | Запускает тесты только из указанного списка проектов; поддерживает wildcard `*` (по умолчанию: запускаются все проекты). |
-| `--ui` | Запускает тесты в интерактивном UI-режиме. |
-| `-j <workers>` или `--workers <workers>` | Количество параллельных воркеров или процент от числа логических ядер CPU; используйте `1`, чтобы запускать в одном воркере (по умолчанию: 50%). |
+| `--debug [mode]` | Запустить тесты с Playwright Inspector. Сокращение для переменной окружения `PWDEBUG=1` и параметров `--timeout=0 --max-failures=1 --headed --workers=1`. Необязательный режим — "inspector" (по умолчанию) или "cli": режим "cli" позволяет подключаться и выполнять отладку через интерфейс командной строки. |
+| `--headed` | Запустить тесты в браузерах с графическим интерфейсом (по умолчанию: без графического интерфейса). |
+| `-g <grep>` or `--grep <grep>` | Запустить только тесты, соответствующие этому регулярному выражению (по умолчанию: ".*"). |
+| `--project <project-name...>` | Запустить только тесты из указанного списка проектов; поддерживается подстановочный символ '*' (по умолчанию: запускать все проекты). |
+| `--ui` | Запустить тесты в интерактивном режиме с пользовательским интерфейсом. |
+| `-j <workers>` or `--workers <workers>` | Количество параллельных рабочих процессов или процент от числа логических ядер процессора; используйте 1 для запуска в одном рабочем процессе (по умолчанию: 50%). |
 
 #### Все опции {#all-options}
 
 | Опция | Описание |
 | :--- | :--- |
-| Аргументы без опций | Каждый аргумент трактуется как регулярное выражение, сопоставляемое с полным путём к файлу теста. Будут выполнены только тесты из файлов, путь которых соответствует шаблону. Спецсимволы вроде `$` или `*` нужно экранировать с помощью `\`. Во многих shell/терминалах аргументы может потребоваться заключать в кавычки. |
-| `-c <file>` или `--config <file>` | Файл конфигурации или директория с тестами с необязательным `playwright.config.&#123;m,c&#125;?&#123;js,ts&#125;`. По умолчанию используется `playwright.config.ts` или `playwright.config.js` в текущей директории. |
-| `--debug` | Запускает тесты с Playwright Inspector. Сокращение для `PWDEBUG=1` и опций `--timeout=0 --max-failures=1 --headed --workers=1`. |
-| `--fail-on-flaky-tests` | Завершает запуск с ошибкой, если какой‑то тест помечен как flaky (по умолчанию: false). |
-| `--forbid-only` | Завершает запуск с ошибкой, если встречается `test.only` (по умолчанию: false). Полезно в CI. |
-| `--fully-parallel` | Запускает все тесты параллельно (по умолчанию: false). |
-| `--global-timeout <timeout>` | Максимальное время выполнения всего набора тестов (в миллисекундах) (по умолчанию: без ограничений). |
-| `-g <grep>` или `--grep <grep>` | Запускает только тесты, соответствующие этому регулярному выражению (по умолчанию: `".*"`). |
-| `--grep-invert <grep>` | Запускает только тесты, которые не соответствуют этому регулярному выражению. |
-| `--headed` | Запускает тесты в браузерах с интерфейсом (по умолчанию: headless). |
-| `--ignore-snapshots` | Игнорирует ожидания скриншотов и снапшотов. |
-| `-j <workers>` или `--workers <workers>` | Количество параллельных воркеров или процент от числа логических ядер CPU; используйте `1`, чтобы запускать в одном воркере (по умолчанию: 50%). |
-| `--last-failed` | Повторно запускает только упавшие тесты. |
-| `--list` | Собирает список тестов и выводит его, но не запускает. |
-| `--max-failures <N>` или `-x` | Останавливается после первых `N` падений. Опция `-x` останавливает после первого падения. |
-| `--no-deps` | Не запускает зависимости проектов. |
-| `--output <dir>` | Папка для выходных артефактов (по умолчанию: `"test-results"`). |
-| `--only-changed [ref]` | Запускает только файлы тестов, изменённые между `HEAD` и `ref`. По умолчанию запускаются все незакоммиченные изменения. Поддерживается только Git. |
-| `--pass-with-no-tests` | Считает запуск успешным, даже если тесты не найдены. |
-| `--project <project-name...>` | Запускает тесты только из указанного списка проектов; поддерживает wildcard `*` (по умолчанию: запускаются все проекты). |
-| `--quiet` | Подавляет stdio. |
-| `--repeat-each <N>` | Запускает каждый тест `N` раз (по умолчанию: 1). |
-| `--reporter <reporter>` | Репортёр, который будет использоваться; перечисляется через запятую, может быть `"dot"`, `"line"`, `"list"` и др. (по умолчанию: `"list"`). Также можно передать путь к файлу пользовательского репортера. |
-| `--retries <retries>` | Максимальное число повторов для flaky-тестов; 0 — без повторов (по умолчанию: без повторов). |
-| `--shard <shard>` | Делит тесты на шарды и выполняет только выбранный шард, в формате `"current/all"` (нумерация с 1), например `"3/5"`. |
-| `--test-list <file>` | Путь к файлу со списком тестов для запуска. См. [test list](#test-list). |
-| `--test-list-invert <file>` | Путь к файлу со списком тестов, которые нужно пропустить. См. [test list](#test-list). |
-| `--timeout <timeout>` | Таймаут теста в миллисекундах; 0 — без ограничений (по умолчанию: 30 секунд). |
-| `--trace <mode>` | Принудительно задаёт режим трассировки: `on`, `off`, `on-first-retry`, `on-all-retries`, `retain-on-failure`, `retain-on-first-failure`. |
-| `--tsconfig <path>` | Путь к единому tsconfig для всех импортируемых файлов (по умолчанию: tsconfig ищется для каждого импортируемого файла отдельно). |
-| `--ui` | Запускает тесты в интерактивном UI-режиме. |
-| `--ui-host <host>` | Хост, на котором будет подниматься UI; при указании опции UI открывается во вкладке браузера. |
-| `--ui-port <port>` | Порт, на котором будет подниматься UI; `0` — любой свободный порт; при указании опции UI открывается во вкладке браузера. |
-| `-u` или `--update-snapshots [mode]` | Обновляет снапшоты фактическими результатами. Возможные значения: `"all"`, `"changed"`, `"missing"`, `"none"`. Запуск без флага использует `"missing"`; запуск с флагом, но без значения — `"changed"`. |
-| `--update-source-method [mode]` | Обновляет снапшоты фактическими результатами. Возможные значения: `"patch"` (по умолчанию), `"3way"`, `"overwrite"`. `"patch"` создаёт unified diff-файл, который можно применить к исходникам позже. `"3way"` добавляет в исходники маркеры merge-конфликтов. `"overwrite"` перезаписывает исходники новыми значениями снапшотов. |
-| `-x` | Останавливается после первого падения. |
+| Аргументы, не являющиеся опциями | Каждый аргумент рассматривается как регулярное выражение, сопоставляемое с полным путём к файлу теста. Будут выполнены только тесты из файлов, соответствующих шаблону. Специальные символы, такие как `$` или `*`, следует экранировать с помощью `\`. Во многих оболочках и терминалах может потребоваться заключить аргументы в кавычки. |
+| `--add-reporter <reporter>` | Репортёры, добавляемые к репортёрам, настроенным в файле конфигурации, через запятую. Можно указать имя встроенного репортёра или путь к файлу пользовательского репортёра. В отличие от `--reporter`, эта опция сохраняет настроенные репортёры, а не заменяет их. |
+| `-c <file>` или `--config <file>` | Файл конфигурации или каталог с тестами, в котором может находиться файл "playwright.config.&#123;m,c&#125;?&#123;js,ts&#125;". По умолчанию используется `playwright.config.ts` или `playwright.config.js` в текущем каталоге. |
+| `--debug [mode]` | Запуск тестов с Playwright Inspector. Сокращение для переменной окружения `PWDEBUG=1` и опций `--timeout=0 --max-failures=1 --headed --workers=1`. Необязательный режим — "inspector" (по умолчанию) или "cli"; режим "cli" позволяет подключаться и выполнять отладку через CLI. |
+| `--fail-on-flaky-tests` | Завершать запуск с ошибкой, если хотя бы один тест помечен как нестабильный (по умолчанию: false). |
+| `--forbid-only` | Завершать запуск с ошибкой при вызове `test.only` (по умолчанию: false). Полезно в CI. |
+| `--fully-parallel` | Запускать все тесты параллельно (по умолчанию: false). |
+| `--global-timeout <timeout>` | Максимальное время выполнения этого набора тестов в миллисекундах (по умолчанию: без ограничений). |
+| `-g <grep>` или `--grep <grep>` | Запускать только тесты, соответствующие этому регулярному выражению (по умолчанию: ".*"). |
+| `-G <grep>` или `--grep-invert <grep>` | Запускать только тесты, не соответствующие этому регулярному выражению. |
+| `--headed` | Запускать тесты в браузерах с графическим интерфейсом (по умолчанию: без графического интерфейса). |
+| `--ignore-snapshots` | Игнорировать проверки скриншотов и снимков. |
+| `-j <workers>` или `--workers <workers>` | Количество одновременно работающих рабочих процессов или процент от числа логических ядер процессора; укажите 1 для запуска в одном рабочем процессе (по умолчанию: 50%). |
+| `--last-failed` | Повторно запускать только тесты, завершившиеся с ошибкой. |
+| `--last-failed-file <file>` | Переопределить путь по умолчанию к JSON-файлу с результатами последнего запуска для `--last-failed` (по умолчанию: `<outputDir>/.last-run.json`). Эквивалентно переменной окружения `PLAYWRIGHT_LAST_RUN_OUTPUT_FILE`. |
+| `--list` | Собрать все тесты и вывести сведения о них, но не запускать их. |
+| `--max-failures <N>` или `-x` | Остановить выполнение после первых `N` ошибок. При передаче `-x` выполнение останавливается после первой ошибки. |
+| `--no-deps` | Не запускать зависимости проектов. |
+| `--output <dir>` | Каталог для выходных артефактов (по умолчанию: "test-results"). |
+| `--only-changed [ref]` | Запускать только файлы тестов, изменённые между 'HEAD' и 'ref'. По умолчанию запускаются тесты для всех незафиксированных изменений. Поддерживается только Git. |
+| `--pass-with-no-tests` | Считать запуск успешным, даже если тесты не найдены. |
+| `--project <project-name...>` | Запускать тесты только из указанного списка проектов; поддерживается подстановочный символ '*' (по умолчанию: запускать все проекты). |
+| `--quiet` | Подавлять стандартный вывод и вывод ошибок (stdio). |
+| `--repeat-each <N>` | Запускать каждый тест `N` раз (по умолчанию: 1). |
+| `--reporter <reporter>` | Используемые репортёры, через запятую; можно указать "dot", "line", "list", "failures" или другие (по умолчанию: "list" локально и "dot" в CI). Также можно передать путь к файлу пользовательского репортёра. |
+| `--retries <retries>` | Максимальное количество повторных попыток для нестабильных тестов; ноль — без повторных попыток (по умолчанию: без повторных попыток). |
+| `--run-agents <mode>` | Запускать агентов для генерации кода для `page.perform`. Возможные значения: "missing", "all" и "none" (по умолчанию: "none"). См. [агенты тестирования](./test-agents.mdx). |
+| `--shard <shard>` | Разделить тесты на части и выполнить только выбранную часть, указанную в формате "current/all", с нумерацией от 1, например "3/5". |
+| `--shuffle [seed]` | Планировать выполнение тестов в случайном порядке: перемешиваются файлы тестов, а в [параллельном режиме](./test-parallel.mdx) — и отдельные тесты. Тесты, которые должны выполняться вместе, например в последовательном наборе, сохраняют свой порядок. Начальное значение генератора случайных чисел выводится в начале запуска; передайте его, чтобы воспроизвести тот же порядок. |
+| `--test-list <file>` | Путь к файлу, содержащему список тестов для запуска. Подробнее см. в разделе [список тестов](#test-list). |
+| `--test-list-invert <file>` | Путь к файлу, содержащему список тестов, которые нужно пропустить. Подробнее см. в разделе [список тестов](#test-list).  |
+| `--timeout <timeout>` | Указать предельное время выполнения теста в миллисекундах; ноль — без ограничений (по умолчанию: 30 секунд). |
+| `--trace <mode>` | Принудительно задать режим трассировки; возможные значения: `on`, `off`, `on-first-retry`, `on-all-retries`, `retain-on-failure`, `retain-on-first-failure`, `retain-on-failure-and-retries`. |
+| `--tsconfig <path>` | Путь к единому файлу tsconfig, применяемому ко всем импортируемым файлам (по умолчанию: искать tsconfig отдельно для каждого импортируемого файла). |
+| `--ui` | Запускать тесты в интерактивном режиме UI. |
+| `--ui-host <host>` | Хост для предоставления UI; при указании этой опции UI открывается во вкладке браузера. |
+| `--ui-port <port>` | Порт для предоставления UI; 0 — любой свободный порт. При указании этой опции UI открывается во вкладке браузера. |
+| `-u` или `--update-snapshots [mode]` | Обновлять снимки фактическими результатами. Возможные значения: "all", "changed", "missing", "none" и "default". При запуске тестов без этого флага по умолчанию используется "default"; при запуске с флагом, но без значения — "changed". |
+| `--update-source-method <method>` | Выбрать способ обновления исходного кода. Возможные значения: "patch" (по умолчанию), "3way" и "overwrite". "Patch" создаёт файл различий в формате unified diff, который можно использовать для последующего обновления исходного кода. "3way" добавляет маркеры конфликтов слияния в исходный код. "Overwrite" перезаписывает исходный код, подставляя новые значения снимков.|
+| `-x` | Остановить выполнение после первой ошибки. |
 
 #### Список тестов {#test-list}
 
@@ -126,7 +130,19 @@ npx playwright test --ui
 # Это файл со списком тестов.
 # В нём могут быть комментарии и пустые строки.
 
-# Полностью квалифицированный тест с проектом:
+# Запустить ВСЕ тесты в файле:
+path/to/example.spec.ts
+
+# Запустить все тесты в файле для определённого проекта:
+[chromium] › path/to/example.spec.ts
+
+# Запустить все тесты в определённой группе/наборе:
+path/to/example.spec.ts › suite name
+
+# Запустить все тесты во вложенной группе:
+path/to/example.spec.ts › outer suite › inner suite
+
+# Полностью квалифицированное имя теста с указанием проекта:
 [chromium] › path/to/example.spec.ts:3:9 › suite › nested suite › example test
 
 # Этот тест включён для всех проектов:
@@ -204,17 +220,20 @@ npx playwright install --with-deps
 
 | Option | Description |
 | :--- | :--- |
-| | `--force` | Принудительно переустановить стабильные каналы браузера |
-| | `--with-deps` | Установить системные зависимости браузера |
-| | `--dry-run` | Не выполнять установку, только вывести информацию |
-| | `--only-shell` | Установить только chromium-headless-shell вместо полного Chromium |
-| | `--no-shell` | Не устанавливать chromium-headless-shell |
+| `--force` | Принудительно переустановить уже установленные браузеры |
+| `--with-deps` | Установить системные зависимости браузеров |
+| `--dry-run` | Не выполнять установку, а только вывести информацию |
+| `--list` | Вывести список браузеров из всех установок Playwright |
+| `--only-shell` | Установить только chromium-headless-shell вместо полной версии Chromium |
+| `--no-shell` | Не устанавливать chromium-headless-shell |
+| `--no-progress` | Не показывать индикаторы хода загрузки |
+| `--no-remove` | Не удалять неиспользуемые браузеры |
 
 #### Параметры установки зависимостей {#install-deps-options}
 
 | Option | Description |
 | :--- | :--- |
-| `--dry-run` | Don't perform installation, just print information |
+| `--dry-run` | Проверяет установку без изменений системы. В Linux имитирует установку через apt-get и возвращает ненулевой код, если требуемые пакеты отсутствуют. Это удобно для автоматических проверок. В Windows выводит команду установки. |
 
 ## Инструменты генерации и отладки {#generation-debugging-tools}
 
@@ -287,7 +306,15 @@ npx playwright show-trace trace/
  
 Прочитать отчёты [blob](./test-reporters#blob-reporter) и объединить их. [Подробнее о merge-reports](./test-sharding.mdx).
 
-#### Синтаксис {#syntax-5}
+При передаче `--port` другие пользователи вашего компьютера могут открыть трассировку на этом порту. При передаче `--host` любой, кто имеет доступ к указанному адресу и порту, может открыть трассировку. Например, при использовании `--host=0.0.0.0` это могут сделать пользователи других компьютеров в вашей сети.
+
+## Специализированные команды
+
+### Объединение отчётов
+
+Чтение и объединение отчётов в формате [blob](./test-reporters#blob-reporter). [Подробнее о merge-reports](./test-sharding.mdx).
+
+#### Синтаксис
 
 ```bash
 npx playwright merge-reports [options] <blob dir>
@@ -304,25 +331,26 @@ npx playwright merge-reports ./reports
 
 | Параметр | Описание |
 | :--- | :--- |
-| `-c, --config <file>` | Файл конфигурации. Может использоваться для указания дополнительной конфигурации для выходного отчёта |
-| | `--reporter <reporter>` | Используемый репортёр, через запятую; может быть "list", "line", "dot", "json", "junit", "null", "github", "html", "blob" (по умолчанию: "list") |
- 
-### Очистка кэша {#clear-cache}
- 
-Очистить все кэши Playwright.
- 
-#### Синтаксис {#syntax-6}
+| `-c, --config <file>` | Файл конфигурации. Можно использовать для указания дополнительной конфигурации выходного отчёта |
+| `--reporter <reporter>` | Используемый репортёр; можно указать несколько через запятую. Допустимые значения: "list", "line", "dot", "failures", "json", "junit", "null", "github", "html", "blob", "perfetto" (по умолчанию: "list" при локальном запуске и "dot" в CI) |
+
+### Очистка кеша
+
+Очистить все кеши Playwright.
+
+#### Синтаксис
 
 ```bash
 npx playwright clear-cache
 ```
 
+Playwright хранит транспилированные тесты в системном временном каталоге. Чтобы выбрать другой каталог, например на общем сервере Linux, задайте переменную окружения `PLAYWRIGHT_TRANSFORM_CACHE_DIR`:
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
+```bash
+PLAYWRIGHT_TRANSFORM_CACHE_DIR=~/.cache/playwright-transform npx playwright test
+```
+
+
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -335,10 +363,11 @@ npx playwright clear-cache
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -357,6 +386,7 @@ npx playwright clear-cache
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -364,9 +394,18 @@ npx playwright clear-cache
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -384,6 +423,7 @@ npx playwright clear-cache
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -396,6 +436,7 @@ npx playwright clear-cache
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -417,6 +458,7 @@ npx playwright clear-cache
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

@@ -133,6 +133,11 @@ export default defineConfig({
 
 Тесты начинаются уже аутентифицированными, потому что мы указали `storageState` в конфигурации.
 
+:::note
+
+Если приложение хранит токены аутентификации в IndexedDB, как Firebase Authentication, при сохранении состояния включите [indexedDB](/api/class-browsercontext.mdx#browser-context-storage-state-option-indexed-db): `await page.context().storageState({ path: authFile, indexedDB: true })`. По умолчанию снимок не содержит IndexedDB.
+:::
+
 ```js title="tests/example.spec.ts"
 import { test } from '@playwright/test';
 
@@ -494,7 +499,7 @@ test('admin and user', async ({ adminPage, userPage }) => {
 
 ### Хранение сессии {#session-storage}
 
-Повторное использование аутентифицированного состояния охватывает аутентификацию на основе [куки](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies), [локального хранилища](https://developer.mozilla.org/en-US/docs/Web/API/Storage) и [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API). Редко [хранилище сессии](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) используется для хранения информации, связанной с состоянием входа. Хранилище сессии специфично для определенного домена и не сохраняется между загрузками страниц. Playwright не предоставляет API для сохранения хранилища сессии, но следующий фрагмент кода может быть использован для сохранения/загрузки хранилища сессии.
+Повторное использование состояния аутентификации поддерживает аутентификацию на основе [файлов cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies), [локального хранилища](https://developer.mozilla.org/en-US/docs/Web/API/Storage), [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) и ключей доступа (passkey, [WebAuthn](https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API)). В редких случаях для хранения информации, связанной с состоянием входа в систему, используется [хранилище сеанса](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage). Хранилище сеанса привязано к определённому домену и не сохраняется между загрузками страниц. Playwright не предоставляет API для сохранения хранилища сеанса, но для его сохранения и загрузки можно использовать следующий фрагмент кода.
 
 ```js
 // Получите хранилище сессии и сохраните как переменную окружения
@@ -526,11 +531,6 @@ test('not signed in test', async ({ page }) => {
 });
 ```
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -543,10 +543,11 @@ test('not signed in test', async ({ page }) => {
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -565,6 +566,7 @@ test('not signed in test', async ({ page }) => {
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -572,9 +574,18 @@ test('not signed in test', async ({ page }) => {
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -592,6 +603,7 @@ test('not signed in test', async ({ page }) => {
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -604,6 +616,7 @@ test('not signed in test', async ({ page }) => {
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -625,4 +638,5 @@ test('not signed in test', async ({ page }) => {
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"

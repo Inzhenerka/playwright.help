@@ -25,6 +25,22 @@ await page.Locator(".result-frame").ContentFrame.GetByRole(AriaRole.Button).Clic
 await page.Locator(".result-frame").First.ContentFrame.getByRole(AriaRole.Button).ClickAsync();
 ```
 
+**Любой фрейм**
+
+Вызов [Page.FrameLocator()](/api/class-page.mdx#page-frame-locator) или [Frame.FrameLocator()](/api/class-frame.mdx#frame-frame-locator) без селектора создаёт локатор фрейма, который начинает поиск в любом фрейме поддерева — так что вам не нужно сначала находить iframe.
+
+```csharp
+// Находит кнопку в любом фрейме на странице:
+await page.FrameLocator().GetByRole(AriaRole.Button).ClickAsync();
+
+// Находит iframe с id "my-frame" в любом месте страницы и нажимает кнопку внутри него:
+await page.FrameLocator().Locator("#my-frame").ContentFrame.GetByRole(AriaRole.Button).ClickAsync();
+```
+
+Это влияет только на начало поиска — оставшаяся часть локатора разрешается внутри одного фрейма, как и у любого другого локатора. В соответствии с приведёнными выше правилами строгости, если соответствующие элементы найдены в нескольких фреймах, возникает ошибка.
+
+Такой локатор фрейма не указывает на конкретный `iframe`, поэтому для него не поддерживаются [FrameLocator.Owner](/api/class-framelocator.mdx#frame-locator-owner), [FrameLocator.First](/api/class-framelocator.mdx#frame-locator-first), [FrameLocator.Last](/api/class-framelocator.mdx#frame-locator-last) и [FrameLocator.Nth()](/api/class-framelocator.mdx#frame-locator-nth).
+
 **Преобразование Locator в FrameLocator**
 
 Если у вас есть объект [Locator], указывающий на `iframe`, его можно преобразовать в [FrameLocator] с помощью [Locator.ContentFrame](/api/class-locator.mdx#locator-content-frame).
@@ -37,7 +53,7 @@ await page.Locator(".result-frame").First.ContentFrame.getByRole(AriaRole.Button
 
 ## Методы {#methods}
 
-### FrameLocator {#frame-locator-frame-locator}
+### FrameLocator {/* #frame-locator-frame-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.17</font><x-search>frameLocator.FrameLocator</x-search>
 
@@ -59,7 +75,7 @@ FrameLocator.FrameLocator(selector);
 
 ---
 
-### GetByAltText {#frame-locator-get-by-alt-text}
+### GetByAltText {/* #frame-locator-get-by-alt-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.GetByAltText</x-search>
 
@@ -91,7 +107,7 @@ await page.GetByAltText("Playwright logo").ClickAsync();
 
 ---
 
-### GetByLabel {#frame-locator-get-by-label}
+### GetByLabel {/* #frame-locator-get-by-label */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.GetByLabel</x-search>
 
@@ -126,7 +142,7 @@ await page.GetByLabel("Password").FillAsync("secret");
 
 ---
 
-### GetByPlaceholder {#frame-locator-get-by-placeholder}
+### GetByPlaceholder {/* #frame-locator-get-by-placeholder */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.GetByPlaceholder</x-search>
 
@@ -162,7 +178,7 @@ await page
 
 ---
 
-### GetByRole {#frame-locator-get-by-role}
+### GetByRole {/* #frame-locator-get-by-role */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.GetByRole</x-search>
 
@@ -208,8 +224,13 @@ await page
     
     Атрибут, который обычно устанавливается с помощью `aria-checked` или нативных `<input type=checkbox>` контролов.
     
-    Узнайте больше о [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
-  - `Disabled` [bool]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-disabled"/><a href="#frame-locator-get-by-role-option-disabled" class="list-anchor">#</a>
+Подробнее об атрибуте [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
+  - `Description|DescriptionRegex` [string]? | [Regex]? *(необязательно)* <font size="2">Добавлено в: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-description"/><a href="#frame-locator-get-by-role-option-description" class="list-anchor">#</a>
+    
+    Параметр для сопоставления с [доступным описанием](https://w3c.github.io/accname/#dfn-accessible-description). По умолчанию сопоставление выполняется без учёта регистра и ищет подстроку. Используйте [Exact](/api/class-framelocator.mdx#frame-locator-get-by-role-option-exact), чтобы управлять этим поведением.
+    
+    Подробнее о [доступном описании](https://w3c.github.io/accname/#dfn-accessible-description).
+  - `Disabled` [bool]? *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-disabled"/><a href="#frame-locator-get-by-role-option-disabled" class="list-anchor">#</a>
     
     Атрибут, который обычно устанавливается с помощью `aria-disabled` или `disabled`.
     
@@ -220,8 +241,8 @@ await page
     
   - `Exact` [bool]? *(опционально)* <font size="2">Добавлено в: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-exact"/><a href="#frame-locator-get-by-role-option-exact" class="list-anchor">#</a>
     
-    Совпадает ли [Name|NameRegex](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) точно: с учетом регистра и всей строки. По умолчанию false. Игнорируется, когда [Name|NameRegex](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) является регулярным выражением. Обратите внимание, что точное совпадение все равно обрезает пробелы.
-  - `Expanded` [bool]? *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-expanded"/><a href="#frame-locator-get-by-role-option-expanded" class="list-anchor">#</a>
+Определяет, должны ли [Name|NameRegex](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) и [Description|DescriptionRegex](/api/class-framelocator.mdx#frame-locator-get-by-role-option-description) совпадать точно: с учётом регистра и по всей строке. По умолчанию — false. Игнорируется, если значение является регулярным выражением. Обратите внимание, что даже при точном сопоставлении пробельные символы по краям строки удаляются.
+  - `Expanded` [bool]? *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-expanded"/><a href="#frame-locator-get-by-role-option-expanded" class="list-anchor">#</a>
     
     Атрибут, который обычно устанавливается с помощью `aria-expanded`.
     
@@ -263,7 +284,7 @@ await page
 
 ---
 
-### GetByTestId {#frame-locator-get-by-test-id}
+### GetByTestId {/* #frame-locator-get-by-test-id */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.GetByTestId</x-search>
 
@@ -297,7 +318,7 @@ await page.GetByTestId("directions").ClickAsync();
 
 ---
 
-### GetByText {#frame-locator-get-by-text}
+### GetByText {/* #frame-locator-get-by-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.GetByText</x-search>
 
@@ -353,7 +374,7 @@ page.GetByText(new Regex("^hello$", RegexOptions.IgnoreCase));
 
 ---
 
-### GetByTitle {#frame-locator-get-by-title}
+### GetByTitle {/* #frame-locator-get-by-title */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.GetByTitle</x-search>
 
@@ -387,7 +408,7 @@ await Expect(Page.GetByTitle("Issues count")).toHaveText("25 issues");
 
 ---
 
-### Locator {#frame-locator-locator}
+### Locator {/* #frame-locator-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.17</font><x-search>frameLocator.Locator</x-search>
 
@@ -430,7 +451,7 @@ FrameLocator.Locator(selectorOrLocator, options);
 
 ---
 
-### Owner {#frame-locator-owner}
+### Owner {/* #frame-locator-owner */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.43</font><x-search>frameLocator.Owner</x-search>
 
@@ -456,11 +477,11 @@ await Expect(locator).ToBeVisibleAsync();
 
 ## Устаревшие {#deprecated}
 
-### First {#frame-locator-first}
+### First {/* #frame-locator-first */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.17</font><x-search>frameLocator.First</x-search>
 
-:::warning Устарело
+:::warning[Устарело]
 
 Используйте [Locator.First](/api/class-locator.mdx#locator-first), а затем [Locator.ContentFrame](/api/class-locator.mdx#locator-content-frame) вместо этого.
 
@@ -479,11 +500,11 @@ FrameLocator.First
 
 ---
 
-### Last {#frame-locator-last}
+### Last {/* #frame-locator-last */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.17</font><x-search>frameLocator.Last</x-search>
 
-:::warning Устарело
+:::warning[Устарело]
 
 Используйте [Locator.Last](/api/class-locator.mdx#locator-last), а затем [Locator.ContentFrame](/api/class-locator.mdx#locator-content-frame) вместо этого.
 
@@ -502,11 +523,11 @@ FrameLocator.Last
 
 ---
 
-### Nth {#frame-locator-nth}
+### Nth {/* #frame-locator-nth */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.17</font><x-search>frameLocator.Nth</x-search>
 
-:::warning Устарело
+:::warning[Устарело]
 
 Используйте [Locator.Nth()](/api/class-locator.mdx#locator-nth), а затем [Locator.ContentFrame](/api/class-locator.mdx#locator-content-frame) вместо этого.
 
@@ -538,6 +559,8 @@ FrameLocator.Nth(index);
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -557,15 +580,18 @@ FrameLocator.Nth(index);
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

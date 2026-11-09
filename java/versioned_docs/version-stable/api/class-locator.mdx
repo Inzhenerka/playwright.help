@@ -16,7 +16,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Методы {#methods}
 
-### all {#locator-all}
+### all {/* #locator-all */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.29</font><x-search>locator.all</x-search>
 
@@ -43,7 +43,7 @@ for (Locator li : page.getByRole("listitem").all())
 
 ---
 
-### allInnerTexts {#locator-all-inner-texts}
+### allInnerTexts {/* #locator-all-inner-texts */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.allInnerTexts</x-search>
 
@@ -57,7 +57,7 @@ for (Locator li : page.getByRole("listitem").all())
 **Использование**
 
 ```java
-String[] texts = page.getByRole(AriaRole.LINK).allInnerTexts();
+List<String> texts = page.getByRole(AriaRole.LINK).allInnerTexts();
 ```
 
 **Возвращает**
@@ -65,7 +65,7 @@ String[] texts = page.getByRole(AriaRole.LINK).allInnerTexts();
 
 ---
 
-### allTextContents {#locator-all-text-contents}
+### allTextContents {/* #locator-all-text-contents */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.allTextContents</x-search>
 
@@ -79,7 +79,7 @@ String[] texts = page.getByRole(AriaRole.LINK).allInnerTexts();
 **Использование**
 
 ```java
-String[] texts = page.getByRole(AriaRole.LINK).allTextContents();
+List<String> texts = page.getByRole(AriaRole.LINK).allTextContents();
 ```
 
 **Возвращает**
@@ -87,7 +87,7 @@ String[] texts = page.getByRole(AriaRole.LINK).allTextContents();
 
 ---
 
-### and {#locator-and}
+### and {/* #locator-and */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.34</font><x-search>locator.and</x-search>
 
@@ -111,7 +111,7 @@ Locator button = page.getByRole(AriaRole.BUTTON).and(page.getByTitle("Subscribe"
 
 ---
 
-### ariaSnapshot {#locator-aria-snapshot}
+### ariaSnapshot {/* #locator-aria-snapshot */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.49</font><x-search>locator.ariaSnapshot</x-search>
 
@@ -124,8 +124,17 @@ page.getByRole(AriaRole.LINK).ariaSnapshot();
 ```
 
 **Аргументы**
-- `options` `Locator.AriaSnapshotOptions` *(опционально)*
-  - `setTimeout` [double] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-option-timeout"/><a href="#locator-aria-snapshot-option-timeout" class="list-anchor">#</a>
+- `options` `Locator.AriaSnapshotOptions` *(необязательный)*
+  - `setBoxes` [boolean] *(необязательный)* <font size="2">Добавлено в: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-option-boxes"/><a href="#locator-aria-snapshot-option-boxes" class="list-anchor">#</a>
+    
+    Если установлено значение `true`, в снимок добавляется ограничивающий прямоугольник каждого элемента в формате `[box=x,y,width,height]`. Координаты задаются относительно области просмотра в CSS-пикселях, как в значении, возвращаемом [`Element.getBoundingClientRect()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect). По умолчанию — `false`.
+  - `setDepth` [int] *(необязательный)* <font size="2">Добавлено в: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-option-depth"/><a href="#locator-aria-snapshot-option-depth" class="list-anchor">#</a>
+    
+    Если указано, ограничивает глубину снимка.
+  - `setMode` `enum AriaSnapshotMode { AI, DEFAULT }` *(необязательный)* <font size="2">Добавлено в: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-option-mode"/><a href="#locator-aria-snapshot-option-mode" class="list-anchor">#</a>
+    
+    Если установлено значение `"ai"`, возвращает снимок, оптимизированный для обработки искусственным интеллектом. По умолчанию — `"default"`. Дополнительную информацию см. в подробном описании.
+  - `setTimeout` [double] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-option-timeout"/><a href="#locator-aria-snapshot-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
@@ -158,9 +167,16 @@ page.getByRole(AriaRole.LINK).ariaSnapshot();
     - link "About"
 ```
 
+Снимок, оптимизированный для ИИ и управляемый параметром [setMode](/api/class-locator.mdx#locator-aria-snapshot-option-mode), отличается от снимка по умолчанию:
+
+1. Включает идентификаторы элементов, например `[ref=e2]`.
+2. Не ждёт появления элемента, соответствующего локатору, и выбрасывает исключение, если совпадений нет.
+3. Включает снимки `<iframe>` внутри целевого элемента.
+4. Может опускать имена, которые повторяют содержимое дочерних элементов в снимке, например имя заголовка со ссылкой. Имена диалогов, ориентиров, групп, таблиц и заголовков таблиц сохраняются.
+
 ---
 
-### blur {#locator-blur}
+### blur {/* #locator-blur */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.28</font><x-search>locator.blur</x-search>
 
@@ -184,7 +200,7 @@ Locator.blur(options);
 
 ---
 
-### boundingBox {#locator-bounding-box}
+### boundingBox {/* #locator-bounding-box */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.boundingBox</x-search>
 
@@ -228,7 +244,7 @@ page.mouse().click(box.x + box.width / 2, box.y + box.height / 2);
 
 ---
 
-### check {#locator-check}
+### check {/* #locator-check */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.check</x-search>
 
@@ -260,8 +276,11 @@ page.getByRole(AriaRole.CHECKBOX).check();
     - `setY` [double]
       
       
-    Точка для использования относительно верхнего левого угла элемента. Если не указано, используется видимая точка элемента.
-  - `setTimeout` [double] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-check-option-timeout"/><a href="#locator-check-option-timeout" class="list-anchor">#</a>
+Точка относительно верхнего левого угла области элемента, включающей внутренние отступы (padding box). Если не указана, используется какая-либо видимая точка элемента.
+  - `setScroll` `enum ScrollMode { AUTO, NONE }` *(необязательно)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-check-option-scroll"/><a href="#locator-check-option-scroll" class="list-anchor">#</a>
+    
+    Определяет, прокручивает ли Playwright страницу, чтобы сделать элемент видимым, перед выполнением действия. По умолчанию используется значение `"auto"`: при необходимости выполняется прокрутка, чтобы сделать элемент видимым, в том числе прокрутка вложенных прокручиваемых контейнеров. При значении `"none"` Playwright не выполняет прокрутку, и действие завершается ошибкой, если элемент ещё не находится в области просмотра. Это полезно для проверки того, что элемент доступен пользователю без дополнительной прокрутки.
+  - `setTimeout` [double] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-check-option-timeout"/><a href="#locator-check-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
   - `setTrial` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-check-option-trial"/><a href="#locator-check-option-trial" class="list-anchor">#</a>
@@ -286,7 +305,7 @@ page.getByRole(AriaRole.CHECKBOX).check();
 
 ---
 
-### clear {#locator-clear}
+### clear {/* #locator-clear */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.28</font><x-search>locator.clear</x-search>
 
@@ -326,7 +345,7 @@ page.getByRole(AriaRole.TEXTBOX).clear();
 
 ---
 
-### click {#locator-click}
+### click {/* #locator-click */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.click</x-search>
 
@@ -381,8 +400,11 @@ page.locator("canvas").click(new Locator.ClickOptions()
     - `setY` [double]
       
       
-     Точка, используемая относительно верхнего левого угла области отступов (padding box) элемента. Если не указано, используется какая‑то видимая точка элемента.
-  - `setSteps` [int] (опционально) <font size="2">Добавлено в: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-click-option-steps"/><a href="#locator-click-option-steps" class="list-anchor">#</a>
+Точка относительно верхнего левого угла области элемента, включающей внутренние отступы (padding box). Если не указана, используется одна из видимых точек элемента.
+  - `setScroll` `enum ScrollMode { AUTO, NONE }` *(необязательно)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-click-option-scroll"/><a href="#locator-click-option-scroll" class="list-anchor">#</a>
+    
+    Определяет, прокручивает ли Playwright страницу, чтобы элемент оказался в области просмотра, перед выполнением действия. По умолчанию используется значение `"auto"`, при котором элемент при необходимости прокручивается в область просмотра, в том числе с прокруткой вложенных прокручиваемых контейнеров. Если установлено значение `"none"`, Playwright не выполняет прокрутку, и действие завершается ошибкой, если элемент ещё не находится в области просмотра. Это полезно для проверки того, что элемент доступен пользователю без дополнительной прокрутки.
+  - `setSteps` [int] *(необязательно)* <font size="2">Добавлено в: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-click-option-steps"/><a href="#locator-click-option-steps" class="list-anchor">#</a>
     
      По умолчанию — 1. Отправляет `n` интерполированных событий `mousemove`, чтобы представить перемещение между текущей позицией курсора Playwright и указанной точкой назначения. При значении 1 генерируется одно событие `mousemove` в точке назначения.
   - `setTimeout` [double] (опционально)<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-click-option-timeout"/><a href="#locator-click-option-timeout" class="list-anchor">#</a>
@@ -409,7 +431,7 @@ page.locator("canvas").click(new Locator.ClickOptions()
 
 ---
 
-### contentFrame {#locator-content-frame}
+### contentFrame {/* #locator-content-frame */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.43</font><x-search>locator.contentFrame</x-search>
 
@@ -433,7 +455,7 @@ frameLocator.getByRole(AriaRole.BUTTON).click();
 
 ---
 
-### count {#locator-count}
+### count {/* #locator-count */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.count</x-search>
 
@@ -455,7 +477,7 @@ int count = page.getByRole(AriaRole.LISTITEM).count();
 
 ---
 
-### dblclick {#locator-dblclick}
+### dblclick {/* #locator-dblclick */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.dblclick</x-search>
 
@@ -497,8 +519,11 @@ Locator.dblclick(options);
     - `setY` [double]
       
       
-     Точка, используемая относительно верхнего левого угла области отступов (padding box) элемента. Если не указано, используется какая‑то видимая точка элемента.
-  - `setSteps` [int] (опционально) <font size="2">Добавлено в: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-dblclick-option-steps"/><a href="#locator-dblclick-option-steps" class="list-anchor">#</a>
+Точка относительно верхнего левого угла области элемента, включающей внутренние отступы (padding box). Если не указана, используется какая-либо видимая точка элемента.
+  - `setScroll` `enum ScrollMode { AUTO, NONE }` *(необязательно)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-dblclick-option-scroll"/><a href="#locator-dblclick-option-scroll" class="list-anchor">#</a>
+    
+    Определяет, прокручивает ли Playwright страницу, чтобы элемент оказался в области просмотра перед выполнением действия. По умолчанию используется значение `"auto"`, при котором элемент при необходимости прокручивается в область просмотра, в том числе за счёт прокрутки вложенных прокручиваемых контейнеров. При значении `"none"` Playwright не выполняет прокрутку к элементу, и действие завершается ошибкой, если элемент ещё не находится в области просмотра. Это полезно для проверки того, что элемент доступен пользователю без дополнительной прокрутки.
+  - `setSteps` [int] *(необязательно)* <font size="2">Добавлено в: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-dblclick-option-steps"/><a href="#locator-dblclick-option-steps" class="list-anchor">#</a>
     
      По умолчанию — 1. Отправляет `n` интерполированных событий `mousemove`, чтобы представить перемещение между текущей позицией курсора Playwright и указанной точкой назначения. При значении 1 генерируется одно событие `mousemove` в точке назначения.
   - `setTimeout` [double] (опционально)<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-dblclick-option-timeout"/><a href="#locator-dblclick-option-timeout" class="list-anchor">#</a>
@@ -529,7 +554,7 @@ Locator.dblclick(options);
 
 ---
 
-### describe {#locator-describe}
+### describe {/* #locator-describe */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.53</font><x-search>locator.describe</x-search>
 
@@ -552,11 +577,11 @@ button.click();
 
 ---
 
-### description {#locator-description}
+### description {/* #locator-description */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.57</font><x-search>locator.description</x-search>
 
-Возвращает описание локатора, ранее заданное с помощью [Locator.describe()](/api/class-locator.mdx#locator-describe). Возвращает `null`, если пользовательское описание не было задано. Для человекочитаемого представления предпочтительнее использовать `Locator.toString()`, поскольку он использует описание, если оно доступно.
+Возвращает описание локатора, ранее заданное с помощью [Locator.describe()](/api/class-locator.mdx#locator-describe). Возвращает `null`, если пользовательское описание не было задано.
 
 **Использование**
 
@@ -573,7 +598,7 @@ System.out.println(input.description()); // null
 
 ---
 
-### dispatchEvent {#locator-dispatch-event}
+### dispatchEvent {/* #locator-dispatch-event */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.dispatchEvent</x-search>
 
@@ -629,7 +654,7 @@ locator.dispatchEvent("dragstart", arg);
 
 ---
 
-### dragTo {#locator-drag-to}
+### dragTo {/* #locator-drag-to */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.18</font><x-search>locator.dragTo</x-search>
 
@@ -662,8 +687,11 @@ source.dragTo(target, new Locator.DragToOptions()
     :::
     
     
-    Эта опция не имеет эффекта.
-  - `setSourcePosition` SourcePosition *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drag-to-option-source-position"/><a href="#locator-drag-to-option-source-position" class="list-anchor">#</a>
+Этот параметр не оказывает никакого влияния.
+  - `setScroll` `enum ScrollMode { AUTO, NONE }` *(необязательный)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drag-to-option-scroll"/><a href="#locator-drag-to-option-scroll" class="list-anchor">#</a>
+    
+    Определяет, будет ли Playwright прокручивать страницу, чтобы элемент оказался в области просмотра, перед выполнением действия. По умолчанию используется значение `"auto"`: при необходимости элемент прокручивается в область просмотра, в том числе за счёт прокрутки вложенных прокручиваемых контейнеров. При значении `"none"` Playwright не выполняет прокрутку, и действие завершается ошибкой, если элемент ещё не находится в области просмотра. Это полезно для проверки того, что элемент доступен пользователю без дополнительной прокрутки.
+  - `setSourcePosition` SourcePosition *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drag-to-option-source-position"/><a href="#locator-drag-to-option-source-position" class="list-anchor">#</a>
     - `setX` [double]
       
       
@@ -698,7 +726,61 @@ source.dragTo(target, new Locator.DragToOptions()
 
 ---
 
-### evaluate {#locator-evaluate}
+### drop {/* #locator-drop */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.60</font><x-search>locator.drop</x-search>
+
+Имитирует внешнее перетаскивание файлов или данных, подобных содержимому буфера обмена, на элемент, соответствующий этому локатору.
+
+**Использование**
+
+Перетащить буфер с содержимым файла в область загрузки:
+
+Перетащить обычный текст и URL вместе:
+
+**Аргументы**
+- `payload` Payload<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drop-option-payload"/><a href="#locator-drop-option-payload" class="list-anchor">#</a>
+  - `setFiles` [Path] | [Path]&#91;&#93; | Files | Files&#91;&#93; *(optional)*
+    - `setName` [String]
+      
+      Имя файла
+    - `setMimeType` [String]
+      
+      Тип файла
+    - `setBuffer` [byte&#91;&#93;]
+      
+      Содержимое файла
+    
+    
+  - `setData` [Map]&lt;[String], [String]&gt; *(optional)*
+    
+    
+  Данные для перетаскивания на целевой элемент. Укажите `files` (пути к файлам или буферы в памяти), `data` (отображение MIME-тип → строка для содержимого, подобного данным буфера обмена, например `text/plain`, `text/html`, `text/uri-list`), или оба параметра.
+- `options` `Locator.DropOptions` *(optional)*
+  - `setPosition` Position *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drop-option-position"/><a href="#locator-drop-option-position" class="list-anchor">#</a>
+    - `setX` [double]
+      
+      
+    - `setY` [double]
+      
+      
+    Точка относительно верхнего левого угла области элемента, включающей внутренние отступы. Если не указана, используется некоторая видимая точка элемента.
+  - `setTimeout` [double] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drop-option-timeout"/><a href="#locator-drop-option-timeout" class="list-anchor">#</a>
+    
+    Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить с помощью методов [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+
+**Возвращаемое значение**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drop-return"/><a href="#locator-drop-return" class="list-anchor">#</a>
+
+**Подробности**
+
+Отправляет нативные события `dragenter`, `dragover` и `drop` в центре целевого элемента с синтетическим объектом [DataTransfer], содержащим предоставленные файлы и/или записи данных. Работает во всех браузерах благодаря созданию [DataTransfer] в контексте страницы.
+
+Если обработчик `dragover` целевого элемента не вызывает `preventDefault()`, считается, что целевой элемент отклонил перетаскивание: Playwright отправляет `dragleave` и этот метод выбрасывает исключение.
+
+---
+
+### evaluate {/* #locator-evaluate */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.evaluate</x-search>
 
@@ -740,7 +822,7 @@ System.out.println(result); // prints "myId text 56"
 
 ---
 
-### evaluateAll {#locator-evaluate-all}
+### evaluateAll {/* #locator-evaluate-all */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.evaluateAll</x-search>
 
@@ -774,7 +856,7 @@ boolean moreThanTen = (boolean) locator.evaluateAll("(divs, min) => divs.length 
 
 ---
 
-### evaluateHandle {#locator-evaluate-handle}
+### evaluateHandle {/* #locator-evaluate-handle */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.evaluateHandle</x-search>
 
@@ -816,7 +898,7 @@ Locator.evaluateHandle(expression, arg, options);
 
 ---
 
-### fill {#locator-fill}
+### fill {/* #locator-fill */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.fill</x-search>
 
@@ -861,7 +943,7 @@ page.getByRole(AriaRole.TEXTBOX).fill("example value");
 
 ---
 
-### filter {#locator-filter}
+### filter {/* #locator-filter */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.22</font><x-search>locator.filter</x-search>
 
@@ -902,14 +984,14 @@ rowLocator
     Соответствует элементам, содержащим указанный текст где-либо внутри, возможно, в дочернем или потомке элемента. При передаче [string] сопоставление нечувствительно к регистру и ищет подстроку. Например, `"Playwright"` соответствует `<article><div>Playwright</div></article>`.
   - `setVisible` [boolean] *(опционально)* <font size="2">Добавлено в: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-option-visible"/><a href="#locator-filter-option-visible" class="list-anchor">#</a>
     
-    Соответствует только видимым или невидимым элементам.
+Соответствует только видимым или только невидимым элементам. Для поиска только видимых элементов предпочтительно использовать сокращённый метод [Locator.visible()](/api/class-locator.mdx#locator-visible).
 
 **Возвращает**
 - [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-return"/><a href="#locator-filter-return" class="list-anchor">#</a>
 
 ---
 
-### first {#locator-first}
+### first {/* #locator-first */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.first</x-search>
 
@@ -926,7 +1008,7 @@ Locator.first();
 
 ---
 
-### focus {#locator-focus}
+### focus {/* #locator-focus */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.focus</x-search>
 
@@ -950,7 +1032,7 @@ Locator.focus(options);
 
 ---
 
-### frameLocator {#locator-frame-locator}
+### frameLocator {/* #locator-frame-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.17</font><x-search>locator.frameLocator</x-search>
 
@@ -973,7 +1055,7 @@ locator.click();
 
 ---
 
-### getAttribute {#locator-get-attribute}
+### getAttribute {/* #locator-get-attribute */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.getAttribute</x-search>
 
@@ -1005,7 +1087,7 @@ Locator.getAttribute(name, options);
 
 ---
 
-### getByAltText {#locator-get-by-alt-text}
+### getByAltText {/* #locator-get-by-alt-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>locator.getByAltText</x-search>
 
@@ -1037,7 +1119,7 @@ page.getByAltText("Playwright logo").click();
 
 ---
 
-### getByLabel {#locator-get-by-label}
+### getByLabel {/* #locator-get-by-label */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>locator.getByLabel</x-search>
 
@@ -1072,7 +1154,7 @@ page.getByLabel("Password").fill("secret");
 
 ---
 
-### getByPlaceholder {#locator-get-by-placeholder}
+### getByPlaceholder {/* #locator-get-by-placeholder */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>locator.getByPlaceholder</x-search>
 
@@ -1106,7 +1188,7 @@ page.getByPlaceholder("name@example.com").fill("playwright@microsoft.com");
 
 ---
 
-### getByRole {#locator-get-by-role}
+### getByRole {/* #locator-get-by-role */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>locator.getByRole</x-search>
 
@@ -1152,8 +1234,13 @@ page.getByRole(AriaRole.BUTTON,
     
     Атрибут, который обычно устанавливается с помощью `aria-checked` или нативных `<input type=checkbox>` контролов.
     
-    Узнайте больше о [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
-  - `setDisabled` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-role-option-disabled"/><a href="#locator-get-by-role-option-disabled" class="list-anchor">#</a>
+Подробнее об [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
+  - `setDescription` [String] | [Pattern] *(необязательно)* <font size="2">Добавлено в: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-role-option-description"/><a href="#locator-get-by-role-option-description" class="list-anchor">#</a>
+    
+    Параметр для сопоставления с [доступным описанием](https://w3c.github.io/accname/#dfn-accessible-description). По умолчанию сопоставление выполняется без учёта регистра и ищет подстроку; используйте [setExact](/api/class-locator.mdx#locator-get-by-role-option-exact), чтобы управлять этим поведением.
+    
+    Подробнее о [доступном описании](https://w3c.github.io/accname/#dfn-accessible-description).
+  - `setDisabled` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-role-option-disabled"/><a href="#locator-get-by-role-option-disabled" class="list-anchor">#</a>
     
     Атрибут, который обычно устанавливается с помощью `aria-disabled` или `disabled`.
     
@@ -1164,8 +1251,8 @@ page.getByRole(AriaRole.BUTTON,
     
   - `setExact` [boolean] *(опционально)* <font size="2">Добавлено в: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-role-option-exact"/><a href="#locator-get-by-role-option-exact" class="list-anchor">#</a>
     
-    Совпадает ли [setName](/api/class-locator.mdx#locator-get-by-role-option-name) точно: с учетом регистра и всей строки. По умолчанию false. Игнорируется, когда [setName](/api/class-locator.mdx#locator-get-by-role-option-name) является регулярным выражением. Обратите внимание, что точное совпадение все равно обрезает пробелы.
-  - `setExpanded` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-role-option-expanded"/><a href="#locator-get-by-role-option-expanded" class="list-anchor">#</a>
+Определяет, требуется ли точное совпадение для [setName](/api/class-locator.mdx#locator-get-by-role-option-name) и [setDescription](/api/class-locator.mdx#locator-get-by-role-option-description): с учётом регистра и по всей строке. По умолчанию — false. Игнорируется, если значение является регулярным выражением. Обратите внимание, что даже при точном совпадении пробельные символы в начале и конце строки удаляются.
+  - `setExpanded` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-role-option-expanded"/><a href="#locator-get-by-role-option-expanded" class="list-anchor">#</a>
     
     Атрибут, который обычно устанавливается с помощью `aria-expanded`.
     
@@ -1207,7 +1294,7 @@ page.getByRole(AriaRole.BUTTON,
 
 ---
 
-### getByTestId {#locator-get-by-test-id}
+### getByTestId {/* #locator-get-by-test-id */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>locator.getByTestId</x-search>
 
@@ -1241,7 +1328,7 @@ page.getByTestId("directions").click();
 
 ---
 
-### getByText {#locator-get-by-text}
+### getByText {/* #locator-get-by-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>locator.getByText</x-search>
 
@@ -1297,7 +1384,7 @@ page.getByText(Pattern.compile("^hello$", Pattern.CASE_INSENSITIVE));
 
 ---
 
-### getByTitle {#locator-get-by-title}
+### getByTitle {/* #locator-get-by-title */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>locator.getByTitle</x-search>
 
@@ -1331,7 +1418,24 @@ assertThat(page.getByTitle("Issues count")).hasText("25 issues");
 
 ---
 
-### highlight {#locator-highlight}
+### hideHighlight {/* #locator-hide-highlight */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.60</font><x-search>locator.hideHighlight</x-search>
+
+Скрывает подсветку элемента, ранее добавленную с помощью [Locator.highlight()](/api/class-locator.mdx#locator-highlight).
+
+**Использование**
+
+```java
+Locator.hideHighlight();
+```
+
+**Возвращаемое значение**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hide-highlight-return"/><a href="#locator-hide-highlight-return" class="list-anchor">#</a>
+
+---
+
+### highlight {/* #locator-highlight */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.20</font><x-search>locator.highlight</x-search>
 
@@ -1341,14 +1445,21 @@ assertThat(page.getByTitle("Issues count")).hasText("25 issues");
 
 ```java
 Locator.highlight();
+Locator.highlight(options);
 ```
 
+**Аргументы**
+- `options` `Locator.HighlightOptions` *(необязательно)*
+  - `setStyle` [String] *(необязательно)* <font size="2">Добавлено в: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-highlight-option-style"/><a href="#locator-highlight-option-style" class="list-anchor">#</a>
+    
+    Дополнительные встроенные CSS-стили, применяемые к слою подсветки, например `"outline: 2px dashed red"`.
+
 **Возвращает**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-highlight-return"/><a href="#locator-highlight-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-highlight-return"/><a href="#locator-highlight-return" class="list-anchor">#</a>
 
 ---
 
-### hover {#locator-hover}
+### hover {/* #locator-hover */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.hover</x-search>
 
@@ -1383,8 +1494,11 @@ page.getByRole(AriaRole.LINK).hover();
     - `setY` [double]
       
       
-    Точка для использования относительно верхнего левого угла элемента. Если не указано, используется видимая точка элемента.
-  - `setTimeout` [double] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-timeout"/><a href="#locator-hover-option-timeout" class="list-anchor">#</a>
+Точка относительно верхнего левого угла области элемента, включающей внутренние отступы (padding box). Если не указана, используется какая-либо видимая точка элемента.
+  - `setScroll` `enum ScrollMode { AUTO, NONE }` *(необязательно)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-scroll"/><a href="#locator-hover-option-scroll" class="list-anchor">#</a>
+    
+    Определяет, будет ли Playwright прокручивать страницу, чтобы элемент оказался в области просмотра перед выполнением действия. По умолчанию используется значение `"auto"`: при необходимости элемент прокручивается в область просмотра, в том числе за счёт прокрутки вложенных прокручиваемых контейнеров. Если установлено значение `"none"`, Playwright не выполняет прокрутку, и действие завершается ошибкой, если элемент ещё не находится в области просмотра. Это полезно для проверки того, что элемент доступен пользователю без дополнительной прокрутки.
+  - `setTimeout` [double] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-timeout"/><a href="#locator-hover-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
   - `setTrial` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-trial"/><a href="#locator-hover-option-trial" class="list-anchor">#</a>
@@ -1407,7 +1521,7 @@ page.getByRole(AriaRole.LINK).hover();
 
 ---
 
-### innerHTML {#locator-inner-html}
+### innerHTML {/* #locator-inner-html */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.innerHTML</x-search>
 
@@ -1431,7 +1545,7 @@ Locator.innerHTML(options);
 
 ---
 
-### innerText {#locator-inner-text}
+### innerText {/* #locator-inner-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.innerText</x-search>
 
@@ -1460,7 +1574,7 @@ Locator.innerText(options);
 
 ---
 
-### inputValue {#locator-input-value}
+### inputValue {/* #locator-input-value */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.inputValue</x-search>
 
@@ -1492,7 +1606,7 @@ String value = page.getByRole(AriaRole.TEXTBOX).inputValue();
 
 ---
 
-### isChecked {#locator-is-checked}
+### isChecked {/* #locator-is-checked */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.isChecked</x-search>
 
@@ -1520,7 +1634,7 @@ boolean checked = page.getByRole(AriaRole.CHECKBOX).isChecked();
 
 ---
 
-### isDisabled {#locator-is-disabled}
+### isDisabled {/* #locator-is-disabled */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.isDisabled</x-search>
 
@@ -1548,7 +1662,7 @@ boolean disabled = page.getByRole(AriaRole.BUTTON).isDisabled();
 
 ---
 
-### isEditable {#locator-is-editable}
+### isEditable {/* #locator-is-editable */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.isEditable</x-search>
 
@@ -1576,7 +1690,7 @@ boolean editable = page.getByRole(AriaRole.TEXTBOX).isEditable();
 
 ---
 
-### isEnabled {#locator-is-enabled}
+### isEnabled {/* #locator-is-enabled */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.isEnabled</x-search>
 
@@ -1604,7 +1718,7 @@ boolean enabled = page.getByRole(AriaRole.BUTTON).isEnabled();
 
 ---
 
-### isHidden {#locator-is-hidden}
+### isHidden {/* #locator-is-hidden */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.isHidden</x-search>
 
@@ -1635,7 +1749,7 @@ boolean hidden = page.getByRole(AriaRole.BUTTON).isHidden();
 
 ---
 
-### isVisible {#locator-is-visible}
+### isVisible {/* #locator-is-visible */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.isVisible</x-search>
 
@@ -1666,7 +1780,7 @@ boolean visible = page.getByRole(AriaRole.BUTTON).isVisible();
 
 ---
 
-### last {#locator-last}
+### last {/* #locator-last */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.last</x-search>
 
@@ -1683,7 +1797,7 @@ Locator banana = page.getByRole(AriaRole.LISTITEM).last();
 
 ---
 
-### locator {#locator-locator}
+### locator {/* #locator-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.locator</x-search>
 
@@ -1727,7 +1841,36 @@ Locator.locator(selectorOrLocator, options);
 
 ---
 
-### nth {#locator-nth}
+### normalize {/* #locator-normalize */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.59</font><x-search>locator.normalize</x-search>
+
+Возвращает новый локатор, использующий рекомендуемые подходы к поиску соответствующего элемента, отдавая предпочтение тестовым идентификаторам, ролям ARIA и другим атрибутам, видимым пользователю, перед CSS-селекторами. Это полезно для преобразования селекторов, зависящих от деталей реализации, в более устойчивые, удобочитаемые локаторы.
+
+**Использование**
+
+Агент может выбрать элемент по идентификатору из снимка [Page.ariaSnapshot()](/api/class-page.mdx#page-aria-snapshot), полученного в режиме `"ai"`. Идентификаторы действуют только для последнего снимка. Вызовите `normalize()` у локатора, полученного по идентификатору, затем преобразуйте результат в строку, чтобы получить код устойчивого локатора на вашем языке, как это делает `codegen`.
+
+Рассмотрим следующий снимок aria.
+
+```yaml
+- button "Submit" [ref=e2]
+```
+
+Идентификатор элемента можно преобразовать в код локатора:
+
+```java
+Locator normalized = page.getByRef("e2").normalize();
+System.out.println(normalized.toString());
+// getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Submit"))
+```
+
+**Возвращаемое значение**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-normalize-return"/><a href="#locator-normalize-return" class="list-anchor">#</a>
+
+---
+
+### nth {/* #locator-nth */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.nth</x-search>
 
@@ -1747,7 +1890,7 @@ Locator banana = page.getByRole(AriaRole.LISTITEM).nth(2);
 
 ---
 
-### or {#locator-or}
+### or {/* #locator-or */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.33</font><x-search>locator.or</x-search>
 
@@ -1783,7 +1926,7 @@ newEmail.click();
 
 ---
 
-### page {#locator-page}
+### page {/* #locator-page */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.19</font><x-search>locator.page</x-search>
 
@@ -1800,7 +1943,7 @@ Locator.page();
 
 ---
 
-### press {#locator-press}
+### press {/* #locator-press */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.press</x-search>
 
@@ -1853,7 +1996,7 @@ page.getByRole(AriaRole.TEXTBOX).press("Backspace");
 
 ---
 
-### pressSequentially {#locator-press-sequentially}
+### pressSequentially {/* #locator-press-sequentially */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.38</font><x-search>locator.pressSequentially</x-search>
 
@@ -1906,7 +2049,7 @@ locator.press("Enter");
 
 ---
 
-### screenshot {#locator-screenshot}
+### screenshot {/* #locator-screenshot */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.screenshot</x-search>
 
@@ -1952,8 +2095,8 @@ page.getByRole(AriaRole.LINK).screenshot(new Locator.ScreenshotOptions()
     Путь к файлу для сохранения изображения. Тип скриншота будет определен по расширению файла. Если [setPath](/api/class-locator.mdx#locator-screenshot-option-path) является относительным путем, то он разрешается относительно текущей рабочей директории. Если путь не указан, изображение не будет сохранено на диск.
   - `setQuality` [int] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-quality"/><a href="#locator-screenshot-option-quality" class="list-anchor">#</a>
     
-    Качество изображения, от 0 до 100. Не применимо к изображениям `png`.
-  - `setScale` `enum ScreenshotScale { CSS, DEVICE }` *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-scale"/><a href="#locator-screenshot-option-scale" class="list-anchor">#</a>
+Качество изображения в диапазоне от 0 до 100. Не применяется к изображениям в формате `png`. Для `jpeg` значение по умолчанию — `80`. Для `webp` качество `100` (значение по умолчанию) позволяет получить изображение без потерь, а при более низких значениях используется сжатие с потерями.
+  - `setScale` `enum ScreenshotScale { CSS, DEVICE }` *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-scale"/><a href="#locator-screenshot-option-scale" class="list-anchor">#</a>
     
     При установке в `"css"`, скриншот будет иметь один пиксель на каждый css пиксель на странице. Для устройств с высоким разрешением это позволит сохранить скриншоты небольшими. Использование опции `"device"` создаст один пиксель на каждый пиксель устройства, так что скриншоты устройств с высоким разрешением будут в два раза больше или даже больше.
     
@@ -1963,8 +2106,8 @@ page.getByRole(AriaRole.LINK).screenshot(new Locator.ScreenshotOptions()
     Текст стиля, который будет применен при создании скриншота. Здесь вы можете скрыть динамические элементы, сделать элементы невидимыми или изменить их свойства, чтобы помочь вам создать повторяемые скриншоты. Этот стиль проникает в Shadow DOM и применяется к внутренним фреймам.
   - `setTimeout` [double] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-timeout"/><a href="#locator-screenshot-option-timeout" class="list-anchor">#</a>
     
-    Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
-  - `setType` `enum ScreenshotType { PNG, JPEG }` *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-type"/><a href="#locator-screenshot-option-type" class="list-anchor">#</a>
+Максимальное время ожидания в миллисекундах. По умолчанию — `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить с помощью методов [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+  - `setType` `enum ScreenshotType { PNG, JPEG, WEBP }` *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-type"/><a href="#locator-screenshot-option-type" class="list-anchor">#</a>
     
     Укажите тип скриншота, по умолчанию `png`.
 
@@ -1981,7 +2124,7 @@ page.getByRole(AriaRole.LINK).screenshot(new Locator.ScreenshotOptions()
 
 ---
 
-### scrollIntoViewIfNeeded {#locator-scroll-into-view-if-needed}
+### scrollIntoViewIfNeeded {/* #locator-scroll-into-view-if-needed */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.scrollIntoViewIfNeeded</x-search>
 
@@ -2007,7 +2150,7 @@ Locator.scrollIntoViewIfNeeded(options);
 
 ---
 
-### selectOption {#locator-select-option}
+### selectOption {/* #locator-select-option */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.selectOption</x-search>
 
@@ -2076,7 +2219,7 @@ element.selectOption(new String[] {"red", "green", "blue"});
 
 ---
 
-### selectText {#locator-select-text}
+### selectText {/* #locator-select-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.selectText</x-search>
 
@@ -2105,7 +2248,7 @@ Locator.selectText(options);
 
 ---
 
-### setChecked {#locator-set-checked}
+### setChecked {/* #locator-set-checked */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.15</font><x-search>locator.setChecked</x-search>
 
@@ -2140,8 +2283,11 @@ page.getByRole(AriaRole.CHECKBOX).setChecked(true);
     - `setY` [double]
       
       
-    Точка для использования относительно верхнего левого угла рамки элемента. Если не указано, используется видимая точка элемента.
-  - `setTimeout` [double] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-timeout"/><a href="#locator-set-checked-option-timeout" class="list-anchor">#</a>
+Точка относительно верхнего левого угла области элемента, включающей внутренние отступы (padding box). Если не указана, используется какая-либо видимая точка элемента.
+  - `setScroll` `enum ScrollMode { AUTO, NONE }` *(необязательно)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-scroll"/><a href="#locator-set-checked-option-scroll" class="list-anchor">#</a>
+    
+    Определяет, будет ли Playwright прокручивать страницу, чтобы сделать элемент видимым, перед выполнением действия. По умолчанию используется значение `"auto"`, при котором элемент при необходимости прокручивается в видимую область, в том числе с прокруткой вложенных прокручиваемых контейнеров. При значении `"none"` Playwright не выполняет прокрутку, и действие завершается ошибкой, если элемент ещё не находится в области просмотра. Это полезно для проверки того, что элемент доступен пользователю без дополнительной прокрутки.
+  - `setTimeout` [double] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-timeout"/><a href="#locator-set-checked-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `setTrial` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-trial"/><a href="#locator-set-checked-option-trial" class="list-anchor">#</a>
@@ -2165,7 +2311,7 @@ page.getByRole(AriaRole.CHECKBOX).setChecked(true);
 
 ---
 
-### setInputFiles {#locator-set-input-files}
+### setInputFiles {/* #locator-set-input-files */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.setInputFiles</x-search>
 
@@ -2226,7 +2372,7 @@ page.getByLabel("Upload file").setInputFiles(new FilePayload(
 
 ---
 
-### tap {#locator-tap}
+### tap {/* #locator-tap */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.tap</x-search>
 
@@ -2262,8 +2408,11 @@ Locator.tap(options);
     - `setY` [double]
       
       
-    Точка для использования относительно верхнего левого угла элемента. Если не указано, используется видимая точка элемента.
-  - `setTimeout` [double] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-timeout"/><a href="#locator-tap-option-timeout" class="list-anchor">#</a>
+Точка относительно верхнего левого угла области элемента, включающей внутренние отступы (padding box). Если не указана, используется какая-либо видимая точка элемента.
+  - `setScroll` `enum ScrollMode { AUTO, NONE }` *(необязательно)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-scroll"/><a href="#locator-tap-option-scroll" class="list-anchor">#</a>
+    
+    Определяет, прокручивает ли Playwright страницу, чтобы сделать элемент видимым перед выполнением действия. По умолчанию используется значение `"auto"`: при необходимости элемент прокручивается в область видимости, в том числе за счёт прокрутки вложенных прокручиваемых контейнеров. При значении `"none"` Playwright не выполняет прокрутку, и действие завершается ошибкой, если элемент ещё не находится в области просмотра. Это полезно для проверки того, что элемент доступен пользователю без дополнительной прокрутки.
+  - `setTimeout` [double] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-timeout"/><a href="#locator-tap-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
   - `setTrial` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-trial"/><a href="#locator-tap-option-trial" class="list-anchor">#</a>
@@ -2291,7 +2440,7 @@ Locator.tap(options);
 
 ---
 
-### textContent {#locator-text-content}
+### textContent {/* #locator-text-content */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.textContent</x-search>
 
@@ -2320,7 +2469,7 @@ Locator.textContent(options);
 
 ---
 
-### uncheck {#locator-uncheck}
+### uncheck {/* #locator-uncheck */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.uncheck</x-search>
 
@@ -2352,8 +2501,11 @@ page.getByRole(AriaRole.CHECKBOX).uncheck();
     - `setY` [double]
       
       
-    Точка для использования относительно верхнего левого угла элемента. Если не указано, используется видимая точка элемента.
-  - `setTimeout` [double] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-timeout"/><a href="#locator-uncheck-option-timeout" class="list-anchor">#</a>
+Точка относительно верхнего левого угла области элемента, включающей внутренние отступы (padding box). Если не указана, используется какая-либо видимая точка элемента.
+  - `setScroll` `enum ScrollMode { AUTO, NONE }` *(необязательно)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-scroll"/><a href="#locator-uncheck-option-scroll" class="list-anchor">#</a>
+    
+    Определяет, прокручивает ли Playwright страницу, чтобы элемент оказался в видимой области, перед выполнением действия. По умолчанию используется значение `"auto"`: при необходимости элемент прокручивается в видимую область, в том числе за счёт прокрутки вложенных прокручиваемых контейнеров. При значении `"none"` Playwright не выполняет прокрутку, и действие завершается ошибкой, если элемент ещё не находится в области просмотра. Это полезно для проверки того, что элемент доступен пользователю без дополнительной прокрутки.
+  - `setTimeout` [double] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-timeout"/><a href="#locator-uncheck-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах. По умолчанию `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить, используя методы [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
   - `setTrial` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-trial"/><a href="#locator-uncheck-option-trial" class="list-anchor">#</a>
@@ -2378,7 +2530,37 @@ page.getByRole(AriaRole.CHECKBOX).uncheck();
 
 ---
 
-### waitFor {#locator-wait-for}
+### visible {/* #locator-visible */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.63</font><x-search>locator.visible</x-search>
+
+Возвращает локатор, соответствующий только [видимым](../actionability.mdx#visible) элементам, игнорируя невидимые. Это рекомендуемый способ различать элементы по видимости, в отличие от CSS-псевдокласса `:visible`.
+
+Обратите внимание, что видимость проверяется при каждом использовании локатора, а не в момент вызова [Locator.visible()](/api/class-locator.mdx#locator-visible).
+
+**Использование**
+
+Рассмотрим страницу с двумя кнопками, первая из которых невидима, а вторая видима.
+
+```html
+<button style='display: none'>Invisible</button>
+<button>Visible</button>
+```
+
+Этот код найдёт только вторую кнопку, поскольку она видима, а затем нажмёт её.
+
+```java
+page.locator("button").visible().click();
+```
+
+Чтобы вместо этого находить невидимые элементы, используйте [Locator.filter()](/api/class-locator.mdx#locator-filter) с параметром [setVisible](/api/class-locator.mdx#locator-filter-option-visible), установленным в `false`.
+
+**Возвращает**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-visible-return"/><a href="#locator-visible-return" class="list-anchor">#</a>
+
+---
+
+### waitFor {/* #locator-wait-for */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>locator.waitFor</x-search>
 
@@ -2411,9 +2593,69 @@ orderSent.waitFor();
 
 ---
 
-## Устарело {#deprecated}
+### waitForFunction {/* #locator-wait-for-function */}
 
-### elementHandle {#locator-element-handle}
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.62</font><x-search>locator.waitForFunction</x-search>
+
+Метод завершается, когда [expression](/api/class-locator.mdx#locator-wait-for-function-option-expression), вызываемое с соответствующим элементом в качестве первого аргумента и [arg](/api/class-locator.mdx#locator-wait-for-function-option-arg) в качестве второго, возвращает истинное значение (truthy).
+
+Это универсальный способ дождаться, пока элемент удовлетворит произвольному условию, без использования проверок утверждений. При каждой повторной попытке локатор заново находит элемент, поэтому метод допускает повторный рендеринг элемента во время ожидания.
+
+Если [expression](/api/class-locator.mdx#locator-wait-for-function-option-expression) возвращает [Promise], этот метод дождётся разрешения промиса, прежде чем проверять его значение.
+
+Если [expression](/api/class-locator.mdx#locator-wait-for-function-option-expression) выбрасывает исключение или возвращает отклонённый промис, этот метод выбрасывает исключение.
+
+**Использование**
+
+Ожидание появления атрибута:
+
+Передача аргумента в [expression](/api/class-locator.mdx#locator-wait-for-function-option-expression):
+
+**Аргументы**
+- `expression` [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-function-option-expression"/><a href="#locator-wait-for-function-option-expression" class="list-anchor">#</a>
+  
+  Выражение JavaScript, которое будет вычислено в контексте браузера. Если результатом вычисления выражения является функция, она вызывается автоматически.
+- `arg` [EvaluationArgument] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-function-option-arg"/><a href="#locator-wait-for-function-option-arg" class="list-anchor">#</a>
+  
+  Необязательный аргумент для передачи в [expression](/api/class-locator.mdx#locator-wait-for-function-option-expression).
+- `options` `Locator.WaitForFunctionOptions` *(необязательно)*
+  - `setTimeout` [double] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-function-option-timeout"/><a href="#locator-wait-for-function-option-timeout" class="list-anchor">#</a>
+    
+    Максимальное время ожидания в миллисекундах. По умолчанию — `30000` (30 секунд). Передайте `0`, чтобы отключить тайм-аут. Значение по умолчанию можно изменить с помощью методов [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) или [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
+
+**Возвращаемое значение**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-function-return"/><a href="#locator-wait-for-function-return" class="list-anchor">#</a>
+
+---
+
+### within {/* #locator-within */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.64</font><x-search>locator.within</x-search>
+
+Возвращает локатор, который находит элементы текущего локатора внутри каждого элемента, найденного с помощью [locator](/api/class-locator.mdx#locator-within-option-locator).
+
+Обратите внимание: относительные локаторы, такие как [Locator.nth()](/api/class-locator.mdx#locator-nth) или [Locator.first()](/api/class-locator.mdx#locator-first), применяются отдельно внутри каждого найденного родительского элемента. В приведённом ниже примере `page.getByRole('cell').nth(2)` выбирает третью ячейку каждой строки, а не третью ячейку во всей таблице.
+
+**Использование**
+
+```java
+Locator thirdColumn = page.getByRole(AriaRole.CELL).nth(2).within(page.getByRole(AriaRole.ROW));
+assertThat(thirdColumn).hasText(new String[] {"Apple", "Banana", "Cherry"});
+```
+
+**Аргументы**
+- `locator` [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-within-option-locator"/><a href="#locator-within-option-locator" class="list-anchor">#</a>
+  
+  Локатор, находящий родительские элементы, внутри которых будет выполняться поиск.
+
+**Возвращаемое значение**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-within-return"/><a href="#locator-within-return" class="list-anchor">#</a>
+
+---
+
+## Устаревшие методы
+
+### elementHandle {/* #locator-element-handle */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.elementHandle</x-search>
 
@@ -2444,7 +2686,7 @@ Locator.elementHandle(options);
 
 ---
 
-### elementHandles {#locator-element-handles}
+### elementHandles {/* #locator-element-handles */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.elementHandles</x-search>
 
@@ -2468,11 +2710,11 @@ Locator.elementHandles();
 
 ---
 
-### type {#locator-type}
+### type {/* #locator-type */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.14</font><x-search>locator.type</x-search>
 
-:::warning Устарело
+:::warning[Устарело]
 
 В большинстве случаев следует использовать [Locator.fill()](/api/class-locator.mdx#locator-fill). Вам нужно нажимать клавиши по одной, только если на странице есть специальная обработка клавиатуры - в этом случае используйте [Locator.pressSequentially()](/api/class-locator.mdx#locator-press-sequentially).
 
@@ -2519,6 +2761,8 @@ Locator.elementHandles();
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -2540,15 +2784,18 @@ Locator.elementHandles();
 [RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -2561,6 +2808,7 @@ Locator.elementHandles();
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[BiConsumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html "BiConsumer"
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
@@ -2568,6 +2816,7 @@ Locator.elementHandles();
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[Integer]: https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html "Integer"
 [long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"

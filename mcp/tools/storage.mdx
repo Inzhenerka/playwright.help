@@ -1,0 +1,171 @@
+---
+title: "Хранилище и аутентификация"
+---
+
+# Хранилище и аутентификация
+
+Управляйте файлами cookie, localStorage и sessionStorage, а также сохраняйте и восстанавливайте полное состояние браузера для сохранения аутентификации между сеансами. Требуется [возможность](../capabilities.mdx) **storage**.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--caps=storage"]
+    }
+  }
+}
+```
+
+## Состояние хранилища
+
+Сохраняйте и восстанавливайте полное состояние браузера (файлы cookie + локальное хранилище) в одном файле. Это основной способ сохранять аутентификацию между сеансами.
+
+### browser_storage_state
+
+Сохраните текущее состояние в JSON-файл.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `filename` | string | нет | Файл для сохранения. Относительные пути разрешаются относительно корня рабочей области. По умолчанию используется `storage-state-{timestamp}.json` в каталоге выходных данных |
+
+```txt
+→ browser_storage_state { filename: "auth-state.json" }
+  - [Состояние хранилища](auth-state.json)
+```
+
+### browser_set_storage_state
+
+Восстановите ранее сохранённое состояние. Сначала удаляются существующие файлы cookie и очищается локальное хранилище.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `filename` | string | да | Путь к файлу состояния хранилища. Относительные пути разрешаются относительно корня рабочей области |
+
+```txt
+→ browser_set_storage_state { filename: "auth-state.json" }
+  Состояние хранилища восстановлено из auth-state.json
+
+→ browser_navigate { url: "https://app.example.com/dashboard" }
+  // Вход в систему уже выполнен
+  - heading "Dashboard" [level=1] [ref=e2]
+```
+
+### Рабочий процесс: сохраните состояние входа, чтобы не входить повторно
+
+```txt
+// Войдите в систему один раз
+→ browser_navigate { url: "https://app.example.com/login" }
+→ browser_type { target: "e3", text: "alice@example.com" }
+→ browser_type { target: "e5", text: "s3cret!" }
+→ browser_click { target: "e7" }
+
+  - heading "Dashboard" [level=1] [ref=e2]
+
+// Сохраните состояние
+→ browser_storage_state { filename: "auth-state.json" }
+
+// Следующий сеанс: восстановите состояние вместо повторного входа
+→ browser_set_storage_state { filename: "auth-state.json" }
+→ browser_navigate { url: "https://app.example.com/dashboard" }
+```
+
+Или загружайте состояние автоматически при запуске сервера:
+
+```json
+["@playwright/mcp@latest", "--caps=storage", "--isolated", "--storage-state=./auth-state.json"]
+```
+
+## Файлы cookie
+
+### browser_cookie_list
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `domain` | string | нет | Фильтрация файлов cookie по домену |
+| `path` | string | нет | Фильтрация файлов cookie по пути |
+
+```txt
+→ browser_cookie_list
+
+  session_id=abc123 (domain: .example.com, path: /)
+  theme=dark (domain: .example.com, path: /)
+```
+
+### browser_cookie_get
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `name` | string | да | Имя файла cookie, который нужно получить |
+
+```txt
+→ browser_cookie_get { name: "session_id" }
+
+  session_id=abc123 (domain: .example.com, path: /, httpOnly: true, secure: true, sameSite: Lax)
+```
+
+### browser_cookie_set
+
+По умолчанию доменом служит имя хоста текущей страницы, а путём — `/`.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `name` | string | да | Имя файла cookie |
+| `value` | string | да | Значение файла cookie |
+| `domain` | string | нет | Домен файла cookie |
+| `path` | string | нет | Путь файла cookie |
+| `expires` | number | нет | Срок действия в виде временной метки Unix |
+| `httpOnly` | boolean | нет | Доступен ли файл cookie только через HTTP |
+| `secure` | boolean | нет | Передаётся ли файл cookie только по защищённому соединению |
+| `sameSite` | string | нет | `Strict`, `Lax` или `None` |
+
+### browser_cookie_delete / browser_cookie_clear
+
+Удалите определённый файл cookie по параметру `name` или очистите все файлы cookie.
+
+### Рабочий процесс: проверьте выход из системы, очистив файлы cookie
+
+```txt
+→ browser_cookie_clear
+→ browser_navigate { url: "https://app.example.com/dashboard" }
+
+  - heading "Sign in" [level=1] [ref=e2]
+  - textbox "Email" [ref=e3]
+```
+
+## localStorage
+
+Управляйте парами «ключ — значение» в localStorage для текущего источника (origin).
+
+| Инструмент | Параметры |
+|------|-----------|
+| `browser_localstorage_list` | (нет) |
+| `browser_localstorage_get` | `key` (string) |
+| `browser_localstorage_set` | `key` (string), `value` (string) |
+| `browser_localstorage_delete` | `key` (string) |
+| `browser_localstorage_clear` | (нет) |
+
+```txt
+→ browser_localstorage_list
+
+  user_preferences={"theme":"dark","lang":"en"}
+  onboarding_done=true
+
+→ browser_localstorage_set { key: "onboarding_done", value: "false" }
+→ browser_navigate { url: "https://app.example.com" }
+
+  // Появляется мастер первоначальной настройки
+  - heading "Welcome! Let's get started" [level=1] [ref=e2]
+```
+
+## sessionStorage
+
+Тот же интерфейс, что и у localStorage, но с областью действия в пределах сеанса — данные удаляются при закрытии вкладки.
+
+| Инструмент | Параметры |
+|------|-----------|
+| `browser_sessionstorage_list` | (нет) |
+| `browser_sessionstorage_get` | `key` (string) |
+| `browser_sessionstorage_set` | `key` (string), `value` (string) |
+| `browser_sessionstorage_delete` | `key` (string) |
+| `browser_sessionstorage_clear` | (нет) |

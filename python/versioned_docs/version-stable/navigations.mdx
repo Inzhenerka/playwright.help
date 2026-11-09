@@ -47,7 +47,11 @@ await page.goto("https://example.com")
 Если страница выполняет перенаправление на стороне клиента до `load`, [page.goto()](/api/class-page.mdx#page-goto) будет ждать, пока перенаправленная страница вызовет событие `load`.
 :::
 
-## Когда страница загружена? {#when-is-the-page-loaded}
+:::note
+В Firefox навигация, инициированная самой страницей, может прервать [page.goto()](/api/class-page.mdx#page-goto) с ошибкой `NS_BINDING_ABORTED`. Это [известное ограничение Firefox](https://github.com/microsoft/playwright/issues/20749).
+:::
+
+## Когда страница считается загруженной?
 
 Современные страницы выполняют множество действий после того, как событие `load` было вызвано. Они лениво загружают данные, заполняют интерфейс, загружают дорогие ресурсы, скрипты и стили после того, как событие `load` было вызвано. Нет способа определить, что страница `загружена`, это зависит от страницы, фреймворка и т.д. Так когда же можно начинать взаимодействовать с ней?
 
@@ -89,7 +93,7 @@ Playwright работает как очень быстрый пользоват�
 
 ## Гидратация {#hydration}
 
-В какой-то момент вы столкнетесь с ситуацией, когда Playwright выполняет действие, но ничего не происходит. Или вы вводите текст в поле ввода, и он исчезает. Наиболее вероятная причина этого - плохая [гидратация](https://en.wikipedia.org/wiki/Hydration_(web_development)) страницы.
+В какой-то момент вы столкнётесь с ситуацией, когда Playwright выполняет действие, но, по всей видимости, ничего не происходит. Или вы вводите текст в поле ввода, а он исчезает. Наиболее вероятная причина такого поведения — некорректная [гидратация](https://en.wikipedia.org/wiki/Hydration_%28web_development%29) страницы.
 
 Когда страница гидратируется, сначала статическая версия страницы отправляется в браузер. Затем отправляется динамическая часть, и страница становится "живой". Как очень быстрый пользователь, Playwright начнет взаимодействовать со страницей в тот момент, когда он ее увидит. И если кнопка на странице включена, но слушатели еще не добавлены, Playwright выполнит свою работу, но клик не будет иметь никакого эффекта.
 
@@ -125,7 +129,17 @@ await page.wait_for_url("**/login")
 </TabItem>
 </Tabs>
 
-## События навигации {#navigation-events}
+## Кеш переходов назад и вперёд (BFCache)
+
+Современные браузеры используют кеш переходов назад и вперёд (Back/Forward Cache, BFCache), чтобы мгновенно загружать страницу, когда пользователь переходит назад или вперёд. Для этого DOM и куча JavaScript страницы замораживаются в памяти, а при возвращении на страницу — размораживаются.
+
+По умолчанию Playwright отключает BFCache во всех браузерах, чтобы обеспечить согласованные, чистые среды тестирования. 
+
+Даже если вы явно включите BFCache, **тестирование восстановления страниц из BFCache не поддерживается**. Поскольку при восстановлении из BFCache пропускается этап получения данных по сети, браузер не генерирует стандартные события жизненного цикла навигации (такие как `commit`, `domcontentloaded` или `load`). Синхронизация внутреннего состояния `Page` в Playwright в значительной степени зависит от этих событий сетевого уровня. 
+
+Следовательно, восстановление страницы из BFCache (например, с помощью `page.goBack()`) обходит механизм отслеживания жизненного цикла Playwright, что приводит к превышению времени ожидания и полной рассинхронизации объекта `Page`, из-за которой последующие взаимодействия завершатся ошибкой.
+
+## События навигации
 
 Playwright разделяет процесс отображения нового документа на странице на **навигацию** и **загрузку**.
 
@@ -151,11 +165,15 @@ Playwright разделяет процесс отображения нового
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [Error]: /api/class-error.mdx "Error"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
@@ -169,14 +187,17 @@ Playwright разделяет процесс отображения нового
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

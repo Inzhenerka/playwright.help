@@ -122,7 +122,7 @@ Playwright проглатывает любые ошибки, выброшенн�
 
 ## Методы {#methods}
 
-### onBegin {#reporter-on-begin}
+### onBegin {/* #reporter-on-begin */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onBegin</x-search>
 
@@ -144,7 +144,7 @@ reporter.onBegin(config, suite);
 
 ---
 
-### onEnd {#reporter-on-end}
+### onEnd {/* #reporter-on-end */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onEnd</x-search>
 
@@ -181,7 +181,7 @@ await reporter.onEnd(result);
     
 ---
 
-### onError {#reporter-on-error}
+### onError {/* #reporter-on-error */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onError</x-search>
 
@@ -191,16 +191,20 @@ await reporter.onEnd(result);
 
 ```js
 reporter.onError(error);
+reporter.onError(error, workerInfo);
 ```
 
 **Аргументы**
 - `error` [TestError]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-error-option-error"/><a href="#reporter-on-error-option-error" class="list-anchor">#</a>
   
-  Ошибка.
+Ошибка.
+- `workerInfo` [WorkerInfo] *(необязательно)* <font size="2">Добавлено в: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-error-option-worker-info"/><a href="#reporter-on-error-option-worker-info" class="list-anchor">#</a>
+  
+  Содержит информацию о рабочем процессе, в котором возникла эта ошибка. Значение `undefined` для ошибок, не связанных с конкретным рабочим процессом.
 
 ---
 
-### onExit {#reporter-on-exit}
+### onExit {/* #reporter-on-exit */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.33</font><x-search>reporter.onExit</x-search>
 
@@ -217,7 +221,7 @@ await reporter.onExit();
 
 ---
 
-### onStdErr {#reporter-on-std-err}
+### onStdErr {/* #reporter-on-std-err */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onStdErr</x-search>
 
@@ -242,7 +246,7 @@ reporter.onStdErr(chunk, test, result);
 
 ---
 
-### onStdOut {#reporter-on-std-out}
+### onStdOut {/* #reporter-on-std-out */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onStdOut</x-search>
 
@@ -267,7 +271,7 @@ reporter.onStdOut(chunk, test, result);
 
 ---
 
-### onStepBegin {#reporter-on-step-begin}
+### onStepBegin {/* #reporter-on-step-begin */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onStepBegin</x-search>
 
@@ -292,7 +296,7 @@ reporter.onStepBegin(test, result, step);
 
 ---
 
-### onStepEnd {#reporter-on-step-end}
+### onStepEnd {/* #reporter-on-step-end */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onStepEnd</x-search>
 
@@ -317,7 +321,7 @@ reporter.onStepEnd(test, result, step);
 
 ---
 
-### onTestBegin {#reporter-on-test-begin}
+### onTestBegin {/* #reporter-on-test-begin */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onTestBegin</x-search>
 
@@ -339,7 +343,7 @@ reporter.onTestBegin(test, result);
 
 ---
 
-### onTestEnd {#reporter-on-test-end}
+### onTestEnd {/* #reporter-on-test-end */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.onTestEnd</x-search>
 
@@ -361,7 +365,40 @@ reporter.onTestEnd(test, result);
 
 ---
 
-### printsToStdio {#reporter-prints-to-stdio}
+### preprocess {/* #reporter-preprocess */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.62</font><x-search>reporter.preprocess</x-search>
+
+Вызывается после вычисления конфигурации и перед [reporter.onBegin()](/api/class-reporter.mdx#reporter-on-begin). Позволяет репортёру помечать отдельные тесты как пропущенные, исключённые, исправленные или ожидаемо падающие.
+
+**Usage**
+
+```js
+await reporter.preprocess(params);
+```
+
+**Arguments**
+- `params` [Object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-preprocess-option-params"/><a href="#reporter-preprocess-option-params" class="list-anchor">#</a>
+  - `config` [FullConfig]
+    
+    Итоговая конфигурация.
+  - `suite` [Suite]
+    
+    Корневой набор с проектами, файлами и тестами, которые будут запущены.
+  - `testRun` [TestRun]
+    
+    Управляет выбором тестов для запуска и их ожидаемым статусом.
+  
+  Набор учитывает фильтры `--project`, `--grep`/`--grep-invert` и `.only` и содержит только тесты, подходящие под текущий запуск. Проекты настройки и зависимости доступны только для чтения через [TestRun].
+  
+  Набор всегда содержит все подходящие тесты без учёта `--shard`. Playwright делит набор после завершения [reporter.preprocess()](/api/class-reporter.mdx#reporter-preprocess), если репортёр не вызвал [testRun.skipSharding()](/api/class-testrun.mdx#test-run-skip-sharding).
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-preprocess-return"/><a href="#reporter-preprocess-return" class="list-anchor">#</a>
+
+---
+
+### printsToStdio {/* #reporter-prints-to-stdio */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>reporter.printsToStdio</x-search>
 
@@ -377,11 +414,6 @@ reporter.printsToStdio();
 - [boolean]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-prints-to-stdio-return"/><a href="#reporter-prints-to-stdio-return" class="list-anchor">#</a>
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -394,10 +426,11 @@ reporter.printsToStdio();
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -416,6 +449,7 @@ reporter.printsToStdio();
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -423,9 +457,18 @@ reporter.printsToStdio();
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -443,6 +486,7 @@ reporter.printsToStdio();
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -455,6 +499,7 @@ reporter.printsToStdio();
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -476,6 +521,7 @@ reporter.printsToStdio();
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

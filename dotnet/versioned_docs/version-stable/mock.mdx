@@ -28,11 +28,13 @@ await page.RouteAsync("*/**/api/v1/fruits", async route => {
 // Перейти на страницу
 await page.GotoAsync("https://demo.playwright.dev/api-mocking");
 
-// Убедиться, что фрукт Strawberry виден
-await Expect(page.GetByTextAsync("Strawberry")).ToBeVisibleAsync();
+// Проверяем, что фрукт Strawberry отображается
+await Expect(page.GetByText("Strawberry")).ToBeVisibleAsync();
 ```
 
-Из трассировки теста видно, что API никогда не вызывался, однако он был выполнен с использованием мокированных данных. ![трассировка мокирования API](https://github.com/microsoft/playwright/assets/13063165/3dc14cbf-c100-4efc-ac21-d7b52d698b53)
+В трассировке этого теста видно, что API ни разу не вызывался, а запрос был обработан с использованием подставных данных.
+
+<img src="https://github.com/microsoft/playwright/assets/13063165/3dc14cbf-c100-4efc-ac21-d7b52d698b53" alt="трассировка подмены API" width="2946" height="1902" />
 
 Подробнее о [продвинутой работе с сетью](./network.mdx).
 
@@ -59,13 +61,17 @@ await page.RouteAsync("*/**/api/v1/fruits", async (route) => {
 // Перейти на страницу
 await page.GotoAsync("https://demo.playwright.dev/api-mocking");
 
-// Убедиться, что фрукт Loquat виден
-await Expect(page.GetByTextAsync("Loquat", new () { Exact = true })).ToBeVisibleAsync();
+// Assert that the Loquat fruit is visible
+await Expect(page.GetByText("Loquat", new () { Exact = true })).ToBeVisibleAsync();
 ```
 
-В трассировке нашего теста видно, что API был вызван и ответ был изменен. ![трассировка теста, показывающая вызов и выполнение API](https://github.com/microsoft/playwright/assets/13063165/8b8dd82d-1b3e-428e-871b-840581fed439)
+В трассировке нашего теста видно, что был выполнен вызов API, а ответ был изменён.
 
-При проверке ответа видно, что наш новый фрукт был добавлен в список. ![трассировка теста, показывающая мокированный ответ](https://github.com/microsoft/playwright/assets/13063165/03e6c87c-4ecc-47e8-9ca0-30fface25e9d)
+<img src="https://github.com/microsoft/playwright/assets/13063165/8b8dd82d-1b3e-428e-871b-840581fed439" alt="трассировка теста, показывающая вызов API и возврат подменённого ответа" width="2946" height="1902" />
+
+Изучив ответ, можно увидеть, что наш новый фрукт был добавлен в список.
+
+<img src="https://github.com/microsoft/playwright/assets/13063165/03e6c87c-4ecc-47e8-9ca0-30fface25e9d" alt="трассировка теста, показывающая подменённый ответ" width="2946" height="1902" />
 
 Подробнее о [продвинутой работе с сетью](./network.mdx).
 
@@ -135,9 +141,13 @@ await page.GotoAsync("https://demo.playwright.dev/api-mocking");
 await page.ExpectByTextAsync("Playwright", new() { Exact = true }).ToBeVisibleAsync();
 ```
 
-В трассировке нашего теста видно, что маршрут был выполнен из HAR-файла и API не был вызван. ![трассировка, показывающая использование HAR-файла](https://github.com/microsoft/playwright/assets/13063165/1bd7ab66-ea4f-43c2-a4e5-ca17d4837ff1)
+В трассировке нашего теста видно, что ответ на перехваченный запрос был получен из HAR-файла, а вызов API не выполнялся.
 
-Если мы проверим ответ, мы увидим, что наш новый фрукт был добавлен в JSON, что было сделано путем ручного обновления хешированного `.txt` файла внутри папки `hars`. ![трассировка, показывающая ответ из HAR-файла](https://github.com/microsoft/playwright/assets/13063165/db3117fc-7b02-4973-9a51-29e213261a6a)
+<img src="https://github.com/microsoft/playwright/assets/13063165/1bd7ab66-ea4f-43c2-a4e5-ca17d4837ff1" alt="трассировка, показывающая использование HAR-файла" width="2946" height="1902" />
+
+Если изучить ответ, можно увидеть, что наш новый фрукт был добавлен в JSON. Для этого мы вручную обновили файл `.txt` с хешем в имени внутри папки `hars`.
+
+<img src="https://github.com/microsoft/playwright/assets/13063165/db3117fc-7b02-4973-9a51-29e213261a6a" alt="трассировка, показывающая ответ из HAR-файла" width="2946" height="1902" />
 
 Воспроизведение HAR строго соответствует URL и HTTP-методу. Для POST-запросов также строго соответствуют POST-пейлоады. Если несколько записей соответствуют запросу, выбирается та, у которой больше всего совпадающих заголовков. Запись, приводящая к перенаправлению, будет автоматически следовать.
 
@@ -197,6 +207,8 @@ await page.RouteWebSocketAsync("wss://example.com/ws", ws => {
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -216,15 +228,18 @@ await page.RouteWebSocketAsync("wss://example.com/ws", ws => {
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

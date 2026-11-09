@@ -6,7 +6,21 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Список утверждений {#list-of-assertions}
+## Введение
+
+Playwright включает специализированные для веба проверки, которые автоматически повторяются до тех пор, пока не будет выполнено ожидаемое условие. Рассмотрим следующий пример:
+
+```python
+expect(page.get_by_test_id("status")).to_have_text("Submitted")
+```
+
+Playwright будет повторно проверять элемент с тестовым идентификатором `status`, пока его текст не станет равен `"Submitted"`. При каждой попытке Playwright будет заново находить элемент и проверять его, пока условие не будет выполнено или не истечёт время ожидания.
+
+По умолчанию время ожидания для проверок составляет 5 секунд.
+
+## Автоматически повторяемые проверки
+
+Следующие проверки будут повторяться до тех пор, пока проверка не завершится успешно или не истечёт отведённое для неё время ожидания.
 
 | Утверждение | Описание |
 | :- | :- |
@@ -39,7 +53,23 @@ import HTMLCard from '@site/src/components/HTMLCard';
 | [expect(page).to_have_url()](/api/class-pageassertions.mdx#page-assertions-to-have-url) | У страницы есть URL |
 | [expect(response).to_be_ok()](/api/class-apiresponseassertions.mdx#api-response-assertions-to-be-ok) | Ответ имеет статус OK |
 
-## Пользовательское сообщение ожидания {#custom-expect-message}
+## Мягкие проверки
+
+По умолчанию неудачная проверка прерывает выполнение теста. Playwright также поддерживает *мягкие проверки*: неудачные мягкие проверки **не** прерывают выполнение теста, но помечают его как проваленный.
+
+```python
+# Выполняем несколько проверок, которые не остановят тест в случае неудачи...
+expect.soft(page.get_by_test_id("status")).to_have_text("Success")
+expect.soft(page.get_by_test_id("eta")).to_have_text("1 day")
+
+# ... и продолжаем тест, чтобы проверить другие элементы.
+page.get_by_role("link", name="next page").click()
+expect.soft(page.get_by_role("heading", name="Make another order")).to_be_visible()
+```
+
+Обратите внимание, что мягкие проверки работают только с плагином [`pytest-playwright`](https://pypi.org/project/pytest-playwright/) (или [`pytest-playwright-asyncio`](https://pypi.org/project/pytest-playwright-asyncio/)) версии `0.8.0` или новее.
+
+## Пользовательское сообщение проверки Expect {/* #custom-expect-message */}
 
 Вы можете указать пользовательское сообщение ожидания в качестве второго аргумента функции `expect`, например:
 
@@ -94,11 +124,15 @@ def test_foobar(page: Page) -> None:
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [Error]: /api/class-error.mdx "Error"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
@@ -112,14 +146,17 @@ def test_foobar(page: Page) -> None:
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

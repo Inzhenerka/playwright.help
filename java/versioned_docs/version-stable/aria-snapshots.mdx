@@ -14,11 +14,13 @@ import LiteYouTube from '@site/src/components/LiteYouTube';
 
 ```java
 page.navigate("https://playwright.dev/");
-assertThat(page.locator("banner")).matchesAriaSnapshot("""
+assertThat(page).matchesAriaSnapshot("""
   - banner:
     - heading /Playwright enables reliable end-to-end/ [level=1]
-    - link "Get started"
-    - link "Star microsoft/playwright on GitHub"
+    - link "Get started":
+      - /url: /docs/intro
+    - link "Star microsoft/playwright on GitHub":
+      - /url: https://github.com/microsoft/playwright
     - link /[\\d]+k\\+ stargazers on GitHub/
 """);
 ```
@@ -70,7 +72,7 @@ assertThat(page.locator("banner")).matchesAriaSnapshot("""
 
 ## Aria снимки {#aria-snapshots}
 
-В Playwright aria снимки предоставляют YAML представление дерева доступности страницы. Эти снимки могут быть сохранены и сравнены позже, чтобы проверить, остается ли структура страницы согласованной или соответствует определенным ожиданиям.
+В Playwright снимки ARIA представляют дерево доступности страницы в формате YAML. Эти снимки можно сохранять и впоследствии сравнивать, чтобы проверять, остаётся ли структура страницы неизменной или соответствует ли она заданным ожиданиям. Шаблон задаёт ограничения и не обязательно является полной сериализацией дерева доступности.
 
 Формат YAML описывает иерархическую структуру доступных элементов на странице, детализируя **роли**, **атрибуты**, **значения** и **текстовое содержимое**. Структура следует синтаксису, подобному дереву, где каждый узел представляет доступный элемент, а отступы указывают на вложенные элементы.
 
@@ -80,15 +82,15 @@ assertThat(page.locator("banner")).matchesAriaSnapshot("""
 - role "name" [attribute=value]
 ```
 
-- **role**: Указывает ARIA или HTML роль элемента (например, `heading`, `list`, `listitem`, `button`).
-- **"name"**: Доступное имя элемента. Строки в кавычках указывают точные значения, `/patterns/` используются для регулярных выражений.
-- **[attribute=value]**: Атрибуты и значения в квадратных скобках представляют конкретные ARIA атрибуты, такие как `checked`, `disabled`, `expanded`, `level`, `pressed` или `selected`.
+- **role**: Указывает ARIA- или HTML-роль элемента (например, `heading`, `list`, `listitem`, `button`).
+- **"name"**: Доступное имя элемента. Строки в кавычках обозначают точные значения, а `/patterns/` используются для регулярных выражений.
+- **[attribute=value]**: Атрибуты и значения в квадратных скобках представляют определённые ARIA-атрибуты, такие как `checked`, `disabled`, `expanded`, `invalid`, `level`, `pressed` или `selected`. Атрибуты могут задавать ограничение на конкретное значение, например `[pressed=mixed]`.
 
 Эти значения берутся из ARIA-атрибутов или вычисляются на основе семантики HTML. Чтобы посмотреть структуру дерева доступности (accessibility tree) страницы, используйте вкладку [Chrome DevTools Accessibility Tab](https://developer.chrome.com/docs/devtools/accessibility/reference#tab).
 
 ## Сопоставление снимков {#snapshot-matching}
 
-Метод утверждения [assertThat(locator).matchesAriaSnapshot()](/api/class-locatorassertions.mdx#locator-assertions-to-match-aria-snapshot) в Playwright сравнивает доступную структуру области локатора с заранее определенным шаблоном aria снимка, помогая проверить состояние страницы в соответствии с требованиями тестирования.
+Метод проверки [assertThat(page).matchesAriaSnapshot()](/api/class-pageassertions.mdx#page-assertions-to-match-aria-snapshot) в Playwright сравнивает структуру страницы, доступную для вспомогательных технологий, с заранее заданным шаблоном ARIA-снимка, помогая проверить соответствие состояния страницы требованиям тестирования. Вы также можете использовать [assertThat(locator).matchesAriaSnapshot()](/api/class-locatorassertions.mdx#locator-assertions-to-match-aria-snapshot) для проверки определённой части страницы.
 
 Для следующего DOM:
 
@@ -99,15 +101,16 @@ assertThat(page.locator("banner")).matchesAriaSnapshot("""
 Вы можете сопоставить его, используя следующий шаблон снимка:
 
 ```java
-assertThat(page.locator("body")).matchesAriaSnapshot("""
+assertThat(page).matchesAriaSnapshot("""
   - heading "title"
 """);
 ```
 
 При сопоставлении шаблон снимка сравнивается с текущим деревом доступности страницы:
-* Если структура дерева соответствует шаблону, тест проходит; в противном случае он не проходит, указывая на несоответствие между ожидаемыми и фактическими состояниями доступности.
-* Сравнение чувствительно к регистру и сворачивает пробелы, поэтому отступы и разрывы строк игнорируются.
-* Сравнение чувствительно к порядку, что означает, что порядок элементов в шаблоне снимка должен соответствовать порядку в дереве доступности страницы.
+* Если структура дерева соответствует шаблону, тест проходит; в противном случае он завершается с ошибкой, указывая на несоответствие между ожидаемым и фактическим состояниями доступности.
+* Сравнение учитывает регистр и нормализует пробельные символы в именах и текстовых значениях. Отступы YAML определяют вложенность.
+* Сравнение учитывает порядок: порядок элементов в шаблоне снимка должен совпадать с порядком элементов в дереве доступности страницы.
+* Шаблон из одного узла может совпадать с узлом на любой глубине в пределах выбранной страницы или локатора. Несколько узлов верхнего уровня должны совпадать с узлами, расположенными под одним родительским узлом, в том же порядке.
 
 ### Частичное сопоставление {#partial-matching}
 
@@ -117,9 +120,7 @@ assertThat(page.locator("body")).matchesAriaSnapshot("""
 <button>Submit</button>
 ```
 
-*aria снимок*
-
-```yaml
+```yaml title="ARIA-снимок"
 - button
 ```
 
@@ -133,9 +134,7 @@ assertThat(page.locator("body")).matchesAriaSnapshot("""
 <input type="checkbox" checked>
 ```
 
-*aria снимок для частичного сопоставления*
-
-```yaml
+```yaml title="ARIA-снимок (частичное совпадение)"
 - checkbox
 ```
 
@@ -153,10 +152,8 @@ assertThat(page.locator("body")).matchesAriaSnapshot("""
 </ul>
 ```
 
-*aria снимок для частичного сопоставления*
-
-```yaml
-- list
+```yaml title="ARIA-снимок (частичное совпадение)"
+- list:
   - listitem: Feature B
 ```
 
@@ -174,17 +171,17 @@ assertThat(page.locator("body")).matchesAriaSnapshot("""
 </ul>
 ```
 
-*ARIA-снимок для частичного совпадения*
-
-```yaml
-- list
+```yaml title="ARIA-снимок (частичное совпадение)"
+- list:
   - listitem: Feature B
 ```
 
-Свойство `/children` можно использовать, чтобы управлять тем, как сопоставляются дочерние элементы:
-- `contain` (по умолчанию): совпадает, если все указанные дочерние элементы присутствуют в заданном порядке
-- `equal`: совпадает, если дочерние элементы в точности соответствуют указанному списку в заданном порядке
-- `deep-equal`: совпадает, если дочерние элементы в точности соответствуют указанному списку в заданном порядке, включая вложенные дочерние элементы
+Свойство `/children` управляет сопоставлением дочерних элементов узла, в котором оно указано:
+- `contain` (по умолчанию): совпадение, если все указанные дочерние элементы присутствуют в заданном порядке.
+- `equal`: совпадение, если непосредственные дочерние элементы точно соответствуют указанному списку и его порядку.
+- `deep-equal`: совпадение, если дочерние элементы и их вложенные дочерние элементы точно соответствуют указанному списку и его порядку.
+
+Если ожидаемые дочерние элементы не указаны, `contain` допускает любые дочерние элементы, а `equal` и `deep-equal` требуют их отсутствия. Добавьте `/children: contain` во вложенный узел, чтобы переопределить унаследованный режим сопоставления `deep-equal` и разрешить в этом узле дополнительные дочерние элементы.
 
 ```html
 <ul>
@@ -194,16 +191,22 @@ assertThat(page.locator("body")).matchesAriaSnapshot("""
 </ul>
 ```
 
-*ARIA-снимок завершится неудачей, потому что Feature C отсутствует в шаблоне*
+Следующая проверка снимка завершится ошибкой, поскольку Feature C отсутствует в шаблоне:
 
-```yaml
-- list
+```yaml title="aria snapshot"
+- list:
   - /children: equal
   - listitem: Feature A
   - listitem: Feature B
 ```
 
-### Сопоставление с регулярными выражениями {#matching-with-regular-expressions}
+#### Глобальная настройка режима `children`
+
+Вместо добавления свойства `/children` в каждый снимок можно задать режим сопоставления дочерних элементов по умолчанию для всех вызовов `toMatchAriaSnapshot` в файле конфигурации:
+
+Отдельные снимки по-прежнему могут переопределять глобальную настройку, явно указывая свойство `/children` в шаблоне.
+
+### Сопоставление с помощью регулярных выражений
 
 Регулярные выражения позволяют гибко сопоставлять элементы с динамическим или переменным текстом. Доступные имена и текст могут поддерживать шаблоны регулярных выражений.
 
@@ -211,9 +214,7 @@ assertThat(page.locator("body")).matchesAriaSnapshot("""
 <h1>Issues 12</h1>
 ```
 
-*aria снимок с регулярным выражением*
-
-```yaml
+```yaml title="ARIA-снимок"
 - heading /Issues \d+/
 ```
 
@@ -227,14 +228,14 @@ assertThat(page.locator("body")).matchesAriaSnapshot("""
 - **Действие "Assert snapshot"**: В генераторе кода вы можете использовать действие "Assert snapshot", чтобы автоматически создать утверждение снимка для выбранных элементов. Это быстрый способ захватить aria снимок как часть вашего записанного тестового потока.
 - **Вкладка "Aria snapshot"**: Вкладка "Aria snapshot" в интерфейсе генератора кода визуально представляет aria снимок для выбранного локатора, позволяя вам исследовать, проверять и проверять роли элементов, атрибуты и доступные имена, чтобы помочь в создании и проверке снимков.
 
-### Использование метода `Locator.ariaSnapshot` {#using-the-locatorariasnapshot-method}
+### Использование [Page.ariaSnapshot()](/api/class-page.mdx#page-aria-snapshot) и [Locator.ariaSnapshot()](/api/class-locator.mdx#locator-aria-snapshot)
 
-Метод [Locator.ariaSnapshot()](/api/class-locator.mdx#locator-aria-snapshot) позволяет программно создавать YAML представление доступных элементов в пределах области локатора, что особенно полезно для динамической генерации снимков во время выполнения теста.
+Методы [Page.ariaSnapshot()](/api/class-page.mdx#page-aria-snapshot) и [Locator.ariaSnapshot()](/api/class-locator.mdx#locator-aria-snapshot) позволяют программно создавать YAML-представление элементов дерева доступности в области действия локатора. Это особенно полезно для динамического создания снимков во время выполнения тестов.
 
 **Пример**:
 
 ```java
-String snapshot = page.locator("body").ariaSnapshot();
+String snapshot = page.ariaSnapshot();
 System.out.println(snapshot);
 ```
 
@@ -251,9 +252,7 @@ System.out.println(snapshot);
 <h2>Subtitle</h2>
 ```
 
-*aria снимок*
-
-```yaml
+```yaml title="Снимок ARIA"
 - heading "Title" [level=1]
 - heading "Subtitle" [level=2]
 ```
@@ -266,9 +265,7 @@ System.out.println(snapshot);
 <div>Sample accessible name</div>
 ```
 
-*aria снимок*
-
-```yaml
+```yaml title="ARIA-снимок"
 - text: Sample accessible name
 ```
 
@@ -280,24 +277,32 @@ System.out.println(snapshot);
 <p>Line 1<br>Line 2</p>
 ```
 
-*aria снимок*
-
-```yaml
+```yaml title="ARIA-снимок"
 - paragraph: Line 1 Line 2
 ```
 
 ### Ссылки {#links}
 
-Ссылки отображают свой текст или составное содержимое из псевдоэлементов.
+Ссылки отображают свой текст или содержимое, сформированное с помощью псевдоэлементов. Адрес назначения ссылки можно сопоставить с помощью свойства `/url`.
 
 ```html
 <a href="#more-info">Read more about Accessibility</a>
 ```
 
-*aria снимок*
+```yaml title="ARIA-снимок"
+- link "Подробнее о специальных возможностях":
+    - /url: "#more-info"
+```
 
-```yaml
-- link "Read more about Accessibility"
+Значение `/url` также может быть регулярным выражением:
+
+```html
+<a href="https://www.youtube.com/channel/UC46Zj8pDH5tDosqm1gd7WTg">YouTube channel</a>
+```
+
+```yaml title="aria snapshot"
+- link:
+  - /url: /https://www.youtube.com/channel/.*/
 ```
 
 ### Текстовые поля {#text-boxes}
@@ -308,9 +313,7 @@ System.out.println(snapshot);
 <input type="text" value="Enter your name">
 ```
 
-*aria снимок*
-
-```yaml
+```yaml title="ARIA-снимок"
 - textbox: Enter your name
 ```
 
@@ -325,9 +328,7 @@ System.out.println(snapshot);
 </ul>
 ```
 
-*aria снимок*
-
-```yaml
+```yaml title="ARIA-снимок"
 - list "Main Features":
   - listitem: Feature 1
   - listitem: Feature 2
@@ -344,15 +345,13 @@ System.out.println(snapshot);
 </details>
 ```
 
-*aria снимок*
-
-```yaml
+```yaml title="ARIA-снимок"
 - group: Summary
 ```
 
 ### Атрибуты и состояния {#attributes-and-states}
 
-Часто используемые ARIA атрибуты, такие как `checked`, `disabled`, `expanded`, `level`, `pressed` и `selected`, представляют состояния управления.
+Часто используемые атрибуты ARIA, такие как `checked`, `disabled`, `expanded`, `invalid`, `level`, `pressed` и `selected`, представляют состояния элементов управления.
 
 #### Флажок с атрибутом `checked` {#checkbox-with-checked-attribute}
 
@@ -360,9 +359,7 @@ System.out.println(snapshot);
 <input type="checkbox" checked>
 ```
 
-*aria снимок*
-
-```yaml
+```yaml title="снимок ARIA"
 - checkbox [checked]
 ```
 
@@ -372,10 +369,28 @@ System.out.println(snapshot);
 <button aria-pressed="true">Toggle</button>
 ```
 
-*aria снимок*
-
-```yaml
+```yaml title="Снимок ARIA"
 - button "Toggle" [pressed=true]
+```
+
+#### Поле ввода с атрибутом `aria-invalid`
+
+Значение `aria-invalid` отображается напрямую. Значение `true` отображается как `[invalid]`, а `grammar` и `spelling` отображаются как `[invalid=grammar]` и `[invalid=spelling]`. Значение `false` опускается.
+
+```html
+<input type="text" aria-label="Email" aria-invalid="true" value="not-an-email">
+```
+
+```yaml title="aria snapshot"
+- textbox "Email" [invalid]: not-an-email
+```
+
+```html
+<input type="text" aria-label="Bio" aria-invalid="spelling">
+```
+
+```yaml title="aria snapshot"
+- textbox "Bio" [invalid=spelling]
 ```
 
 
@@ -389,6 +404,8 @@ System.out.println(snapshot);
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -410,15 +427,18 @@ System.out.println(snapshot);
 [RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -431,6 +451,7 @@ System.out.println(snapshot);
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[BiConsumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html "BiConsumer"
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
@@ -438,6 +459,7 @@ System.out.println(snapshot);
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[Integer]: https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html "Integer"
 [long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"

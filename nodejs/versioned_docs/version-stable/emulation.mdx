@@ -12,7 +12,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Устройства {#devices}
 
-Playwright поставляется с [реестром параметров устройств](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json), используя [playwright.devices](/api/class-playwright.mdx#playwright-devices) для выбранных настольных, планшетных и мобильных устройств. Это может быть использовано для симуляции поведения браузера для конкретного устройства, такого как user agent, размер экрана, viewport и наличие поддержки touch. Все тесты будут выполняться с указанными параметрами устройства.
+Playwright поставляется с [реестром параметров устройств](https://github.com/microsoft/playwright/blob/main/packages/isomorphic/deviceDescriptorsSource.json), доступным через [playwright.devices](/api/class-playwright.mdx#playwright-devices), для ряда настольных компьютеров, планшетов и мобильных устройств. Его можно использовать для имитации поведения браузера на конкретном устройстве, задавая такие параметры, как пользовательский агент (user agent), размер экрана, область просмотра и поддержка сенсорного ввода. Все тесты будут выполняться с указанными параметрами устройства.
 
 <Tabs
   groupId="js-flavor"
@@ -61,7 +61,18 @@ const context = await browser.newContext({
 </TabItem>
 </Tabs>
 
-<img width="458" alt="сайт playwright.dev в эмуляции iPhone 13" src="https://user-images.githubusercontent.com/13063165/220411073-76fe59f9-9a2d-463d-8e30-c19a7deca133.png" />
+<img height="1582" width="916" alt="Сайт playwright.dev с эмуляцией iPhone 13" src="https://user-images.githubusercontent.com/13063165/220411073-76fe59f9-9a2d-463d-8e30-c19a7deca133.png" />
+
+**Примечание**: Предварительно настроенные устройства предполагают использование определённой платформы. Например, "Desktop Chrome" задаёт строку User-Agent, характерную для Windows.
+
+Если вы хотите использовать User-Agent, соответствующий платформе, на которой запускаются тесты, рекомендуем сбросить значение свойства `userAgent`.
+
+```js
+const context = await browser.newContext({
+  ...devices['Desktop Chrome'],
+  userAgent: undefined,
+});
+```
 
 ## Вьюпорт (Viewport) {#viewport}
 
@@ -214,6 +225,8 @@ export default defineConfig({
 });
 ```
 
+<ApiAnchor id="locale--timezone" />
+
 ## Локаль и Часовой пояс {#locale-timezone}
 
 Эмулируйте локаль и часовой пояс браузера: их можно задать глобально для всех тестов в конфиге, а затем переопределять для отдельных тестов.
@@ -269,7 +282,7 @@ const context = await browser.newContext({
 </TabItem>
 </Tabs>
 
-<img width="1394" alt="Bing на немецком языке и с немецким часовым поясом" src="https://user-images.githubusercontent.com/13063165/220416571-ccc96ab1-44bb-4579-8430-64502fc24a15.png" />
+<img height="1824" width="2788" alt="Bing на немецком языке с настроенным часовым поясом" src="https://user-images.githubusercontent.com/13063165/220416571-ccc96ab1-44bb-4579-8430-64502fc24a15.png" />
 
 ###### 
 Обратите внимание: это влияет только на часовой пояс и локаль браузера, но не на часовой пояс раннера тестов. Чтобы задать часовой пояс раннера, можно использовать [переменную окружения `TZ`](https://nodejs.org/api/cli.html#tz).
@@ -406,7 +419,7 @@ const context = await browser.newContext({
 </TabItem>
 </Tabs>
 
-<img width="1394" alt="geolocation for italy on bing maps" src="https://user-images.githubusercontent.com/13063165/220417670-bb22d815-f5cd-47c4-8562-0b88165eac27.png" />
+<img height="1824" width="2788" alt="геолокация для Италии на картах Bing" src="https://user-images.githubusercontent.com/13063165/220417670-bb22d815-f5cd-47c4-8562-0b88165eac27.png" />
 
 Измените местоположение позже:
 
@@ -448,7 +461,7 @@ await context.setGeolocation({ longitude: 48.858455, latitude: 2.294474 });
 
 ## Цветовая схема и медиа {#color-scheme-and-media}
 
-Эмулируйте `"colorScheme"` пользователя. Поддерживаемые значения: 'light' и 'dark'. Вы также можете эмулировать тип медиа с помощью [page.emulateMedia()](/api/class-page.mdx#page-emulate-media).
+Эмулирует пользовательскую настройку `"colorScheme"`. Поддерживаемые значения: 'light', 'dark' и 'no-preference'. Вы также можете эмулировать тип медиа с помощью [page.emulateMedia()](/api/class-page.mdx#page-emulate-media).
 
 ```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -506,7 +519,63 @@ await page.emulateMedia({ media: 'print' });
 </TabItem>
 </Tabs>
 
-<img width="1394" alt="сайт Playwright в тёмном режиме" src="https://user-images.githubusercontent.com/13063165/220411638-55d2b051-4678-4da7-9f0b-ed22f5a3c47c.png" />
+<img height="1824" width="2788" alt="сайт Playwright в тёмном режиме" src="https://user-images.githubusercontent.com/13063165/220411638-55d2b051-4678-4da7-9f0b-ed22f5a3c47c.png" />
+
+Параметры `"reducedMotion"`, `"forcedColors"` и `"contrast"` аналогичным образом эмулируют медиафункции `prefers-reduced-motion`, `forced-colors` и `prefers-contrast`. Поддерживаемые значения: `'reduce'` и `'no-preference'` для уменьшения анимации, `'active'` и `'none'` для принудительных цветов, а также `'more'` и `'no-preference'` для контрастности. Метод [page.emulateMedia()](/api/class-page.mdx#page-emulate-media) изменяет их для отдельной страницы.
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    reducedMotion: 'reduce',
+    forcedColors: 'active',
+    contrast: 'more',
+  },
+});
+```
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="test"
+  values={[
+    {label: 'Тест', value: 'test'},
+    {label: 'Библиотека', value: 'library'}
+  ]
+}>
+<TabItem value="test">
+
+```js title="tests/example.spec.ts"
+import { test, expect } from '@playwright/test';
+
+test.use({
+  reducedMotion: 'reduce', // или 'no-preference'
+  forcedColors: 'active', // или 'none'
+  contrast: 'more', // или 'no-preference'
+});
+
+test('мой тест с уменьшением анимации, принудительными цветами и повышенной контрастностью', async ({ page }) => {
+  // ...
+});
+```
+
+</TabItem>
+<TabItem value="library">
+
+```js
+// Создаём контекст с уменьшением анимации, принудительными цветами и повышенной контрастностью
+const context = await browser.newContext({
+  reducedMotion: 'reduce', // или 'no-preference'
+  forcedColors: 'active', // или 'none'
+  contrast: 'more', // или 'no-preference'
+});
+
+// Изменяем медиафункции для страницы
+await page.emulateMedia({ reducedMotion: 'reduce', forcedColors: 'active', contrast: 'more' });
+```
+
+</TabItem>
+</Tabs>
 
 ## User Agent {#user-agent}
 
@@ -558,7 +627,11 @@ export default defineConfig({
 });
 ```
 
-## Включение JavaScript {#javascript-enabled}
+:::note
+Эмуляция автономного режима влияет только на запросы, проходящие через стандартный сетевой стек браузера, такие как переходы между страницами, `fetch()`, `XMLHttpRequest` и WebSockets. Она не влияет на трафик WebRTC: установленные соединения `RTCPeerConnection` продолжают отправлять и получать медиаданные по UDP. Чтобы протестировать потерю соединения WebRTC, прервите соединение за пределами браузера, например остановив TURN-сервер или используя брандмауэр на уровне ОС.
+:::
+
+## JavaScript включён {/* #javascript-enabled */}
 
 Эмулируйте сценарий пользователя, в котором JavaScript отключен.
 
@@ -595,11 +668,6 @@ const context = await browser.newContext({
 </Tabs>
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -612,10 +680,11 @@ const context = await browser.newContext({
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -634,6 +703,7 @@ const context = await browser.newContext({
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -641,9 +711,18 @@ const context = await browser.newContext({
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -661,6 +740,7 @@ const context = await browser.newContext({
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -673,6 +753,7 @@ const context = await browser.newContext({
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -694,6 +775,7 @@ const context = await browser.newContext({
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

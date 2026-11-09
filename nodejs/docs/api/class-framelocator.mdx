@@ -26,6 +26,22 @@ await page.locator('.result-frame').contentFrame().getByRole('button').click();
 await page.locator('.result-frame').contentFrame().first().getByRole('button').click();
 ```
 
+**Any frame**
+
+Calling [page.frameLocator()](/api/class-page.mdx#page-frame-locator) or [frame.frameLocator()](/api/class-frame.mdx#frame-frame-locator) without a selector creates a frame locator that starts the search in any frame of the subtree - so that you don't need to locate the iframe first.
+
+```js
+// Finds the button in any frame on the page:
+await page.frameLocator().getByRole('button').click();
+
+// Finds the iframe with id "my-frame" anywhere on the page, and clicks the button inside it:
+await page.frameLocator().locator('#my-frame').contentFrame().getByRole('button').click();
+```
+
+Only the start of the search is affected - the rest of the locator is resolved inside a single frame, just like any other locator. Following the strictness rules above, an error is thrown when elements are matched in multiple frames.
+
+Such a frame locator does not point to a particular `iframe`, so [frameLocator.owner()](/api/class-framelocator.mdx#frame-locator-owner), [frameLocator.first()](/api/class-framelocator.mdx#frame-locator-first), [frameLocator.last()](/api/class-framelocator.mdx#frame-locator-last) and [frameLocator.nth()](/api/class-framelocator.mdx#frame-locator-nth) are not supported on it.
+
 **Converting Locator to FrameLocator**
 
 If you have a [Locator] object pointing to an `iframe` it can be converted to [FrameLocator] using [locator.contentFrame()](/api/class-locator.mdx#locator-content-frame).
@@ -39,7 +55,7 @@ If you have a [FrameLocator] object it can be converted to [Locator] pointing to
 
 ## Methods
 
-### frameLocator {#frame-locator-frame-locator}
+### frameLocator {/* #frame-locator-frame-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.frameLocator</x-search>
 
@@ -61,7 +77,7 @@ frameLocator.frameLocator(selector);
 
 ---
 
-### getByAltText {#frame-locator-get-by-alt-text}
+### getByAltText {/* #frame-locator-get-by-alt-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.getByAltText</x-search>
 
@@ -93,7 +109,7 @@ await page.getByAltText('Playwright logo').click();
 
 ---
 
-### getByLabel {#frame-locator-get-by-label}
+### getByLabel {/* #frame-locator-get-by-label */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.getByLabel</x-search>
 
@@ -128,7 +144,7 @@ await page.getByLabel('Password').fill('secret');
 
 ---
 
-### getByPlaceholder {#frame-locator-get-by-placeholder}
+### getByPlaceholder {/* #frame-locator-get-by-placeholder */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.getByPlaceholder</x-search>
 
@@ -164,7 +180,7 @@ await page
 
 ---
 
-### getByRole {#frame-locator-get-by-role}
+### getByRole {/* #frame-locator-get-by-role */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.getByRole</x-search>
 
@@ -183,7 +199,7 @@ Consider the following DOM structure.
 <button>Submit</button>
 ```
 
-You can locate each element by it's implicit role:
+You can locate each element by its implicit role:
 
 ```js
 await expect(page.getByRole('heading', { name: 'Sign up' })).toBeVisible();
@@ -203,6 +219,11 @@ await page.getByRole('button', { name: /submit/i }).click();
     An attribute that is usually set by `aria-checked` or native `<input type=checkbox>` controls.
     
     Learn more about [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
+  - `description` [string] | [RegExp] *(optional)* <font size="2">Added in: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-description"/><a href="#frame-locator-get-by-role-option-description" class="list-anchor">#</a>
+    
+    Option to match the [accessible description](https://w3c.github.io/accname/#dfn-accessible-description). By default, matching is case-insensitive and searches for a substring, use [exact](/api/class-framelocator.mdx#frame-locator-get-by-role-option-exact) to control this behavior.
+    
+    Learn more about [accessible description](https://w3c.github.io/accname/#dfn-accessible-description).
   - `disabled` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-disabled"/><a href="#frame-locator-get-by-role-option-disabled" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-disabled` or `disabled`.
@@ -214,7 +235,7 @@ await page.getByRole('button', { name: /submit/i }).click();
     
   - `exact` [boolean] *(optional)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-exact"/><a href="#frame-locator-get-by-role-option-exact" class="list-anchor">#</a>
     
-    Whether [name](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) is matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when [name](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) is a regular expression. Note that exact match still trims whitespace.
+    Whether [name](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) and [description](/api/class-framelocator.mdx#frame-locator-get-by-role-option-description) are matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when the value is a regular expression. Note that exact match still trims whitespace.
   - `expanded` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-expanded"/><a href="#frame-locator-get-by-role-option-expanded" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-expanded`.
@@ -257,7 +278,7 @@ Many html elements have an implicitly [defined role](https://w3c.github.io/html-
 
 ---
 
-### getByTestId {#frame-locator-get-by-test-id}
+### getByTestId {/* #frame-locator-get-by-test-id */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.getByTestId</x-search>
 
@@ -271,7 +292,7 @@ Consider the following DOM structure.
 <button data-testid="directions">Itinéraire</button>
 ```
 
-You can locate the element by it's test id:
+You can locate the element by its test id:
 
 ```js
 await page.getByTestId('directions').click();
@@ -302,7 +323,7 @@ export default defineConfig({
 
 ---
 
-### getByText {#frame-locator-get-by-text}
+### getByText {/* #frame-locator-get-by-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.getByText</x-search>
 
@@ -358,7 +379,7 @@ Input elements of the type `button` and `submit` are matched by their `value` in
 
 ---
 
-### getByTitle {#frame-locator-get-by-title}
+### getByTitle {/* #frame-locator-get-by-title */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.getByTitle</x-search>
 
@@ -392,7 +413,7 @@ await expect(page.getByTitle('Issues count')).toHaveText('25 issues');
 
 ---
 
-### locator {#frame-locator-locator}
+### locator {/* #frame-locator-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.locator</x-search>
 
@@ -436,7 +457,7 @@ frameLocator.locator(selectorOrLocator, options);
 
 ---
 
-### owner {#frame-locator-owner}
+### owner {/* #frame-locator-owner */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.43</font><x-search>frameLocator.owner</x-search>
 
@@ -462,11 +483,11 @@ await expect(locator).toBeVisible();
 
 ## Deprecated
 
-### first {#frame-locator-first}
+### first {/* #frame-locator-first */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.first</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 Use [locator.first()](/api/class-locator.mdx#locator-first) followed by [locator.contentFrame()](/api/class-locator.mdx#locator-content-frame) instead.
 
@@ -486,11 +507,11 @@ frameLocator.first();
 
 ---
 
-### last {#frame-locator-last}
+### last {/* #frame-locator-last */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.last</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 Use [locator.last()](/api/class-locator.mdx#locator-last) followed by [locator.contentFrame()](/api/class-locator.mdx#locator-content-frame) instead.
 
@@ -510,11 +531,11 @@ frameLocator.last();
 
 ---
 
-### nth {#frame-locator-nth}
+### nth {/* #frame-locator-nth */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.nth</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 Use [locator.nth()](/api/class-locator.mdx#locator-nth) followed by [locator.contentFrame()](/api/class-locator.mdx#locator-content-frame) instead.
 
@@ -536,11 +557,6 @@ frameLocator.nth(index);
 - [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-nth-return"/><a href="#frame-locator-nth-return" class="list-anchor">#</a>
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -553,10 +569,11 @@ frameLocator.nth(index);
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -575,6 +592,7 @@ frameLocator.nth(index);
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -582,9 +600,18 @@ frameLocator.nth(index);
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -602,6 +629,7 @@ frameLocator.nth(index);
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -614,6 +642,7 @@ frameLocator.nth(index);
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -635,6 +664,7 @@ frameLocator.nth(index);
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"

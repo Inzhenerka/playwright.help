@@ -8,14 +8,27 @@
 
 ### Настройка репозитория
 
+Для локальной сборки нужны Bun 1.4.4 и Node.js 22 или новее. Bun устанавливает зависимости и запускает скрипты, а Docusaurus работает на Node.js.
+
 ```sh
-npm install
+bun install --frozen-lockfile
 ```
 
 ### Запуск сервера разработки
 
+Для просмотра страниц из репозитория, включая MCP и Agent CLI:
+
 ```sh
-npm run start-nodejs
+bun run prepare-nodejs
+bun run start
+```
+
+Откройте [MCP](http://localhost:3000/mcp/introduction) или [Agent CLI](http://localhost:3000/agent-cli/introduction).
+
+Для запуска с автоматической генерацией документации из исходников Playwright:
+
+```sh
+bun run start-nodejs
 ```
 
 См. `package.json` для других языков (Java, Python, .NET).
@@ -23,8 +36,8 @@ npm run start-nodejs
 ### Сборка продакшен-версии и запуск сервера
 
 ```sh
-npm run build
-npm run serve
+bun run build
+bun run serve
 ```
 
 ### Запуск на Windows
@@ -32,7 +45,7 @@ npm run serve
 Чтобы обновить документацию в PowerShell, убедитесь, что переменная окружения задана корректно, например:
 
 ```powershell
-$env:SRC_DIR="C:\Users\user\src\playwright"; npm run roll
+$env:SRC_DIR="C:\Users\user\src\playwright"; bun run roll
 ```
 
 ### Запуск сквозных (end-to-end) тестов
@@ -42,13 +55,14 @@ $env:SRC_DIR="C:\Users\user\src\playwright"; npm run roll
 В одном терминале запустите:
 
 ```sh
-npm run start-nodejs
+bun run prepare-nodejs
+bun run start
 ```
 
 В другом терминале запустите (будет использоваться локальный сервер docusaurus):
 
 ```sh
-npx playwright test nodejs
+bun run playwright test nodejs
 ```
 
 #### Запуск в другом окружении

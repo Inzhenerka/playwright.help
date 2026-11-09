@@ -57,7 +57,7 @@ await context.tracing.stop(path = "trace.zip")
 
 ## Methods
 
-### group {#tracing-group}
+### group {/* #tracing-group */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.49</font><x-search>tracing.group</x-search>
 
@@ -121,11 +121,11 @@ await page.context.tracing.group_end()
   Specifies a custom location for the group to be shown in the trace viewer. Defaults to the location of the [tracing.group()](/api/class-tracing.mdx#tracing-group) call.
 
 **Returns**
-- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-group-return"/><a href="#tracing-group-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-group-return"/><a href="#tracing-group-return" class="list-anchor">#</a>
 
 ---
 
-### group_end {#tracing-group-end}
+### group_end {/* #tracing-group-end */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.49</font><x-search>tracing.group_end</x-search>
 
@@ -142,11 +142,11 @@ tracing.group_end()
 
 ---
 
-### start {#tracing-start}
+### start {/* #tracing-start */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>tracing.start</x-search>
 
-Start tracing.
+Start tracing. Disposing the returned [Disposable] stops tracing without saving the trace, similarly to calling [tracing.stop()](/api/class-tracing.mdx#tracing-stop) without a path.
 
 :::note
 
@@ -188,17 +188,24 @@ await context.tracing.stop(path = "trace.zip")
 </Tabs>
 
 **Arguments**
+- `aria_snapshots` [bool] *(optional)* <font size="2">Added in: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-aria-snapshots"/><a href="#tracing-start-option-aria-snapshots" class="list-anchor">#</a>
+  
+  Whether to capture aria snapshot of the page on every action.
+- `live` [bool] *(optional)* <font size="2">Added in: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-live"/><a href="#tracing-start-option-live" class="list-anchor">#</a>
+  
+  When enabled, the trace is written to an unarchived file that is updated in real time as actions occur, instead of caching changes and archiving them into a zip file at the end. This is useful for live trace viewing during test execution.
 - `name` [str] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-name"/><a href="#tracing-start-option-name" class="list-anchor">#</a>
   
   If specified, intermediate trace files are going to be saved into the files with the given name prefix inside the [traces_dir](/api/class-browsertype.mdx#browser-type-launch-option-traces-dir) directory specified in [browser_type.launch()](/api/class-browsertype.mdx#browser-type-launch). To specify the final trace zip file name, you need to pass `path` option to [tracing.stop()](/api/class-tracing.mdx#tracing-stop) instead.
 - `screenshots` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-screenshots"/><a href="#tracing-start-option-screenshots" class="list-anchor">#</a>
   
   Whether to capture screenshots during tracing. Screenshots are used to build a timeline preview.
+- `screen_snapshots` [bool] *(optional)* <font size="2">Added in: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-screen-snapshots"/><a href="#tracing-start-option-screen-snapshots" class="list-anchor">#</a>
+  
+  Whether to capture a screenshot of the page on every action.
 - `snapshots` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-snapshots"/><a href="#tracing-start-option-snapshots" class="list-anchor">#</a>
   
-  If this option is true tracing will
-  * capture DOM snapshot on every action
-  * record network activity
+  Whether to capture DOM snapshot and record network activity on every action.
 - `sources` [bool] *(optional)* <font size="2">Added in: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-sources"/><a href="#tracing-start-option-sources" class="list-anchor">#</a>
   
   Whether to include source files for trace actions.
@@ -207,15 +214,15 @@ await context.tracing.stop(path = "trace.zip")
   Trace name to be shown in the Trace Viewer.
 
 **Returns**
-- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-return"/><a href="#tracing-start-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-return"/><a href="#tracing-start-return" class="list-anchor">#</a>
 
 ---
 
-### start_chunk {#tracing-start-chunk}
+### start_chunk {/* #tracing-start-chunk */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>tracing.start_chunk</x-search>
 
-Start a new trace chunk. If you'd like to record multiple traces on the same [BrowserContext], use [tracing.start()](/api/class-tracing.mdx#tracing-start) once, and then create multiple trace chunks with [tracing.start_chunk()](/api/class-tracing.mdx#tracing-start-chunk) and [tracing.stop_chunk()](/api/class-tracing.mdx#tracing-stop-chunk).
+Start a new trace chunk. Disposing the returned [Disposable] stops the chunk without saving it, similarly to calling [tracing.stop_chunk()](/api/class-tracing.mdx#tracing-stop-chunk) without a path. If you'd like to record multiple traces on the same [BrowserContext], use [tracing.start()](/api/class-tracing.mdx#tracing-start) once, and then create multiple trace chunks with [tracing.start_chunk()](/api/class-tracing.mdx#tracing-start-chunk) and [tracing.stop_chunk()](/api/class-tracing.mdx#tracing-stop-chunk).
 
 **Usage**
 
@@ -276,11 +283,70 @@ await context.tracing.stop_chunk(path = "trace2.zip")
   Trace name to be shown in the Trace Viewer.
 
 **Returns**
-- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-chunk-return"/><a href="#tracing-start-chunk-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-chunk-return"/><a href="#tracing-start-chunk-return" class="list-anchor">#</a>
 
 ---
 
-### stop {#tracing-stop}
+### start_har {/* #tracing-start-har */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>tracing.start_har</x-search>
+
+Start recording a HAR (HTTP Archive) of network activity in this context. The HAR file is written to disk when [tracing.stop_har()](/api/class-tracing.mdx#tracing-stop-har) is called, or when the returned [Disposable] is disposed.
+
+Only one HAR recording can be active at a time per [Tracing] instance.
+
+**Usage**
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+context.tracing.start_har("trace.har")
+page = context.new_page()
+page.goto("https://playwright.dev")
+context.tracing.stop_har()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await context.tracing.start_har("trace.har")
+page = await context.new_page()
+await page.goto("https://playwright.dev")
+await context.tracing.stop_har()
+```
+
+</TabItem>
+</Tabs>
+
+**Arguments**
+- `path` [Union]\[[str], [pathlib.Path]\]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-path"/><a href="#tracing-start-har-option-path" class="list-anchor">#</a>
+  
+  Path on the filesystem to write the HAR file to. If the file name ends with `.zip`, the HAR is saved as a zip archive with response bodies attached as separate files.
+- `content` "omit" | "embed" | "attach" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-content"/><a href="#tracing-start-har-option-content" class="list-anchor">#</a>
+  
+  Optional setting to control resource content management. If `omit` is specified, content is not persisted. If `attach` is specified, resources are persisted as separate files or entries in the ZIP archive. If `embed` is specified, content is stored inline the HAR file as per HAR specification. Defaults to `attach` for `.zip` output files and to `embed` for all other file extensions.
+- `mode` "full" | "minimal" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-mode"/><a href="#tracing-start-har-option-mode" class="list-anchor">#</a>
+  
+  When set to `minimal`, only record information necessary for routing from HAR. This omits sizes, timing, page, cookies, security and other types of HAR information that are not used when replaying from HAR. Defaults to `full`.
+- `url_filter` [str] | [Pattern] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-url-filter"/><a href="#tracing-start-har-option-url-filter" class="list-anchor">#</a>
+  
+  A glob or regex pattern to filter requests that are stored in the HAR. Defaults to none.
+
+**Returns**
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-return"/><a href="#tracing-start-har-return" class="list-anchor">#</a>
+
+---
+
+### stop {/* #tracing-stop */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>tracing.stop</x-search>
 
@@ -303,7 +369,7 @@ tracing.stop(**kwargs)
 
 ---
 
-### stop_chunk {#tracing-stop-chunk}
+### stop_chunk {/* #tracing-stop-chunk */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>tracing.stop_chunk</x-search>
 
@@ -324,6 +390,23 @@ tracing.stop_chunk(**kwargs)
 **Returns**
 - [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-stop-chunk-return"/><a href="#tracing-stop-chunk-return" class="list-anchor">#</a>
 
+---
+
+### stop_har {/* #tracing-stop-har */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>tracing.stop_har</x-search>
+
+Stop HAR recording and save the HAR file to the path given to [tracing.start_har()](/api/class-tracing.mdx#tracing-start-har).
+
+**Usage**
+
+```python
+tracing.stop_har()
+```
+
+**Returns**
+- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-stop-har-return"/><a href="#tracing-stop-har-return" class="list-anchor">#</a>
+
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
@@ -335,11 +418,15 @@ tracing.stop_chunk(**kwargs)
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [Error]: /api/class-error.mdx "Error"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
@@ -353,14 +440,17 @@ tracing.stop_chunk(**kwargs)
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

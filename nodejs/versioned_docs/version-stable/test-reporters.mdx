@@ -52,7 +52,31 @@ export default defineConfig({
 });
 ```
 
-## Встроенные отчётчики {#built-in-reporters}
+### Отчёт только о сбоях {/* #report-only-failures */}
+
+Используйте `onlyFailures` с репортерами JSON, JUnit или HTML, чтобы включать в отчёт только тесты с неожиданными результатами (включая неожиданные успешные результаты), нестабильные тесты и прерванные тесты. Нестабильные тесты включаются в отчёт, даже если они проходят при повторном запуске. Для каждого включённого теста сохраняются все попытки выполнения, в том числе успешные повторные запуски:
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  reporter: [['html', { onlyFailures: true }]],
+});
+```
+
+Настраивайте `onlyFailures` отдельно для каждого репортера. Чтобы использовать эту настройку при объединении blob-отчётов, передайте файл конфигурации в команду `npx playwright merge-reports --config=playwright.config.ts ./blob-report`.
+
+Используйте репортер `failures`, чтобы выводить диагностическую информацию в терминал по мере выполнения тестов без отображения прогресса. Например, можно сохранять полный HTML-отчёт, одновременно выводя в терминал краткую информацию:
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  reporter: [['failures'], ['html']],
+});
+```
+
+## Встроенные репортеры
 
 Все встроенные отчётчики показывают подробную информацию о сбоях и в основном различаются по степени подробности для успешных запусков.
 
@@ -72,7 +96,7 @@ export default defineConfig({
 });
 ```
 
-Вот пример вывода в середине выполнения теста. Сбои будут перечислены в конце.
+Вот пример вывода в процессе выполнения тестов. По умолчанию информация о сбоях будет выведена в конце.
 
 ```bash
 npx playwright test --reporter=list
@@ -100,13 +124,36 @@ export default defineConfig({
 });
 ```
 
-Отчёт List поддерживает следующие параметры конфигурации и переменные окружения:
+Вы можете выводить информацию об ошибках сразу по мере их появления, не дожидаясь завершения запуска:
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  reporter: [['list', { printFailuresInline: true }]],
+});
+```
+
+Вы можете не выводить теги тестов, которые автоматически добавляются к названиям тестов:
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  reporter: [['list', { omitTags: true }]],
+});
+```
+
+Репортёр List поддерживает следующие параметры конфигурации и переменные окружения:
 
 | Имя переменной окружения | Опция конфигурации отчётчика | Описание | По умолчанию |
 |---|---|---|---|
-| `PLAYWRIGHT_LIST_PRINT_STEPS` | `printSteps` | Печатать ли каждый шаг на отдельной строке. | `false` |
-| `PLAYWRIGHT_FORCE_TTY` | | Нужно ли формировать вывод, подходящий для «живого» терминала. Поддерживает `true`, `1`, `false`, `0`, `[WIDTH]` и `[WIDTH]x[HEIGHT]`. Значения `[WIDTH]` и `[WIDTH]x[HEIGHT]` задают размеры TTY. | `true`, когда терминал в режиме TTY; иначе `false`. |
-| `FORCE_COLOR` | | Нужно ли выводить цветной вывод. | `true`, когда терминал в режиме TTY; иначе `false`. |
+| `PLAYWRIGHT_LIST_PRINT_STEPS` | `printSteps` | Выводить ли каждый шаг в отдельной строке. | `false`
+| `PLAYWRIGHT_LIST_PRINT_FAILURES_INLINE` | `printFailuresInline` | Выводить ли подробности ошибок сразу после неудачного теста, а не в конце. | `false`
+| `PLAYWRIGHT_LIST_OMIT_TAGS` | `omitTags` | Скрывать ли теги тестов, автоматически добавляемые к названиям тестов. | `false`
+| `PLAYWRIGHT_FORCE_TTY` | | Формировать ли вывод, подходящий для интерактивного терминала. Поддерживаются значения `true`, `1`, `false`, `0`, `[WIDTH]` и `[WIDTH]x[HEIGHT]`. Значения `[WIDTH]` и `[WIDTH]x[HEIGHT]` задают размеры TTY. | `true`, если терминал работает в режиме TTY, иначе `false`.
+| `FORCE_COLOR` | | Использовать ли цветной вывод. | `true`, если терминал работает в режиме TTY, иначе `false`.
+| `NO_COLOR` | | Отключать ли цветной вывод ([no-color.org](https://no-color.org/)). Любое непустое значение отключает цвета. | не задано
 
 ### Отчётчик Line {#line-reporter}
 
@@ -143,8 +190,10 @@ Running 124 tests using 6 workers
 
 | Имя переменной окружения | Опция конфигурации отчётчика | Описание | По умолчанию |
 |---|---|---|---|
-| `PLAYWRIGHT_FORCE_TTY` | | Нужно ли формировать вывод, подходящий для «живого» терминала. Поддерживает `true`, `1`, `false`, `0`, `[WIDTH]` и `[WIDTH]x[HEIGHT]`. Значения `[WIDTH]` и `[WIDTH]x[HEIGHT]` задают размеры TTY. | `true`, когда терминал в режиме TTY; иначе `false`. |
-| `FORCE_COLOR` | | Нужно ли выводить цветной вывод. | `true`, когда терминал в режиме TTY; иначе `false`. |
+| `PLAYWRIGHT_LINE_OMIT_TAGS` | `omitTags` | Определяет, следует ли исключать теги тестов, которые автоматически добавляются к названиям тестов. | `false`
+| `PLAYWRIGHT_FORCE_TTY` | | Определяет, следует ли формировать вывод, подходящий для интерактивного терминала. Поддерживает значения `true`, `1`, `false`, `0`, `[WIDTH]` и `[WIDTH]x[HEIGHT]`. Значения `[WIDTH]` и `[WIDTH]x[HEIGHT]` задают размеры TTY. | `true`, когда терминал находится в режиме TTY, в противном случае — `false`.
+| `FORCE_COLOR` | | Определяет, следует ли использовать цветной вывод. | `true`, когда терминал находится в режиме TTY, в противном случае — `false`.
+| `NO_COLOR` | | Определяет, следует ли отключать цветной вывод ([no-color.org](https://no-color.org/)). Любое непустое значение отключает цвета. | не задано
 
 ### Отчётчик Dot {#dot-reporter}
 
@@ -185,8 +234,37 @@ Running 124 tests using 6 workers
 
 | Имя переменной окружения | Опция конфигурации отчётчика | Описание | По умолчанию |
 |---|---|---|---|
-| `PLAYWRIGHT_FORCE_TTY` | | Нужно ли формировать вывод, подходящий для «живого» терминала. Поддерживает `true`, `1`, `false`, `0`, `[WIDTH]` и `[WIDTH]x[HEIGHT]`. Значения `[WIDTH]` и `[WIDTH]x[HEIGHT]` задают размеры TTY. | `true`, когда терминал в режиме TTY; иначе `false`. |
-| `FORCE_COLOR` | | Нужно ли выводить цветной вывод. | `true`, когда терминал в режиме TTY; иначе `false`. |
+| `PLAYWRIGHT_DOT_OMIT_TAGS` | `omitTags` | Следует ли скрывать теги тестов, автоматически добавляемые к названиям тестов. | `false`
+| `PLAYWRIGHT_FORCE_TTY` | | Следует ли формировать вывод, подходящий для интерактивного терминала. Поддерживает значения `true`, `1`, `false`, `0`, `[WIDTH]` и `[WIDTH]x[HEIGHT]`. Значения `[WIDTH]` и `[WIDTH]x[HEIGHT]` задают размеры TTY. | `true`, если терминал находится в режиме TTY, иначе `false`.
+| `FORCE_COLOR` | | Следует ли использовать цветной вывод. | `true`, если терминал находится в режиме TTY, иначе `false`.
+| `NO_COLOR` | | Следует ли отключать цветной вывод ([no-color.org](https://no-color.org/)). Любое непустое значение отключает цвета. | не задано
+
+### Репортёр failures {/* #failures-reporter */}
+
+Репортёр failures выводит информацию о сбоях и успешных повторных запусках по мере их возникновения, а затем — итоговую сводку.
+
+```bash
+npx playwright test --reporter=failures
+```
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  reporter: 'failures',
+});
+```
+
+Используйте [testConfig.quiet](/api/class-testconfig.mdx#test-config-quiet), чтобы подавить вывод тестов в stdout и stderr.
+
+Репортёр failures поддерживает следующие параметры конфигурации и переменные окружения:
+
+| Имя переменной окружения | Параметр конфигурации репортёра | Описание | Значение по умолчанию |
+|---|---|---|---|
+| `PLAYWRIGHT_FAILURES_OMIT_TAGS` | `omitTags` | Следует ли скрывать теги тестов, добавляемые к названиям тестов. | `false` |
+| `PLAYWRIGHT_FORCE_TTY` | | Следует ли формировать вывод, подходящий для интерактивного терминала. | `true`, если терминал находится в режиме TTY, иначе `false` |
+| `FORCE_COLOR` | | Следует ли использовать цветной вывод. | `true`, если терминал находится в режиме TTY, иначе `false` |
+| `NO_COLOR` | | Следует ли отключать цветной вывод. | не задано |
 
 ### Отчётчик HTML {#html-reporter}
 
@@ -208,7 +286,7 @@ export default defineConfig({
 });
 ```
 
-По умолчанию отчёт записывается в папку `playwright-report` в текущем рабочем каталоге. Можно изменить это расположение, используя переменную окружения `PLAYWRIGHT_HTML_OUTPUT_DIR` или конфигурацию отчётчика.
+По умолчанию отчёт сохраняется в папку `playwright-report` в каталоге, содержащем package.json, или в текущем рабочем каталоге (если package.json не найден). Это расположение можно переопределить с помощью переменной окружения `PLAYWRIGHT_HTML_OUTPUT_DIR` или настройки репортера.
 
 В файле конфигурации передайте параметры напрямую:
 
@@ -242,18 +320,27 @@ npx playwright show-report
 npx playwright show-report my-report
 ```
 
-Отчёт HTML поддерживает следующие параметры конфигурации и переменные окружения:
+Также можно передать архив `.zip` — например, скачанный из артефактов CI. Архив должен содержать файл `index.html` на верхнем уровне. Playwright распакует его во временный каталог и запустит сервер для просмотра отчёта:
+
+```bash
+npx playwright show-report playwright-report.zip
+```
+
+HTML-отчёт поддерживает следующие параметры конфигурации и переменные окружения:
 
 | Имя переменной окружения | Опция конфигурации отчётчика | Описание | По умолчанию |
 |---|---|---|---|
-| `PLAYWRIGHT_HTML_TITLE` | `title` | Заголовок, отображаемый в сгенерированном отчёте. | По умолчанию заголовок не отображается |
-| `PLAYWRIGHT_HTML_OUTPUT_DIR` | `outputFolder` | Директория, в которую сохранять отчёт. | `playwright-report` |
-| `PLAYWRIGHT_HTML_OPEN` | `open` | Когда открывать HTML-отчёт в браузере: `'always'`, `'never'` или `'on-failure'` | `'on-failure'` |
-| `PLAYWRIGHT_HTML_HOST` | `host` | Когда отчёт открывается в браузере, он будет раздаваться, будучи привязанным к этому hostname. | `localhost` |
-| `PLAYWRIGHT_HTML_PORT` | `port` | Когда отчёт открывается в браузере, он будет раздаваться на этом порту. | `9323` или любой доступный порт, если `9323` недоступен. |
-| `PLAYWRIGHT_HTML_ATTACHMENTS_BASE_URL` | `attachmentsBaseURL` | Отдельное место, куда загружаются вложения из подкаталога `data`. Нужна только если вы загружаете отчёт и `data` отдельно в разные места. | `data/` |
-| `PLAYWRIGHT_HTML_NO_COPY_PROMPT` | `noCopyPrompt` | Если `true`, отключает отображение подсказки Copy для ошибок. Поддерживает `true`, `1`, `false` и `0`. | `false` |
-| `PLAYWRIGHT_HTML_NO_SNIPPETS` | `noSnippets` | Если `true`, отключает отображение фрагментов кода в логе действий. Если есть ошибка верхнего уровня, раздел отчёта с фрагментом кода всё равно будет отображаться. Поддерживает `true`, `1`, `false` и `0`. | `false` |
+| `PLAYWRIGHT_HTML_TITLE` | `title` | Заголовок, отображаемый в сгенерированном отчёте. | По умолчанию заголовок не отображается
+| `PLAYWRIGHT_HTML_ONLY_FAILURES` | `onlyFailures` | Включать только тесты с неожиданными результатами, нестабильные тесты (включая успешные повторные попытки) и прерванные тесты. См. [Отчёт только о сбоях](#report-only-failures). | `false`
+| `PLAYWRIGHT_HTML_OUTPUT_DIR` | `outputFolder` | Каталог для сохранения отчёта. | `playwright-report`
+| `PLAYWRIGHT_HTML_OPEN` | `open` | Когда открывать HTML-отчёт в браузере: `'always'`, `'never'` или `'on-failure'` | `'on-failure'`
+| `PLAYWRIGHT_HTML_HOST` | `host` | При открытии отчёта в браузере сервер будет привязан к этому имени хоста. | `localhost`
+| `PLAYWRIGHT_HTML_PORT` | `port` | При открытии отчёта в браузере сервер будет использовать этот порт. | `9323` или любой доступный порт, если `9323` недоступен.
+| `PLAYWRIGHT_HTML_ATTACHMENTS_BASE_URL` | `attachmentsBaseURL` | Отдельное расположение, куда загружаются вложения из подкаталога `data`. Требуется только в том случае, если отчёт и `data` загружаются отдельно в разные расположения. | `data/`
+| `PLAYWRIGHT_HTML_NO_COPY_PROMPT` | `noCopyPrompt` | Если установлено значение true, отключает отображение кнопки «Copy prompt» для ошибок. Поддерживает значения `true`, `1`, `false` и `0`. | `false`
+| `PLAYWRIGHT_HTML_NO_SNIPPETS` | `noSnippets` | Если установлено значение true, отключает отображение фрагментов кода в журнале действий. При наличии ошибки верхнего уровня соответствующий раздел отчёта с фрагментом кода всё равно будет отображаться. Поддерживает значения `true`, `1`, `false` и `0`. | `false`
+| `PLAYWRIGHT_HTML_DO_NOT_INLINE_ASSETS` | `doNotInlineAssets` | Если установлено значение true, JavaScript, CSS и данные отчёта записываются в отдельные файлы рядом с `index.html`, а не встраиваются в него. Используйте этот параметр при размещении отчёта со строгой [политикой безопасности содержимого (Content Security Policy)](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP), запрещающей встроенные скрипты и стили. Поддерживает значения `true`, `1`, `false` и `0`. | `false`
+| `PLAYWRIGHT_HTML_MERGE_FILES` | `mergeFiles` | Если установлено значение true, тесты группируются по заголовку блока `test.describe()` верхнего уровня, а не по файлу, которому они принадлежат. Поддерживает значения `true`, `1`, `false` и `0`. | `false`
 
 ### Отчётчик Blob {#blob-reporter}
 
@@ -265,7 +352,7 @@ npx playwright test --reporter=blob
 
 По умолчанию отчёт записывается в директорию `blob-report` в директории с package.json или в текущей рабочей директории (если package.json не найден).
 
-Имя файла отчёта выглядит как `report-<hash>.zip` или `report-<hash>-<shard_number>.zip`, если используется [шардинг](./test-sharding.mdx). Хэш — необязательное значение, вычисляемое на основе `--grep`, `--grepInverted`, `--project`, [testConfig.tag](/api/class-testconfig.mdx#test-config-tag) и файловых фильтров, переданных как аргументы командной строки. Хэш гарантирует, что запуск Playwright с разными опциями командной строки будет создавать разные (но стабильные между запусками) имена отчётов. Имя выходного файла можно переопределить в файле конфигурации или передать через переменную окружения `'PLAYWRIGHT_BLOB_OUTPUT_FILE'`.
+Имя файла отчёта имеет вид `report-<hash>.zip` или `report-<hash>-<shard_number>.zip`, если используется [шардирование](./test-sharding.mdx). Хеш — это необязательное значение, вычисляемое на основе `--grep`, `--grep-invert`, `--project`, [testConfig.tag](/api/class-testconfig.mdx#test-config-tag) и фильтров файлов, переданных в качестве аргументов командной строки. Хеш гарантирует, что запуск Playwright с разными параметрами командной строки будет создавать отчёты с разными именами, которые при этом остаются неизменными между запусками с одинаковыми параметрами. Имя выходного файла можно переопределить в файле конфигурации или задать с помощью переменной окружения `'PLAYWRIGHT_BLOB_OUTPUT_FILE'`.
 
 <Tabs groupId="blob-report" defaultValue="shards" values={[ {label: 'Shards', value: 'shards'}, {label: 'Environments', value: 'environments'}, ] }>
 
@@ -304,9 +391,9 @@ Blob-отчёт поддерживает следующие опции конф�
 
 | Имя переменной окружения | Опция конфигурации отчётчика | Описание | По умолчанию
 |---|---|---|---|
-| `PLAYWRIGHT_BLOB_OUTPUT_DIR` | `outputDir` | Каталог для сохранения вывода. Существующее содержимое удаляется перед записью нового отчёта. | `blob-report`
-| `PLAYWRIGHT_BLOB_OUTPUT_NAME` | `fileName` | Имя файла отчёта. | `report-<project>-<hash>-<shard_number>.zip`
-| `PLAYWRIGHT_BLOB_OUTPUT_FILE` | `outputFile` | Полный путь к выходному файлу. Если определено, `outputDir` и `fileName` будут проигнорированы. | `undefined`
+| `PLAYWRIGHT_BLOB_OUTPUT_DIR` | `outputDir` | Каталог для сохранения результатов. Существующее содержимое удаляется перед записью нового отчёта. | `blob-report`
+| `PLAYWRIGHT_BLOB_OUTPUT_NAME` | `fileName` | Имя файла отчёта. | `report-<hash>-<shard_number>.zip`
+| `PLAYWRIGHT_BLOB_OUTPUT_FILE` | `outputFile` | Полный путь к выходному файлу. Если задан, параметры `outputDir` и `fileName` будут проигнорированы. | `undefined`
 
 ### Отчётчик JSON {#json-reporter}
 
@@ -363,8 +450,9 @@ export default defineConfig({
 | Имя переменной окружения | Опция конфигурации отчётчика | Описание | По умолчанию
 |---|---|---|---|
 | `PLAYWRIGHT_JSON_OUTPUT_DIR` | | Каталог для сохранения выходного файла. Игнорируется, если указан выходной файл. | `cwd` или каталог конфигурации.
-| `PLAYWRIGHT_JSON_OUTPUT_NAME` | `outputFile` | Базовое имя файла для вывода, относительно каталога вывода. | Отчёт JSON выводится в stdout.
-| `PLAYWRIGHT_JSON_OUTPUT_FILE` | `outputFile` | Полный путь к выходному файлу. Если определено, `PLAYWRIGHT_JSON_OUTPUT_DIR` и `PLAYWRIGHT_JSON_OUTPUT_NAME` будут проигнорированы. | Отчёт JSON выводится в stdout.
+| `PLAYWRIGHT_JSON_ONLY_FAILURES` | `onlyFailures` | Включать только тесты с неожиданными результатами, нестабильные тесты (включая успешные повторные запуски) и прерванные тесты. См. [Отчёт только о сбоях](#report-only-failures). | `false`
+| `PLAYWRIGHT_JSON_OUTPUT_NAME` | | Базовое имя выходного файла относительно каталога вывода. | JSON-отчёт выводится в стандартный поток вывода.
+| `PLAYWRIGHT_JSON_OUTPUT_FILE` | `outputFile` | Полный путь к выходному файлу. Если задан, `PLAYWRIGHT_JSON_OUTPUT_DIR` и `PLAYWRIGHT_JSON_OUTPUT_NAME` игнорируются. | JSON-отчёт выводится в стандартный поток вывода.
 
 ### Отчётчик JUnit {#junit-reporter}
 
@@ -420,15 +508,43 @@ export default defineConfig({
 
 | Имя переменной окружения | Опция конфигурации отчётчика | Описание | По умолчанию
 |---|---|---|---|
-| `PLAYWRIGHT_JUNIT_OUTPUT_DIR` | | Каталог для сохранения выходного файла. Игнорируется, если выходной файл не указан. | `cwd` или каталог конфигурации.
-| `PLAYWRIGHT_JUNIT_OUTPUT_NAME` | `outputFile` | Базовое имя файла для вывода, относительно каталога вывода. | Отчёт JUnit выводится в stdout.
-| `PLAYWRIGHT_JUNIT_OUTPUT_FILE` | `outputFile` | Полный путь к выходному файлу. Если определено, `PLAYWRIGHT_JUNIT_OUTPUT_DIR` и `PLAYWRIGHT_JUNIT_OUTPUT_NAME` будут проигнорированы. | Отчёт JUnit выводится в stdout.
-| `PLAYWRIGHT_JUNIT_STRIP_ANSI` | `stripANSIControlSequences` | Удалять ли ANSI управляющие последовательности из текста перед записью в отчёт. | По умолчанию текст выводится как есть.
-| `PLAYWRIGHT_JUNIT_INCLUDE_PROJECT_IN_TEST_NAME` | `includeProjectInTestName` | Включать ли имя проекта Playwright в каждое тестовое задание в качестве префикса имени. | По умолчанию не включается.
-| `PLAYWRIGHT_JUNIT_SUITE_ID` |  | Значение атрибута `id` в корневой записи `<testsuites/>` отчёта. | Пустая строка.
-| `PLAYWRIGHT_JUNIT_SUITE_NAME` |  | Значение атрибута `name` в корневой записи `<testsuites/>` отчёта. | Пустая строка.
+| `PLAYWRIGHT_JUNIT_OUTPUT_DIR` | | Каталог для сохранения выходного файла. Игнорируется, если указан выходной файл. | `cwd` или каталог конфигурации.
+| `PLAYWRIGHT_JUNIT_ONLY_FAILURES` | `onlyFailures` | Включать только тесты с неожиданными результатами, нестабильные тесты (включая успешные повторные запуски) и прерванные тесты. Сохраняет все попытки независимо от `includeRetries`. См. [Отчёт только о сбоях](#report-only-failures). | `false`
+| `PLAYWRIGHT_JUNIT_OUTPUT_NAME` | | Базовое имя выходного файла относительно каталога вывода. | Отчёт JUnit выводится в стандартный поток вывода.
+| `PLAYWRIGHT_JUNIT_OUTPUT_FILE` | `outputFile` | Полный путь к выходному файлу. Если задан, `PLAYWRIGHT_JUNIT_OUTPUT_DIR` и `PLAYWRIGHT_JUNIT_OUTPUT_NAME` игнорируются. | Отчёт JUnit выводится в стандартный поток вывода.
+| `PLAYWRIGHT_JUNIT_STRIP_ANSI` | `stripANSIControlSequences` | Удалять ли управляющие последовательности ANSI из текста перед записью в отчёт. | По умолчанию текст вывода добавляется без изменений.
+| `PLAYWRIGHT_JUNIT_INCLUDE_PROJECT_IN_TEST_NAME` | `includeProjectInTestName` | Включать ли имя проекта Playwright в название каждого тестового случая в качестве префикса. | По умолчанию не включается.
+| `PLAYWRIGHT_JUNIT_OMIT_TAGS` | `omitTags` | Исключать ли теги тестов, которые автоматически добавляются к сведениям о сбоях. | `false`
+| `PLAYWRIGHT_JUNIT_SUITE_ID` |  | Значение атрибута `id` корневого элемента отчёта `<testsuites/>`. | Пустая строка.
+| `PLAYWRIGHT_JUNIT_SUITE_NAME` |  | Значение атрибута `name` корневого элемента отчёта `<testsuites/>`. | Пустая строка.
 
-### Аннотации GitHub Actions {#github-actions-annotations}
+### Репортёр Perfetto {/* #perfetto-reporter */}
+
+Репортёр Perfetto создаёт JSON-файл в формате [Trace Event Format](https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/preview), который можно открыть в [интерфейсе Perfetto](https://ui.perfetto.dev) или в `chrome://tracing`. Он представляет запуск тестов в виде временной шкалы с отдельной дорожкой для каждого рабочего процесса, где каждый тест отображается как сегмент, содержащий хуки до и после выполнения, фикстуры и шаги в виде вложенных сегментов. Каждый сегмент содержит подробные сведения о тесте или шаге в аргументах события трассировки, включая расположение в исходном коде, [testStep.params](/api/class-teststep.mdx#test-step-params), теги, аннотации, ошибки, стандартные потоки ввода-вывода и пути к файлам вложений.
+
+```bash
+npx playwright test --reporter=perfetto
+```
+
+По умолчанию отчёт записывается в `test-results/perfetto.json`. Если имя выходного файла заканчивается на `.gz`, отчёт сжимается с помощью gzip на лету. Оба средства просмотра поддерживают этот формат, и такое сжатие особенно полезно при больших запусках тестов.
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  reporter: [['perfetto', { outputFile: 'perfetto.json.gz' }]],
+});
+```
+
+Отчёт Perfetto поддерживает следующие параметры конфигурации и переменные окружения:
+
+| Имя переменной окружения | Параметр конфигурации репортёра| Описание | Значение по умолчанию
+|---|---|---|---|
+| `PLAYWRIGHT_PERFETTO_OUTPUT_DIR` | | Каталог для сохранения выходного файла. Игнорируется, если указан выходной файл. | `test-results`
+| `PLAYWRIGHT_PERFETTO_OUTPUT_NAME` | | Базовое имя выходного файла относительно каталога вывода. | `perfetto.json`
+| `PLAYWRIGHT_PERFETTO_OUTPUT_FILE` | `outputFile` | Полный путь к выходному файлу. Если задан, `PLAYWRIGHT_PERFETTO_OUTPUT_DIR` и `PLAYWRIGHT_PERFETTO_OUTPUT_NAME` игнорируются. | `undefined`
+
+### Аннотации GitHub Actions
 
 Вы можете использовать встроенный отчётчик `github`, чтобы получить автоматические аннотации сбоев при запуске в GitHub Actions.
 
@@ -444,7 +560,9 @@ export default defineConfig({
 });
 ```
 
-## Пользовательские отчётчики {#custom-reporters}
+Репортёр `github` поддерживает параметр `omitTags` (или переменную окружения `PLAYWRIGHT_GITHUB_OMIT_TAGS`), позволяющий скрыть теги тестов в аннотациях, например: `reporter: [['github', { omitTags: true }]]`.
+
+## Пользовательские репортёры
 
 Вы можете создать пользовательский отчётчик, реализовав класс с некоторыми методами отчётчика. Узнайте больше о [Reporter] API.
 
@@ -498,11 +616,6 @@ npx playwright test --reporter="./myreporter/my-awesome-reporter.ts"
 * [Monocart](https://github.com/cenfun/monocart-reporter)
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -515,10 +628,11 @@ npx playwright test --reporter="./myreporter/my-awesome-reporter.ts"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -537,6 +651,7 @@ npx playwright test --reporter="./myreporter/my-awesome-reporter.ts"
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -544,9 +659,18 @@ npx playwright test --reporter="./myreporter/my-awesome-reporter.ts"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -564,6 +688,7 @@ npx playwright test --reporter="./myreporter/my-awesome-reporter.ts"
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -576,6 +701,7 @@ npx playwright test --reporter="./myreporter/my-awesome-reporter.ts"
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -597,6 +723,7 @@ npx playwright test --reporter="./myreporter/my-awesome-reporter.ts"
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

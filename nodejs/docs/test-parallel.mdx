@@ -128,6 +128,56 @@ test('runs second', async () => {
 });
 ```
 
+## Test locks
+
+A few tests in your suite may access a shared resource that does not support concurrent access, for example an external service or a global account setting. You can declare named locks on such tests, so that tests sharing a lock name never run at the same time, while all other tests continue to run in parallel. Locks work across files, worker processes and [projects](./test-projects.mdx).
+
+```js title="settings.spec.ts"
+import { test, expect } from '@playwright/test';
+
+test('update user settings', { lock: 'user-settings' }, async ({ page }) => {
+  // ...
+});
+```
+
+```js title="profile.spec.ts"
+import { test, expect } from '@playwright/test';
+
+// Never runs concurrently with 'update user settings' above,
+// even in a different project.
+test('rename user', { lock: 'user-settings' }, async ({ page }) => {
+  // ...
+});
+```
+
+A test can declare multiple locks and will only run when all of them are available. You can also declare locks on a group with [test.describe()](/api/class-test.mdx#test-describe), applying them to every test inside.
+
+```js
+test('reset the database', { lock: ['database', 'external-api'] }, async () => {
+  // ...
+});
+```
+
+You can also add locks to the enclosing file or describe group with [test.describe.configure()](/api/class-test.mdx#test-describe-configure).  Repeated calls add locks without removing existing ones.
+
+```js
+test.describe.configure({ lock: 'user-settings' });
+```
+
+Playwright acquires all the locks of a test before the test starts and releases them when it finishes.
+
+The built-in `-exclusive-` lock runs a test in isolation: it starts only when no other tests are running, and no other tests start until it finishes. All other tests continue to run in parallel with each other. This is useful for a few tests that are sensitive to any concurrent activity, for example tests that measure performance or restart a shared service.
+
+```js
+test('restart the server', { lock: '-exclusive-' }, async () => {
+  // No other test runs while this one is running.
+});
+```
+
+:::note
+In the default and [serial](#serial-mode) modes, all tests in a file run together in order, so a lock declared on any test is held for the duration of the whole file.
+:::
+
 ## Opt out of fully parallel mode
 
 If your configuration applies parallel mode to all tests using [testConfig.fullyParallel](/api/class-testconfig.mdx#test-config-fully-parallel), you might still want to run some tests with default settings. You can override the mode per describe: 
@@ -139,6 +189,44 @@ test.describe('runs in parallel with other describes', () => {
   test('in order 2', async ({ page }) => {});
 });
 ```
+
+## Avoiding shared state in parallel tests
+
+Playwright runs tests in separate worker processes, each with its own isolated [BrowserContext], so cookies, storage and in-memory globals are already isolated. Flakiness comes from state that lives *outside* a single test. Here are recipes for the common cases.
+
+### Give each test its own backend data
+
+Two tests that create or edit the same record race with each other. Derive a unique identifier from [testInfo.testId](/api/class-testinfo.mdx#test-info-test-id) so parallel tests never collide:
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('creates an order', async ({ page }, testInfo) => {
+  const orderId = `order-${testInfo.testId}`;
+  await page.goto(`/orders/new?id=${orderId}`);
+  await expect(page.getByText(orderId)).toBeVisible();
+});
+```
+
+If many tests can share one dataset, create it once per worker instead — see [Isolate test data between parallel workers](#isolate-test-data-between-parallel-workers).
+
+### Write to a unique file path
+
+Multiple tests writing the same path clobber each other. [testInfo.outputPath()](/api/class-testinfo.mdx#test-info-output-path) returns a path scoped to the current test:
+
+```js
+import { test } from '@playwright/test';
+import fs from 'fs';
+
+test('exports a CSV', async ({ page }, testInfo) => {
+  const file = testInfo.outputPath('export.csv');
+  await fs.promises.writeFile(file, 'a,b,c', 'utf8');
+});
+```
+
+### Keep tests independent
+
+Above all, [keep your tests isolated](./writing-tests.mdx#test-isolation) from one another. A test that leaks state through a module-level variable or depends on another test's side effects works when tests run in order, but breaks the moment they run in parallel or in a different order. Set up everything a test needs in that test or in a [fixture](./test-fixtures.mdx#creating-a-fixture), and never rely on another test having run first.
 
 ## Shard tests between multiple machines
 
@@ -173,7 +261,7 @@ export default defineConfig({
 
 ## Worker index and parallel index
 
-Each worker process is assigned two ids: a unique worker index that starts with 1, and a parallel index that is between `0` and `workers - 1`. When a worker is restarted, for example after a failure, the new worker process has the same `parallelIndex` and a new `workerIndex`.
+Each worker process is assigned two ids: a unique worker index that starts with 0, and a parallel index that is between `0` and `workers - 1`. When a worker is restarted, for example after a failure, the new worker process has the same `parallelIndex` and a new `workerIndex`.
 
 You can read an index from environment variables `process.env.TEST_WORKER_INDEX` and `process.env.TEST_PARALLEL_INDEX`, or access them through [testInfo.workerIndex](/api/class-testinfo.mdx#test-info-worker-index) and [testInfo.parallelIndex](/api/class-testinfo.mdx#test-info-parallel-index).
 
@@ -283,11 +371,6 @@ Do not define your tests directly in a helper file. This could lead to unexpecte
 :::
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -300,10 +383,11 @@ Do not define your tests directly in a helper file. This could lead to unexpecte
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -322,6 +406,7 @@ Do not define your tests directly in a helper file. This could lead to unexpecte
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -329,9 +414,18 @@ Do not define your tests directly in a helper file. This could lead to unexpecte
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -349,6 +443,7 @@ Do not define your tests directly in a helper file. This could lead to unexpecte
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -361,6 +456,7 @@ Do not define your tests directly in a helper file. This could lead to unexpecte
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -382,6 +478,7 @@ Do not define your tests directly in a helper file. This could lead to unexpecte
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"

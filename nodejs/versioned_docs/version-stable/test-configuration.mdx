@@ -33,7 +33,10 @@ export default defineConfig({
   // Отключить параллельные тесты на CI.
   workers: process.env.CI ? 1 : undefined,
 
-  // Репортер для использования
+// Ограничиваем время выполнения всего запуска тестов, чтобы при превышении лимита он завершался с отчётом, а не зависал.
+  globalTimeout: 60 * 60 * 1000,
+
+  // Используемый репортёр
   reporter: 'html',
 
   use: {
@@ -61,15 +64,16 @@ export default defineConfig({
 
 | Опция | Описание |
 | :- | :- |
-| [testConfig.forbidOnly](/api/class-testconfig.mdx#test-config-forbid-only) | Выходить с ошибкой, если какие-либо тесты помечены как `test.only`. Полезно на CI.|
-| [testConfig.fullyParallel](/api/class-testconfig.mdx#test-config-fully-parallel) | Запускать все тесты во всех файлах параллельно. Подробнее см. [Параллелизм](./test-parallel) и [Шардинг](./test-sharding). |
-| [testConfig.projects](/api/class-testconfig.mdx#test-config-projects) | Запускать тесты в нескольких конфигурациях или на нескольких браузерах |
-| [testConfig.reporter](/api/class-testconfig.mdx#test-config-reporter) | Репортер для использования. Подробнее о доступных репортерах см. в разделе [Тестовые репортеры](/test-reporters.mdx). |
-| [testConfig.retries](/api/class-testconfig.mdx#test-config-retries) | Максимальное количество попыток повторного выполнения теста. Подробнее о повторных попытках см. в разделе [Повторные попытки тестов](/test-retries.mdx).|
-| [testConfig.testDir](/api/class-testconfig.mdx#test-config-test-dir) | Директория с файлами тестов. |
-| [testConfig.use](/api/class-testconfig.mdx#test-config-use)  | Опции с `use{}` |
-| [testConfig.webServer](/api/class-testconfig.mdx#test-config-web-server) | Для запуска сервера во время тестов используйте опцию `webServer` |
-| [testConfig.workers](/api/class-testconfig.mdx#test-config-workers) | Максимальное количество параллельных рабочих процессов для использования при параллелизации тестов. Также может быть установлено в процентах от логических ядер процессора, например, `'50%'`. Подробнее см. [Параллелизм](./test-parallel) и [Шардинг](./test-sharding). |
+| [testConfig.forbidOnly](/api/class-testconfig.mdx#test-config-forbid-only) | Завершать ли выполнение с ошибкой, если какие-либо тесты помечены как `test.only`. Полезно в CI.|
+| [testConfig.fullyParallel](/api/class-testconfig.mdx#test-config-fully-parallel) | Запускать все тесты во всех файлах параллельно. Подробнее см. в разделах [Параллельное выполнение](./test-parallel) и [Шардинг](./test-sharding). |
+| [testConfig.globalTimeout](/api/class-testconfig.mdx#test-config-global-timeout) | Максимальное время выполнения всего набора тестов. По его истечении Playwright останавливает выполнение, а репортеры по-прежнему формируют отчет. Подробнее см. в разделе [Тайм-ауты](./test-timeouts.mdx). |
+| [testConfig.projects](/api/class-testconfig.mdx#test-config-projects) | Запускать тесты в нескольких конфигурациях или в нескольких браузерах |
+| [testConfig.reporter](/api/class-testconfig.mdx#test-config-reporter) | Используемый репортер. Подробнее о доступных репортерах см. в разделе [Репортеры тестов](/test-reporters.mdx). |
+| [testConfig.retries](/api/class-testconfig.mdx#test-config-retries) | Максимальное количество повторных попыток выполнения каждого теста. Подробнее о повторных попытках см. в разделе [Повторные попытки выполнения тестов](/test-retries.mdx).|
+| [testConfig.testDir](/api/class-testconfig.mdx#test-config-test-dir) | Каталог с файлами тестов. |
+| [testConfig.use](/api/class-testconfig.mdx#test-config-use)  | Параметры, задаваемые с помощью `use{}` |
+| [testConfig.webServer](/api/class-testconfig.mdx#test-config-web-server) | Чтобы запускать сервер на время выполнения тестов, используйте параметр `webServer` |
+| [testConfig.workers](/api/class-testconfig.mdx#test-config-workers) | Максимальное количество одновременно работающих рабочих процессов для параллельного выполнения тестов. Также можно задать в процентах от количества логических ядер процессора, например `'50%'`. Подробнее см. в разделах [Параллельное выполнение](./test-parallel) и [Шардинг](./test-sharding). |
 
 ## Фильтрация тестов {#filtering-tests}
 
@@ -89,8 +93,8 @@ export default defineConfig({
 
 | Опция | Описание |
 | :- | :- |
-| [testConfig.testIgnore](/api/class-testconfig.mdx#test-config-test-ignore) | Шаблоны glob или регулярные выражения, которые должны быть проигнорированы при поиске файлов тестов. Например, `'*test-assets'` |
-| [testConfig.testMatch](/api/class-testconfig.mdx#test-config-test-match) | Шаблоны glob или регулярные выражения, которые соответствуют файлам тестов. Например, `'*todo-tests/*.spec.ts'`. По умолчанию Playwright запускает файлы <code>.*(test&#124;spec)\.(js&#124;ts&#124;mjs)</code>. |
+| [testConfig.testIgnore](/api/class-testconfig.mdx#test-config-test-ignore) | Glob-шаблоны или регулярные выражения для файлов, которые следует игнорировать при поиске тестовых файлов. Например, `'*test-assets'` |
+| [testConfig.testMatch](/api/class-testconfig.mdx#test-config-test-match) | Glob-шаблоны или регулярные выражения, которым соответствуют тестовые файлы. Например, `'*todo-tests/*.spec.ts'`. По умолчанию Playwright запускает файлы, соответствующие шаблону <code>**/*.@(spec&#124;test).?(c&#124;m)[jt]s?(x)</code>. |
 
 ## Расширенная конфигурация {#advanced-configuration}
 
@@ -154,11 +158,6 @@ export default defineConfig({
 | [expect(value).toMatchSnapshot()](/api/class-snapshotassertions.mdx#snapshot-assertions-to-match-snapshot-1)| Конфигурация для метода `expect(locator).toMatchSnapshot()`.|
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -171,10 +170,11 @@ export default defineConfig({
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -193,6 +193,7 @@ export default defineConfig({
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -200,9 +201,18 @@ export default defineConfig({
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -220,6 +230,7 @@ export default defineConfig({
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -232,6 +243,7 @@ export default defineConfig({
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -253,6 +265,7 @@ export default defineConfig({
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

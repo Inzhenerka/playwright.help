@@ -68,7 +68,7 @@ pwsh bin/Debug/netX/playwright.ps1 install --with-deps chromium
 
 ## Настройка браузеров {#configure-browsers}
 
-Playwright может запускать тесты в браузерах Chromium, WebKit и Firefox, а также в брендированных браузерах, таких как Google Chrome и Microsoft Edge. Он также может работать на эмулируемых планшетах и мобильных устройствах. См. [реестр параметров устройств](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json) для полного списка выбранных настольных, планшетных и мобильных устройств.
+Playwright позволяет запускать тесты в браузерах Chromium, WebKit и Firefox, а также в фирменных браузерах, таких как Google Chrome и Microsoft Edge. Кроме того, он поддерживает запуск тестов на эмулируемых планшетах и мобильных устройствах. Полный список доступных профилей настольных компьютеров, планшетов и мобильных устройств приведён в [реестре параметров устройств](https://github.com/microsoft/playwright/blob/main/packages/isomorphic/deviceDescriptorsSource.json).
 
 ### Запуск тестов в разных браузерах {#run-tests-on-different-browsers}
 
@@ -140,6 +140,8 @@ dotnet test -- Playwright.BrowserName=chromium Playwright.LaunchOptions.Channel=
 # только запуск тестов в headless режиме
 pwsh bin/Debug/netX/playwright.ps1 install --with-deps --no-shell
 ```
+
+<ApiAnchor id="google-chrome--microsoft-edge" />
 
 ### Google Chrome и Microsoft Edge {#google-chrome-microsoft-edge}
 
@@ -290,7 +292,7 @@ set NODE_EXTRA_CA_CERTS="C:\certs\root.crt"
 </TabItem>
 </Tabs>
 
-Если ваша сеть медленно подключается к архиву браузеров Playwright, вы можете увеличить время ожидания подключения в миллисекундах с помощью переменной окружения `PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT`:
+Если архив браузера загружается медленно или загрузка зависает, вы можете увеличить время ожидания сокета при загрузке, указав его в миллисекундах в переменной окружения `PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT`. Несмотря на название, эта переменная задаёт время ожидания при отсутствии данных, а не время ожидания установления соединения: она ограничивает длительность периода, в течение которого при загрузке не поступают данные. По умолчанию это время составляет 30 секунд:
 
 <Tabs
   groupId="bash-flavor"
@@ -462,7 +464,7 @@ pwsh bin/Debug/netX/playwright.ps1 install
 </TabItem>
 </Tabs>
 
-При запуске скриптов Playwright попросите его искать браузеры в общем расположении.
+При запуске скриптов Playwright укажите Playwright искать браузеры в общем расположении.
 
 <Tabs
   groupId="bash-flavor"
@@ -502,14 +504,18 @@ Playwright отслеживает пакеты, которым нужны эти
 
 :::note
 
-Разработчики могут включить этот режим, экспортировав `PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers` в своем `.bashrc`.
+Разработчики могут включить этот режим, добавив `export PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers` в свой файл `.bashrc`.
 :::
 
 ### Удаление устаревших браузеров {#stale-browser-removal}
 
 Playwright отслеживает клиентов, которые используют его браузеры. Когда больше нет клиентов, которым требуется определенная версия браузера, эта версия удаляется из системы. Таким образом, вы можете безопасно использовать экземпляры Playwright разных версий и в то же время не тратить дисковое пространство на браузеры, которые больше не используются.
 
-Чтобы отказаться от удаления неиспользуемых браузеров, вы можете установить переменную окружения `PLAYWRIGHT_SKIP_BROWSER_GC=1`.
+Чтобы отключить удаление неиспользуемых браузеров, можно установить переменную окружения `PLAYWRIGHT_SKIP_BROWSER_GC=1` или передать параметр `--no-remove` команде установки:
+
+```bash
+pwsh bin/Debug/netX/playwright.ps1 install --no-remove
+```
 
 ### Список всех установленных браузеров {#list-all-installed-browsers}
 
@@ -544,6 +550,8 @@ pwsh bin/Debug/netX/playwright.ps1 uninstall --all
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -563,15 +571,18 @@ pwsh bin/Debug/netX/playwright.ps1 uninstall --all
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

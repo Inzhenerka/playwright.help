@@ -12,7 +12,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Методы {#methods}
 
-### newContext {#api-request-new-context}
+### newContext {/* #api-request-new-context */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequest.newContext</x-search>
 
@@ -29,11 +29,11 @@ APIRequest.newContext(options);
 - `options` `ApiRequest.NewContextOptions` *(опционально)*
   - `setBaseURL` [String] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-base-url"/><a href="#api-request-new-context-option-base-url" class="list-anchor">#</a>
     
-    Методы, такие как [APIRequestContext.get()](/api/class-apirequestcontext.mdx#api-request-context-get), учитывают базовый URL, используя конструктор [`URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) для построения соответствующего URL. Примеры:
-    * baseURL: `http://localhost:3000` и отправка запроса на `/bar.html` приводит к `http://localhost:3000/bar.html`
-    * baseURL: `http://localhost:3000/foo/` и отправка запроса на `./bar.html` приводит к `http://localhost:3000/foo/bar.html`
-    * baseURL: `http://localhost:3000/foo` (без завершающего слэша) и навигация к `./bar.html` приводит к `http://localhost:3000/bar.html`
-  - `setClientCertificates` [List]&lt;ClientCertificates&gt; *(опционально)* <font size="2">Добавлено в: 1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-client-certificates"/><a href="#api-request-new-context-option-client-certificates" class="list-anchor">#</a>
+Методы, такие как [APIRequestContext.get()](/api/class-apirequestcontext.mdx#api-request-context-get), учитывают базовый URL, используя конструктор [`URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) для построения соответствующего URL. Примеры:
+    * baseURL: `http://localhost:3000` и отправка запроса к `/bar.html` приводят к `http://localhost:3000/bar.html`
+    * baseURL: `http://localhost:3000/foo/` и отправка запроса к `./bar.html` приводят к `http://localhost:3000/foo/bar.html`
+    * baseURL: `http://localhost:3000/foo` (без завершающего слеша) и переход к `./bar.html` приводят к `http://localhost:3000/bar.html`
+  - `setClientCertificates` [List]&lt;ClientCertificates&gt; *(необязательно)* <font size="2">Добавлено в: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-client-certificates"/><a href="#api-request-new-context-option-client-certificates" class="list-anchor">#</a>
     - `setOrigin` [String]
       
       Точный источник, для которого сертификат действителен. Источник включает протокол `https`, имя хоста и, возможно, порт.
@@ -77,8 +77,8 @@ APIRequest.newContext(options);
     Объект, содержащий дополнительные HTTP заголовки, которые будут отправлены с каждым запросом. По умолчанию отсутствуют.
   - `setFailOnStatusCode` [boolean] *(опционально)* <font size="2">Добавлено в: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-fail-on-status-code"/><a href="#api-request-new-context-option-fail-on-status-code" class="list-anchor">#</a>
     
-    Следует ли выбрасывать исключение для кодов ответа, отличных от 2xx и 3xx. По умолчанию объект ответа возвращается для всех кодов состояния.
-  - `setHttpCredentials` HttpCredentials *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-http-credentials"/><a href="#api-request-new-context-option-http-credentials" class="list-anchor">#</a>
+Определяет, следует ли выбрасывать исключение при получении кодов ответа, отличных от 2xx и 3xx. По умолчанию объект ответа возвращается для всех кодов состояния.
+  - `setHttpCredentials` HttpCredentials | [List]&lt;HttpCredentials&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-http-credentials"/><a href="#api-request-new-context-option-http-credentials" class="list-anchor">#</a>
     - `setUsername` [String]
       
       
@@ -92,8 +92,10 @@ APIRequest.newContext(options);
       
       Эта опция применяется только к запросам, отправленным из соответствующего [APIRequestContext] и не влияет на запросы, отправленные из браузера. `'always'` - заголовок `Authorization` с учетными данными базовой аутентификации будет отправлен с каждым API-запросом. `'unauthorized` - учетные данные отправляются только при получении ответа 401 (Unauthorized) с заголовком `WWW-Authenticate`. По умолчанию `'unauthorized'`.
     
-    Учетные данные для [HTTP-аутентификации](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Если источник не указан, имя пользователя и пароль отправляются на любые серверы при получении неавторизованных ответов.
-  - `setIgnoreHTTPSErrors` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-ignore-https-errors"/><a href="#api-request-new-context-option-ignore-https-errors" class="list-anchor">#</a>
+Учётные данные для [HTTP-аутентификации](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Если источник (origin) не указан, имя пользователя и пароль отправляются любым серверам в ответ на сообщения об отсутствии авторизации.
+    
+    Передайте массив, чтобы использовать разные учётные данные для разных источников. Используется первая запись, соответствующая источнику запроса, а записи без указанного источника соответствуют любому запросу.
+  - `setIgnoreHTTPSErrors` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-ignore-https-errors"/><a href="#api-request-new-context-option-ignore-https-errors" class="list-anchor">#</a>
     
     Определяет, нужно ли игнорировать ошибки HTTPS при отправке сетевых запросов. По умолчанию — `false`.
   - `setMaxRedirects` [int] *(опционально)* <font size="2">Добавлено в: v1.52</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-max-redirects"/><a href="#api-request-new-context-option-max-redirects" class="list-anchor">#</a>
@@ -140,6 +142,8 @@ APIRequest.newContext(options);
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -161,15 +165,18 @@ APIRequest.newContext(options);
 [RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -182,6 +189,7 @@ APIRequest.newContext(options);
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[BiConsumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html "BiConsumer"
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
@@ -189,6 +197,7 @@ APIRequest.newContext(options);
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[Integer]: https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html "Integer"
 [long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"

@@ -1,0 +1,147 @@
+---
+title: "Консоль и выполнение кода"
+---
+
+# Консоль и выполнение кода
+
+## Сообщения консоли
+
+```bash
+playwright-cli console                  # все сообщения (уровень info и выше)
+playwright-cli console error            # только ошибки
+playwright-cli console warning          # предупреждения и ошибки
+playwright-cli console debug            # все сообщения
+playwright-cli console --clear          # очистить буфер сообщений
+```
+
+Каждый уровень включает сообщения более высоких уровней серьёзности; по умолчанию используется `info`. Вывод начинается
+со строки с количеством сообщений, чтобы можно было сразу понять, есть ли на странице ошибки или предупреждения:
+
+```bash
+$ playwright-cli console error
+# Total messages: 37 (Errors: 2, Warnings: 5)
+# Returning 2 messages for level "error"
+#
+# [ERROR] Uncaught TypeError: Cannot read property 'map' of undefined @ app.js:42
+# [ERROR] Failed to load resource: 404 (Not Found) @ /api/users
+```
+
+### Рабочий процесс: отладка неработающей страницы
+
+```bash
+# Проверьте консоль на наличие ошибок
+playwright-cli console error
+# [ERROR] Failed to fetch: GET https://api.example.com/data 404
+
+# Теперь вы знаете, что конечная точка API возвращает код 404
+# Подмените ответ для маршрута или продолжите исследование
+playwright-cli route "**/api/data" \
+  --body='{"items":[]}' --content-type=application/json
+playwright-cli reload
+```
+
+## Выполнение JavaScript
+
+```bash
+playwright-cli eval <func> [target]
+```
+
+Аргумент — это функция: `() => { ... }` для страницы или `element => { ... }`, если указана цель.
+Передайте `--filename`, чтобы записать результат в файл вместо его непосредственного вывода.
+
+### Выполнение кода на уровне страницы
+
+```bash
+$ playwright-cli eval "() => document.title"
+# React - TodoMVC
+
+$ playwright-cli eval "() => window.innerWidth + 'x' + window.innerHeight"
+# 1280x720
+
+$ playwright-cli eval "() => JSON.stringify([...document.querySelectorAll('a')].map(a => a.href))" \
+    --filename=links.json
+```
+
+### Выполнение кода для элемента
+
+`eval` позволяет прочитать атрибуты, которые не отображаются в снимке, — `id`, `class`, `data-*`,
+а также вычисленные стили:
+
+```bash
+$ playwright-cli eval "el => el.id" e15
+# item-42
+
+$ playwright-cli eval "el => el.getAttribute('data-testid')" e15
+# todo-item
+
+$ playwright-cli eval "el => getComputedStyle(el).color" e5
+# rgb(255, 0, 0)
+```
+
+### Передача результатов по конвейеру
+
+`--raw` убирает сведения о состоянии страницы и снимок, оставляя только значение:
+
+```bash
+playwright-cli --raw eval "JSON.stringify(performance.timing)" | jq '.loadEventEnd - .navigationStart'
+```
+
+## Запуск кода Playwright
+
+Выполняйте произвольные скрипты Playwright с полным доступом к API:
+
+```bash
+playwright-cli run-code <code>
+playwright-cli run-code --filename=script.js
+```
+
+Код должен представлять собой одно функциональное выражение — оно оборачивается в `(...)` и вычисляется, поэтому
+`import` / `require` недоступны. Функция получает текущий объект `page`, а возвращаемое ею значение
+выводится в консоль.
+
+### Настройка геолокации
+
+```bash
+playwright-cli run-code "async (page) => {
+  await page.context().grantPermissions(['geolocation']);
+  await page.context().setGeolocation({latitude: 37.77, longitude: -122.42});
+}"
+```
+
+### Ожидание определённого условия
+
+```bash
+playwright-cli run-code "async (page) => {
+  await page.waitForSelector('.data-loaded');
+  return 'Data loaded successfully';
+}"
+```
+
+### Эмуляция медиапараметров
+
+```bash
+playwright-cli run-code "async (page) => page.emulateMedia({ colorScheme: 'dark' })"
+```
+
+### Работа внутри iframe
+
+```bash
+playwright-cli run-code "async (page) => {
+  const frame = page.locator('iframe#checkout').contentFrame();
+  await frame.getByRole('button', { name: 'Pay' }).click();
+}"
+```
+
+### Извлечение структурированных данных
+
+```bash
+playwright-cli run-code "async (page) => {
+  const items = await page.$$eval('.product', els =>
+    els.map(el => ({
+      name: el.querySelector('.name').textContent,
+      price: el.querySelector('.price').textContent
+    }))
+  );
+  return JSON.stringify(items, null, 2);
+}"
+```

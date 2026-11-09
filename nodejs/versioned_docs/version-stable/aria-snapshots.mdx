@@ -14,11 +14,13 @@ import LiteYouTube from '@site/src/components/LiteYouTube';
 
 ```js
 await page.goto('https://playwright.dev/');
-await expect(page.getByRole('banner')).toMatchAriaSnapshot(`
+await expect(page).toMatchAriaSnapshot(`
   - banner:
     - heading /Playwright enables reliable end-to-end/ [level=1]
-    - link "Get started"
-    - link "Star microsoft/playwright on GitHub"
+    - link "Get started":
+      - /url: /docs/intro
+    - link "Star microsoft/playwright on GitHub":
+      - /url: https://github.com/microsoft/playwright
     - link /[\\d]+k\\+ stargazers on GitHub/
 `);
 ```
@@ -70,7 +72,7 @@ await expect(page.getByRole('banner')).toMatchAriaSnapshot(`
 
 ## Aria снимки {#aria-snapshots}
 
-В Playwright, aria снимки предоставляют YAML-представление дерева доступности страницы. Эти снимки могут быть сохранены и сравнены позже, чтобы проверить, остается ли структура страницы последовательной или соответствует определенным ожиданиям.
+В Playwright снимки ARIA представляют дерево доступности страницы в формате YAML. Эти снимки можно сохранять и впоследствии сравнивать, чтобы проверять, остаётся ли структура страницы неизменной или соответствует ли она заданным ожиданиям. Шаблон задаёт ограничения и не обязательно является полной сериализацией дерева доступности.
 
 Формат YAML описывает иерархическую структуру доступных элементов на странице, детализируя **роли**, **атрибуты**, **значения** и **текстовое содержимое**. Структура следует синтаксису, похожему на дерево, где каждый узел представляет доступный элемент, а отступы указывают на вложенные элементы.
 
@@ -80,15 +82,15 @@ await expect(page.getByRole('banner')).toMatchAriaSnapshot(`
 - role "name" [attribute=value]
 ```
 
-- **role**: Указывает ARIA или HTML роль элемента (например, `heading`, `list`, `listitem`, `button`).
-- **"name"**: Доступное имя элемента. Строки в кавычках указывают точные значения, `/patterns/` используются для регулярных выражений.
-- **[attribute=value]**: Атрибуты и значения в квадратных скобках представляют конкретные ARIA атрибуты, такие как `checked`, `disabled`, `expanded`, `level`, `pressed` или `selected`.
+- **role**: Указывает ARIA-роль или HTML-роль элемента (например, `heading`, `list`, `listitem`, `button`).
+- **"name"**: Доступное имя элемента. Строки в кавычках обозначают точные значения, а `/patterns/` используются для регулярных выражений.
+- **[attribute=value]**: Атрибуты и значения в квадратных скобках представляют определённые ARIA-атрибуты, такие как `checked`, `disabled`, `expanded`, `invalid`, `level`, `pressed` или `selected`. Атрибуты могут задавать ограничение на конкретное значение, например `[pressed=mixed]`.
 
 Эти значения берутся из атрибутов ARIA или вычисляются на основе HTML-семантики. Чтобы посмотреть структуру дерева доступности страницы, используйте [вкладку Accessibility в Chrome DevTools](https://developer.chrome.com/docs/devtools/accessibility/reference#tab).
 
 ## Сопоставление снимков {#snapshot-matching}
 
-Метод утверждения [expect(locator).toMatchAriaSnapshot()](/api/class-locatorassertions.mdx#locator-assertions-to-match-aria-snapshot) в Playwright сравнивает доступную структуру области локатора с заранее определенным шаблоном aria снимка, помогая проверить состояние страницы в соответствии с требованиями тестирования.
+Метод проверки [expect(page).toMatchAriaSnapshot()](/api/class-pageassertions.mdx#page-assertions-to-match-aria-snapshot) в Playwright сравнивает структуру доступности страницы с заранее заданным шаблоном ARIA-снимка, помогая проверить соответствие состояния страницы требованиям тестирования. Вы также можете использовать [expect(locator).toMatchAriaSnapshot()](/api/class-locatorassertions.mdx#locator-assertions-to-match-aria-snapshot), чтобы сравнить с шаблоном определённую часть страницы.
 
 Для следующего DOM:
 
@@ -99,15 +101,16 @@ await expect(page.getByRole('banner')).toMatchAriaSnapshot(`
 Вы можете сопоставить его, используя следующий шаблон снимка:
 
 ```js
-await expect(page.locator('body')).toMatchAriaSnapshot(`
+await expect(page).toMatchAriaSnapshot(`
   - heading "title"
 `);
 ```
 
 При сопоставлении шаблон снимка сравнивается с текущим деревом доступности страницы:
-* Если структура дерева соответствует шаблону, тест проходит; в противном случае он не проходит, указывая на несоответствие между ожидаемыми и фактическими состояниями доступности.
-* Сравнение чувствительно к регистру и сворачивает пробелы, поэтому отступы и разрывы строк игнорируются.
-* Сравнение чувствительно к порядку, что означает, что порядок элементов в шаблоне снимка должен соответствовать порядку в дереве доступности страницы.
+* Если структура дерева соответствует шаблону, тест проходит; в противном случае он завершается с ошибкой, указывающей на несоответствие между ожидаемым и фактическим состояниями доступности.
+* Сравнение учитывает регистр и нормализует пробельные символы в именах и текстовых значениях. Отступы YAML определяют вложенность.
+* Сравнение учитывает порядок: порядок элементов в шаблоне снимка должен совпадать с порядком элементов в дереве доступности страницы.
+* Шаблон из одного узла может соответствовать узлу на любой глубине в пределах выбранной страницы или локатора. Несколько узлов верхнего уровня должны соответствовать узлам с одним и тем же родительским узлом, расположенным в указанном порядке.
 
 ### Частичное сопоставление {#partial-matching}
 
@@ -117,9 +120,7 @@ await expect(page.locator('body')).toMatchAriaSnapshot(`
 <button>Submit</button>
 ```
 
-*aria снимок*
-
-```yaml
+```yaml title="ARIA-снимок"
 - button
 ```
 
@@ -133,9 +134,7 @@ await expect(page.locator('body')).toMatchAriaSnapshot(`
 <input type="checkbox" checked>
 ```
 
-*aria снимок для частичного сопоставления*
-
-```yaml
+```yaml title="ARIA-снимок (частичное совпадение)"
 - checkbox
 ```
 
@@ -153,10 +152,8 @@ await expect(page.locator('body')).toMatchAriaSnapshot(`
 </ul>
 ```
 
-*aria снимок для частичного сопоставления*
-
-```yaml
-- list
+```yaml title="ARIA-снимок (частичное совпадение)"
+- list:
   - listitem: Feature B
 ```
 
@@ -174,17 +171,17 @@ await expect(page.locator('body')).toMatchAriaSnapshot(`
 </ul>
 ```
 
-*ARIA-снимок для частичного совпадения*
-
-```yaml
-- list
+```yaml title="ARIA-снимок (частичное совпадение)"
+- list:
   - listitem: Feature B
 ```
 
-Свойство `/children` можно использовать, чтобы управлять тем, как сопоставляются дочерние элементы:
-- `contain` (по умолчанию): совпадает, если все указанные дочерние элементы присутствуют в указанном порядке
-- `equal`: совпадает, если дочерние элементы в точности соответствуют указанному списку в указанном порядке
-- `deep-equal`: совпадает, если дочерние элементы в точности соответствуют указанному списку в указанном порядке, включая вложенные дочерние элементы
+Свойство `/children` управляет сопоставлением дочерних узлов того узла, в котором оно указано:
+- `contain` (по умолчанию): Совпадение, если все указанные дочерние узлы присутствуют в заданном порядке.
+- `equal`: Совпадение, если непосредственные дочерние узлы в точности соответствуют указанному списку с учётом порядка.
+- `deep-equal`: Совпадение, если дочерние узлы и все их потомки в точности соответствуют указанному списку с учётом порядка.
+
+Если ожидаемые дочерние узлы не указаны, `contain` допускает любые дочерние узлы, тогда как `equal` и `deep-equal` требуют их отсутствия. Добавьте `/children: contain` во вложенный узел, чтобы переопределить унаследованный режим сопоставления `deep-equal` и разрешить в нём дополнительные дочерние узлы.
 
 ```html
 <ul>
@@ -194,16 +191,34 @@ await expect(page.locator('body')).toMatchAriaSnapshot(`
 </ul>
 ```
 
-*ARIA-снимок упадёт, потому что Feature C отсутствует в шаблоне*
+Следующая проверка снимка завершится неудачей, поскольку Feature C отсутствует в шаблоне:
 
-```yaml
-- list
+```yaml title="aria snapshot"
+- list:
   - /children: equal
   - listitem: Feature A
   - listitem: Feature B
 ```
 
-### Сопоставление с регулярными выражениями {#matching-with-regular-expressions}
+#### Глобальная настройка режима `children`
+
+Вместо добавления свойства `/children` в каждый снимок вы можете задать режим сопоставления дочерних элементов по умолчанию для всех вызовов `toMatchAriaSnapshot` в файле конфигурации:
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  expect: {
+    toMatchAriaSnapshot: {
+      children: 'equal',
+    },
+  },
+});
+```
+
+Отдельные снимки по-прежнему могут переопределять глобальную настройку, явно указывая свойство `/children` в шаблоне.
+
+### Сопоставление с помощью регулярных выражений
 
 Регулярные выражения позволяют гибко сопоставлять элементы с динамическим или переменным текстом. Доступные имена и текст могут поддерживать шаблоны регулярных выражений.
 
@@ -211,9 +226,7 @@ await expect(page.locator('body')).toMatchAriaSnapshot(`
 <h1>Issues 12</h1>
 ```
 
-*aria снимок с регулярным выражением*
-
-```yaml
+```yaml title="ARIA-снимок"
 - heading /Issues \d+/
 ```
 
@@ -231,13 +244,13 @@ await expect(page.locator('body')).toMatchAriaSnapshot(`
 
 При использовании тестового раннера Playwright (`@playwright/test`) вы можете автоматически обновлять снимки с помощью флага `--update-snapshots`, сокращенно `-u`.
 
-Запуск тестов с флагом `--update-snapshots` обновит снимки, которые не совпали. Совпадающие снимки не будут обновлены.
+При запуске без этого флага используется режим `default`: отсутствующие снимки создаются, но тесты, которые их создают, завершаются с ошибкой, чтобы запуск с новыми снимками не прошёл незаметно. Используйте `missing`, чтобы создавать отсутствующие снимки и при этом сохранять успешный статус этих тестов. При указании `-u` используется режим `changed`, в котором обновляются снимки, не совпадающие с текущим результатом. Используйте `all`, чтобы заново создать все снимки, включая совпадающие, или `none`, чтобы запретить обновление снимков.
 
 ```bash
 npx playwright test --update-snapshots
 ```
 
-Обновление снимков полезно, когда изменения в структуре приложения требуют новых снимков в качестве основы. Обратите внимание, что Playwright будет ждать максимального времени ожидания, указанного в конфигурации тестового раннера, чтобы убедиться, что страница стабилизировалась перед созданием снимка. Возможно, потребуется настроить `--timeout`, если тест достигает тайм-аута при генерации снимков.
+Обновление снимков полезно, когда изменения в структуре приложения требуют новых эталонных снимков. Playwright повторяет проверку утверждения до истечения тайм-аута expect. Измените значение `--timeout`, если создание снимков занимает больше времени, чем отведено тайм-аутом теста.
 
 #### Пустой шаблон для генерации снимков {#empty-template-for-snapshot-generation}
 
@@ -247,11 +260,11 @@ npx playwright test --update-snapshots
 await expect(locator).toMatchAriaSnapshot('');
 ```
 
-Обратите внимание, что Playwright будет ждать максимального времени ожидания, указанного в конфигурации тестового раннера, чтобы убедиться, что страница стабилизировалась перед созданием снимка. Возможно, потребуется настроить `--timeout`, если тест достигает тайм-аута при генерации снимков.
+Это работает без `-u`, поскольку в режиме по умолчанию создаются недостающие снимки.
 
 #### Файлы патчей снимков {#snapshot-patch-files}
 
-При обновлении снимков Playwright создает файлы патчей, которые фиксируют различия. Эти файлы патчей могут быть просмотрены, применены и зафиксированы в системе контроля версий, позволяя командам отслеживать структурные изменения с течением времени и обеспечивать, чтобы обновления соответствовали требованиям приложения.
+Для встроенных шаблонов снимков Playwright создаёт файлы патчей, содержащие различия. Эти файлы патчей можно просмотреть и применить. Отдельные снимки `.aria.yml` записываются непосредственно по настроенному для них пути.
 
 Способ обновления исходного кода можно изменить с помощью флага `--update-source-method`. Доступно несколько вариантов:
 - **"patch"** (по умолчанию): Генерирует унифицированный файл diff, который можно применить к исходному коду с помощью `git apply`.
@@ -282,14 +295,14 @@ export default defineConfig({
 });
 ```
 
-### Использование метода `Locator.ariaSnapshot` {#using-the-locatorariasnapshot-method}
+### Использование [page.ariaSnapshot()](/api/class-page.mdx#page-aria-snapshot) и [locator.ariaSnapshot()](/api/class-locator.mdx#locator-aria-snapshot)
 
-Метод [locator.ariaSnapshot()](/api/class-locator.mdx#locator-aria-snapshot) позволяет программно создавать YAML-представление доступных элементов в области локатора, что особенно полезно для динамической генерации снимков во время выполнения теста.
+Методы [page.ariaSnapshot()](/api/class-page.mdx#page-aria-snapshot) и [locator.ariaSnapshot()](/api/class-locator.mdx#locator-aria-snapshot) позволяют программно создавать YAML-представление элементов дерева доступности в области действия локатора, что особенно полезно для динамического создания снимков во время выполнения тестов.
 
 **Пример**:
 
 ```js
-const snapshot = await page.locator('body').ariaSnapshot();
+const snapshot = await page.ariaSnapshot();
 console.log(snapshot);
 ```
 
@@ -306,9 +319,7 @@ console.log(snapshot);
 <h2>Subtitle</h2>
 ```
 
-*aria снимок*
-
-```yaml
+```yaml title="ARIA-снимок"
 - heading "Title" [level=1]
 - heading "Subtitle" [level=2]
 ```
@@ -321,9 +332,7 @@ console.log(snapshot);
 <div>Sample accessible name</div>
 ```
 
-*aria снимок*
-
-```yaml
+```yaml title="ARIA-снимок"
 - text: Sample accessible name
 ```
 
@@ -335,24 +344,32 @@ console.log(snapshot);
 <p>Line 1<br>Line 2</p>
 ```
 
-*aria снимок*
-
-```yaml
+```yaml title="ARIA-снимок"
 - paragraph: Line 1 Line 2
 ```
 
 ### Ссылки {#links}
 
-Ссылки отображают свой текст или составное содержимое из псевдоэлементов.
+Ссылки отображают свой текст или составное содержимое из псевдоэлементов. Адрес назначения ссылки можно сопоставить с помощью свойства `/url`.
 
 ```html
 <a href="#more-info">Read more about Accessibility</a>
 ```
 
-*aria снимок*
+```yaml title="ARIA-снимок"
+- link "Read more about Accessibility":
+    - /url: "#more-info"
+```
 
-```yaml
-- link "Read more about Accessibility"
+Значение `/url` также может быть регулярным выражением:
+
+```html
+<a href="https://www.youtube.com/channel/UC46Zj8pDH5tDosqm1gd7WTg">YouTube channel</a>
+```
+
+```yaml title="aria snapshot"
+- link:
+  - /url: /https://www.youtube.com/channel/.*/
 ```
 
 ### Текстовые поля {#text-boxes}
@@ -363,9 +380,7 @@ console.log(snapshot);
 <input type="text" value="Enter your name">
 ```
 
-*aria снимок*
-
-```yaml
+```yaml title="ARIA-снимок"
 - textbox: Enter your name
 ```
 
@@ -380,9 +395,7 @@ console.log(snapshot);
 </ul>
 ```
 
-*aria снимок*
-
-```yaml
+```yaml title="ARIA-снимок"
 - list "Main Features":
   - listitem: Feature 1
   - listitem: Feature 2
@@ -399,15 +412,13 @@ console.log(snapshot);
 </details>
 ```
 
-*aria снимок*
-
-```yaml
+```yaml title="ARIA-снимок"
 - group: Summary
 ```
 
 ### Атрибуты и состояния {#attributes-and-states}
 
-Часто используемые ARIA атрибуты, такие как `checked`, `disabled`, `expanded`, `level`, `pressed` и `selected`, представляют состояния управления.
+Часто используемые атрибуты ARIA, такие как `checked`, `disabled`, `expanded`, `invalid`, `level`, `pressed` и `selected`, отражают состояния элементов управления.
 
 #### Флажок с атрибутом `checked` {#checkbox-with-checked-attribute}
 
@@ -415,9 +426,7 @@ console.log(snapshot);
 <input type="checkbox" checked>
 ```
 
-*aria снимок*
-
-```yaml
+```yaml title="снимок ARIA"
 - checkbox [checked]
 ```
 
@@ -427,18 +436,31 @@ console.log(snapshot);
 <button aria-pressed="true">Toggle</button>
 ```
 
-*aria снимок*
-
-```yaml
+```yaml title="ARIA-снимок"
 - button "Toggle" [pressed=true]
 ```
 
+#### Поле ввода с атрибутом `aria-invalid` {#input-with-aria-invalid-attribute}
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
+Значение `aria-invalid` отображается напрямую. Значение `true` отображается как `[invalid]`, а `grammar` и `spelling` отображаются как `[invalid=grammar]` и `[invalid=spelling]`. Значение `false` опускается.
+
+```html
+<input type="text" aria-label="Email" aria-invalid="true" value="not-an-email">
+```
+
+```yaml title="aria snapshot"
+- textbox "Email" [invalid]: not-an-email
+```
+
+```html
+<input type="text" aria-label="Bio" aria-invalid="spelling">
+```
+
+```yaml title="aria snapshot"
+- textbox "Bio" [invalid=spelling]
+```
+
+
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -451,10 +473,11 @@ console.log(snapshot);
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -473,6 +496,7 @@ console.log(snapshot);
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -480,9 +504,18 @@ console.log(snapshot);
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -500,6 +533,7 @@ console.log(snapshot);
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -512,6 +546,7 @@ console.log(snapshot);
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -533,6 +568,7 @@ console.log(snapshot);
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

@@ -61,7 +61,41 @@ asyncio.run(main())
 
 ## Methods
 
-### close {#browser-close}
+### bind {/* #browser-bind */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>browser.bind</x-search>
+
+Binds the browser to a named pipe or web socket, making it available for other clients to connect to.
+
+**Usage**
+
+```python
+browser.bind(title)
+browser.bind(title, **kwargs)
+```
+
+**Arguments**
+- `title` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-bind-option-title"/><a href="#browser-bind-option-title" class="list-anchor">#</a>
+  
+  Title of the browser server, used for identification.
+- `host` [str] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-bind-option-host"/><a href="#browser-bind-option-host" class="list-anchor">#</a>
+  
+  Host to bind the web socket server to. When specified, a web socket server is created instead of a named pipe.
+- `port` [int] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-bind-option-port"/><a href="#browser-bind-option-port" class="list-anchor">#</a>
+  
+  Port to bind the web socket server to. When specified, a web socket server is created instead of a named pipe. Use `0` to let the OS pick an available port.
+- `workspace_dir` [str] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-bind-option-workspace-dir"/><a href="#browser-bind-option-workspace-dir" class="list-anchor">#</a>
+  
+  Working directory associated with this browser server.
+
+**Returns**
+- [Dict]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-bind-return"/><a href="#browser-bind-return" class="list-anchor">#</a>
+  - `endpoint` [str]
+    
+    
+---
+
+### close {/* #browser-close */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browser.close</x-search>
 
@@ -93,7 +127,7 @@ browser.close(**kwargs)
 
 ---
 
-### new_browser_cdp_session {#browser-new-browser-cdp-session}
+### new_browser_cdp_session {/* #browser-new-browser-cdp-session */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browser.new_browser_cdp_session</x-search>
 
@@ -115,7 +149,7 @@ browser.new_browser_cdp_session()
 
 ---
 
-### new_context {#browser-new-context}
+### new_context {/* #browser-new-context */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browser.new_context</x-search>
 
@@ -183,7 +217,7 @@ await browser.close()
 - `bypass_csp` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-bypass-csp"/><a href="#browser-new-context-option-bypass-csp" class="list-anchor">#</a>
   
   Toggles bypassing page's Content-Security-Policy. Defaults to `false`.
-- `client_certificates` [List]\[[Dict]\] *(optional)* <font size="2">Added in: 1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-client-certificates"/><a href="#browser-new-context-option-client-certificates" class="list-anchor">#</a>
+- `client_certificates` [List]\[[Dict]\] *(optional)* <font size="2">Added in: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-client-certificates"/><a href="#browser-new-context-option-client-certificates" class="list-anchor">#</a>
   - `origin` [str]
     
     Exact origin that the certificate is valid for. Origin includes `https` protocol, a hostname and optionally a port.
@@ -250,7 +284,7 @@ await browser.close()
 - `has_touch` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-has-touch"/><a href="#browser-new-context-option-has-touch" class="list-anchor">#</a>
   
   Specifies if viewport supports touch events. Defaults to false. Learn more about [mobile emulation](../emulation.mdx#devices).
-- `http_credentials` [Dict] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-http-credentials"/><a href="#browser-new-context-option-http-credentials" class="list-anchor">#</a>
+- `http_credentials` [Dict] | [List]\[[Dict]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-http-credentials"/><a href="#browser-new-context-option-http-credentials" class="list-anchor">#</a>
   - `username` [str]
     
     
@@ -265,12 +299,14 @@ await browser.close()
     This option only applies to the requests sent from corresponding [APIRequestContext] and does not affect requests sent from the browser. `'always'` - `Authorization` header with basic authentication credentials will be sent with the each API request. `'unauthorized` - the credentials are only sent when 401 (Unauthorized) response with `WWW-Authenticate` header is received. Defaults to `'unauthorized'`.
   
   Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). If no origin is specified, the username and password are sent to any servers upon unauthorized responses.
+  
+  Pass an array to use different credentials for different origins. The first entry that matches the request origin is used, and entries with no origin match any request.
 - `ignore_https_errors` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-ignore-https-errors"/><a href="#browser-new-context-option-ignore-https-errors" class="list-anchor">#</a>
   
   Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
 - `is_mobile` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-is-mobile"/><a href="#browser-new-context-option-is-mobile" class="list-anchor">#</a>
   
-  Whether the `meta viewport` tag is taken into account and touch events are enabled. isMobile is a part of device, so you don't actually need to set it manually. Defaults to `false` and is not supported in Firefox. Learn more about [mobile emulation](../emulation.mdx#ismobile).
+  Whether the `meta viewport` tag is taken into account and touch events are enabled. isMobile is a part of device, so you don't actually need to set it manually. Defaults to `false`. Learn more about [mobile emulation](../emulation.mdx#ismobile).
 - `java_script_enabled` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-java-script-enabled"/><a href="#browser-new-context-option-java-script-enabled" class="list-anchor">#</a>
   
   Whether or not to enable JavaScript in the context. Defaults to `true`. Learn more about [disabling JavaScript](../emulation.mdx#javascript-enabled).
@@ -317,6 +353,9 @@ await browser.close()
 - `record_video_dir` [Union]\[[str], [pathlib.Path]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-record-video-dir"/><a href="#browser-new-context-option-record-video-dir" class="list-anchor">#</a>
   
   Enables video recording for all pages into the specified directory. If not specified videos are not recorded. Make sure to call [browser_context.close()](/api/class-browsercontext.mdx#browser-context-close) for videos to be saved.
+- `record_video_fps` [int] *(optional)* <font size="2">Added in: v1.64</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-record-video-fps"/><a href="#browser-new-context-option-record-video-fps" class="list-anchor">#</a>
+  
+  Frame rate of the recorded videos in frames per second. Defaults to `25`. Firefox and WebKit currently capture up to 25 frames per second.
 - `record_video_size` [Dict] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-context-option-record-video-size"/><a href="#browser-new-context-option-record-video-size" class="list-anchor">#</a>
   - `width` [int]
     
@@ -412,7 +451,7 @@ await browser.close()
 
 ---
 
-### new_page {#browser-new-page}
+### new_page {/* #browser-new-page */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browser.new_page</x-search>
 
@@ -440,7 +479,7 @@ browser.new_page(**kwargs)
 - `bypass_csp` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-bypass-csp"/><a href="#browser-new-page-option-bypass-csp" class="list-anchor">#</a>
   
   Toggles bypassing page's Content-Security-Policy. Defaults to `false`.
-- `client_certificates` [List]\[[Dict]\] *(optional)* <font size="2">Added in: 1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-client-certificates"/><a href="#browser-new-page-option-client-certificates" class="list-anchor">#</a>
+- `client_certificates` [List]\[[Dict]\] *(optional)* <font size="2">Added in: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-client-certificates"/><a href="#browser-new-page-option-client-certificates" class="list-anchor">#</a>
   - `origin` [str]
     
     Exact origin that the certificate is valid for. Origin includes `https` protocol, a hostname and optionally a port.
@@ -507,7 +546,7 @@ browser.new_page(**kwargs)
 - `has_touch` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-has-touch"/><a href="#browser-new-page-option-has-touch" class="list-anchor">#</a>
   
   Specifies if viewport supports touch events. Defaults to false. Learn more about [mobile emulation](../emulation.mdx#devices).
-- `http_credentials` [Dict] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-http-credentials"/><a href="#browser-new-page-option-http-credentials" class="list-anchor">#</a>
+- `http_credentials` [Dict] | [List]\[[Dict]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-http-credentials"/><a href="#browser-new-page-option-http-credentials" class="list-anchor">#</a>
   - `username` [str]
     
     
@@ -522,12 +561,14 @@ browser.new_page(**kwargs)
     This option only applies to the requests sent from corresponding [APIRequestContext] and does not affect requests sent from the browser. `'always'` - `Authorization` header with basic authentication credentials will be sent with the each API request. `'unauthorized` - the credentials are only sent when 401 (Unauthorized) response with `WWW-Authenticate` header is received. Defaults to `'unauthorized'`.
   
   Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). If no origin is specified, the username and password are sent to any servers upon unauthorized responses.
+  
+  Pass an array to use different credentials for different origins. The first entry that matches the request origin is used, and entries with no origin match any request.
 - `ignore_https_errors` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-ignore-https-errors"/><a href="#browser-new-page-option-ignore-https-errors" class="list-anchor">#</a>
   
   Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
 - `is_mobile` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-is-mobile"/><a href="#browser-new-page-option-is-mobile" class="list-anchor">#</a>
   
-  Whether the `meta viewport` tag is taken into account and touch events are enabled. isMobile is a part of device, so you don't actually need to set it manually. Defaults to `false` and is not supported in Firefox. Learn more about [mobile emulation](../emulation.mdx#ismobile).
+  Whether the `meta viewport` tag is taken into account and touch events are enabled. isMobile is a part of device, so you don't actually need to set it manually. Defaults to `false`. Learn more about [mobile emulation](../emulation.mdx#ismobile).
 - `java_script_enabled` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-java-script-enabled"/><a href="#browser-new-page-option-java-script-enabled" class="list-anchor">#</a>
   
   Whether or not to enable JavaScript in the context. Defaults to `true`. Learn more about [disabling JavaScript](../emulation.mdx#javascript-enabled).
@@ -574,6 +615,9 @@ browser.new_page(**kwargs)
 - `record_video_dir` [Union]\[[str], [pathlib.Path]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-record-video-dir"/><a href="#browser-new-page-option-record-video-dir" class="list-anchor">#</a>
   
   Enables video recording for all pages into the specified directory. If not specified videos are not recorded. Make sure to call [browser_context.close()](/api/class-browsercontext.mdx#browser-context-close) for videos to be saved.
+- `record_video_fps` [int] *(optional)* <font size="2">Added in: v1.64</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-record-video-fps"/><a href="#browser-new-page-option-record-video-fps" class="list-anchor">#</a>
+  
+  Frame rate of the recorded videos in frames per second. Defaults to `25`. Firefox and WebKit currently capture up to 25 frames per second.
 - `record_video_size` [Dict] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-new-page-option-record-video-size"/><a href="#browser-new-page-option-record-video-size" class="list-anchor">#</a>
   - `width` [int]
     
@@ -669,7 +713,7 @@ browser.new_page(**kwargs)
 
 ---
 
-### start_tracing {#browser-start-tracing}
+### start_tracing {/* #browser-start-tracing */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browser.start_tracing</x-search>
 
@@ -711,12 +755,12 @@ await browser.stop_tracing()
 </Tabs>
 
 **Arguments**
-- `page` [Page] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-start-tracing-option-page"/><a href="#browser-start-tracing-option-page" class="list-anchor">#</a>
-  
-  Optional, if specified, tracing includes screenshots of the given page.
 - `categories` [List]\[[str]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-start-tracing-option-categories"/><a href="#browser-start-tracing-option-categories" class="list-anchor">#</a>
   
   specify custom categories to use instead of default.
+- `page` [Page] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-start-tracing-option-page"/><a href="#browser-start-tracing-option-page" class="list-anchor">#</a>
+  
+  Optional, if specified, tracing includes screenshots of the given page.
 - `path` [Union]\[[str], [pathlib.Path]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-start-tracing-option-path"/><a href="#browser-start-tracing-option-path" class="list-anchor">#</a>
   
   A path to write the trace file to.
@@ -729,7 +773,7 @@ await browser.stop_tracing()
 
 ---
 
-### stop_tracing {#browser-stop-tracing}
+### stop_tracing {/* #browser-stop-tracing */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browser.stop_tracing</x-search>
 
@@ -751,9 +795,26 @@ browser.stop_tracing()
 
 ---
 
+### unbind {/* #browser-unbind */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>browser.unbind</x-search>
+
+Unbinds the browser server previously bound with [browser.bind()](/api/class-browser.mdx#browser-bind).
+
+**Usage**
+
+```python
+browser.unbind()
+```
+
+**Returns**
+- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-unbind-return"/><a href="#browser-unbind-return" class="list-anchor">#</a>
+
+---
+
 ## Properties
 
-### browser_type {#browser-browser-type}
+### browser_type {/* #browser-browser-type */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.23</font><x-search>browser.browser_type</x-search>
 
@@ -770,7 +831,7 @@ browser.browser_type
 
 ---
 
-### contexts {#browser-contexts}
+### contexts {/* #browser-contexts */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browser.contexts</x-search>
 
@@ -813,7 +874,7 @@ print(len(browser.contexts)) # prints `1`
 
 ---
 
-### is_connected {#browser-is-connected}
+### is_connected {/* #browser-is-connected */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browser.is_connected</x-search>
 
@@ -830,7 +891,7 @@ browser.is_connected()
 
 ---
 
-### version {#browser-version}
+### version {/* #browser-version */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browser.version</x-search>
 
@@ -849,7 +910,24 @@ browser.version
 
 ## Events
 
-### on("disconnected") {#browser-event-disconnected}
+### on("context") {/* #browser-event-context */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>browser.on("context")</x-search>
+
+Emitted when a new browser context is created.
+
+**Usage**
+
+```python
+browser.on("context", handler)
+```
+
+**Event data**
+- [BrowserContext]
+
+---
+
+### on("disconnected") {/* #browser-event-disconnected */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browser.on("disconnected")</x-search>
 
@@ -877,11 +955,15 @@ browser.on("disconnected", handler)
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [Error]: /api/class-error.mdx "Error"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
@@ -895,14 +977,17 @@ browser.on("disconnected", handler)
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

@@ -1,0 +1,113 @@
+---
+title: "Генерация кода и подсветка"
+---
+
+# Генерация кода и подсветка
+
+Каждое действие `playwright-cli` выводит код Playwright, который только что был выполнен. Этот сгенерированный код служит исходным
+материалом для тестов — на этой странице рассматривается его использование, а также команды, помогающие при написании тестов: запись
+сценария, который пользователь выполняет вручную, преобразование идентификатора элемента (`ref`) в локатор и подсветка элементов на странице.
+
+## Сгенерированный код
+
+```bash
+$ playwright-cli fill e1 "user@example.com"
+### Ran Playwright code
+await page.getByRole('textbox', { name: 'Email' }).fill('user@example.com');
+### Page
+- Page URL: https://example.com/login
+...
+
+$ playwright-cli click e3
+### Ran Playwright code
+await page.getByRole('button', { name: 'Sign In' }).click();
+```
+
+Соберите эти строки в тест и добавьте проверки:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('login flow', async ({ page }) => {
+  await page.goto('https://example.com/login');
+  await page.getByRole('textbox', { name: 'Email' }).fill('user@example.com');
+  await page.getByRole('textbox', { name: 'Password' }).fill('password123');
+  await page.getByRole('button', { name: 'Sign In' }).click();
+
+  await expect(page).toHaveURL(/.*dashboard/);
+});
+```
+
+При генерации кода предпочтение отдаётся локаторам на основе ролей, которые гораздо устойчивее к изменениям разметки, чем CSS-селекторы.
+Задайте для параметра `codegen` в [файле конфигурации](../configuration.mdx) значение `python`, `java` или
+`csharp`, чтобы генерировать код на соответствующем языке вместо TypeScript, или `none`, чтобы полностью отключить вывод секции с кодом.
+
+## Запись действий пользователя
+
+Если сценарий проще показать, чем описать — например, перетаскивание, жест на canvas или
+вход с аппаратным ключом безопасности, — передайте управление браузером пользователю и запишите его действия.
+
+```bash
+playwright-cli open https://example.com --headed
+playwright-cli recording-start
+# пользователь выполняет сценарий в окне браузера
+playwright-cli recording-stop
+```
+
+Команда `recording-stop` выводит все действия пользователя в виде кода Playwright:
+
+```txt
+Recording stopped. Recorded actions:
+
+await page.getByRole('link', { name: 'Products' }).click();
+await page.getByRole('textbox', { name: 'Search' }).fill('laptop');
+await page.getByRole('textbox', { name: 'Search' }).press('Enter');
+```
+
+Команда `recording-start` выводит окно браузера на передний план, поэтому запускайте её в сеансе с видимым окном браузера.
+
+## Генерация локатора
+
+Команда `generate-locator` преобразует идентификатор элемента (`ref`) или селектор в локатор, который можно использовать в тесте:
+
+```bash
+$ playwright-cli generate-locator e5
+# getByRole('button', { name: 'Add to cart' })
+
+$ playwright-cli --raw generate-locator "#checkout button.primary"
+# getByRole('button', { name: 'Checkout' })
+```
+
+Используйте её вместе с [`eval`](./console-eval.mdx), если нужны атрибуты элемента — `id`,
+`data-testid` или класс, — которые не отображаются в снимке:
+
+```bash
+playwright-cli eval "el => el.getAttribute('data-testid')" e5
+```
+
+## Подсветка элементов
+
+Команда `highlight` добавляет вокруг элемента наложение, которое остаётся видимым до его скрытия. Это удобно, чтобы показать пользователю,
+какой элемент вы имеете в виду, а также явно обозначить целевой элемент на скриншоте или в
+[записанном видео](./video-recording.mdx).
+
+```bash
+playwright-cli highlight e5
+playwright-cli highlight e5 --style="outline: 3px dashed red"
+
+playwright-cli highlight e5 --hide     # скрыть подсветку одного элемента
+playwright-cli highlight --hide        # скрыть всю подсветку на странице
+```
+
+Подсветка — это наложение, а не изменение страницы: она не перехватывает клики, поэтому её можно оставлять включённой
+при взаимодействии со страницей.
+
+## Процесс генерации тестов
+
+В установленном [навыке](../skills.mdx) описан более полный цикл «планирование → генерация → исправление», основанный
+на том же механизме:
+
+1. **Планирование** — исследуйте приложение с помощью CLI и напишите файл спецификации с описанием того, что нужно протестировать.
+2. **Генерация** — воспроизведите спецификацию шаг за шагом, собирая сгенерированный код в файлы тестов.
+3. **Исправление** — запустите падающий тест с параметром `--debug=cli`, [подключитесь](./test-debugging.mdx) к странице,
+   выполнение которой приостановлено, и используйте только что сгенерированный код, чтобы исправить устаревший локатор или проверку.

@@ -246,7 +246,7 @@ await page.goto('https://example.com');
 // Delete header
 await page.route('**/*', async route => {
   const headers = route.request().headers();
-  delete headers['X-Secret'];
+  delete headers['x-secret'];
   await route.continue({ headers });
 });
 
@@ -293,6 +293,40 @@ await page.route('**/title.html', async route => {
   });
 });
 ```
+
+## How request interception works
+
+Routes sit between the page and the browser's network stack. The handler runs before the network stack has processed the request: [route.continue()](/api/class-route.mdx#route-continue) passes it on, [route.fulfill()](/api/class-route.mdx#route-fulfill) answers it without touching the network, and [route.abort()](/api/class-route.mdx#route-abort) fails it.
+
+```mermaid
+sequenceDiagram
+  participant Page
+  participant Playwright
+  participant Network as Network stack
+  participant Server
+
+  Page->>Playwright: request
+  Note over Playwright: route handler runs
+  Playwright->>Network: route.continue()
+  Note over Network: adds Cookie, Host, Sec-Fetch-*, ...
+  Network->>Server: request
+  Server-->>Network: response
+  Note over Network: stores cookies
+  Network-->>Playwright: response headers as sent by the server
+  Network-->>Page: response
+```
+
+### Headers owned by the network stack
+
+Some headers are attached by the network stack right before the request is sent: `Cookie`, `Host`, `Accept-Encoding`, `Content-Length`, `Sec-Fetch-*` and a few others. This is a security boundary: an `HttpOnly` cookie, for example, is never exposed to the page. Since the route handler runs before that step, these headers are not reliably present in [request.headers()](/api/class-request.mdx#request-headers) or [request.allHeaders()](/api/class-request.mdx#request-all-headers), and they cannot be overridden. A `cookie` header passed to [route.continue()](/api/class-route.mdx#route-continue) is ignored in favor of the browser's cookie store.
+
+On the response side the network stack has already done its work, so [response.allHeaders()](/api/class-response.mdx#response-all-headers) returns the headers exactly as the server sent them, including `Set-Cookie` for `HttpOnly` cookies. To see the exact request headers that went over the wire, observe the request without routing it: with no routes installed, [request.allHeaders()](/api/class-request.mdx#request-all-headers) includes all of them.
+
+### Redirects
+
+Playwright treats a request and its redirects as a single unit. The handler is called once, for the original request, and the browser follows the redirect on its own. [response.request()](/api/class-response.mdx#response-request) returns the last request in the chain, and [request.redirectedFrom()](/api/class-request.mdx#request-redirected-from) walks it back to the one you intercepted. Headers passed to [route.continue()](/api/class-route.mdx#route-continue) apply to every hop of the chain, except `cookie`, which always comes from the cookie store.
+
+Fulfilling with a `3xx` status does not give you a second chance to intercept. Chromium and Firefox follow the redirect without calling your handler, and WebKit rejects the call. To serve different content, fulfill with that content. To send the request elsewhere, pass `url` to [route.continue()](/api/class-route.mdx#route-continue) or [route.fallback()](/api/class-route.mdx#route-fallback).
 
 ## Glob URL patterns
 
@@ -342,11 +376,6 @@ It might be that you are using a mock tool such as Mock Service Worker (MSW). Wh
 If you're interested in not solely using Service Workers for testing and network mocking, but in routing and listening for requests made by Service Workers themselves, please see [this guide](./service-workers.mdx).
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -359,10 +388,11 @@ If you're interested in not solely using Service Workers for testing and network
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -381,6 +411,7 @@ If you're interested in not solely using Service Workers for testing and network
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -388,9 +419,18 @@ If you're interested in not solely using Service Workers for testing and network
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -408,6 +448,7 @@ If you're interested in not solely using Service Workers for testing and network
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -420,6 +461,7 @@ If you're interested in not solely using Service Workers for testing and network
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -441,6 +483,7 @@ If you're interested in not solely using Service Workers for testing and network
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"

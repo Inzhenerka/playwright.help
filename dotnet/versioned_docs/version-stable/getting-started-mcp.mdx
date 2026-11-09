@@ -1,0 +1,338 @@
+---
+id: getting-started-mcp
+title: "Playwright MCP"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import HTMLCard from '@site/src/components/HTMLCard';
+
+## Введение
+
+Сервер Playwright MCP предоставляет возможности автоматизации браузера через [Model Context Protocol](https://modelcontextprotocol.io), позволяя большим языковым моделям (LLM) взаимодействовать с веб-страницами с помощью структурированных снимков дерева доступности. Он работает с VS Code, Cursor, Windsurf, Claude Desktop и любыми другими MCP-клиентами — модели с поддержкой обработки изображений не требуются.
+
+## Предварительные требования
+
+Прежде чем начать, убедитесь, что у вас установлены:
+- [Node.js](https://nodejs.org/) версии 20 или новее
+- MCP-клиент: VS Code, Cursor, Windsurf, Claude Code, Claude Desktop или аналогичный
+
+## Начало работы
+
+### Установка
+
+Добавьте сервер Playwright MCP в свой клиент, используя стандартную конфигурацию:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ]
+    }
+  }
+}
+```
+
+#### VS Code
+
+Нажмите одну из кнопок ниже для непосредственной установки:
+
+[<img src="https://img.shields.io/badge/VS_Code-VS_Code?style=flat-square&label=Install%20Server&color=0098FF" alt="Установить в VS Code" />](https://insiders.vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522playwright%2522%252C%2522command%2522%253A%2522npx%2522%252C%2522args%2522%253A%255B%2522%2540playwright%252Fmcp%2540latest%2522%255D%257D) [<img alt="Установить в VS Code Insiders" src="https://img.shields.io/badge/VS_Code_Insiders-VS_Code_Insiders?style=flat-square&label=Install%20Server&color=24bfa5" />](https://insiders.vscode.dev/redirect?url=vscode-insiders%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522playwright%2522%252C%2522command%2522%253A%2522npx%2522%252C%2522args%2522%253A%255B%2522%2540playwright%252Fmcp%2540latest%2522%255D%257D)
+
+Или выполните установку через интерфейс командной строки VS Code:
+
+```bash
+code --add-mcp '{"name":"playwright","command":"npx","args":["@playwright/mcp@latest"]}'
+```
+
+#### Cursor
+
+[<img src="https://cursor.com/deeplink/mcp-install-dark.svg" alt="Установить в Cursor" />](https://cursor.com/en/install-mcp?name=Playwright&config=eyJjb21tYW5kIjoibnB4IEBwbGF5d3JpZ2h0L21jcEBsYXRlc3QifQ%3D%3D)
+
+Или перейдите в `Cursor Settings` → `MCP` → `Add new MCP Server`, выберите тип подключения через команду и укажите `npx @playwright/mcp@latest`.
+
+#### Claude Code
+
+```bash
+claude mcp add playwright npx @playwright/mcp@latest
+```
+
+#### Claude Desktop
+
+Следуйте [руководству](https://modelcontextprotocol.io/quickstart/user) по установке MCP и используйте стандартную конфигурацию, приведённую выше.
+
+#### Другие клиенты
+
+Стандартная конфигурация работает с большинством MCP-клиентов, включая Windsurf, Cline, Goose, Kiro, Codex, Copilot CLI и другие. Информацию о том, где разместить конфигурацию, можно найти в документации вашего клиента по MCP.
+
+### Первое взаимодействие
+
+После подключения сервера попросите своего ИИ-ассистента взаимодействовать с веб-страницей:
+
+```txt
+Перейди на https://demo.playwright.dev/todomvc и добавь несколько задач в список.
+```
+
+Ассистент воспользуется инструментами Playwright MCP, чтобы открыть браузер, перейти на страницу и взаимодействовать с элементами — всё это с помощью структурированных снимков дерева доступности, а не скриншотов.
+
+## Основные возможности
+
+### Снимки дерева доступности
+
+Playwright MCP работает с деревом доступности страницы, а не с пикселями. При выполнении инструмент возвращает структурированный снимок, содержащий элементы страницы, их роли и текстовое содержимое. LLM использует ссылки на элементы из этих снимков для взаимодействия со страницей:
+
+```txt
+- heading "todos" [level=1]
+- textbox "What needs to be done?" [ref=e5]
+- listitem:
+  - checkbox "Toggle Todo" [ref=e10]
+  - text: "Buy groceries"
+```
+
+LLM читает этот снимок и использует `ref=e5` для ввода текста в текстовое поле или `ref=e10` для установки флажка.
+
+### Взаимодействие со страницами
+
+Playwright MCP предоставляет инструменты для всех распространённых действий в браузере:
+-   **Навигация**: открытие URL-адресов, переход назад и вперёд, перезагрузка страниц.
+-   **Нажатия и ввод текста**: нажатие на элементы, ввод текста, заполнение форм, выбор пунктов раскрывающихся списков.
+-   **Скриншоты**: создание снимков текущей страницы или отдельных элементов для визуальной проверки.
+-   **Клавиатура и мышь**: нажатие клавиш, наведение указателя, перетаскивание элементов.
+-   **Диалоговые окна**: подтверждение или отклонение диалоговых окон браузера.
+-   **Вкладки**: создание, закрытие вкладок браузера и переключение между ними.
+
+### Выполнение кода Playwright
+
+Для сложных взаимодействий, выходящих за рамки отдельных вызовов инструментов, используйте инструмент `browser_run_code_unsafe`, позволяющий выполнять скрипты Playwright напрямую. Этот инструмент выполняет произвольный JavaScript в процессе сервера Playwright и эквивалентен удалённому выполнению кода (RCE) — включайте его только для доверенных MCP-клиентов:
+
+```txt
+Выполни этот код Playwright, чтобы проверить количество задач:
+async (page) => {
+  const count = await page.getByTestId('todo-count').textContent();
+  return count;
+}
+```
+
+### Мониторинг сети и имитация ответов
+
+Анализируйте сетевой трафик и имитируйте ответы API:
+-   **Просмотр сетевых запросов**: получение списка всех запросов, выполненных с момента загрузки страницы.
+-   **Имитация маршрутов**: настройка сопоставления URL-адресов с шаблонами для возврата собственных ответов.
+-   **Сообщения консоли**: доступ к выводу консоли браузера для отладки.
+
+### Состояние хранилища
+
+Сохраняйте и восстанавливайте состояние браузера, включая файлы cookie и localStorage:
+-   **Сохранение состояния**: сохранение данных аутентификации и сеанса в файл.
+-   **Восстановление состояния**: загрузка ранее сохранённого состояния в новый сеанс.
+-   **Управление файлами cookie**: получение списка, чтение, установка и удаление отдельных файлов cookie.
+
+### Инструменты WebMCP
+
+Страницы могут регистрировать собственные инструменты для агентов через экспериментальный API [WebMCP](https://webmachinelearning.github.io/webmcp/). Инструменты текущей вкладки доступны как MCP-инструменты с именами `webmcp_<tool>`.
+
+Имена инструментов, описания, схемы и результаты предоставляются страницей, поэтому рассматривайте их как недоверенные входные данные.
+
+## Настройка
+
+### Режим с графическим интерфейсом
+
+По умолчанию Playwright MCP запускает браузер с графическим интерфейсом, чтобы вы могли видеть происходящее. Для запуска без графического интерфейса:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--headless"
+      ]
+    }
+  }
+}
+```
+
+### Выбор браузера
+
+Выберите браузер, который будет использоваться:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--browser=firefox"
+      ]
+    }
+  }
+}
+```
+
+Поддерживаемые значения: `chrome`, `firefox`, `webkit`, `msedge`.
+
+### Профиль пользователя
+
+Playwright MCP поддерживает три режима работы с профилем:
+-   **Постоянный (по умолчанию)**: состояние входа в систему и файлы cookie сохраняются между сеансами. Профиль хранится в `ms-playwright/mcp-{channel}-{workspace-hash}` в каталоге кеша вашей платформы, поэтому разные проекты автоматически получают отдельные профили. Для изменения расположения используйте `--user-data-dir`.
+-   **Изолированный**: каждый сеанс начинается с чистого состояния. Для включения передайте `--isolated`. Начальное состояние можно загрузить с помощью `--storage-state`.
+-   **Расширение браузера**: подключайтесь к уже открытым вкладкам браузера с помощью [расширения Playwright](https://github.com/microsoft/playwright/blob/main/packages/extension/README.md). Для включения передайте `--extension`.
+
+### Тайм-аут бездействия
+
+Страница, на которой продолжаются анимация или отрисовка, потребляет ресурсы процессора всё время, пока браузер открыт, а сеанс агента может длиться часами. Поэтому браузер без графического интерфейса, запущенный сервером, закрывается через час без вызовов инструментов. Браузеры с графическим интерфейсом, а также браузеры, подключённые через `--cdp-endpoint` или `--extension`, никогда не закрываются автоматически. Передайте `--idle-timeout`, чтобы задать тайм-аут в миллисекундах для любого режима, или `0`, чтобы отключить его:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--idle-timeout=300000"
+      ]
+    }
+  }
+}
+```
+
+Если за указанный промежуток времени не завершился ни один вызов инструмента, браузер закрывается независимо от наличия графического интерфейса — так же, как если бы вы закрыли его вручную. Следующий вызов инструмента запускает новый браузер, поэтому агенту приходится заново переходить на страницу. Таймер никогда не срабатывает во время выполнения вызова инструмента.
+-   При использовании `--isolated` файлы cookie и данные хранилища, находящиеся в памяти, теряются при закрытии из-за бездействия. Чтобы сохранить их, используйте постоянный профиль или `--storage-state`. У каждого клиента свой таймер: контекст бездействующего клиента закрывается, пока другие клиенты продолжают работать, а браузер закрывается, когда ни у одного клиента не остаётся контекста.
+-   При использовании `--cdp-endpoint` или `--extension` браузер не принадлежит серверу, поэтому тайм-аут по умолчанию отсутствует, а явно заданный тайм-аут лишь разрывает подключение к браузеру, оставляя его страницы открытыми. При использовании `--extension` следующий вызов инструмента заново запускает процедуру подключения.
+-   При использовании `--shared-browser-context` таймер охватывает всех клиентов: клиент, который бездействует, пока другие продолжают работать, сохраняет свои вкладки и состояние, а общий браузер закрывается только после того, как каждый клиент бездействовал в течение заданного тайм-аута.
+
+### Файл конфигурации
+
+Для расширенной настройки используйте файл конфигурации JSON:
+
+```bash
+npx @playwright/mcp@latest --config path/to/config.json
+```
+
+Файл конфигурации поддерживает параметры браузера, параметры контекста, сетевые правила, тайм-ауты и многое другое. Полную схему см. в [репозитории Playwright MCP](https://github.com/microsoft/playwright-mcp/blob/main/config.d.ts).
+
+### Автономный сервер
+
+При запуске браузера с графическим интерфейсом в системе без дисплея или из рабочих процессов IDE запускайте MCP-сервер отдельно, используя транспорт HTTP:
+
+```bash
+npx @playwright/mcp@latest --port 8931
+```
+
+Сеансы HTTP используют тайм-аут проверки активности длительностью пять секунд. Если ваш MCP-клиент или прокси-сервер не отвечает на ping-запросы, инициированные сервером, задайте для `PLAYWRIGHT_MCP_PING_TIMEOUT_MS` более длительный тайм-аут в миллисекундах. Установите значение `0`, чтобы отключить проверку активности.
+
+Затем укажите в своём MCP-клиенте HTTP-адрес сервера:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "url": "http://localhost:8931/mcp"
+    }
+  }
+}
+```
+
+## Краткий справочник
+
+| Действие                    | Как выполнить                                                  |
+| ------------------------- | ------------------------------------------------------------- |
+| **Установить сервер**        | Добавьте стандартную конфигурацию в свой MCP-клиент                        |
+| **Перейти на страницу**    | Попросите: «Перейди на https://example.com»                              |
+| **Нажать на элемент**      | Попросите: «Нажми кнопку Submit»                                |
+| **Заполнить форму**           | Попросите: «Введи test@example.com в поле электронной почты»          |
+| **Сделать скриншот**     | Попросите: «Сделай скриншот страницы»                          |
+| **Выполнить код Playwright**   | Попросите: «Выполни этот код Playwright: ...»                          |
+| **Имитировать API**           | Попросите: «Настрой имитацию ответа эндпоинта /api/users, чтобы он возвращал ...»             |
+| **Использовать графический интерфейс**       | Включён по умолчанию. Передайте `--headless`, чтобы отключить                         |
+| **Выбрать браузер**      | Передайте `--browser=firefox` в args                              |
+
+## Что дальше
+-   [Пишите тесты с использованием веб-ориентированных проверок, фикстур страниц и локаторов](./writing-tests.mdx)
+-   [Запускайте тесты в CI](./ci-intro.mdx)
+-   [Узнайте больше о Trace Viewer](./trace-viewer.mdx)
+
+
+[APIRequest]: /api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
+[Browser]: /api/class-browser.mdx "Browser"
+[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
+[Clock]: /api/class-clock.mdx "Clock"
+[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
+[Dialog]: /api/class-dialog.mdx "Dialog"
+[Download]: /api/class-download.mdx "Download"
+[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
+[Frame]: /api/class-frame.mdx "Frame"
+[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: /api/class-jshandle.mdx "JSHandle"
+[Keyboard]: /api/class-keyboard.mdx "Keyboard"
+[Locator]: /api/class-locator.mdx "Locator"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
+[Mouse]: /api/class-mouse.mdx "Mouse"
+[Page]: /api/class-page.mdx "Page"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
+[Playwright]: /api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
+[Request]: /api/class-request.mdx "Request"
+[Response]: /api/class-response.mdx "Response"
+[Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
+[Selectors]: /api/class-selectors.mdx "Selectors"
+[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: /api/class-tracing.mdx "Tracing"
+[Video]: /api/class-video.mdx "Video"
+[WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
+[WebSocket]: /api/class-websocket.mdx "WebSocket"
+[WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
+[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
+[Worker]: /api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[bool]: https://docs.microsoft.com/en-us/dotnet/api/system.boolean "bool"
+[Date]: https://learn.microsoft.com/en-us/dotnet/api/system.datetime "DateTime"
+[double]: https://docs.microsoft.com/en-us/dotnet/api/system.double "double"
+[byte]: https://docs.microsoft.com/en-us/dotnet/api/system.byte "byte"
+[int]: https://docs.microsoft.com/en-us/dotnet/api/system.int32 "int"
+[long]: https://docs.microsoft.com/en-us/dotnet/api/system.int64 "long"
+[void]: https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/void "void"
+[string]: https://docs.microsoft.com/en-us/dotnet/api/system.string "string"
+[URL]: https://nodejs.org/api/url.html "URL"
+[Regex]: https://docs.microsoft.com/en-us/dotnet/api/system.text.regularexpressions.regex "Regex"
+
+[Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1 "Action"
+[Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2 "Func"
+[IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable "IEnumerable"
+[IReadOnlyList]: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1?view=net-9.0 "IReadOnlyList"
+[IDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary "IDictionary"
+[Task]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-5.0 "Task"
+[IReadOnlyDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2 "IReadOnlyDictionary"
+[JsonElement]: https://docs.microsoft.com/en-us/dotnet/api/system.text.json.jsonelement "JsonElement"
+
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/dotnet/about "Все доступные теги образов"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/dotnet/about "Microsoft Artifact Registry"
+[Dockerfile.noble]: https://github.com/microsoft/playwright-dotnet/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"

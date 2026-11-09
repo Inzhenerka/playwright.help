@@ -24,7 +24,7 @@ test('basic test', async ({ page }) => {
 
 ## Methods
 
-### test {#test-call}
+### test {/* #test-call */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test</x-search>
 
@@ -95,6 +95,25 @@ You can also add annotations during runtime by manipulating [testInfo.annotation
 
 Learn more about [test annotations](../test-annotations.mdx).
 
+**Locks**
+
+You can declare named locks to prevent specific tests from running at the same time, while all other tests continue to run in parallel. Tests that share a lock name never run concurrently, even when they are declared in different files or belong to different [projects](../test-projects.mdx). This is useful when a few tests access a shared resource that does not support concurrent access.
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('update user settings', {
+  lock: 'user-settings',
+}, async ({ page }) => {
+  // This test never runs concurrently with other tests
+  // that declare the 'user-settings' lock.
+});
+```
+
+The built-in `-exclusive-` lock runs the test only when no other tests are running.
+
+Learn more about [test locks](../test-parallel.mdx#test-locks).
+
 **Arguments**
 - `title` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-call-option-title"/><a href="#test-call-option-title" class="list-anchor">#</a>
   
@@ -112,6 +131,9 @@ Learn more about [test annotations](../test-annotations.mdx).
       Optional annotation description, for example an issue url.
     
     
+  - `lock` [string] | [Array]&lt;[string]&gt; *(optional)*
+    
+    
   Additional test details.
 - `body` [function]\([Fixtures], [TestInfo]\)<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-call-option-body"/><a href="#test-call-option-body" class="list-anchor">#</a>
   
@@ -119,7 +141,34 @@ Learn more about [test annotations](../test-annotations.mdx).
 
 ---
 
-### test.afterAll {#test-after-all}
+### test.abort {/* #test-abort */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>test.test.abort</x-search>
+
+Aborts the currently running test by throwing an error. The test is immediately marked as failed and execution stops. This is useful from inside a fixture or a route handler when you have detected an unrecoverable misuse and want to fail the test right away.
+
+**Usage**
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('does not publish to shared page', async ({ page }) => {
+  await page.route('**/publish', route => {
+    test.abort('Tests must not publish to the shared page. Use the `clone` option.');
+    return route.abort();
+  });
+  // ...
+});
+```
+
+**Arguments**
+- `message` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-abort-option-message"/><a href="#test-abort-option-message" class="list-anchor">#</a>
+  
+  Optional message describing the reason for the abort. It will be included in the failure error.
+
+---
+
+### test.afterAll {/* #test-after-all */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.afterAll</x-search>
 
@@ -165,7 +214,7 @@ Playwright will continue running all applicable hooks even if some of them have 
 
 ---
 
-### test.afterEach {#test-after-each}
+### test.afterEach {/* #test-after-each */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.afterEach</x-search>
 
@@ -219,7 +268,7 @@ Playwright will continue running all applicable hooks even if some of them have 
 
 ---
 
-### test.beforeAll {#test-before-all}
+### test.beforeAll {/* #test-before-all */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.beforeAll</x-search>
 
@@ -275,7 +324,7 @@ Playwright will continue running all applicable hooks even if some of them have 
 
 ---
 
-### test.beforeEach {#test-before-each}
+### test.beforeEach {/* #test-before-each */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.beforeEach</x-search>
 
@@ -329,7 +378,7 @@ Playwright will continue running all applicable hooks even if some of them have 
 
 ---
 
-### test.describe {#test-describe}
+### test.describe {/* #test-describe */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.describe</x-search>
 
@@ -419,6 +468,26 @@ test.describe('two annotated tests', {
 
 Learn more about [test annotations](../test-annotations.mdx).
 
+**Locks**
+
+You can declare named locks for all tests in a group by providing additional details. Tests that share a lock name never run concurrently. Learn more about [test locks](../test-parallel.mdx#test-locks).
+
+```js
+import { test, expect } from '@playwright/test';
+
+test.describe('two tests with a lock', {
+  lock: 'user-settings',
+}, () => {
+  test('one', async ({ page }) => {
+    // ...
+  });
+
+  test('two', async ({ page }) => {
+    // ...
+  });
+});
+```
+
 **Arguments**
 - `title` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-option-title"/><a href="#test-describe-option-title" class="list-anchor">#</a>
   
@@ -435,6 +504,9 @@ Learn more about [test annotations](../test-annotations.mdx).
       
       
     
+  - `lock` [string] | [Array]&lt;[string]&gt; *(optional)*
+    
+    
   Additional details for all tests in the group.
 - `callback` [function]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-option-callback"/><a href="#test-describe-option-callback" class="list-anchor">#</a>
   
@@ -442,7 +514,7 @@ Learn more about [test annotations](../test-annotations.mdx).
 
 ---
 
-### test.describe.configure {#test-describe-configure}
+### test.describe.configure {/* #test-describe-configure */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.describe.configure</x-search>
 
@@ -494,6 +566,14 @@ Learn more about the execution modes [here](../test-parallel.mdx).
   test('runs second', async ({ page }) => {});
   ```
   
+* Declaring locks for all tests in a scope.
+  
+  ```js
+  test.describe.configure({ lock: 'user-settings' });
+  test('update user settings', async ({ page }) => {});
+  test('reset user settings', async ({ page }) => {});
+  ```
+  
 * Run multiple describes in parallel, but tests inside each describe in order.
   
   ```js
@@ -514,6 +594,9 @@ Learn more about the execution modes [here](../test-parallel.mdx).
   
 **Arguments**
 - `options` [Object] *(optional)*
+  - `lock` [string] | [Array]&lt;[string]&gt; *(optional)* <font size="2">Added in: v1.64</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-configure-option-lock"/><a href="#test-describe-configure-option-lock" class="list-anchor">#</a>
+    
+    Additional named locks for all tests in the enclosing scope, including nested groups.  Locks are added to those declared in [test.describe()](/api/class-test.mdx#test-describe) details and previous calls to [test.describe.configure()](/api/class-test.mdx#test-describe-configure).
   - `mode` "default" | "parallel" | "serial" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-configure-option-mode"/><a href="#test-describe-configure-option-mode" class="list-anchor">#</a>
     
     Execution mode. Learn more about the execution modes [here](../test-parallel.mdx).
@@ -526,7 +609,7 @@ Learn more about the execution modes [here](../test-parallel.mdx).
 
 ---
 
-### test.describe.fixme {#test-describe-fixme}
+### test.describe.fixme {/* #test-describe-fixme */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.25</font><x-search>test.test.describe.fixme</x-search>
 
@@ -576,7 +659,7 @@ test.describe.fixme(() => {
 
 ---
 
-### test.describe.only {#test-describe-only}
+### test.describe.only {/* #test-describe-only */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.describe.only</x-search>
 
@@ -629,7 +712,7 @@ test.describe.only(() => {
 
 ---
 
-### test.describe.skip {#test-describe-skip}
+### test.describe.skip {/* #test-describe-skip */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.describe.skip</x-search>
 
@@ -679,7 +762,7 @@ test.describe.skip(() => {
 
 ---
 
-### test.extend {#test-extend}
+### test.extend {/* #test-extend */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.extend</x-search>
 
@@ -827,7 +910,7 @@ Learn more about [fixtures](../test-fixtures.mdx) and [parametrizing tests](../t
 
 ---
 
-### test.fail {#test-fail}
+### test.fail {/* #test-fail */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.fail</x-search>
 
@@ -841,6 +924,7 @@ To annotate test as "failing" at runtime:
 * `test.fail(condition, description)`
 * `test.fail(callback, description)`
 * `test.fail()`
+* `test.fail(description)`
 
 **Usage**
 
@@ -880,7 +964,7 @@ test('fail in WebKit 2', async ({ page }) => {
 });
 ```
 
-You can also call `test.fail()` without arguments inside the test body to always mark the test as failed. We recommend declaring a failing test with `test.fail(title, body)` instead.
+You can also call `test.fail()` without a condition inside the test body to always mark the test as failed, optionally with a `description`. We recommend declaring a failing test with `test.fail(title, body)` instead.
 
 ```js
 import { test, expect } from '@playwright/test';
@@ -923,7 +1007,7 @@ test('less readable', async ({ page }) => {
 
 ---
 
-### test.fail.only {#test-fail-only}
+### test.fail.only {/* #test-fail-only */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.49</font><x-search>test.test.fail.only</x-search>
 
@@ -971,7 +1055,7 @@ test('not in the focused group', async ({ page }) => {
 
 ---
 
-### test.fixme {#test-fixme}
+### test.fixme {/* #test-fixme */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.fixme</x-search>
 
@@ -985,6 +1069,7 @@ To annotate test as "fixme" at runtime:
 * `test.fixme(condition, description)`
 * `test.fixme(callback, description)`
 * `test.fixme()`
+* `test.fixme(description)`
 
 **Usage**
 
@@ -1024,7 +1109,7 @@ test('to be fixed in Safari 2', async ({ page }) => {
 });
 ```
 
-You can also call `test.fixme()` without arguments inside the test body to always mark the test as failed. We recommend using `test.fixme(title, body)` instead.
+You can also call `test.fixme()` without a condition inside the test body to always mark the test as "fixme", optionally with a `description`. We recommend using `test.fixme(title, body)` instead.
 
 ```js
 import { test, expect } from '@playwright/test';
@@ -1067,7 +1152,7 @@ test('less readable', async ({ page }) => {
 
 ---
 
-### test.info {#test-info}
+### test.info {/* #test-info */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.info</x-search>
 
@@ -1090,7 +1175,7 @@ test('example test', async ({ page }) => {
 
 ---
 
-### test.only {#test-only}
+### test.only {/* #test-only */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.only</x-search>
 
@@ -1129,7 +1214,7 @@ test.only('focus this test', async ({ page }) => {
 
 ---
 
-### test.setTimeout {#test-set-timeout}
+### test.setTimeout {/* #test-set-timeout */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.setTimeout</x-search>
 
@@ -1185,7 +1270,7 @@ Timeout for the currently running test is available through [testInfo.timeout](/
 
 ---
 
-### test.skip {#test-skip}
+### test.skip {/* #test-skip */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.skip</x-search>
 
@@ -1201,6 +1286,7 @@ To skip a test at runtime:
 * `test.skip(condition, description)`
 * `test.skip(callback, description)`
 * `test.skip()`
+* `test.skip(description)`
 
 **Usage**
 
@@ -1240,13 +1326,13 @@ test('Safari-only test 2', async ({ page }) => {
 });
 ```
 
-You can also call `test.skip()` without arguments inside the test body to always skip the test. However, we recommend using `test.skip(title, body)` instead.
+You can also call `test.skip()` without a condition inside the test body to always skip the test, optionally with a `description`. However, we recommend using `test.skip(title, body)` instead.
 
 ```js
 import { test, expect } from '@playwright/test';
 
 test('less readable', async ({ page }) => {
-  test.skip();
+  test.skip('Not implemented yet');
   // ...
 });
 ```
@@ -1283,7 +1369,7 @@ test('less readable', async ({ page }) => {
 
 ---
 
-### test.slow {#test-slow}
+### test.slow {/* #test-slow */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.slow</x-search>
 
@@ -1291,6 +1377,7 @@ Marks a test as "slow". Slow test will be given triple the default timeout.
 
 Note that [test.slow()](/api/class-test.mdx#test-slow) cannot be used in a `beforeAll` or `afterAll` hook. Use [test.setTimeout()](/api/class-test.mdx#test-set-timeout) instead.
 * `test.slow()`
+* `test.slow(description)`
 * `test.slow(condition, description)`
 * `test.slow(callback, description)`
 
@@ -1346,7 +1433,7 @@ test('fail in Safari 2', async ({ page }) => {
 
 ---
 
-### test.step {#test-step}
+### test.step {/* #test-step */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.step</x-search>
 
@@ -1386,6 +1473,12 @@ test('test', async ({ page }) => {
   - `location` [Location] *(optional)* <font size="2">Added in: v1.48</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-option-location"/><a href="#test-step-option-location" class="list-anchor">#</a>
     
     Specifies a custom location for the step to be shown in test reports and trace viewer. By default, location of the [test.step()](/api/class-test.mdx#test-step) call is shown.
+  - `params` [Object]&lt;[string], [Object]&gt; *(optional)* <font size="2">Added in: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-option-params"/><a href="#test-step-option-params" class="list-anchor">#</a>
+    
+    Arbitrary serializable parameters describing the step. They are reported to the reporters as `testStep.params` and are shown in the trace viewer.
+  - `subtitle` [string] *(optional)* <font size="2">Added in: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-option-subtitle"/><a href="#test-step-option-subtitle" class="list-anchor">#</a>
+    
+    Step subtitle that complements the title, for example the target of the step. It is reported to the reporters as `testStep.subtitle` and is shown next to the title in test reports and the trace viewer.
   - `timeout` [number] *(optional)* <font size="2">Added in: v1.50</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-option-timeout"/><a href="#test-step-option-timeout" class="list-anchor">#</a>
     
     The maximum time, in milliseconds, allowed for the step to complete. If the step does not complete within the specified timeout, the [test.step()](/api/class-test.mdx#test-step) method will throw a [TimeoutError]. Defaults to `0` (no timeout).
@@ -1522,7 +1615,7 @@ test('example', async ({ page }) => {
 
 ---
 
-### test.step.skip {#test-step-skip}
+### test.step.skip {/* #test-step-skip */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.50</font><x-search>test.test.step.skip</x-search>
 
@@ -1559,6 +1652,12 @@ test('my test', async ({ page }) => {
   - `location` [Location] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-skip-option-location"/><a href="#test-step-skip-option-location" class="list-anchor">#</a>
     
     Specifies a custom location for the step to be shown in test reports and trace viewer. By default, location of the [test.step()](/api/class-test.mdx#test-step) call is shown.
+  - `params` [Object]&lt;[string], [Object]&gt; *(optional)* <font size="2">Added in: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-skip-option-params"/><a href="#test-step-skip-option-params" class="list-anchor">#</a>
+    
+    Arbitrary serializable parameters describing the step. They are reported to the reporters as `testStep.params` and are shown in the trace viewer.
+  - `subtitle` [string] *(optional)* <font size="2">Added in: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-skip-option-subtitle"/><a href="#test-step-skip-option-subtitle" class="list-anchor">#</a>
+    
+    Step subtitle that complements the title, for example the target of the step. It is reported to the reporters as `testStep.subtitle` and is shown next to the title in test reports and the trace viewer.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-skip-option-timeout"/><a href="#test-step-skip-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds for the step to finish. Defaults to `0` (no timeout).
@@ -1568,7 +1667,7 @@ test('my test', async ({ page }) => {
 
 ---
 
-### test.use {#test-use}
+### test.use {/* #test-use */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.use</x-search>
 
@@ -1617,7 +1716,7 @@ test('test with locale', async ({ page }) => {
 
 ## Properties
 
-### test.expect {#test-expect}
+### test.expect {/* #test-expect */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.expect</x-search>
 
@@ -1638,7 +1737,7 @@ test('example', async ({ page }) => {
 
 ## Deprecated
 
-### test.describe.parallel {#test-describe-parallel}
+### test.describe.parallel {/* #test-describe-parallel */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.describe.parallel</x-search>
 
@@ -1696,7 +1795,7 @@ test.describe.parallel(() => {
 
 ---
 
-### test.describe.parallel.only {#test-describe-parallel-only}
+### test.describe.parallel.only {/* #test-describe-parallel-only */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.describe.parallel.only</x-search>
 
@@ -1752,7 +1851,7 @@ test.describe.parallel.only(() => {
 
 ---
 
-### test.describe.serial {#test-describe-serial}
+### test.describe.serial {/* #test-describe-serial */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.describe.serial</x-search>
 
@@ -1814,7 +1913,7 @@ test.describe.serial(() => {
 
 ---
 
-### test.describe.serial.only {#test-describe-serial-only}
+### test.describe.serial.only {/* #test-describe-serial-only */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.describe.serial.only</x-search>
 
@@ -1877,11 +1976,6 @@ test.describe.serial.only(() => {
   A callback that is run immediately when calling [test.describe.serial.only()](/api/class-test.mdx#test-describe-serial-only). Any tests added in this callback will belong to the group.
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -1894,10 +1988,11 @@ test.describe.serial.only(() => {
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -1916,6 +2011,7 @@ test.describe.serial.only(() => {
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -1923,9 +2019,18 @@ test.describe.serial.only(() => {
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -1943,6 +2048,7 @@ test.describe.serial.only(() => {
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -1955,6 +2061,7 @@ test.describe.serial.only(() => {
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -1976,6 +2083,7 @@ test.describe.serial.only(() => {
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"

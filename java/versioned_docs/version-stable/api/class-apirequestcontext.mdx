@@ -10,9 +10,17 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 Каждый контекст браузера Playwright имеет связанный с ним экземпляр [APIRequestContext], который разделяет хранилище cookies с контекстом браузера и может быть доступен через [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) или [Page.request()](/api/class-page.mdx#page-request). Также возможно создать новый экземпляр APIRequestContext вручную, вызвав [APIRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context).
 
-**Управление cookies**
+У каждого браузерного контекста Playwright есть связанный [APIRequestContext], доступный через [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) или [Page.request()](/api/class-page.mdx#page-request) (они возвращают
 
-[APIRequestContext], возвращаемый [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) и [Page.request()](/api/class-page.mdx#page-request), разделяет хранилище cookies с соответствующим [BrowserContext]. Каждый API запрос будет иметь заголовок `Cookie`, заполненный значениями из контекста браузера. Если ответ API содержит заголовок `Set-Cookie`, он автоматически обновит cookies [BrowserContext], и запросы, сделанные со страницы, их подхватят. Это означает, что если вы войдете в систему с помощью этого API, ваш e2e тест будет авторизован, и наоборот.
+**один и тот же экземпляр** — `page.request` представляет собой сокращённую запись для `page.context().request`). Вы также можете создать отдельный, изолированный экземпляр с помощью [APIRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context).
+
+**Управление файлами cookie**
+
+[APIRequestContext], возвращаемый методами [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) и
+
+[Page.request()](/api/class-page.mdx#page-request), использует то же хранилище файлов cookie, что и связанный с ним [BrowserContext]:
+
+Если вам нужны API-запросы, которые **не** используют общее с браузером хранилище файлов cookie, создайте изолированный контекст с помощью [APIRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context). Такой объект `APIRequestContext` будет иметь собственное изолированное хранилище файлов cookie.
 
 Если вы хотите, чтобы API запросы не влияли на cookies браузера, вы должны создать новый [APIRequestContext], вызвав [APIRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context). Такой объект `APIRequestContext` будет иметь собственное изолированное хранилище cookies.
 
@@ -20,7 +28,141 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Методы {#methods}
 
-### delete {#api-request-context-delete}
+### addCookies {/* #api-request-context-add-cookies */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.64</font><x-search>apiRequestContext.addCookies</x-search>
+
+Добавляет файлы cookie в этот контекст запросов. Они будут отправляться с соответствующими последующими запросами. Для [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) и [Page.request()](/api/class-page.mdx#page-request) это эквивалентно вызову [BrowserContext.addCookies()](/api/class-browsercontext.mdx#browser-context-add-cookies) в соответствующем контексте браузера.
+
+**Использование**
+
+```java
+request.addCookies(Arrays.asList(cookieObject1, cookieObject2));
+```
+
+**Аргументы**
+- `cookies` [List]&lt;Cookies&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-add-cookies-option-cookies"/><a href="#api-request-context-add-cookies-option-cookies" class="list-anchor">#</a>
+  - `setName` [String]
+    
+    
+  - `setValue` [String]
+    
+    
+  - `setUrl` [String] *(optional)*
+    
+    Требуется либо `url`, либо оба параметра `domain` и `path`. Необязательный параметр.
+  - `setDomain` [String] *(optional)*
+    
+    Чтобы файл cookie также применялся ко всем поддоменам, добавьте точку перед доменом, например: ".example.com". Требуется либо `url`, либо оба параметра `domain` и `path`. Необязательный параметр.
+  - `setPath` [String] *(optional)*
+    
+    Требуется либо `url`, либо оба параметра `domain` и `path`. Необязательный параметр.
+  - `setExpires` [double] *(optional)*
+    
+    Время Unix в секундах. Необязательный параметр.
+  - `setHttpOnly` [boolean] *(optional)*
+    
+    Необязательно.
+  - `setSecure` [boolean] *(optional)*
+    
+    Необязательно.
+  - `setSameSite` `enum SameSiteAttribute { STRICT, LAX, NONE }` *(optional)*
+    
+    Необязательно.
+  - `setPartitionKey` [String] *(optional)*
+    
+    Ключ раздела для сторонних файлов cookie с разделением по сайту ([CHIPS](https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Privacy_sandbox/Partitioned_cookies)). Необязательный параметр.
+
+**Возвращает**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-add-cookies-return"/><a href="#api-request-context-add-cookies-return" class="list-anchor">#</a>
+
+---
+
+### clearCookies {/* #api-request-context-clear-cookies */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.64</font><x-search>apiRequestContext.clearCookies</x-search>
+
+Удаляет файлы cookie из этого контекста запросов. Принимает необязательный фильтр. Для [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) и [Page.request()](/api/class-page.mdx#page-request) это эквивалентно вызову [BrowserContext.clearCookies()](/api/class-browsercontext.mdx#browser-context-clear-cookies) в соответствующем контексте браузера.
+
+**Использование**
+
+```java
+request.clearCookies();
+request.clearCookies(new APIRequestContext.ClearCookiesOptions().setName("session-id"));
+request.clearCookies(new APIRequestContext.ClearCookiesOptions().setDomain("my-origin.com"));
+request.clearCookies(new APIRequestContext.ClearCookiesOptions().setPath("/api/v1"));
+request.clearCookies(new APIRequestContext.ClearCookiesOptions()
+                         .setName("session-id")
+                         .setDomain("my-origin.com"));
+```
+
+**Аргументы**
+- `options` `ApiRequestContext.ClearCookiesOptions` *(optional)*
+  - `setDomain` [String] | [Pattern] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-option-domain"/><a href="#api-request-context-clear-cookies-option-domain" class="list-anchor">#</a>
+    
+    Удаляет только файлы cookie с указанным доменом.
+  - `setName` [String] | [Pattern] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-option-name"/><a href="#api-request-context-clear-cookies-option-name" class="list-anchor">#</a>
+    
+    Удаляет только файлы cookie с указанным именем.
+  - `setPath` [String] | [Pattern] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-option-path"/><a href="#api-request-context-clear-cookies-option-path" class="list-anchor">#</a>
+    
+    Удаляет только файлы cookie с указанным путём.
+
+**Возвращает**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-return"/><a href="#api-request-context-clear-cookies-return" class="list-anchor">#</a>
+
+---
+
+### cookies {/* #api-request-context-cookies */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.64</font><x-search>apiRequestContext.cookies</x-search>
+
+Если URL не указаны, этот метод возвращает все файлы cookie. Если URL указаны, возвращаются только файлы cookie, применимые к этим URL. Для [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) и [Page.request()](/api/class-page.mdx#page-request) это эквивалентно вызову [BrowserContext.cookies()](/api/class-browsercontext.mdx#browser-context-cookies) в соответствующем контексте браузера.
+
+**Использование**
+
+```java
+APIRequestContext.cookies();
+APIRequestContext.cookies(urls);
+```
+
+**Аргументы**
+- `urls` [String] | [List]&lt;[String]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-cookies-option-urls"/><a href="#api-request-context-cookies-option-urls" class="list-anchor">#</a>
+  
+  Необязательный список URL.
+
+**Возвращает**
+- [List]&lt;Cookies&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-cookies-return"/><a href="#api-request-context-cookies-return" class="list-anchor">#</a>
+  - `name` [String]
+    
+    
+  - `value` [String]
+    
+    
+  - `domain` [String]
+    
+    
+  - `path` [String]
+    
+    
+  - `expires` [double]
+    
+    Время Unix в секундах.
+  - `httpOnly` [boolean]
+    
+    
+  - `secure` [boolean]
+    
+    
+  - `sameSite` `enum SameSiteAttribute { STRICT, LAX, NONE }`
+    
+    
+  - `partitionKey` [String] *(optional)*
+    
+    
+---
+
+### delete {/* #api-request-context-delete */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.delete</x-search>
 
@@ -46,7 +188,7 @@ APIRequestContext.delete(url, options);
 
 ---
 
-### dispose {#api-request-context-dispose}
+### dispose {/* #api-request-context-dispose */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.dispose</x-search>
 
@@ -70,7 +212,7 @@ APIRequestContext.dispose(options);
 
 ---
 
-### fetch {#api-request-context-fetch}
+### fetch {/* #api-request-context-fetch */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.fetch</x-search>
 
@@ -117,7 +259,7 @@ APIResponse response = request.fetch("https://example.com/api/uploadScript",
 
 ---
 
-### get {#api-request-context-get}
+### get {/* #api-request-context-get */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.get</x-search>
 
@@ -146,7 +288,7 @@ request.get("https://example.com/api/getText", RequestOptions.create()
 
 ---
 
-### head {#api-request-context-head}
+### head {/* #api-request-context-head */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.head</x-search>
 
@@ -172,7 +314,7 @@ APIRequestContext.head(url, options);
 
 ---
 
-### patch {#api-request-context-patch}
+### patch {/* #api-request-context-patch */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.patch</x-search>
 
@@ -198,7 +340,7 @@ APIRequestContext.patch(url, options);
 
 ---
 
-### post {#api-request-context-post}
+### post {/* #api-request-context-post */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.post</x-search>
 
@@ -253,7 +395,7 @@ APIResponse response = request.post("https://example.com/api/uploadScript",
 
 ---
 
-### put {#api-request-context-put}
+### put {/* #api-request-context-put */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.put</x-search>
 
@@ -279,7 +421,7 @@ APIRequestContext.put(url, options);
 
 ---
 
-### storageState {#api-request-context-storage-state}
+### storageState {/* #api-request-context-storage-state */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequestContext.storageState</x-search>
 
@@ -296,14 +438,35 @@ APIRequestContext.storageState(options);
 - `options` `ApiRequestContext.StorageStateOptions` *(опционально)*
   - `setIndexedDB` [boolean] *(опционально)* <font size="2">Добавлено в: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-indexed-db"/><a href="#api-request-context-storage-state-option-indexed-db" class="list-anchor">#</a>
     
-    Установите в `true`, чтобы включить IndexedDB в снимок состояния хранилища.
-  - `setPath` [Path] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-path"/><a href="#api-request-context-storage-state-option-path" class="list-anchor">#</a>
+Установите значение `true`, чтобы включить IndexedDB в снимок состояния хранилища.
+  - `setOpfs` [boolean] *(необязательно)* <font size="2">Добавлено в: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-opfs"/><a href="#api-request-context-storage-state-option-opfs" class="list-anchor">#</a>
+    
+    Установите значение `true`, чтобы включить приватную файловую систему источника (OPFS) в снимок состояния хранилища.
+  - `setPath` [Path] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-path"/><a href="#api-request-context-storage-state-option-path" class="list-anchor">#</a>
     
     Путь к файлу для сохранения состояния хранилища. Если [setPath](/api/class-apirequestcontext.mdx#api-request-context-storage-state-option-path) является относительным путем, то он разрешается относительно текущей рабочей директории. Если путь не указан, состояние хранилища все равно возвращается, но не будет сохранено на диск.
 
 **Возвращает**
 - [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-return"/><a href="#api-request-context-storage-state-return" class="list-anchor">#</a>
 
+---
+
+## Свойства
+
+### tracing() {/* #api-request-context-tracing */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.60</font><x-search>apiRequestContext.tracing()</x-search>
+
+Средство записи трассировки для запросов, выполняемых через этот контекст API-запросов.
+
+**Использование**
+
+```java
+APIRequestContext.tracing()
+```
+
+**Возвращает**
+- [Tracing]
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -314,6 +477,8 @@ APIRequestContext.storageState(options);
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -335,15 +500,18 @@ APIRequestContext.storageState(options);
 [RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -356,6 +524,7 @@ APIRequestContext.storageState(options);
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[BiConsumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html "BiConsumer"
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
@@ -363,6 +532,7 @@ APIRequestContext.storageState(options);
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[Integer]: https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html "Integer"
 [long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"

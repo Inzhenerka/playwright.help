@@ -41,10 +41,11 @@ npx playwright test --shard=4/4
 
 Без настройки fullyParallel, Playwright Test по умолчанию использует уровень детализации на уровне файлов, что означает, что целые тестовые файлы назначаются шардам (обратите внимание, что один и тот же файл может быть назначен разным шардам в разных проектах). В этом случае количество тестов в файле может значительно повлиять на распределение шардов. Если ваши тестовые файлы неравномерно распределены (т.е. некоторые файлы содержат намного больше тестов, чем другие), определенные шарды могут выполнять значительно больше тестов, в то время как другие могут выполнять меньше или даже ни одного.
 
-**Основные выводы:**
-- **С** `fullyParallel: true`: Тесты разделяются на уровне отдельных тестов, что приводит к более сбалансированному выполнению шардов.
-- **Без** `fullyParallel`: Тесты разделяются на уровне файлов, поэтому для балансировки шардов важно, чтобы ваши тестовые файлы были небольшими и равномерно распределенными.
-- Чтобы обеспечить наиболее эффективное использование шардинга, особенно в средах CI, рекомендуется использовать `fullyParallel: true` при стремлении к сбалансированному распределению по шардам. В противном случае вам может потребоваться вручную организовать ваши тестовые файлы, чтобы избежать дисбаланса.
+**Ключевые выводы:**
+- **С** `fullyParallel: true`: Тесты распределяются на уровне отдельных тестов, что обеспечивает более сбалансированное выполнение шардов.
+- **Без** `fullyParallel`: Тесты распределяются на уровне файлов, поэтому для балансировки шардов важно, чтобы файлы тестов были небольшими и примерно одинаковыми по размеру.
+- Для наиболее эффективного использования шардинга, особенно в средах CI, рекомендуется использовать `fullyParallel: true`, если требуется равномерное распределение тестов между шардами. В противном случае может потребоваться вручную организовать файлы тестов, чтобы избежать дисбаланса.
+- Тесты, помеченные как пропускаемые статически, например с помощью [test.skip()](/api/class-test.mdx#test-skip) или [test.fixme()](/api/class-test.mdx#test-fixme), не учитываются при балансировке шардов, поскольку они не выполняются.
 
 ## Объединение отчетов из нескольких шардов {#merging-reports-from-multiple-shards}
 
@@ -89,7 +90,6 @@ on:
     branches: [ main, master ]
 jobs:
   playwright-tests:
-    timeout-minutes: 60
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -97,8 +97,8 @@ jobs:
         shardIndex: [1, 2, 3, 4]
         shardTotal: [4]
     steps:
-    - uses: actions/checkout@v5
-    - uses: actions/setup-node@v5
+    - uses: actions/checkout@v6
+    - uses: actions/setup-node@v6
       with:
         node-version: lts/*
     - name: Install dependencies
@@ -111,7 +111,7 @@ jobs:
 
     - name: Upload blob report to GitHub Actions Artifacts
       if: ${{ !cancelled() }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: blob-report-${{ matrix.shardIndex }}
         path: blob-report
@@ -130,8 +130,8 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
-    - uses: actions/setup-node@v5
+    - uses: actions/checkout@v6
+    - uses: actions/setup-node@v6
       with:
         node-version: lts/*
     - name: Install dependencies
@@ -148,7 +148,7 @@ jobs:
       run: npx playwright merge-reports --reporter html ./all-blob-reports
 
     - name: Upload HTML report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: html-report--attempt-${{ github.run_attempt }}
         path: playwright-report
@@ -157,11 +157,11 @@ jobs:
 
 Теперь вы можете увидеть, что отчеты были объединены, и объединенный HTML-отчет доступен на вкладке артефактов GitHub Actions.
 
-<img width="875" alt="image" src="https://github.com/microsoft/playwright/assets/9798949/b69dac59-fc19-4b98-8f49-814b1c29ca02" />
+<img height="1610" width="1750" alt="image" src="https://github.com/microsoft/playwright/assets/9798949/b69dac59-fc19-4b98-8f49-814b1c29ca02" />
 
 ## Объединение отчётов из разных окружений {#merging-reports-from-multiple-environments}
 
-Если вы хотите запускать одни и те же тесты в нескольких окружениях (а не шардить тесты между несколькими машинами), эти окружения нужно различать.
+Если вы хотите запускать одни и те же тесты в нескольких окружениях, а не распределять тесты между несколькими машинами с помощью шардинга, необходимо различать эти окружения.
 
 В этом случае полезно задать свойство [testConfig.tag](/api/class-testconfig.mdx#test-config-tag), чтобы пометить все тесты именем окружения. Этот тег будет автоматически подхвачен blob-отчётом, а затем и инструментом объединения.
 
@@ -210,11 +210,6 @@ export default defineConfig({
   
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -227,10 +222,11 @@ export default defineConfig({
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -249,6 +245,7 @@ export default defineConfig({
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -256,9 +253,18 @@ export default defineConfig({
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -276,6 +282,7 @@ export default defineConfig({
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -288,6 +295,7 @@ export default defineConfig({
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -309,6 +317,7 @@ export default defineConfig({
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

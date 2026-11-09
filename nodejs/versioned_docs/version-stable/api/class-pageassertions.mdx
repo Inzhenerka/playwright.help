@@ -22,7 +22,7 @@ test('navigates to login', async ({ page }) => {
 
 ## Методы {#methods}
 
-### toHaveScreenshot(name) {#page-assertions-to-have-screenshot-1}
+### toHaveScreenshot(name) {/* #page-assertions-to-have-screenshot-1 */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.23</font><x-search>pageAssertions.toHaveScreenshot(name)</x-search>
 
@@ -32,6 +32,9 @@ test('navigates to login', async ({ page }) => {
 
 ```js
 await expect(page).toHaveScreenshot('image.png');
+
+// Store the snapshot in the WebP format.
+await expect(page).toHaveScreenshot('image.webp');
 ```
 
 Обратите внимание, что утверждения скриншотов работают только с тестовым раннером Playwright.
@@ -39,9 +42,9 @@ await expect(page).toHaveScreenshot('image.png');
 **Аргументы**
 - `name` [string] | [Array]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-name"/><a href="#page-assertions-to-have-screenshot-1-option-name" class="list-anchor">#</a>
   
-  Имя снимка.
-- `options` [Object] *(опционально)*
-  - `animations` "disabled" | "allow" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-animations"/><a href="#page-assertions-to-have-screenshot-1-option-animations" class="list-anchor">#</a>
+Имя снимка. Должно иметь расширение `.png` или `.webp`; скриншот создаётся в соответствующем формате. Оба формата используют сжатие без потерь.
+- `options` [Object] *(необязательно)*
+  - `animations` "disabled" | "allow" *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-animations"/><a href="#page-assertions-to-have-screenshot-1-option-animations" class="list-anchor">#</a>
     
     При установке в `"disabled"`, останавливает CSS-анимации, CSS-переходы и веб-анимации. Анимации получают разное обращение в зависимости от их продолжительности:
     * конечные анимации ускоряются до завершения, чтобы они вызвали событие `transitionend`.
@@ -77,19 +80,22 @@ await expect(page).toHaveScreenshot('image.png');
     Укажите цвет наложения для замаскированных элементов в [формате цвета CSS](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value). Цвет по умолчанию - розовый `#FF00FF`.
   - `maxDiffPixelRatio` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-max-diff-pixel-ratio"/><a href="#page-assertions-to-have-screenshot-1-option-max-diff-pixel-ratio" class="list-anchor">#</a>
     
-    Допустимое соотношение пикселей, которые отличаются от общего количества пикселей, между `0` и `1`. По умолчанию настраивается с помощью `TestConfig.expect`. По умолчанию не установлено.
-  - `maxDiffPixels` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-max-diff-pixels"/><a href="#page-assertions-to-have-screenshot-1-option-max-diff-pixels" class="list-anchor">#</a>
+Допустимое отношение количества отличающихся пикселей к общему количеству пикселей, от `0` до `1`. Значение по умолчанию настраивается с помощью `TestConfig.expect`. Обратите внимание, что [threshold](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1-option-threshold) определяет, какие пиксели считаются отличающимися.
+  - `maxDiffPixels` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-max-diff-pixels"/><a href="#page-assertions-to-have-screenshot-1-option-max-diff-pixels" class="list-anchor">#</a>
     
-    Допустимое количество пикселей, которые могут отличаться. По умолчанию настраивается с помощью `TestConfig.expect`. По умолчанию не установлено.
-  - `omitBackground` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-omit-background"/><a href="#page-assertions-to-have-screenshot-1-option-omit-background" class="list-anchor">#</a>
+    Допустимое количество пикселей, которые могут отличаться. Значение по умолчанию настраивается с помощью `TestConfig.expect`. Обратите внимание, что [threshold](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1-option-threshold) определяет, какие пиксели считаются отличающимися.
+  - `omitBackground` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-omit-background"/><a href="#page-assertions-to-have-screenshot-1-option-omit-background" class="list-anchor">#</a>
     
     Скрывает белый фон по умолчанию и позволяет делать скриншоты с прозрачностью. Не применимо к изображениям `jpeg`. По умолчанию `false`.
   - `scale` "css" | "device" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-scale"/><a href="#page-assertions-to-have-screenshot-1-option-scale" class="list-anchor">#</a>
     
     При установке в `"css"`, скриншот будет иметь один пиксель на каждый css пиксель на странице. Для устройств с высоким разрешением это позволит уменьшить размер скриншотов. Использование опции `"device"` создаст один пиксель на каждый пиксель устройства, так что скриншоты устройств с высоким разрешением будут в два раза больше или даже больше.
     
-    По умолчанию `"css"`.
-  - `stylePath` [string] | [Array]&lt;[string]&gt; *(опционально)* <font size="2">Добавлено в: v1.41</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-style-path"/><a href="#page-assertions-to-have-screenshot-1-option-style-path" class="list-anchor">#</a>
+По умолчанию — `"css"`.
+  - `signal` [AbortSignal] *(необязательно)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-signal"/><a href="#page-assertions-to-have-screenshot-1-option-signal" class="list-anchor">#</a>
+    
+    Необязательный [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal), позволяющий отменить проверку. Отмена сигнала приводит к неудачному завершению проверки, как и истечение времени ожидания: если сигнал отменён во время повторных попыток проверки или ещё до её начала, проверка завершается неудачей без дальнейших повторных попыток.
+  - `stylePath` [string] | [Array]&lt;[string]&gt; *(необязательно)* <font size="2">Добавлено в: v1.41</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-style-path"/><a href="#page-assertions-to-have-screenshot-1-option-style-path" class="list-anchor">#</a>
     
     Имя файла, содержащего таблицу стилей, которую нужно применить при создании скриншота. Здесь вы можете скрыть динамические элементы, сделать элементы невидимыми или изменить их свойства, чтобы помочь вам создавать повторяемые скриншоты. Эта таблица стилей проникает в Shadow DOM и применяется к внутренним фреймам.
   - `threshold` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-threshold"/><a href="#page-assertions-to-have-screenshot-1-option-threshold" class="list-anchor">#</a>
@@ -104,11 +110,13 @@ await expect(page).toHaveScreenshot('image.png');
 
 ---
 
-### toHaveScreenshot(options) {#page-assertions-to-have-screenshot-2}
+### toHaveScreenshot(options) {/* #page-assertions-to-have-screenshot-2 */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.23</font><x-search>pageAssertions.toHaveScreenshot(options)</x-search>
 
 Эта функция будет ждать, пока два последовательных скриншота страницы не дадут одинаковый результат, а затем сравнит последний скриншот с ожидаемым.
+
+Снимок сохраняется в формате PNG. Чтобы вместо этого сохранить его в формате WebP, передайте имя снимка с расширением `.webp`.
 
 **Использование**
 
@@ -156,19 +164,22 @@ await expect(page).toHaveScreenshot();
     Укажите цвет наложения для замаскированных элементов в [формате цвета CSS](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value). Цвет по умолчанию - розовый `#FF00FF`.
   - `maxDiffPixelRatio` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-max-diff-pixel-ratio"/><a href="#page-assertions-to-have-screenshot-2-option-max-diff-pixel-ratio" class="list-anchor">#</a>
     
-    Допустимое соотношение пикселей, которые отличаются от общего количества пикселей, между `0` и `1`. По умолчанию настраивается с помощью `TestConfig.expect`. По умолчанию не установлено.
-  - `maxDiffPixels` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-max-diff-pixels"/><a href="#page-assertions-to-have-screenshot-2-option-max-diff-pixels" class="list-anchor">#</a>
+Допустимое отношение количества отличающихся пикселей к общему количеству пикселей, от `0` до `1`. Значение по умолчанию можно настроить с помощью `TestConfig.expect`. Обратите внимание, что [threshold](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-2-option-threshold) определяет, какие пиксели считаются отличающимися.
+  - `maxDiffPixels` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-max-diff-pixels"/><a href="#page-assertions-to-have-screenshot-2-option-max-diff-pixels" class="list-anchor">#</a>
     
-    Допустимое количество пикселей, которые могут отличаться. По умолчанию настраивается с помощью `TestConfig.expect`. По умолчанию не установлено.
-  - `omitBackground` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-omit-background"/><a href="#page-assertions-to-have-screenshot-2-option-omit-background" class="list-anchor">#</a>
+    Допустимое количество пикселей, которые могут отличаться. Значение по умолчанию можно настроить с помощью `TestConfig.expect`. Обратите внимание, что [threshold](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-2-option-threshold) определяет, какие пиксели считаются отличающимися.
+  - `omitBackground` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-omit-background"/><a href="#page-assertions-to-have-screenshot-2-option-omit-background" class="list-anchor">#</a>
     
     Скрывает белый фон по умолчанию и позволяет делать скриншоты с прозрачностью. Не применимо к изображениям `jpeg`. По умолчанию `false`.
   - `scale` "css" | "device" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-scale"/><a href="#page-assertions-to-have-screenshot-2-option-scale" class="list-anchor">#</a>
     
     При установке в `"css"`, скриншот будет иметь один пиксель на каждый css пиксель на странице. Для устройств с высоким разрешением это позволит уменьшить размер скриншотов. Использование опции `"device"` создаст один пиксель на каждый пиксель устройства, так что скриншоты устройств с высоким разрешением будут в два раза больше или даже больше.
     
-    По умолчанию `"css"`.
-  - `stylePath` [string] | [Array]&lt;[string]&gt; *(опционально)* <font size="2">Добавлено в: v1.41</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-style-path"/><a href="#page-assertions-to-have-screenshot-2-option-style-path" class="list-anchor">#</a>
+По умолчанию используется `"css"`.
+  - `signal` [AbortSignal] *(необязательно)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-signal"/><a href="#page-assertions-to-have-screenshot-2-option-signal" class="list-anchor">#</a>
+    
+    Необязательный [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal), позволяющий отменить проверку. Отмена сигнала приводит к сбою проверки, как и истечение времени ожидания: если сигнал отменён во время повторных попыток проверки или уже отменён до её начала, проверка завершается с ошибкой без дальнейших повторных попыток.
+  - `stylePath` [string] | [Array]&lt;[string]&gt; *(необязательно)* <font size="2">Добавлено в: v1.41</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-style-path"/><a href="#page-assertions-to-have-screenshot-2-option-style-path" class="list-anchor">#</a>
     
     Имя файла, содержащего таблицу стилей, которую нужно применить при создании скриншота. Здесь вы можете скрыть динамические элементы, сделать элементы невидимыми или изменить их свойства, чтобы помочь вам создавать повторяемые скриншоты. Эта таблица стилей проникает в Shadow DOM и применяется к внутренним фреймам.
   - `threshold` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-threshold"/><a href="#page-assertions-to-have-screenshot-2-option-threshold" class="list-anchor">#</a>
@@ -183,7 +194,7 @@ await expect(page).toHaveScreenshot();
 
 ---
 
-### toHaveTitle {#page-assertions-to-have-title}
+### toHaveTitle {/* #page-assertions-to-have-title */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.20</font><x-search>pageAssertions.toHaveTitle</x-search>
 
@@ -198,9 +209,12 @@ await expect(page).toHaveTitle(/.*checkout/);
 **Аргументы**
 - `titleOrRegExp` [string] | [RegExp] <font size="2">Добавлено в: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-title-option-title-or-reg-exp"/><a href="#page-assertions-to-have-title-option-title-or-reg-exp" class="list-anchor">#</a>
   
-  Ожидаемый заголовок или регулярное выражение.
-- `options` [Object] *(опционально)*
-  - `timeout` [number] *(опционально)* <font size="2">Добавлено в: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-title-option-timeout"/><a href="#page-assertions-to-have-title-option-timeout" class="list-anchor">#</a>
+Ожидаемый заголовок или регулярное выражение.
+- `options` [Object] *(необязательно)*
+  - `signal` [AbortSignal] *(необязательно)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-title-option-signal"/><a href="#page-assertions-to-have-title-option-signal" class="list-anchor">#</a>
+    
+    Необязательный [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal), позволяющий отменить проверку. Отмена через сигнал приводит к провалу проверки, как и истечение времени ожидания: если сигнал отменён во время повторных попыток проверки или уже был отменён до её начала, проверка завершается неудачей без дальнейших повторных попыток.
+  - `timeout` [number] *(необязательно)* <font size="2">Добавлено в: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-title-option-timeout"/><a href="#page-assertions-to-have-title-option-timeout" class="list-anchor">#</a>
     
     Время для повторной попытки утверждения в миллисекундах. По умолчанию `timeout` в `TestConfig.expect`.
 
@@ -209,7 +223,7 @@ await expect(page).toHaveTitle(/.*checkout/);
 
 ---
 
-### toHaveURL {#page-assertions-to-have-url}
+### toHaveURL {/* #page-assertions-to-have-url */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.20</font><x-search>pageAssertions.toHaveURL</x-search>
 
@@ -224,8 +238,11 @@ await expect(page).toHaveURL('https://playwright.dev/docs/intro');
 // Проверка, что URL страницы содержит 'doc', за которым следует необязательная 's', за которой следует '/'
 await expect(page).toHaveURL(/docs?\//);
 
-// Проверка, что предикат удовлетворен
-// Например: проверка строк запроса
+// Проверяем, что URL страницы соответствует шаблону URL
+await expect(page).toHaveURL(new URLPattern({ pathname: '/docs/*' }));
+
+// Проверяем, что условие предиката выполняется
+// Например: проверяем строки запроса
 await expect(page).toHaveURL(url => {
   const params = url.searchParams;
   return params.has('search') && params.has('options') && params.get('id') === '5';
@@ -233,14 +250,17 @@ await expect(page).toHaveURL(url => {
 ```
 
 **Аргументы**
-- `url` [string] | [RegExp] | [function]\([URL]\):[boolean] <font size="2">Добавлено в: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-url-option-url"/><a href="#page-assertions-to-have-url-option-url" class="list-anchor">#</a>
+- `url` [string] | [RegExp] | [URLPattern] | [function]\([URL]\):[boolean] <font size="2">Добавлено в: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-url-option-url"/><a href="#page-assertions-to-have-url-option-url" class="list-anchor">#</a>
   
   Ожидаемая строка URL, регулярное выражение или предикат, получающий [URL] для совпадения. Когда [baseURL](/api/class-browser.mdx#browser-new-context-option-base-url) предоставляется через параметры контекста и аргумент `url` является строкой, два значения объединяются с помощью конструктора [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) и используются для сравнения с текущим URL браузера.
 - `options` [Object] *(опционально)*
   - `ignoreCase` [boolean] *(опционально)* <font size="2">Добавлено в: v1.44</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-url-option-ignore-case"/><a href="#page-assertions-to-have-url-option-ignore-case" class="list-anchor">#</a>
     
-    Выполнять ли нечувствительное к регистру совпадение. Опция [ignoreCase](/api/class-pageassertions.mdx#page-assertions-to-have-url-option-ignore-case) имеет приоритет над соответствующим параметром регулярного выражения, если указано. Предоставленный предикат игнорирует этот флаг.
-  - `timeout` [number] *(опционально)* <font size="2">Добавлено в: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-url-option-timeout"/><a href="#page-assertions-to-have-url-option-timeout" class="list-anchor">#</a>
+Определяет, следует ли выполнять сопоставление без учёта регистра. Параметр [ignoreCase](/api/class-pageassertions.mdx#page-assertions-to-have-url-option-ignore-case), если он указан, имеет приоритет над соответствующим флагом регулярного выражения. Если передан предикат, этот флаг игнорируется.
+  - `signal` [AbortSignal] *(необязательный)* <font size="2">Добавлено в: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-url-option-signal"/><a href="#page-assertions-to-have-url-option-signal" class="list-anchor">#</a>
+    
+    Необязательный [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal), позволяющий отменить проверку. Отмена сигнала приводит к неудачному завершению проверки, как и истечение времени ожидания: если сигнал отменён во время повторных попыток проверки или уже отменён до её начала, проверка завершается неудачей без дальнейших повторных попыток.
+  - `timeout` [number] *(необязательный)* <font size="2">Добавлено в: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-url-option-timeout"/><a href="#page-assertions-to-have-url-option-timeout" class="list-anchor">#</a>
     
     Время для повторной попытки утверждения в миллисекундах. По умолчанию `timeout` в `TestConfig.expect`.
 
@@ -249,33 +269,89 @@ await expect(page).toHaveURL(url => {
 
 ---
 
-## Свойства {#properties}
+### toMatchAriaSnapshot(expected) {/* #page-assertions-to-match-aria-snapshot */}
 
-### not {#page-assertions-not}
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.60</font><x-search>pageAssertions.toMatchAriaSnapshot(expected)</x-search>
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.20</font><x-search>pageAssertions.not</x-search>
-
-Делает проверку утверждения на противоположное условие. Например, этот код проверяет, что URL страницы не содержит `"error"`:
-
-```js
-await expect(page).not.toHaveURL('error');
-```
+Проверяет, что тело страницы соответствует заданному [снимку дерева доступности](../aria-snapshots.mdx).
 
 **Использование**
 
 ```js
-expect(page).not
+await page.goto('https://demo.playwright.dev/todomvc/');
+await expect(page).toMatchAriaSnapshot(`
+  - heading "todos"
+  - textbox "What needs to be done?"
+`);
+```
+
+**Аргументы**
+- `expected` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-match-aria-snapshot-option-expected"/><a href="#page-assertions-to-match-aria-snapshot-option-expected" class="list-anchor">#</a>
+- `options` [Object] *(необязательно)*
+  - `signal` [AbortSignal] *(необязательно)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-match-aria-snapshot-option-signal"/><a href="#page-assertions-to-match-aria-snapshot-option-signal" class="list-anchor">#</a>
+    
+    Необязательный [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) для отмены проверки. Отмена действует как тайм-аут: если сигнал сработал до начала проверки или во время повторных попыток, проверка сразу завершается ошибкой.
+  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-match-aria-snapshot-option-timeout"/><a href="#page-assertions-to-match-aria-snapshot-option-timeout" class="list-anchor">#</a>
+    
+    Время в миллисекундах, в течение которого проверка повторяется. По умолчанию используется `timeout` из `TestConfig.expect`.
+
+**Возвращает**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-match-aria-snapshot-return"/><a href="#page-assertions-to-match-aria-snapshot-return" class="list-anchor">#</a>
+
+---
+
+### toMatchAriaSnapshot(options) {/* #page-assertions-to-match-aria-snapshot-2 */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.60</font><x-search>pageAssertions.toMatchAriaSnapshot(options)</x-search>
+
+Проверяет, что тело страницы соответствует заданному [снимку дерева доступности](../aria-snapshots.mdx).
+
+Снимок хранится в отдельном файле `.aria.yml`. Его путь задаётся свойствами `expect.toMatchAriaSnapshot.pathTemplate` и/или `snapshotPathTemplate` в конфигурации.
+
+**Использование**
+
+```js
+await expect(page).toMatchAriaSnapshot();
+await expect(page).toMatchAriaSnapshot({ name: 'home.aria.yml' });
+```
+
+**Аргументы**
+- `options` [Object] *(необязательно)*
+  - `name` [string] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-match-aria-snapshot-2-option-name"/><a href="#page-assertions-to-match-aria-snapshot-2-option-name" class="list-anchor">#</a>
+    
+    Имя файла снимка в каталоге снимков этого теста. Если имя не задано, оно генерируется последовательно.
+  - `signal` [AbortSignal] *(необязательно)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-match-aria-snapshot-2-option-signal"/><a href="#page-assertions-to-match-aria-snapshot-2-option-signal" class="list-anchor">#</a>
+    
+    Необязательный [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) для отмены проверки. Отмена действует как тайм-аут: если сигнал сработал до начала проверки или во время повторных попыток, проверка сразу завершается ошибкой.
+  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-match-aria-snapshot-2-option-timeout"/><a href="#page-assertions-to-match-aria-snapshot-2-option-timeout" class="list-anchor">#</a>
+    
+    Время в миллисекундах, в течение которого проверка повторяется. По умолчанию используется `timeout` из `TestConfig.expect`.
+
+**Возвращает**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-match-aria-snapshot-2-return"/><a href="#page-assertions-to-match-aria-snapshot-2-return" class="list-anchor">#</a>
+
+---
+
+## Свойства {#properties}
+
+### not {/* #page-assertions-not */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.20</font><x-search>pageAssertions.not</x-search>
+
+Заставляет утверждение проверять противоположное условие.
+
+**Использование**
+
+Например, этот код проверяет, что URL страницы не содержит `"error"`:
+
+```js
+await expect(page).not.toHaveURL('error');
 ```
 
 **Тип**
 - [PageAssertions]
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -288,10 +364,11 @@ expect(page).not
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -310,6 +387,7 @@ expect(page).not
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -317,9 +395,18 @@ expect(page).not
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -337,6 +424,7 @@ expect(page).not
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -349,6 +437,7 @@ expect(page).not
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -370,6 +459,7 @@ expect(page).not
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

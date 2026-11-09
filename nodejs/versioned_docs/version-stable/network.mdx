@@ -246,7 +246,7 @@ await page.goto('https://example.com');
 // Удаление заголовка
 await page.route('**/*', async route => {
   const headers = route.request().headers();
-  delete headers['X-Secret'];
+  delete headers['x-secret'];
   await route.continue({ headers });
 });
 
@@ -294,7 +294,41 @@ await page.route('**/title.html', async route => {
 });
 ```
 
-## Шаблоны URL с глобами {#glob-url-patterns}
+## Как работает перехват запросов
+
+Маршруты находятся между страницей и сетевым стеком браузера. Обработчик выполняется до того, как сетевой стек обработает запрос: [route.continue()](/api/class-route.mdx#route-continue) передает его дальше, [route.fulfill()](/api/class-route.mdx#route-fulfill) возвращает ответ без обращения к сети, а [route.abort()](/api/class-route.mdx#route-abort) завершает запрос с ошибкой.
+
+```mermaid
+sequenceDiagram
+  participant Page as Страница
+  participant Playwright
+  participant Network as Сетевой стек
+  participant Server as Сервер
+
+  Page->>Playwright: запрос
+  Note over Playwright: выполняется обработчик маршрута
+  Playwright->>Network: route.continue()
+  Note over Network: добавляет Cookie, Host, Sec-Fetch-*, ...
+  Network->>Server: запрос
+  Server-->>Network: ответ
+  Note over Network: сохраняет cookie
+  Network-->>Playwright: заголовки ответа в том виде, в котором их отправил сервер
+  Network-->>Page: ответ
+```
+
+### Заголовки, которыми управляет сетевой стек
+
+Некоторые заголовки добавляются сетевым стеком непосредственно перед отправкой запроса: `Cookie`, `Host`, `Accept-Encoding`, `Content-Length`, `Sec-Fetch-*` и некоторые другие. Это граница безопасности: например, cookie с атрибутом `HttpOnly` никогда не предоставляется странице. Поскольку обработчик маршрута выполняется до этого этапа, наличие этих заголовков в [request.headers()](/api/class-request.mdx#request-headers) или [request.allHeaders()](/api/class-request.mdx#request-all-headers) не гарантируется, и переопределить их нельзя. Заголовок `cookie`, переданный в [route.continue()](/api/class-route.mdx#route-continue), игнорируется: вместо него используются данные из хранилища cookie браузера.
+
+При обработке ответа сетевой стек уже выполнил свою работу, поэтому [response.allHeaders()](/api/class-response.mdx#response-all-headers) возвращает заголовки точно в том виде, в котором их отправил сервер, включая `Set-Cookie` для cookie с атрибутом `HttpOnly`. Чтобы увидеть точные заголовки запроса, фактически отправленные по сети, наблюдайте за запросом, не перехватывая его с помощью маршрутов: если маршруты не установлены, [request.allHeaders()](/api/class-request.mdx#request-all-headers) включает все эти заголовки.
+
+### Перенаправления
+
+Playwright рассматривает запрос и его перенаправления как единое целое. Обработчик вызывается один раз, для исходного запроса, а браузер самостоятельно следует перенаправлению. Метод [response.request()](/api/class-response.mdx#response-request) возвращает последний запрос в цепочке, а [request.redirectedFrom()](/api/class-request.mdx#request-redirected-from) позволяет пройти по ней назад до перехваченного вами запроса. Заголовки, переданные в [route.continue()](/api/class-route.mdx#route-continue), применяются на каждом этапе цепочки, за исключением `cookie`, который всегда берется из хранилища cookie.
+
+Возврат ответа со статусом `3xx` не дает повторной возможности перехватить запрос. Chromium и Firefox следуют перенаправлению, не вызывая ваш обработчик, а WebKit отклоняет вызов. Чтобы вернуть другое содержимое, передайте это содержимое в ответе. Чтобы отправить запрос по другому адресу, передайте `url` в [route.continue()](/api/class-route.mdx#route-continue) или [route.fallback()](/api/class-route.mdx#route-fallback).
+
+## Glob-шаблоны URL
 
 Playwright использует упрощённые glob-шаблоны для сопоставления URL в методах перехвата сети, таких как [page.route()](/api/class-page.mdx#page-route) или [page.waitForResponse()](/api/class-page.mdx#page-wait-for-response). Эти шаблоны поддерживают базовые подстановочные символы:
 1. Звёздочки:
@@ -342,11 +376,6 @@ page.on('websocket', ws => {
 Если вам важно не только использовать Service Worker’ы для тестирования и сетевого мокирования, но и маршрутизировать/слушать запросы, которые выполняют сами Service Worker’ы, см. [это руководство](./service-workers.mdx).
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -359,10 +388,11 @@ page.on('websocket', ws => {
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -381,6 +411,7 @@ page.on('websocket', ws => {
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -388,9 +419,18 @@ page.on('websocket', ws => {
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -408,6 +448,7 @@ page.on('websocket', ws => {
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -420,6 +461,7 @@ page.on('websocket', ws => {
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -441,6 +483,7 @@ page.on('websocket', ws => {
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

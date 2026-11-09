@@ -1,0 +1,136 @@
+---
+title: "Взаимодействие"
+---
+
+# Взаимодействие
+
+Нажимайте на элементы, наводите на них указатель, перетаскивайте их и выбирайте значения, используя идентификаторы элементов из снимков дерева доступности.
+
+| Инструмент | Описание |
+|------|-------------|
+| `browser_click` | Нажатие на элемент |
+| `browser_hover` | Наведение указателя на элемент |
+| `browser_drag` | Перетаскивание одного элемента на другой |
+| `browser_select_option` | Выбор значения в раскрывающемся списке |
+| `browser_resize` | Изменение размера окна браузера |
+
+## Указание целевых элементов
+
+Каждый инструмент взаимодействия принимает параметр `target`, который указывает на элемент. Целевые элементы определяются по снимкам дерева доступности,
+возвращаемым инструментами `browser_snapshot`, `browser_find` или автоматически после каждого действия. Найдите
+метку `[ref=...]` нужного элемента и передайте значение `ref` в качестве `target`.
+
+```txt
+→ browser_snapshot
+  - button "Submit" [ref=e12]       ← target — "e12"
+  - link "Learn more" [ref=e15]     ← target — "e15"
+
+→ browser_click { target: "e12" }
+```
+
+Вместо идентификатора параметр `target` также принимает уникальный селектор или строку локатора. Это удобно, если
+вы уже знаете, как найти элемент:
+
+```txt
+→ browser_click { target: "getByRole('button', { name: 'Submit' })" }
+→ browser_click { target: "#submit" }
+```
+
+Подробнее об идентификаторах элементов см. в разделе [Снимки](../snapshots.mdx).
+
+## browser_click
+
+Нажатие на элемент на странице.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `target` | string | да | Идентификатор элемента из снимка или уникальный селектор |
+| `doubleClick` | boolean | нет | Выполнить двойное нажатие вместо одиночного |
+| `button` | string | нет | `left` (по умолчанию), `right` или `middle` |
+| `modifiers` | string[] | нет | `Alt`, `Control`, `ControlOrMeta`, `Meta`, `Shift` |
+
+```txt
+→ browser_click { target: "e12" }
+→ browser_click { target: "e15", doubleClick: true }
+→ browser_click { target: "e20", button: "right" }
+→ browser_click { target: "e22", modifiers: ["Shift"] }
+```
+
+## browser_hover
+
+Наведите указатель на элемент, чтобы вызвать всплывающую подсказку, раскрывающееся меню или состояние наведения.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `target` | string | да | Идентификатор элемента или селектор |
+
+```txt
+→ browser_hover { target: "e3" }
+
+  - menuitem "Profile" [ref=e20]
+  - menuitem "Settings" [ref=e21]
+  - menuitem "Logout" [ref=e22]
+```
+
+## browser_drag
+
+Перетащите один элемент на другой и отпустите его.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `startTarget` | string | да | Элемент, который нужно перетащить |
+| `endTarget` | string | да | Элемент, на который нужно перетащить исходный элемент |
+
+```txt
+→ browser_drag { startTarget: "e5", endTarget: "e10" }
+```
+
+Для перетаскивания файлов или данных на страницу извне используйте [`browser_drop`](./file-upload.mdx#browser_drop).
+
+## browser_select_option
+
+Выберите одно или несколько значений в раскрывающемся списке `<select>`.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `target` | string | да | Идентификатор элемента `select` или селектор |
+| `values` | string[] | да | Значения для выбора — одно или несколько значений |
+
+```txt
+→ browser_snapshot
+  - combobox "Country" [ref=e7]
+
+→ browser_select_option { target: "e7", values: ["United States"] }
+```
+
+## browser_resize
+
+Изменение размера окна браузера.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `width` | number | да | Ширина в пикселях |
+| `height` | number | да | Высота в пикселях |
+
+```txt
+→ browser_resize { width: 375, height: 812 }    // мобильная область просмотра
+→ browser_resize { width: 1920, height: 1080 }  // настольный компьютер
+```
+
+## Рабочий процесс: заполнение и отправка формы
+
+```txt
+→ browser_snapshot
+  - textbox "Email" [ref=e3]
+  - textbox "Password" [ref=e5]
+  - combobox "Role" [ref=e7]
+  - button "Sign up" [ref=e9]
+
+→ browser_type { target: "e3", text: "alice@example.com" }
+→ browser_type { target: "e5", text: "s3cret!" }
+→ browser_select_option { target: "e7", values: ["Admin"] }
+→ browser_click { target: "e9" }
+
+  - heading "Welcome, Alice!" [level=1] [ref=e2]
+  - text: Your account has been created.
+```

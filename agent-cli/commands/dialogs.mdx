@@ -1,0 +1,91 @@
+---
+title: "Диалоговые окна"
+---
+
+# Диалоговые окна
+
+Обрабатывайте диалоговые окна браузера (alert, confirm, prompt), которые блокируют взаимодействие со страницей.
+
+## Команды
+
+| Команда | Описание |
+|---------|-------------|
+| `dialog-accept [prompt]` | Подтвердить диалоговое окно, при необходимости указав текст для ввода |
+| `dialog-dismiss` | Закрыть (отменить) диалоговое окно |
+
+## Как отображается информация о диалоговом окне
+
+Пока диалоговое окно открыто, каждая команда сообщает о нём в разделе `Modal state` и указывает,
+какая команда позволяет его закрыть:
+
+```txt
+### Modal state
+- ["confirm" dialog with message "Are you sure you want to delete this?"]: can be handled by dialog-accept or dialog-dismiss
+```
+
+Никакие другие действия не могут быть выполнены, пока диалоговое окно не будет обработано.
+
+## Диалоговые окна alert
+
+```bash
+$ playwright-cli click e5
+### Modal state
+- ["alert" dialog with message "Item has been deleted."]: can be handled by dialog-accept or dialog-dismiss
+
+$ playwright-cli dialog-accept
+```
+
+## Диалоговые окна confirm
+
+```bash
+$ playwright-cli click e10
+### Modal state
+- ["confirm" dialog with message "Are you sure you want to delete this?"]: can be handled by dialog-accept or dialog-dismiss
+
+# Подтвердить (OK)
+$ playwright-cli dialog-accept
+
+# Или отменить (Cancel)
+$ playwright-cli dialog-dismiss
+```
+
+## Диалоговые окна prompt
+
+```bash
+$ playwright-cli click e8
+### Modal state
+- ["prompt" dialog with message "Enter your name:"]: can be handled by dialog-accept or dialog-dismiss
+
+# Подтвердить с вводом текста
+$ playwright-cli dialog-accept "Alice"
+
+# Или отменить (отменяет ввод в диалоговом окне)
+$ playwright-cli dialog-dismiss
+```
+
+## Диалоговые окна выбора файлов
+
+Информация об окне выбора файлов отображается аналогичным образом, а для его обработки используется
+[`upload`](./interaction.mdx), а не команды для диалоговых окон:
+
+```txt
+### Modal state
+- [File chooser]: can be handled by upload
+```
+
+```bash
+playwright-cli upload /abs/path/to/document.pdf
+```
+
+## Последовательность действий
+
+```bash
+$ playwright-cli click e12
+### Modal state
+- ["confirm" dialog with message "Discard unsaved changes?"]: can be handled by dialog-accept or dialog-dismiss
+
+$ playwright-cli dialog-accept
+
+$ playwright-cli snapshot
+# Теперь страница отображает обновлённое состояние после подтверждения диалогового окна
+```

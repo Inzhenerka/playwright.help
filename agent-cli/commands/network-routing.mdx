@@ -1,0 +1,173 @@
+---
+title: "Сеть и моки"
+---
+
+# Сеть и моки
+
+Анализируйте сетевой трафик, подменяйте ответы API и тестируйте поведение без подключения к сети.
+
+## Просмотр сетевых запросов
+
+`requests` выводит нумерованный список запросов, выполненных с момента загрузки страницы. Успешно загруженные статические ресурсы
+(изображения, шрифты, таблицы стилей, скрипты) по умолчанию скрыты, чтобы список оставался компактным.
+
+```bash
+playwright-cli requests                      # fetch/XHR и все запросы, завершившиеся с ошибкой
+playwright-cli requests --static             # включить успешно загруженные статические ресурсы
+playwright-cli requests --filter="/api/.*"   # только URL, соответствующие этому регулярному выражению
+playwright-cli requests --clear              # очистить журнал
+```
+
+```bash
+$ playwright-cli requests --filter="/api/"
+# 1. [GET] https://api.example.com/users => [200] OK
+# 2. [POST] https://api.example.com/users/create => [201] Created
+# 3. [GET] https://api.example.com/prefs => [FAILED] net::ERR_ABORTED
+#
+# Примечание: 14 запросов статических ресурсов не показаны; запустите с параметром --static, чтобы увидеть их.
+```
+
+## Просмотр отдельного запроса
+
+Используйте номер из списка `requests`:
+
+| Команда | Описание |
+|---------|-------------|
+| `request <index>` | Полная информация — заголовки и тело запроса, заголовки и тело ответа |
+| `request-headers <index>` | Только заголовки запроса |
+| `request-body <index>` | Только тело запроса |
+| `response-headers <index>` | Только заголовки ответа |
+| `response-body <index>` | Только тело ответа |
+
+```bash
+playwright-cli request 2
+playwright-cli response-body 2
+playwright-cli response-body 2 --filename=users.json
+```
+
+Все пять команд принимают параметр `--filename`, позволяющий записать результат в файл вместо возврата в виде текста.
+`response-body` выводит текстовые тела ответов непосредственно, а двоичные сохраняет в файл, выводя путь к нему.
+
+## Подмена ответов API
+
+```bash
+playwright-cli route <pattern> [options]
+```
+
+| Параметр | Описание |
+|--------|-------------|
+| `--status=<code>` | Код состояния HTTP (по умолчанию: 200) |
+| `--body=<text>` | Тело ответа (текст или строка JSON) |
+| `--content-type=<type>` | Заголовок Content-Type подменённого ответа |
+| `--header="<name>: <value>"` | Заголовок, добавляемый к исходящему запросу (можно указать несколько раз) |
+| `--remove-header=<names>` | Разделённые запятыми имена заголовков, которые нужно удалить из запроса |
+
+Маршрут либо **возвращает подменённый ответ**, либо **изменяет запрос**. Передача `--body` или `--status` позволяет ответить на запрос
+подменённым ответом, при этом страница вообще не обращается к сети. Передача только `--header` /
+`--remove-header` позволяет запросу продолжить выполнение на реальном сервере с изменёнными заголовками.
+
+### Подмена ответа конечной точки API
+
+```bash
+playwright-cli route "**/api/users" \
+  --body='[{"name":"Alice"},{"name":"Bob"}]' \
+  --content-type=application/json
+```
+
+### Тестирование обработки ошибок
+
+```bash
+playwright-cli route "**/api/data" --status=500
+playwright-cli route "**/api/data" --status=503
+```
+
+### Блокировка ресурсов
+
+```bash
+playwright-cli route "**/*.jpg" --status=404
+playwright-cli route "**/analytics/**" --status=204
+```
+
+### Изменение заголовков запроса
+
+```bash
+# удалить учётные данные из каждого запроса
+playwright-cli route "**/*" --remove-header=cookie,authorization
+
+# добавить заголовок к вызовам API
+playwright-cli route "**/api/**" --header="X-Debug: 1"
+```
+
+## Управление маршрутами
+
+```bash
+playwright-cli route-list               # вывести список активных маршрутов
+playwright-cli unroute "**/api/users"   # удалить конкретный маршрут
+playwright-cli unroute                  # удалить все маршруты
+```
+
+## Шаблоны URL
+
+```txt
+**/api/users           - соответствует этому пути на любом источнике (origin)
+**/api/*/details       - сегмент с подстановочным символом
+**/*.{png,jpg,jpeg}    - соответствие расширениям файлов
+**/search?q=*          - соответствие параметрам запроса
+```
+
+## Условная подмена ответов с помощью кода
+
+Для сложных сценариев -- задержек, ответов в зависимости от условий или анализа тела запроса -- используйте `run-code`:
+
+```bash
+playwright-cli run-code "async (page) => {
+  await page.route('**/api/users', async route => {
+    const body = route.request().postDataJSON();
+    if (body.role === 'admin') {
+      await route.fulfill({
+        body: JSON.stringify({ permissions: ['read', 'write', 'delete'] })
+      });
+    } else {
+      await route.fulfill({
+        body: JSON.stringify({ permissions: ['read'] })
+      });
+    }
+  });
+}"
+```
+
+## Рабочий процесс: тестирование обработки ошибок
+
+```bash
+# 1. Настроить подмену ответа API, чтобы возвращался код 503
+playwright-cli route "**/api/users" --status=503
+
+# 2. Перезагрузить страницу, чтобы вызвать ошибку
+playwright-cli reload
+
+# 3. Проверить страницу ошибки
+playwright-cli snapshot
+# - heading "Something went wrong" [level=1]
+# - button "Retry" [ref=e5]
+
+# 4. Сделать снимок экрана в состоянии ошибки
+playwright-cli screenshot --filename=error-state.png
+
+# 5. Удалить подмену и повторить попытку
+playwright-cli unroute
+playwright-cli click e5
+playwright-cli snapshot
+# - heading "Users" [level=1]
+```
+
+## Тестирование автономного режима
+
+```bash
+playwright-cli network-state-set offline   # отключить подключение к сети
+playwright-cli reload                      # страница показывает состояние без подключения к сети
+playwright-cli snapshot
+# - heading "No internet connection" [level=1]
+
+playwright-cli network-state-set online    # восстановить подключение
+playwright-cli reload                      # страница загружается в обычном режиме
+```

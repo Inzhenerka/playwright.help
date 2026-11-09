@@ -104,9 +104,12 @@ window.addEventListener("load", () => {
   }
 });
 
+const nextEnabled = document.currentScript?.dataset.nextEnabled !== "false";
 const kGoToNextToken = ['Shift', 'Shift', 'Shift', 'Shift', 'Shift'];
 let keyPressState = 0;
 document.addEventListener('keydown', (e) => {
+  if (!nextEnabled || e.repeat)
+    return;
   if (kGoToNextToken[keyPressState] === e.key) {
     keyPressState++;
     if (keyPressState === kGoToNextToken.length) {

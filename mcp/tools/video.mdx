@@ -1,0 +1,113 @@
+---
+title: "Запись видео"
+---
+
+# Запись видео
+
+Записывайте сеансы работы в браузере в виде видео в формате WebM с карточками глав и выносками для действий. Требуется [возможность](../capabilities.mdx) **devtools**.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--caps=devtools"]
+    }
+  }
+}
+```
+
+## browser_start_video
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `filename` | string | нет | Файл для сохранения видео. Относительные имена разрешаются относительно корня рабочей области. По умолчанию — `video-{timestamp}.webm` в каталоге вывода |
+| `size` | object | нет | Размер видео в виде `{ width, height }` |
+
+```txt
+→ browser_start_video { filename: "cart-bug-repro.webm" }
+  Запись видео начата.
+
+→ browser_start_video { size: { width: 800, height: 600 } }
+```
+
+## browser_stop_video
+
+Останавливает запись и возвращает записанные файлы. Не принимает параметров.
+
+```txt
+→ browser_stop_video
+  - [Видео](cart-bug-repro.webm)
+```
+
+## browser_video_chapter
+
+Добавляет маркер главы в запись. Показывает полноэкранную карточку главы с размытым фоном.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `title` | string | да | Заголовок главы |
+| `description` | string | нет | Описание главы |
+| `duration` | number | нет | Продолжительность показа карточки главы в миллисекундах |
+
+## browser_video_show_actions / browser_video_hide_actions
+
+Сопровождает последующие действия выносками на странице, которые указывают название действия и подсвечивают целевой
+элемент. Полезно при записи видео или трансляции экрана.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `duration` | number | нет | Время отображения каждой выноски на экране в миллисекундах. По умолчанию — 500 |
+| `position` | string | нет | Расположение названия действия: `top-left`, `top`, `top-right` (по умолчанию), `bottom-left`, `bottom`, `bottom-right` |
+| `cursor` | string | нет | `pointer` (по умолчанию) анимирует перемещение указателя мыши между точками выполнения действий; `none` отключает отображение курсора |
+
+`browser_video_hide_actions` не принимает параметров и отключает выноски.
+
+```txt
+→ browser_video_show_actions { position: "bottom", duration: 800 }
+→ browser_click { target: "e8" }
+→ browser_video_hide_actions
+```
+
+## Рабочий процесс: запись воспроизведения ошибки
+
+```txt
+→ browser_start_video { filename: "cart-bug-repro.webm" }
+→ browser_video_show_actions
+
+→ browser_video_chapter { title: "Подготовка: добавление товаров в корзину" }
+→ browser_navigate { url: "https://store.example.com" }
+→ browser_click { target: "e8" }
+→ browser_click { target: "e12" }
+→ browser_click { target: "e20" }
+
+→ browser_video_chapter {
+    title: "Проверка товаров в корзине",
+    description: "Оба товара должны быть видны"
+  }
+→ browser_snapshot
+  - list "Товары в корзине" [ref=e30]:
+    - listitem [ref=e31]: Наушники - $49.99
+    - listitem [ref=e32]: Кабель - $9.99
+
+→ browser_video_chapter {
+    title: "Ошибка: обновление страницы очищает корзину",
+    description: "Содержимое корзины должно сохраняться, но товары исчезают"
+  }
+→ browser_navigate { url: "https://store.example.com/cart" }
+
+  - heading "Ваша корзина пуста" [level=1] [ref=e2]
+
+→ browser_take_screenshot
+→ browser_stop_video
+  - [Видео](cart-bug-repro.webm)
+```
+
+## Варианты использования
+
+| Сценарий | Подход |
+|----------|----------|
+| Воспроизведение ошибки | Запишите шаги и прикрепите видео к отчёту об ошибке |
+| Документирование тестов | Записывайте видео с карточками глав |
+| Мониторинг агента | Записывайте сеансы работы агента для последующего просмотра |
+| Создание демонстраций | Записывайте видео с включёнными выносками для действий |

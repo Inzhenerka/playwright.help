@@ -16,7 +16,7 @@ Locators are the central piece of Playwright's auto-waiting and retry-ability. I
 
 ## Methods
 
-### all {#locator-all}
+### all {/* #locator-all */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.29</font><x-search>locator.all</x-search>
 
@@ -43,7 +43,7 @@ for (const li of await page.getByRole('listitem').all())
 
 ---
 
-### allInnerTexts {#locator-all-inner-texts}
+### allInnerTexts {/* #locator-all-inner-texts */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.allInnerTexts</x-search>
 
@@ -65,7 +65,7 @@ const texts = await page.getByRole('link').allInnerTexts();
 
 ---
 
-### allTextContents {#locator-all-text-contents}
+### allTextContents {/* #locator-all-text-contents */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.allTextContents</x-search>
 
@@ -87,7 +87,7 @@ const texts = await page.getByRole('link').allTextContents();
 
 ---
 
-### and {#locator-and}
+### and {/* #locator-and */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.34</font><x-search>locator.and</x-search>
 
@@ -111,7 +111,7 @@ const button = page.getByRole('button').and(page.getByTitle('Subscribe'));
 
 ---
 
-### ariaSnapshot {#locator-aria-snapshot}
+### ariaSnapshot {/* #locator-aria-snapshot */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.49</font><x-search>locator.ariaSnapshot</x-search>
 
@@ -125,6 +125,18 @@ await page.getByRole('link').ariaSnapshot();
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `boxes` [boolean] *(optional)* <font size="2">Added in: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-option-boxes"/><a href="#locator-aria-snapshot-option-boxes" class="list-anchor">#</a>
+    
+    When `true`, appends each element's bounding box as `[box=x,y,width,height]` to the snapshot. Coordinates are relative to the viewport, in CSS pixels, as returned by [`Element.getBoundingClientRect()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect). Defaults to `false`.
+  - `depth` [number] *(optional)* <font size="2">Added in: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-option-depth"/><a href="#locator-aria-snapshot-option-depth" class="list-anchor">#</a>
+    
+    When specified, limits the depth of the snapshot.
+  - `mode` "ai" | "default" *(optional)* <font size="2">Added in: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-option-mode"/><a href="#locator-aria-snapshot-option-mode" class="list-anchor">#</a>
+    
+    When set to `"ai"`, returns a snapshot optimized for AI consumption. Defaults to `"default"`. See details for more information.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-option-signal"/><a href="#locator-aria-snapshot-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-option-timeout"/><a href="#locator-aria-snapshot-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -158,9 +170,60 @@ Below is the HTML markup and the respective ARIA snapshot:
     - link "About"
 ```
 
+An AI-optimized snapshot, controlled by [mode](/api/class-locator.mdx#locator-aria-snapshot-option-mode), is different from a default snapshot:
+1. Includes element references `[ref=e2]`. 2. Does not wait for an element matching the locator, and throws when no elements match. 3. Includes snapshots of `<iframe>`s inside the target. 4. Can omit names that repeat printed descendants, such as a heading containing a link. Names that identify dialogs, landmarks, groups, tables and table headers are retained.
+
 ---
 
-### blur {#locator-blur}
+### ariaSnapshotJSON {/* #locator-aria-snapshot-json */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.63</font><x-search>locator.ariaSnapshotJSON</x-search>
+
+Captures the aria snapshot of the given element as a free form JSON object.
+
+**Usage**
+
+```js
+await page.getByRole('list').ariaSnapshotJSON();
+```
+
+**Arguments**
+- `options` [Object] *(optional)*
+  - `boxes` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-json-option-boxes"/><a href="#locator-aria-snapshot-json-option-boxes" class="list-anchor">#</a>
+    
+    When `true`, includes each element's bounding box as a `box` property with `x`, `y`, `width` and `height`. Coordinates are relative to the viewport, in CSS pixels, as returned by [`Element.getBoundingClientRect()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect). Defaults to `false`.
+  - `depth` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-json-option-depth"/><a href="#locator-aria-snapshot-json-option-depth" class="list-anchor">#</a>
+    
+    When specified, limits the depth of the snapshot.
+  - `mode` "ai" | "default" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-json-option-mode"/><a href="#locator-aria-snapshot-json-option-mode" class="list-anchor">#</a>
+    
+    When set to `"ai"`, returns a snapshot optimized for AI consumption. Defaults to `"default"`. See details in [locator.ariaSnapshot()](/api/class-locator.mdx#locator-aria-snapshot).
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-json-option-signal"/><a href="#locator-aria-snapshot-json-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-json-option-timeout"/><a href="#locator-aria-snapshot-json-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- [Promise]&lt;[Serializable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-json-return"/><a href="#locator-aria-snapshot-json-return" class="list-anchor">#</a>
+
+**Details**
+
+This method returns the same tree as [locator.ariaSnapshot()](/api/class-locator.mdx#locator-aria-snapshot), serialized as a JSON value instead of YAML markup. The result is a list of nodes, each node being an object with the following properties:
+* `role` Aria role of the element, or `"text"` for a static text fragment.
+* `name` Accessible name of the element, if any.
+* `text` Text content of the element when it is the only child, or the content of a static text fragment.
+* `children` Child nodes and text fragments.
+* Boolean and value properties for element state flags: `checked`, `disabled`, `expanded`, `active`, `invalid`, `level`, `pressed` and `selected`.
+* Additional element properties, for example `url` for links and `placeholder` for text boxes.
+* `ref` Element reference for AI-optimized snapshots.
+* `cursor` Set to `"pointer"` for clickable elements in AI-optimized snapshots.
+* `box` Bounding box of the element when [boxes](/api/class-locator.mdx#locator-aria-snapshot-json-option-boxes) is set.
+
+---
+
+### blur {/* #locator-blur */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.28</font><x-search>locator.blur</x-search>
 
@@ -175,6 +238,9 @@ await locator.blur(options);
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-blur-option-signal"/><a href="#locator-blur-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-blur-option-timeout"/><a href="#locator-blur-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -184,7 +250,7 @@ await locator.blur(options);
 
 ---
 
-### boundingBox {#locator-bounding-box}
+### boundingBox {/* #locator-bounding-box */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.boundingBox</x-search>
 
@@ -199,6 +265,9 @@ await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-bounding-box-option-signal"/><a href="#locator-bounding-box-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-bounding-box-option-timeout"/><a href="#locator-bounding-box-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -228,7 +297,7 @@ Assuming the page is static, it is safe to use bounding box coordinates to perfo
 
 ---
 
-### check {#locator-check}
+### check {/* #locator-check */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.check</x-search>
 
@@ -261,6 +330,12 @@ await page.getByRole('checkbox').check();
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-check-option-scroll"/><a href="#locator-check-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-check-option-signal"/><a href="#locator-check-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-check-option-timeout"/><a href="#locator-check-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -286,7 +361,7 @@ When all steps combined have not finished during the specified [timeout](/api/cl
 
 ---
 
-### clear {#locator-clear}
+### clear {/* #locator-clear */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.28</font><x-search>locator.clear</x-search>
 
@@ -311,6 +386,9 @@ await page.getByRole('textbox').clear();
     
     
     This option has no effect.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-clear-option-signal"/><a href="#locator-clear-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-clear-option-timeout"/><a href="#locator-clear-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -326,7 +404,7 @@ If the target element is not an `<input>`, `<textarea>` or `[contenteditable]` e
 
 ---
 
-### click {#locator-click}
+### click {/* #locator-click */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.click</x-search>
 
@@ -383,6 +461,12 @@ await page.locator('canvas').click({
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-click-option-scroll"/><a href="#locator-click-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-click-option-signal"/><a href="#locator-click-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `steps` [number] *(optional)* <font size="2">Added in: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-click-option-steps"/><a href="#locator-click-option-steps" class="list-anchor">#</a>
     
     Defaults to 1. Sends `n` interpolated `mousemove` events to represent travel between Playwright's current cursor position and the provided destination. When set to 1, emits a single `mousemove` event at the destination location.
@@ -410,7 +494,7 @@ When all steps combined have not finished during the specified [timeout](/api/cl
 
 ---
 
-### contentFrame {#locator-content-frame}
+### contentFrame {/* #locator-content-frame */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.43</font><x-search>locator.contentFrame</x-search>
 
@@ -434,7 +518,7 @@ await frameLocator.getByRole('button').click();
 
 ---
 
-### count {#locator-count}
+### count {/* #locator-count */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.count</x-search>
 
@@ -456,7 +540,7 @@ const count = await page.getByRole('listitem').count();
 
 ---
 
-### dblclick {#locator-dblclick}
+### dblclick {/* #locator-dblclick */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.dblclick</x-search>
 
@@ -499,6 +583,12 @@ await locator.dblclick(options);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-dblclick-option-scroll"/><a href="#locator-dblclick-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-dblclick-option-signal"/><a href="#locator-dblclick-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `steps` [number] *(optional)* <font size="2">Added in: v1.57</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-dblclick-option-steps"/><a href="#locator-dblclick-option-steps" class="list-anchor">#</a>
     
     Defaults to 1. Sends `n` interpolated `mousemove` events to represent travel between Playwright's current cursor position and the provided destination. When set to 1, emits a single `mousemove` event at the destination location.
@@ -530,7 +620,7 @@ When all steps combined have not finished during the specified [timeout](/api/cl
 
 ---
 
-### describe {#locator-describe}
+### describe {/* #locator-describe */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.53</font><x-search>locator.describe</x-search>
 
@@ -553,11 +643,11 @@ await button.click();
 
 ---
 
-### description {#locator-description}
+### description {/* #locator-description */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.57</font><x-search>locator.description</x-search>
 
-Returns locator description previously set with [locator.describe()](/api/class-locator.mdx#locator-describe). Returns `null` if no custom description has been set. Prefer `Locator.toString()` for a human-readable representation, as it uses the description when available.
+Returns locator description previously set with [locator.describe()](/api/class-locator.mdx#locator-describe). Returns `null` if no custom description has been set. Prefer [locator.toString()](/api/class-locator.mdx#locator-to-string) for a human-readable representation, as it uses the description when available.
 
 **Usage**
 
@@ -574,7 +664,7 @@ console.log(input.description()); // null
 
 ---
 
-### dispatchEvent {#locator-dispatch-event}
+### dispatchEvent {/* #locator-dispatch-event */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.dispatchEvent</x-search>
 
@@ -594,6 +684,9 @@ await locator.dispatchEvent('click');
   
   Optional event-specific initialization properties.
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-dispatch-event-option-signal"/><a href="#locator-dispatch-event-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-dispatch-event-option-timeout"/><a href="#locator-dispatch-event-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -628,7 +721,7 @@ await locator.dispatchEvent('dragstart', { dataTransfer });
 
 ---
 
-### dragTo {#locator-drag-to}
+### dragTo {/* #locator-drag-to */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.18</font><x-search>locator.dragTo</x-search>
 
@@ -664,6 +757,12 @@ await source.dragTo(target, {
     
     
     This option has no effect.
+  - `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drag-to-option-scroll"/><a href="#locator-drag-to-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drag-to-option-signal"/><a href="#locator-drag-to-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `sourcePosition` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drag-to-option-source-position"/><a href="#locator-drag-to-option-source-position" class="list-anchor">#</a>
     - `x` [number]
       
@@ -699,7 +798,79 @@ This method drags the locator to another target locator or target position. It w
 
 ---
 
-### evaluate {#locator-evaluate}
+### drop {/* #locator-drop */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>locator.drop</x-search>
+
+Simulate an external drag-and-drop of files or clipboard-like data onto this locator.
+
+**Usage**
+
+Drop a file buffer onto an upload area:
+
+```js
+await page.locator('#dropzone').drop({
+  files: { name: 'note.txt', mimeType: 'text/plain', buffer: Buffer.from('hello') },
+});
+```
+
+Drop plain text and a URL together:
+
+```js
+await page.locator('#dropzone').drop({
+  data: {
+    'text/plain': 'hello world',
+    'text/uri-list': 'https://example.com',
+  },
+});
+```
+
+**Arguments**
+- `payload` [Object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drop-option-payload"/><a href="#locator-drop-option-payload" class="list-anchor">#</a>
+  - `files` [string] | [Array]&lt;[string]&gt; | [Object] | [Array]&lt;[Object]&gt; *(optional)*
+    - `name` [string]
+      
+      File name
+    - `mimeType` [string]
+      
+      File type
+    - `buffer` [Buffer]
+      
+      File content
+    
+    
+  - `data` [Object]&lt;[string], [string]&gt; *(optional)*
+    
+    
+  Data to drop onto the target. Provide `files` (file paths or in-memory buffers), `data` (a mime-type → string map for clipboard-like content such as `text/plain`, `text/html`, `text/uri-list`), or both.
+- `options` [Object] *(optional)*
+  - `position` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drop-option-position"/><a href="#locator-drop-option-position" class="list-anchor">#</a>
+    - `x` [number]
+      
+      
+    - `y` [number]
+      
+      
+    A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drop-option-signal"/><a href="#locator-drop-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drop-option-timeout"/><a href="#locator-drop-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drop-return"/><a href="#locator-drop-return" class="list-anchor">#</a>
+
+**Details**
+
+Dispatches the native `dragenter`, `dragover`, and `drop` events at the center of the target element with a synthetic [DataTransfer] carrying the provided files and/or data entries. Works cross-browser by constructing the [DataTransfer] in the page context.
+
+If the target element's `dragover` listener does not call `preventDefault()`, the target is considered to have rejected the drop: Playwright dispatches `dragleave` and this method throws.
+
+---
+
+### evaluate {/* #locator-evaluate */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.evaluate</x-search>
 
@@ -724,6 +895,12 @@ console.log(result); // prints "myId text 56"
   
   Optional argument to pass to [pageFunction](/api/class-locator.mdx#locator-evaluate-option-expression).
 - `options` [Object] *(optional)*
+  - `exposeFunctions` [boolean] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-option-expose-functions"/><a href="#locator-evaluate-option-expose-functions" class="list-anchor">#</a>
+    
+    When set to `true`, functions passed inside [arg](/api/class-locator.mdx#locator-evaluate-option-arg) are exposed in the page and can be called from the page function. Calling one returns a [Promise] of its result. Under the hood, each function is exposed via [page.exposeFunction()](/api/class-page.mdx#page-expose-function), so it is technically accessible from all frames of the page. Exposed functions are cleared upon the top-level navigation. Defaults to `false`, in which case functions are not serializable and passing one throws an error.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-option-signal"/><a href="#locator-evaluate-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-option-timeout"/><a href="#locator-evaluate-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds to wait for the locator before evaluating. Note that after locator is resolved, evaluation itself is not limited by the timeout. Defaults to `0` - no timeout.
@@ -741,7 +918,7 @@ If [pageFunction](/api/class-locator.mdx#locator-evaluate-option-expression) thr
 
 ---
 
-### evaluateAll {#locator-evaluate-all}
+### evaluateAll {/* #locator-evaluate-all */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.evaluateAll</x-search>
 
@@ -775,7 +952,7 @@ If [pageFunction](/api/class-locator.mdx#locator-evaluate-all-option-expression)
 
 ---
 
-### evaluateHandle {#locator-evaluate-handle}
+### evaluateHandle {/* #locator-evaluate-handle */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.evaluateHandle</x-search>
 
@@ -796,6 +973,12 @@ await locator.evaluateHandle(pageFunction, arg, options);
   
   Optional argument to pass to [pageFunction](/api/class-locator.mdx#locator-evaluate-handle-option-expression).
 - `options` [Object] *(optional)*
+  - `exposeFunctions` [boolean] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-handle-option-expose-functions"/><a href="#locator-evaluate-handle-option-expose-functions" class="list-anchor">#</a>
+    
+    When set to `true`, functions passed inside [arg](/api/class-locator.mdx#locator-evaluate-handle-option-arg) are exposed in the page and can be called from the page function. Calling one returns a [Promise] of its result. Under the hood, each function is exposed via [page.exposeFunction()](/api/class-page.mdx#page-expose-function), so it is technically accessible from all frames of the page. Exposed functions are cleared upon the top-level navigation. Defaults to `false`, in which case functions are not serializable and passing one throws an error.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-handle-option-signal"/><a href="#locator-evaluate-handle-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-handle-option-timeout"/><a href="#locator-evaluate-handle-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds to wait for the locator before evaluating. Note that after locator is resolved, evaluation itself is not limited by the timeout. Defaults to `0` - no timeout.
@@ -817,7 +1000,7 @@ See [page.evaluateHandle()](/api/class-page.mdx#page-evaluate-handle) for more d
 
 ---
 
-### fill {#locator-fill}
+### fill {/* #locator-fill */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.fill</x-search>
 
@@ -845,6 +1028,9 @@ await page.getByRole('textbox').fill('example value');
     
     
     This option has no effect.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-fill-option-signal"/><a href="#locator-fill-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-fill-option-timeout"/><a href="#locator-fill-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -862,7 +1048,7 @@ To send fine-grained keyboard events, use [locator.pressSequentially()](/api/cla
 
 ---
 
-### filter {#locator-filter}
+### filter {/* #locator-filter */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.22</font><x-search>locator.filter</x-search>
 
@@ -901,14 +1087,14 @@ await rowLocator
     Matches elements containing specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring. For example, `"Playwright"` matches `<article><div>Playwright</div></article>`.
   - `visible` [boolean] *(optional)* <font size="2">Added in: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-option-visible"/><a href="#locator-filter-option-visible" class="list-anchor">#</a>
     
-    Only matches visible or invisible elements.
+    Only matches visible or invisible elements. Prefer the [locator.visible()](/api/class-locator.mdx#locator-visible) shortcut when matching only visible elements.
 
 **Returns**
 - [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-return"/><a href="#locator-filter-return" class="list-anchor">#</a>
 
 ---
 
-### first {#locator-first}
+### first {/* #locator-first */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.first</x-search>
 
@@ -925,7 +1111,7 @@ locator.first();
 
 ---
 
-### focus {#locator-focus}
+### focus {/* #locator-focus */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.focus</x-search>
 
@@ -940,6 +1126,9 @@ await locator.focus(options);
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-focus-option-signal"/><a href="#locator-focus-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-focus-option-timeout"/><a href="#locator-focus-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -949,7 +1138,7 @@ await locator.focus(options);
 
 ---
 
-### frameLocator {#locator-frame-locator}
+### frameLocator {/* #locator-frame-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>locator.frameLocator</x-search>
 
@@ -972,7 +1161,7 @@ await locator.click();
 
 ---
 
-### getAttribute {#locator-get-attribute}
+### getAttribute {/* #locator-get-attribute */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.getAttribute</x-search>
 
@@ -995,6 +1184,9 @@ await locator.getAttribute(name, options);
   
   Attribute name to get the value for.
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-attribute-option-signal"/><a href="#locator-get-attribute-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-attribute-option-timeout"/><a href="#locator-get-attribute-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -1004,7 +1196,7 @@ await locator.getAttribute(name, options);
 
 ---
 
-### getByAltText {#locator-get-by-alt-text}
+### getByAltText {/* #locator-get-by-alt-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.getByAltText</x-search>
 
@@ -1036,7 +1228,7 @@ await page.getByAltText('Playwright logo').click();
 
 ---
 
-### getByLabel {#locator-get-by-label}
+### getByLabel {/* #locator-get-by-label */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.getByLabel</x-search>
 
@@ -1071,7 +1263,7 @@ await page.getByLabel('Password').fill('secret');
 
 ---
 
-### getByPlaceholder {#locator-get-by-placeholder}
+### getByPlaceholder {/* #locator-get-by-placeholder */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.getByPlaceholder</x-search>
 
@@ -1107,7 +1299,7 @@ await page
 
 ---
 
-### getByRole {#locator-get-by-role}
+### getByRole {/* #locator-get-by-role */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.getByRole</x-search>
 
@@ -1126,7 +1318,7 @@ Consider the following DOM structure.
 <button>Submit</button>
 ```
 
-You can locate each element by it's implicit role:
+You can locate each element by its implicit role:
 
 ```js
 await expect(page.getByRole('heading', { name: 'Sign up' })).toBeVisible();
@@ -1146,6 +1338,11 @@ await page.getByRole('button', { name: /submit/i }).click();
     An attribute that is usually set by `aria-checked` or native `<input type=checkbox>` controls.
     
     Learn more about [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
+  - `description` [string] | [RegExp] *(optional)* <font size="2">Added in: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-role-option-description"/><a href="#locator-get-by-role-option-description" class="list-anchor">#</a>
+    
+    Option to match the [accessible description](https://w3c.github.io/accname/#dfn-accessible-description). By default, matching is case-insensitive and searches for a substring, use [exact](/api/class-locator.mdx#locator-get-by-role-option-exact) to control this behavior.
+    
+    Learn more about [accessible description](https://w3c.github.io/accname/#dfn-accessible-description).
   - `disabled` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-role-option-disabled"/><a href="#locator-get-by-role-option-disabled" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-disabled` or `disabled`.
@@ -1157,7 +1354,7 @@ await page.getByRole('button', { name: /submit/i }).click();
     
   - `exact` [boolean] *(optional)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-role-option-exact"/><a href="#locator-get-by-role-option-exact" class="list-anchor">#</a>
     
-    Whether [name](/api/class-locator.mdx#locator-get-by-role-option-name) is matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when [name](/api/class-locator.mdx#locator-get-by-role-option-name) is a regular expression. Note that exact match still trims whitespace.
+    Whether [name](/api/class-locator.mdx#locator-get-by-role-option-name) and [description](/api/class-locator.mdx#locator-get-by-role-option-description) are matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when the value is a regular expression. Note that exact match still trims whitespace.
   - `expanded` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-role-option-expanded"/><a href="#locator-get-by-role-option-expanded" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-expanded`.
@@ -1200,7 +1397,7 @@ Many html elements have an implicitly [defined role](https://w3c.github.io/html-
 
 ---
 
-### getByTestId {#locator-get-by-test-id}
+### getByTestId {/* #locator-get-by-test-id */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.getByTestId</x-search>
 
@@ -1214,7 +1411,7 @@ Consider the following DOM structure.
 <button data-testid="directions">Itinéraire</button>
 ```
 
-You can locate the element by it's test id:
+You can locate the element by its test id:
 
 ```js
 await page.getByTestId('directions').click();
@@ -1245,7 +1442,7 @@ export default defineConfig({
 
 ---
 
-### getByText {#locator-get-by-text}
+### getByText {/* #locator-get-by-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.getByText</x-search>
 
@@ -1301,7 +1498,7 @@ Input elements of the type `button` and `submit` are matched by their `value` in
 
 ---
 
-### getByTitle {#locator-get-by-title}
+### getByTitle {/* #locator-get-by-title */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.getByTitle</x-search>
 
@@ -1335,7 +1532,24 @@ await expect(page.getByTitle('Issues count')).toHaveText('25 issues');
 
 ---
 
-### highlight {#locator-highlight}
+### hideHighlight {/* #locator-hide-highlight */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>locator.hideHighlight</x-search>
+
+Hides the element highlight previously added by [locator.highlight()](/api/class-locator.mdx#locator-highlight).
+
+**Usage**
+
+```js
+await locator.hideHighlight();
+```
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hide-highlight-return"/><a href="#locator-hide-highlight-return" class="list-anchor">#</a>
+
+---
+
+### highlight {/* #locator-highlight */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><x-search>locator.highlight</x-search>
 
@@ -1345,14 +1559,26 @@ Highlight the corresponding element(s) on the screen. Useful for debugging, don'
 
 ```js
 await locator.highlight();
+await locator.highlight(options);
 ```
 
+**Arguments**
+- `options` [Object] *(optional)*
+  - `style` [string] | [Object]&lt;[string], [string] | [number]&gt; *(optional)* <font size="2">Added in: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-highlight-option-style"/><a href="#locator-highlight-option-style" class="list-anchor">#</a>
+    
+    Inline CSS applied to the highlight overlay, e.g.
+    
+    ```js
+    await locator.highlight({ style: 'outline: 2px dashed red' });
+    await locator.highlight({ style: { color: 'red' } });
+    ```
+    
 **Returns**
-- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-highlight-return"/><a href="#locator-highlight-return" class="list-anchor">#</a>
+- [Promise]&lt;[Disposable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-highlight-return"/><a href="#locator-highlight-return" class="list-anchor">#</a>
 
 ---
 
-### hover {#locator-hover}
+### hover {/* #locator-hover */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.hover</x-search>
 
@@ -1388,6 +1614,12 @@ await page.getByRole('link').hover();
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-scroll"/><a href="#locator-hover-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-signal"/><a href="#locator-hover-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-hover-option-timeout"/><a href="#locator-hover-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -1411,7 +1643,7 @@ When all steps combined have not finished during the specified [timeout](/api/cl
 
 ---
 
-### innerHTML {#locator-inner-html}
+### innerHTML {/* #locator-inner-html */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.innerHTML</x-search>
 
@@ -1426,6 +1658,9 @@ await locator.innerHTML(options);
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-inner-html-option-signal"/><a href="#locator-inner-html-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-inner-html-option-timeout"/><a href="#locator-inner-html-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -1435,7 +1670,7 @@ await locator.innerHTML(options);
 
 ---
 
-### innerText {#locator-inner-text}
+### innerText {/* #locator-inner-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.innerText</x-search>
 
@@ -1455,6 +1690,9 @@ await locator.innerText(options);
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-inner-text-option-signal"/><a href="#locator-inner-text-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-inner-text-option-timeout"/><a href="#locator-inner-text-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -1464,7 +1702,7 @@ await locator.innerText(options);
 
 ---
 
-### inputValue {#locator-input-value}
+### inputValue {/* #locator-input-value */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.inputValue</x-search>
 
@@ -1483,6 +1721,9 @@ const value = await page.getByRole('textbox').inputValue();
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-input-value-option-signal"/><a href="#locator-input-value-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-input-value-option-timeout"/><a href="#locator-input-value-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -1496,7 +1737,7 @@ Throws elements that are not an input, textarea or a select. However, if the ele
 
 ---
 
-### isChecked {#locator-is-checked}
+### isChecked {/* #locator-is-checked */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.isChecked</x-search>
 
@@ -1515,6 +1756,9 @@ const checked = await page.getByRole('checkbox').isChecked();
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-is-checked-option-signal"/><a href="#locator-is-checked-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-is-checked-option-timeout"/><a href="#locator-is-checked-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -1524,7 +1768,7 @@ const checked = await page.getByRole('checkbox').isChecked();
 
 ---
 
-### isDisabled {#locator-is-disabled}
+### isDisabled {/* #locator-is-disabled */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.isDisabled</x-search>
 
@@ -1543,6 +1787,9 @@ const disabled = await page.getByRole('button').isDisabled();
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-is-disabled-option-signal"/><a href="#locator-is-disabled-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-is-disabled-option-timeout"/><a href="#locator-is-disabled-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -1552,7 +1799,7 @@ const disabled = await page.getByRole('button').isDisabled();
 
 ---
 
-### isEditable {#locator-is-editable}
+### isEditable {/* #locator-is-editable */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.isEditable</x-search>
 
@@ -1571,6 +1818,9 @@ const editable = await page.getByRole('textbox').isEditable();
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-is-editable-option-signal"/><a href="#locator-is-editable-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-is-editable-option-timeout"/><a href="#locator-is-editable-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -1580,7 +1830,7 @@ const editable = await page.getByRole('textbox').isEditable();
 
 ---
 
-### isEnabled {#locator-is-enabled}
+### isEnabled {/* #locator-is-enabled */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.isEnabled</x-search>
 
@@ -1599,6 +1849,9 @@ const enabled = await page.getByRole('button').isEnabled();
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-is-enabled-option-signal"/><a href="#locator-is-enabled-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-is-enabled-option-timeout"/><a href="#locator-is-enabled-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -1608,7 +1861,7 @@ const enabled = await page.getByRole('button').isEnabled();
 
 ---
 
-### isHidden {#locator-is-hidden}
+### isHidden {/* #locator-is-hidden */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.isHidden</x-search>
 
@@ -1639,7 +1892,7 @@ const hidden = await page.getByRole('button').isHidden();
 
 ---
 
-### isVisible {#locator-is-visible}
+### isVisible {/* #locator-is-visible */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.isVisible</x-search>
 
@@ -1670,7 +1923,7 @@ const visible = await page.getByRole('button').isVisible();
 
 ---
 
-### last {#locator-last}
+### last {/* #locator-last */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.last</x-search>
 
@@ -1687,7 +1940,7 @@ const banana = await page.getByRole('listitem').last();
 
 ---
 
-### locator {#locator-locator}
+### locator {/* #locator-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.locator</x-search>
 
@@ -1731,7 +1984,36 @@ locator.locator(selectorOrLocator, options);
 
 ---
 
-### nth {#locator-nth}
+### normalize {/* #locator-normalize */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>locator.normalize</x-search>
+
+Returns a new locator that uses best practices for referencing the matched element, prioritizing test ids, aria roles, and other user-facing attributes over CSS selectors. This is useful for converting implementation-detail selectors into more resilient, human-readable locators.
+
+**Usage**
+
+An agent can pick an element by its ref from an [page.ariaSnapshot()](/api/class-page.mdx#page-aria-snapshot) taken in the `"ai"` mode. Refs only work for the latest snapshot. Normalize the ref locator and convert it to a string to get resilient locator code in your language, the same way `codegen` does.
+
+Consider the following aria snapshot.
+
+```yaml
+- button "Submit" [ref=e2]
+```
+
+You can turn the ref into locator code:
+
+```js
+const normalized = await page.getByRef('e2').normalize();
+console.log(normalized.toString());
+// getByRole('button', { name: 'Submit' })
+```
+
+**Returns**
+- [Promise]&lt;[Locator]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-normalize-return"/><a href="#locator-normalize-return" class="list-anchor">#</a>
+
+---
+
+### nth {/* #locator-nth */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.nth</x-search>
 
@@ -1751,7 +2033,7 @@ const banana = await page.getByRole('listitem').nth(2);
 
 ---
 
-### or {#locator-or}
+### or {/* #locator-or */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.33</font><x-search>locator.or</x-search>
 
@@ -1787,7 +2069,7 @@ await newEmail.click();
 
 ---
 
-### page {#locator-page}
+### page {/* #locator-page */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.19</font><x-search>locator.page</x-search>
 
@@ -1804,7 +2086,7 @@ locator.page();
 
 ---
 
-### press {#locator-press}
+### press {/* #locator-press */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.press</x-search>
 
@@ -1832,6 +2114,9 @@ await page.getByRole('textbox').press('Backspace');
     
     
     Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-press-option-signal"/><a href="#locator-press-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-press-option-timeout"/><a href="#locator-press-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -1857,7 +2142,7 @@ Shortcuts such as `key: "Control+o"`, `key: "Control++` or `key: "Control+Shift+
 
 ---
 
-### pressSequentially {#locator-press-sequentially}
+### pressSequentially {/* #locator-press-sequentially */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.38</font><x-search>locator.pressSequentially</x-search>
 
@@ -1901,6 +2186,9 @@ await locator.press('Enter');
     
     
     This option has no effect.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-press-sequentially-option-signal"/><a href="#locator-press-sequentially-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-press-sequentially-option-timeout"/><a href="#locator-press-sequentially-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -1910,7 +2198,7 @@ await locator.press('Enter');
 
 ---
 
-### screenshot {#locator-screenshot}
+### screenshot {/* #locator-screenshot */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.screenshot</x-search>
 
@@ -1954,19 +2242,22 @@ await page.getByRole('link').screenshot({ animations: 'disabled', path: 'link.pn
     The file path to save the image to. The screenshot type will be inferred from file extension. If [path](/api/class-locator.mdx#locator-screenshot-option-path) is a relative path, then it is resolved relative to the current working directory. If no path is provided, the image won't be saved to the disk.
   - `quality` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-quality"/><a href="#locator-screenshot-option-quality" class="list-anchor">#</a>
     
-    The quality of the image, between 0-100. Not applicable to `png` images.
+    The quality of the image, between 0-100. Not applicable to `png` images. For `jpeg` the default is `80`. For `webp`, a quality of `100` (the default) produces a lossless image, while lower values use lossy compression.
   - `scale` "css" | "device" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-scale"/><a href="#locator-screenshot-option-scale" class="list-anchor">#</a>
     
     When set to `"css"`, screenshot will have a single pixel per each css pixel on the page. For high-dpi devices, this will keep screenshots small. Using `"device"` option will produce a single pixel per each device pixel, so screenshots of high-dpi devices will be twice as large or even larger.
     
     Defaults to `"device"`.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-signal"/><a href="#locator-screenshot-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `style` [string] *(optional)* <font size="2">Added in: v1.41</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-style"/><a href="#locator-screenshot-option-style" class="list-anchor">#</a>
     
     Text of the stylesheet to apply while making the screenshot. This is where you can hide dynamic elements, make elements invisible or change their properties to help you creating repeatable screenshots. This stylesheet pierces the Shadow DOM and applies to the inner frames.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-timeout"/><a href="#locator-screenshot-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-  - `type` "png" | "jpeg" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-type"/><a href="#locator-screenshot-option-type" class="list-anchor">#</a>
+  - `type` "png" | "jpeg" | "webp" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-type"/><a href="#locator-screenshot-option-type" class="list-anchor">#</a>
     
     Specify screenshot type, defaults to `png`.
 
@@ -1983,7 +2274,7 @@ Returns the buffer with the captured screenshot.
 
 ---
 
-### scrollIntoViewIfNeeded {#locator-scroll-into-view-if-needed}
+### scrollIntoViewIfNeeded {/* #locator-scroll-into-view-if-needed */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.scrollIntoViewIfNeeded</x-search>
 
@@ -2000,6 +2291,9 @@ await locator.scrollIntoViewIfNeeded(options);
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-scroll-into-view-if-needed-option-signal"/><a href="#locator-scroll-into-view-if-needed-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-scroll-into-view-if-needed-option-timeout"/><a href="#locator-scroll-into-view-if-needed-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -2009,7 +2303,7 @@ await locator.scrollIntoViewIfNeeded(options);
 
 ---
 
-### selectOption {#locator-select-option}
+### selectOption {/* #locator-select-option */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.selectOption</x-search>
 
@@ -2061,6 +2355,9 @@ element.selectOption(['red', 'green', 'blue']);
     
     
     This option has no effect.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-option-option-signal"/><a href="#locator-select-option-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-option-option-timeout"/><a href="#locator-select-option-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -2080,7 +2377,7 @@ Triggers a `change` and `input` event once all the provided options have been se
 
 ---
 
-### selectText {#locator-select-text}
+### selectText {/* #locator-select-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.selectText</x-search>
 
@@ -2100,6 +2397,9 @@ await locator.selectText(options);
   - `force` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-text-option-force"/><a href="#locator-select-text-option-force" class="list-anchor">#</a>
     
     Whether to bypass the [actionability](../actionability.mdx) checks. Defaults to `false`.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-text-option-signal"/><a href="#locator-select-text-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-select-text-option-timeout"/><a href="#locator-select-text-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -2109,7 +2409,7 @@ await locator.selectText(options);
 
 ---
 
-### setChecked {#locator-set-checked}
+### setChecked {/* #locator-set-checked */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>locator.setChecked</x-search>
 
@@ -2145,6 +2445,12 @@ await page.getByRole('checkbox').setChecked(true);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-scroll"/><a href="#locator-set-checked-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-signal"/><a href="#locator-set-checked-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-checked-option-timeout"/><a href="#locator-set-checked-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -2169,7 +2475,7 @@ When all steps combined have not finished during the specified [timeout](/api/cl
 
 ---
 
-### setInputFiles {#locator-set-input-files}
+### setInputFiles {/* #locator-set-input-files */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.setInputFiles</x-search>
 
@@ -2221,6 +2527,9 @@ await page.getByLabel('Upload file').setInputFiles({
     
     
     This option has no effect.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-input-files-option-signal"/><a href="#locator-set-input-files-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-set-input-files-option-timeout"/><a href="#locator-set-input-files-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -2236,7 +2545,7 @@ This method expects [Locator] to point to an [input element](https://developer.m
 
 ---
 
-### tap {#locator-tap}
+### tap {/* #locator-tap */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.tap</x-search>
 
@@ -2273,6 +2582,12 @@ await locator.tap(options);
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-scroll"/><a href="#locator-tap-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-signal"/><a href="#locator-tap-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-tap-option-timeout"/><a href="#locator-tap-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -2301,7 +2616,7 @@ When all steps combined have not finished during the specified [timeout](/api/cl
 
 ---
 
-### textContent {#locator-text-content}
+### textContent {/* #locator-text-content */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.textContent</x-search>
 
@@ -2321,6 +2636,9 @@ await locator.textContent(options);
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-text-content-option-signal"/><a href="#locator-text-content-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-text-content-option-timeout"/><a href="#locator-text-content-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -2330,7 +2648,24 @@ await locator.textContent(options);
 
 ---
 
-### uncheck {#locator-uncheck}
+### toString {/* #locator-to-string */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.57</font><x-search>locator.toString</x-search>
+
+Returns a human-readable representation of the locator, using the [locator.description()](/api/class-locator.mdx#locator-description) if one exists; otherwise, it generates a string based on the locator's selector.
+
+**Usage**
+
+```js
+locator.toString();
+```
+
+**Returns**
+- [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-to-string-return"/><a href="#locator-to-string-return" class="list-anchor">#</a>
+
+---
+
+### uncheck {/* #locator-uncheck */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.uncheck</x-search>
 
@@ -2363,6 +2698,12 @@ await page.getByRole('checkbox').uncheck();
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-scroll"/><a href="#locator-uncheck-option-scroll" class="list-anchor">#</a>
+    
+    Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-signal"/><a href="#locator-uncheck-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-uncheck-option-timeout"/><a href="#locator-uncheck-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -2388,7 +2729,37 @@ When all steps combined have not finished during the specified [timeout](/api/cl
 
 ---
 
-### waitFor {#locator-wait-for}
+### visible {/* #locator-visible */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.63</font><x-search>locator.visible</x-search>
+
+Returns a locator that matches only [visible](../actionability.mdx#visible) elements, ignoring the invisible ones. This is the recommended way to distinguish elements by visibility, as opposed to the `:visible` CSS pseudo-class.
+
+Note that visibility is checked every time the locator is used, and not at the moment of the [locator.visible()](/api/class-locator.mdx#locator-visible) call.
+
+**Usage**
+
+Consider a page with two buttons, the first invisible and the second visible.
+
+```html
+<button style='display: none'>Invisible</button>
+<button>Visible</button>
+```
+
+This will only find the second button, because it is visible, and then click it.
+
+```js
+await page.locator('button').visible().click();
+```
+
+To match invisible elements instead, use [locator.filter()](/api/class-locator.mdx#locator-filter) with the [visible](/api/class-locator.mdx#locator-filter-option-visible) option set to `false`.
+
+**Returns**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-visible-return"/><a href="#locator-visible-return" class="list-anchor">#</a>
+
+---
+
+### waitFor {/* #locator-wait-for */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>locator.waitFor</x-search>
 
@@ -2405,6 +2776,9 @@ await orderSent.waitFor();
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-option-signal"/><a href="#locator-wait-for-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `state` "attached" | "detached" | "visible" | "hidden" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-option-state"/><a href="#locator-wait-for-option-state" class="list-anchor">#</a>
     
     Defaults to `'visible'`. Can be either:
@@ -2421,9 +2795,84 @@ await orderSent.waitFor();
 
 ---
 
+### waitForFunction {/* #locator-wait-for-function */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.62</font><x-search>locator.waitForFunction</x-search>
+
+Returns when [pageFunction](/api/class-locator.mdx#locator-wait-for-function-option-expression) returns a truthy value, called with the matching element as a first argument, and [arg](/api/class-locator.mdx#locator-wait-for-function-option-arg) as a second argument.
+
+This is a generic way to wait for an element to reach a custom condition without asserting it. The locator is re-resolved on each retry, so it tolerates the element being re-rendered while waiting.
+
+If [pageFunction](/api/class-locator.mdx#locator-wait-for-function-option-expression) returns a [Promise], this method will wait for the promise to resolve before checking its value.
+
+If [pageFunction](/api/class-locator.mdx#locator-wait-for-function-option-expression) throws or rejects, this method throws.
+
+**Usage**
+
+Wait for an attribute to appear:
+
+```js
+const toggle = page.getByRole('button', { name: 'Menu' });
+await toggle.click();
+await toggle.waitForFunction(element => element.hasAttribute('aria-expanded'));
+```
+
+Passing argument to [pageFunction](/api/class-locator.mdx#locator-wait-for-function-option-expression):
+
+```js
+await page.getByTestId('status').waitForFunction((element, value) => {
+  return element.textContent === value;
+}, 'Ready');
+```
+
+**Arguments**
+- `pageFunction` [function] | [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-function-option-expression"/><a href="#locator-wait-for-function-option-expression" class="list-anchor">#</a>
+  
+  Function to be evaluated in the page context.
+- `arg` [EvaluationArgument] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-function-option-arg"/><a href="#locator-wait-for-function-option-arg" class="list-anchor">#</a>
+  
+  Optional argument to pass to [pageFunction](/api/class-locator.mdx#locator-wait-for-function-option-expression).
+- `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-function-option-signal"/><a href="#locator-wait-for-function-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-function-option-timeout"/><a href="#locator-wait-for-function-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time to wait for in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-wait-for-function-return"/><a href="#locator-wait-for-function-return" class="list-anchor">#</a>
+
+---
+
+### within {/* #locator-within */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>locator.within</x-search>
+
+Returns a locator that matches this locator's elements inside each element matched by [locator](/api/class-locator.mdx#locator-within-option-locator).
+
+Note that relative locators, such as [locator.nth()](/api/class-locator.mdx#locator-nth) or [locator.first()](/api/class-locator.mdx#locator-first), are resolved separately inside each matched parent. In the example below, `page.getByRole('cell').nth(2)` picks the third cell of every row, not the third cell in the whole table.
+
+**Usage**
+
+```js
+const thirdColumn = page.getByRole('cell').nth(2).within(page.getByRole('row'));
+await expect(thirdColumn).toHaveText(['Apple', 'Banana', 'Cherry']);
+```
+
+**Arguments**
+- `locator` [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-within-option-locator"/><a href="#locator-within-option-locator" class="list-anchor">#</a>
+  
+  Locator matching the parent elements to search within.
+
+**Returns**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-within-return"/><a href="#locator-within-return" class="list-anchor">#</a>
+
+---
+
 ## Deprecated
 
-### elementHandle {#locator-element-handle}
+### elementHandle {/* #locator-element-handle */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.elementHandle</x-search>
 
@@ -2445,6 +2894,9 @@ await locator.elementHandle(options);
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-element-handle-option-signal"/><a href="#locator-element-handle-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-element-handle-option-timeout"/><a href="#locator-element-handle-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -2454,7 +2906,7 @@ await locator.elementHandle(options);
 
 ---
 
-### elementHandles {#locator-element-handles}
+### elementHandles {/* #locator-element-handles */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.elementHandles</x-search>
 
@@ -2478,11 +2930,11 @@ await locator.elementHandles();
 
 ---
 
-### type {#locator-type}
+### type {/* #locator-type */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.type</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 In most cases, you should use [locator.fill()](/api/class-locator.mdx#locator-fill) instead. You only need to press keys one by one if there is special keyboard handling on the page - in this case use [locator.pressSequentially()](/api/class-locator.mdx#locator-press-sequentially).
 
@@ -2511,6 +2963,9 @@ To press a special key, like `Control` or `ArrowDown`, use [locator.press()](/ap
     
     
     This option has no effect.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-type-option-signal"/><a href="#locator-type-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-type-option-timeout"/><a href="#locator-type-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -2519,11 +2974,6 @@ To press a special key, like `Control` or `ArrowDown`, use [locator.press()](/ap
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-type-return"/><a href="#locator-type-return" class="list-anchor">#</a>
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -2536,10 +2986,11 @@ To press a special key, like `Control` or `ArrowDown`, use [locator.press()](/ap
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -2558,6 +3009,7 @@ To press a special key, like `Control` or `ArrowDown`, use [locator.press()](/ap
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -2565,9 +3017,18 @@ To press a special key, like `Control` or `ArrowDown`, use [locator.press()](/ap
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -2585,6 +3046,7 @@ To press a special key, like `Control` or `ArrowDown`, use [locator.press()](/ap
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -2597,6 +3059,7 @@ To press a special key, like `Control` or `ArrowDown`, use [locator.press()](/ap
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -2618,6 +3081,7 @@ To press a special key, like `Control` or `ArrowDown`, use [locator.press()](/ap
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"

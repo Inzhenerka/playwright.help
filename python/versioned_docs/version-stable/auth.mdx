@@ -107,11 +107,11 @@ await page.get_by_role("button", name="Sign in").click()
 
 Playwright предоставляет способ повторного использования аутентифицированного состояния в тестах. Таким образом, вы можете войти в систему только один раз, а затем пропустить шаг входа для всех тестов.
 
-Веб-приложения используют аутентификацию на основе cookies или токенов, где аутентифицированное состояние хранится в виде [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies), в [локальном хранилище](https://developer.mozilla.org/en-US/docs/Web/API/Storage) или в [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API). Playwright предоставляет метод [browser_context.storage_state()](/api/class-browsercontext.mdx#browser-context-storage-state), который можно использовать для получения состояния хранилища из аутентифицированных контекстов, а затем создания новых контекстов с предварительно заполненным состоянием.
+Веб-приложения используют аутентификацию на основе файлов cookie или токенов, при которой состояние аутентификации хранится в [файлах cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies), в [локальном хранилище](https://developer.mozilla.org/en-US/docs/Web/API/Storage), в [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) или в виде ключей доступа (passkeys — учётных данных [WebAuthn](https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API)). Playwright предоставляет метод [browser_context.storage_state()](/api/class-browsercontext.mdx#browser-context-storage-state), который позволяет получить состояние хранилища из контекстов, в которых выполнена аутентификация, а затем создать новые контексты с предварительно заполненным состоянием.
 
-Состояние cookies, локального хранилища и IndexedDB может использоваться в разных браузерах. Они зависят от модели аутентификации вашего приложения, которая может требовать некоторой комбинации cookies, локального хранилища или IndexedDB.
+Файлы cookie, локальное хранилище, IndexedDB и виртуальные учётные данные WebAuthn (ключи доступа) можно использовать в разных браузерах. Их использование зависит от модели аутентификации вашего приложения, которая может требовать определённого сочетания файлов cookie, локального хранилища, IndexedDB или ключей доступа.
 
-Следующий фрагмент кода получает состояние из аутентифицированного контекста и создает новый контекст с этим состоянием.
+Следующий фрагмент кода получает состояние из контекста, в котором выполнена аутентификация, и создаёт новый контекст с этим состоянием. Если ваше приложение хранит токены аутентификации в IndexedDB, как, например, при использовании Firebase Authentication, включите параметр [indexed_db](/api/class-browsercontext.mdx#browser-context-storage-state-option-indexed-db) при сохранении состояния. По умолчанию IndexedDB не включается в снимок состояния.
 
 <Tabs
   groupId="python-flavor"
@@ -149,7 +149,7 @@ context = await browser.new_context(storage_state="state.json")
 
 ### Хранилище сессий {#session-storage}
 
-Повторное использование аутентифицированного состояния охватывает аутентификацию на основе [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies), [локального хранилища](https://developer.mozilla.org/en-US/docs/Web/API/Storage) и [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API). Редко [хранилище сессий](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) используется для хранения информации, связанной с аутентифицированным состоянием. Хранилище сессий специфично для определенного домена и не сохраняется между загрузками страниц. Playwright не предоставляет API для сохранения хранилища сессий, но следующий фрагмент кода может быть использован для сохранения/загрузки хранилища сессий.
+Повторное использование состояния аутентификации охватывает аутентификацию на основе [файлов cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies), [локального хранилища](https://developer.mozilla.org/en-US/docs/Web/API/Storage), [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) и ключей доступа (passkey, [WebAuthn](https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API)). В редких случаях для хранения информации, связанной с состоянием входа в систему, используется [хранилище сеанса](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage). Хранилище сеанса привязано к определённому домену, и его содержимое не сохраняется между загрузками страниц. Playwright не предоставляет API для сохранения хранилища сеанса, однако для его сохранения и загрузки можно использовать следующий фрагмент кода.
 
 <Tabs
   groupId="python-flavor"
@@ -169,6 +169,7 @@ os.environ["SESSION_STORAGE"] = session_storage
 
 # Установка хранилища сессий в новом контексте
 session_storage = os.environ["SESSION_STORAGE"]
+escaped_session_storage = session_storage.replace("\\", "\\\\").replace("'", "\\'")
 context.add_init_script("""(storage => {
   if (window.location.hostname === 'example.com') {
     const entries = JSON.parse(storage)
@@ -176,7 +177,7 @@ context.add_init_script("""(storage => {
       window.sessionStorage.setItem(key, value)
     }
   }
-})('""" + session_storage + "')")
+})('""" + escaped_session_storage + "')")
 ```
 
 </TabItem>
@@ -190,6 +191,7 @@ os.environ["SESSION_STORAGE"] = session_storage
 
 # Установка хранилища сессий в новом контексте
 session_storage = os.environ["SESSION_STORAGE"]
+escaped_session_storage = session_storage.replace("\\", "\\\\").replace("'", "\\'")
 await context.add_init_script("""(storage => {
   if (window.location.hostname === 'example.com') {
     const entries = JSON.parse(storage)
@@ -197,7 +199,7 @@ await context.add_init_script("""(storage => {
       window.sessionStorage.setItem(key, value)
     }
   }
-})('""" + session_storage + "')")
+})('""" + escaped_session_storage + "')")
 ```
 
 </TabItem>
@@ -214,11 +216,15 @@ await context.add_init_script("""(storage => {
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [Error]: /api/class-error.mdx "Error"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
@@ -232,14 +238,17 @@ await context.add_init_script("""(storage => {
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

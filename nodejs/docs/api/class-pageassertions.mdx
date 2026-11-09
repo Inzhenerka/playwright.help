@@ -24,7 +24,7 @@ test('navigates to login', async ({ page }) => {
 
 ## Methods
 
-### toHaveScreenshot(name) {#page-assertions-to-have-screenshot-1}
+### toHaveScreenshot(name) {/* #page-assertions-to-have-screenshot-1 */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.23</font><x-search>pageAssertions.toHaveScreenshot(name)</x-search>
 
@@ -34,6 +34,9 @@ This function will wait until two consecutive page screenshots yield the same re
 
 ```js
 await expect(page).toHaveScreenshot('image.png');
+
+// Store the snapshot in the WebP format.
+await expect(page).toHaveScreenshot('image.webp');
 ```
 
 Note that screenshot assertions only work with Playwright test runner.
@@ -41,7 +44,7 @@ Note that screenshot assertions only work with Playwright test runner.
 **Arguments**
 - `name` [string] | [Array]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-name"/><a href="#page-assertions-to-have-screenshot-1-option-name" class="list-anchor">#</a>
   
-  Snapshot name.
+  Snapshot name. Must have a `.png` or `.webp` extension, the screenshot is captured in the corresponding format. Both formats are lossless.
 - `options` [Object] *(optional)*
   - `animations` "disabled" | "allow" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-animations"/><a href="#page-assertions-to-have-screenshot-1-option-animations" class="list-anchor">#</a>
     
@@ -79,10 +82,10 @@ Note that screenshot assertions only work with Playwright test runner.
     Specify the color of the overlay box for masked elements, in [CSS color format](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value). Default color is pink `#FF00FF`.
   - `maxDiffPixelRatio` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-max-diff-pixel-ratio"/><a href="#page-assertions-to-have-screenshot-1-option-max-diff-pixel-ratio" class="list-anchor">#</a>
     
-    An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1`. Default is configurable with `TestConfig.expect`. Unset by default.
+    An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1`. Default is configurable with `TestConfig.expect`. Note that [threshold](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1-option-threshold) defines which pixels are considered different.
   - `maxDiffPixels` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-max-diff-pixels"/><a href="#page-assertions-to-have-screenshot-1-option-max-diff-pixels" class="list-anchor">#</a>
     
-    An acceptable amount of pixels that could be different. Default is configurable with `TestConfig.expect`. Unset by default.
+    An acceptable amount of pixels that could be different. Default is configurable with `TestConfig.expect`. Note that [threshold](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1-option-threshold) defines which pixels are considered different.
   - `omitBackground` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-omit-background"/><a href="#page-assertions-to-have-screenshot-1-option-omit-background" class="list-anchor">#</a>
     
     Hides default white background and allows capturing screenshots with transparency. Not applicable to `jpeg` images. Defaults to `false`.
@@ -91,6 +94,9 @@ Note that screenshot assertions only work with Playwright test runner.
     When set to `"css"`, screenshot will have a single pixel per each css pixel on the page. For high-dpi devices, this will keep screenshots small. Using `"device"` option will produce a single pixel per each device pixel, so screenshots of high-dpi devices will be twice as large or even larger.
     
     Defaults to `"css"`.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-signal"/><a href="#page-assertions-to-have-screenshot-1-option-signal" class="list-anchor">#</a>
+    
+    An optional [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) that can cancel the assertion. Aborting the signal fails the assertion like a timeout: if the signal is aborted while the assertion is retrying, or is already aborted before the assertion starts, the assertion fails without retrying further.
   - `stylePath` [string] | [Array]&lt;[string]&gt; *(optional)* <font size="2">Added in: v1.41</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-style-path"/><a href="#page-assertions-to-have-screenshot-1-option-style-path" class="list-anchor">#</a>
     
     File name containing the stylesheet to apply while making the screenshot. This is where you can hide dynamic elements, make elements invisible or change their properties to help you creating repeatable screenshots. This stylesheet pierces the Shadow DOM and applies to the inner frames.
@@ -106,11 +112,13 @@ Note that screenshot assertions only work with Playwright test runner.
 
 ---
 
-### toHaveScreenshot(options) {#page-assertions-to-have-screenshot-2}
+### toHaveScreenshot(options) {/* #page-assertions-to-have-screenshot-2 */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.23</font><x-search>pageAssertions.toHaveScreenshot(options)</x-search>
 
 This function will wait until two consecutive page screenshots yield the same result, and then compare the last screenshot with the expectation.
+
+The snapshot is stored in the PNG format. To store it in the WebP format instead, pass a snapshot name with the `.webp` extension.
 
 **Usage**
 
@@ -158,10 +166,10 @@ Note that screenshot assertions only work with Playwright test runner.
     Specify the color of the overlay box for masked elements, in [CSS color format](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value). Default color is pink `#FF00FF`.
   - `maxDiffPixelRatio` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-max-diff-pixel-ratio"/><a href="#page-assertions-to-have-screenshot-2-option-max-diff-pixel-ratio" class="list-anchor">#</a>
     
-    An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1`. Default is configurable with `TestConfig.expect`. Unset by default.
+    An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1`. Default is configurable with `TestConfig.expect`. Note that [threshold](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-2-option-threshold) defines which pixels are considered different.
   - `maxDiffPixels` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-max-diff-pixels"/><a href="#page-assertions-to-have-screenshot-2-option-max-diff-pixels" class="list-anchor">#</a>
     
-    An acceptable amount of pixels that could be different. Default is configurable with `TestConfig.expect`. Unset by default.
+    An acceptable amount of pixels that could be different. Default is configurable with `TestConfig.expect`. Note that [threshold](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-2-option-threshold) defines which pixels are considered different.
   - `omitBackground` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-omit-background"/><a href="#page-assertions-to-have-screenshot-2-option-omit-background" class="list-anchor">#</a>
     
     Hides default white background and allows capturing screenshots with transparency. Not applicable to `jpeg` images. Defaults to `false`.
@@ -170,6 +178,9 @@ Note that screenshot assertions only work with Playwright test runner.
     When set to `"css"`, screenshot will have a single pixel per each css pixel on the page. For high-dpi devices, this will keep screenshots small. Using `"device"` option will produce a single pixel per each device pixel, so screenshots of high-dpi devices will be twice as large or even larger.
     
     Defaults to `"css"`.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-signal"/><a href="#page-assertions-to-have-screenshot-2-option-signal" class="list-anchor">#</a>
+    
+    An optional [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) that can cancel the assertion. Aborting the signal fails the assertion like a timeout: if the signal is aborted while the assertion is retrying, or is already aborted before the assertion starts, the assertion fails without retrying further.
   - `stylePath` [string] | [Array]&lt;[string]&gt; *(optional)* <font size="2">Added in: v1.41</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-style-path"/><a href="#page-assertions-to-have-screenshot-2-option-style-path" class="list-anchor">#</a>
     
     File name containing the stylesheet to apply while making the screenshot. This is where you can hide dynamic elements, make elements invisible or change their properties to help you creating repeatable screenshots. This stylesheet pierces the Shadow DOM and applies to the inner frames.
@@ -185,7 +196,7 @@ Note that screenshot assertions only work with Playwright test runner.
 
 ---
 
-### toHaveTitle {#page-assertions-to-have-title}
+### toHaveTitle {/* #page-assertions-to-have-title */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><x-search>pageAssertions.toHaveTitle</x-search>
 
@@ -202,6 +213,9 @@ await expect(page).toHaveTitle(/.*checkout/);
   
   Expected title or RegExp.
 - `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-title-option-signal"/><a href="#page-assertions-to-have-title-option-signal" class="list-anchor">#</a>
+    
+    An optional [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) that can cancel the assertion. Aborting the signal fails the assertion like a timeout: if the signal is aborted while the assertion is retrying, or is already aborted before the assertion starts, the assertion fails without retrying further.
   - `timeout` [number] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-title-option-timeout"/><a href="#page-assertions-to-have-title-option-timeout" class="list-anchor">#</a>
     
     Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
@@ -211,7 +225,7 @@ await expect(page).toHaveTitle(/.*checkout/);
 
 ---
 
-### toHaveURL {#page-assertions-to-have-url}
+### toHaveURL {/* #page-assertions-to-have-url */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><x-search>pageAssertions.toHaveURL</x-search>
 
@@ -226,6 +240,9 @@ await expect(page).toHaveURL('https://playwright.dev/docs/intro');
 // Check for the page URL to contain 'doc', followed by an optional 's', followed by '/'
 await expect(page).toHaveURL(/docs?\//);
 
+// Check for the page URL to match the URL pattern
+await expect(page).toHaveURL(new URLPattern({ pathname: '/docs/*' }));
+
 // Check for the predicate to be satisfied
 // For example: verify query strings
 await expect(page).toHaveURL(url => {
@@ -235,13 +252,16 @@ await expect(page).toHaveURL(url => {
 ```
 
 **Arguments**
-- `url` [string] | [RegExp] | [function]\([URL]\):[boolean] <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-url-option-url"/><a href="#page-assertions-to-have-url-option-url" class="list-anchor">#</a>
+- `url` [string] | [RegExp] | [URLPattern] | [function]\([URL]\):[boolean] <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-url-option-url"/><a href="#page-assertions-to-have-url-option-url" class="list-anchor">#</a>
   
   Expected URL string, RegExp, or predicate receiving [URL] to match. When [baseURL](/api/class-browser.mdx#browser-new-context-option-base-url) is provided via the context options and the `url` argument is a string, the two values are merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor and used for the comparison against the current browser URL.
 - `options` [Object] *(optional)*
   - `ignoreCase` [boolean] *(optional)* <font size="2">Added in: v1.44</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-url-option-ignore-case"/><a href="#page-assertions-to-have-url-option-ignore-case" class="list-anchor">#</a>
     
     Whether to perform case-insensitive match. [ignoreCase](/api/class-pageassertions.mdx#page-assertions-to-have-url-option-ignore-case) option takes precedence over the corresponding regular expression parameter if specified. A provided predicate ignores this flag.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-url-option-signal"/><a href="#page-assertions-to-have-url-option-signal" class="list-anchor">#</a>
+    
+    An optional [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) that can cancel the assertion. Aborting the signal fails the assertion like a timeout: if the signal is aborted while the assertion is retrying, or is already aborted before the assertion starts, the assertion fails without retrying further.
   - `timeout` [number] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-have-url-option-timeout"/><a href="#page-assertions-to-have-url-option-timeout" class="list-anchor">#</a>
     
     Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
@@ -251,33 +271,89 @@ await expect(page).toHaveURL(url => {
 
 ---
 
-## Properties
+### toMatchAriaSnapshot(expected) {/* #page-assertions-to-match-aria-snapshot */}
 
-### not {#page-assertions-not}
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>pageAssertions.toMatchAriaSnapshot(expected)</x-search>
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><x-search>pageAssertions.not</x-search>
-
-Makes the assertion check for the opposite condition. For example, this code tests that the page URL doesn't contain `"error"`:
-
-```js
-await expect(page).not.toHaveURL('error');
-```
+Asserts that the page body matches the given [accessibility snapshot](../aria-snapshots.mdx).
 
 **Usage**
 
 ```js
-expect(page).not
+await page.goto('https://demo.playwright.dev/todomvc/');
+await expect(page).toMatchAriaSnapshot(`
+  - heading "todos"
+  - textbox "What needs to be done?"
+`);
+```
+
+**Arguments**
+- `expected` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-match-aria-snapshot-option-expected"/><a href="#page-assertions-to-match-aria-snapshot-option-expected" class="list-anchor">#</a>
+- `options` [Object] *(optional)*
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-match-aria-snapshot-option-signal"/><a href="#page-assertions-to-match-aria-snapshot-option-signal" class="list-anchor">#</a>
+    
+    An optional [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) that can cancel the assertion. Aborting the signal fails the assertion like a timeout: if the signal is aborted while the assertion is retrying, or is already aborted before the assertion starts, the assertion fails without retrying further.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-match-aria-snapshot-option-timeout"/><a href="#page-assertions-to-match-aria-snapshot-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-match-aria-snapshot-return"/><a href="#page-assertions-to-match-aria-snapshot-return" class="list-anchor">#</a>
+
+---
+
+### toMatchAriaSnapshot(options) {/* #page-assertions-to-match-aria-snapshot-2 */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>pageAssertions.toMatchAriaSnapshot(options)</x-search>
+
+Asserts that the page body matches the given [accessibility snapshot](../aria-snapshots.mdx).
+
+Snapshot is stored in a separate `.aria.yml` file in a location configured by `expect.toMatchAriaSnapshot.pathTemplate` and/or `snapshotPathTemplate` properties in the configuration file.
+
+**Usage**
+
+```js
+await expect(page).toMatchAriaSnapshot();
+await expect(page).toMatchAriaSnapshot({ name: 'home.aria.yml' });
+```
+
+**Arguments**
+- `options` [Object] *(optional)*
+  - `name` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-match-aria-snapshot-2-option-name"/><a href="#page-assertions-to-match-aria-snapshot-2-option-name" class="list-anchor">#</a>
+    
+    Name of the snapshot to store in the snapshot folder corresponding to this test. Generates sequential names if not specified.
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-match-aria-snapshot-2-option-signal"/><a href="#page-assertions-to-match-aria-snapshot-2-option-signal" class="list-anchor">#</a>
+    
+    An optional [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal) that can cancel the assertion. Aborting the signal fails the assertion like a timeout: if the signal is aborted while the assertion is retrying, or is already aborted before the assertion starts, the assertion fails without retrying further.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-match-aria-snapshot-2-option-timeout"/><a href="#page-assertions-to-match-aria-snapshot-2-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-assertions-to-match-aria-snapshot-2-return"/><a href="#page-assertions-to-match-aria-snapshot-2-return" class="list-anchor">#</a>
+
+---
+
+## Properties
+
+### not {/* #page-assertions-not */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><x-search>pageAssertions.not</x-search>
+
+Makes the assertion check for the opposite condition.
+
+**Usage**
+
+For example, this code tests that the page URL doesn't contain `"error"`:
+
+```js
+await expect(page).not.toHaveURL('error');
 ```
 
 **Type**
 - [PageAssertions]
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -290,10 +366,11 @@ expect(page).not
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -312,6 +389,7 @@ expect(page).not
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -319,9 +397,18 @@ expect(page).not
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -339,6 +426,7 @@ expect(page).not
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -351,6 +439,7 @@ expect(page).not
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -372,6 +461,7 @@ expect(page).not
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"

@@ -22,7 +22,7 @@ test('basic test', async ({ page }) => {
 
 ## Методы {#methods}
 
-### test {#test-call}
+### test {/* #test-call */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test</x-search>
 
@@ -93,6 +93,25 @@ test('basic test', {
 
 Узнайте больше о [аннотациях тестов](../test-annotations.mdx).
 
+**Блокировки**
+
+Вы можете объявлять именованные блокировки, чтобы предотвратить одновременное выполнение определённых тестов, в то время как все остальные тесты продолжают выполняться параллельно. Тесты с одинаковым именем блокировки никогда не выполняются одновременно, даже если они объявлены в разных файлах или принадлежат разным [проектам](../test-projects.mdx). Это полезно, когда несколько тестов обращаются к общему ресурсу, который не поддерживает одновременный доступ.
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('update user settings', {
+  lock: 'user-settings',
+}, async ({ page }) => {
+  // Этот тест никогда не выполняется одновременно с другими тестами,
+  // в которых объявлена блокировка 'user-settings'.
+});
+```
+
+Встроенная блокировка `-exclusive-` позволяет запускать тест только тогда, когда никакие другие тесты не выполняются.
+
+Подробнее о [блокировках тестов](../test-parallel.mdx#test-locks).
+
 **Аргументы**
 - `title` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-call-option-title"/><a href="#test-call-option-title" class="list-anchor">#</a>
   
@@ -110,14 +129,44 @@ test('basic test', {
       Опциональное описание аннотации, например, URL проблемы.
     
     
-  Дополнительные детали теста.
+- `lock` [string] | [Array]&lt;[string]&gt; *(необязательно)*
+    
+    
+  Дополнительные сведения о тесте.
 - `body` [function]\([Fixtures], [TestInfo]\)<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-call-option-body"/><a href="#test-call-option-body" class="list-anchor">#</a>
   
   Тело теста, которое принимает один или два аргумента: объект с фикстурами и опциональный [TestInfo].
 
 ---
 
-### test.afterAll {#test-after-all}
+### test.abort {/* #test-abort */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.60</font><x-search>test.test.abort</x-search>
+
+Прерывает текущий тест, выбрасывая ошибку. Тест сразу помечается как неудачный, и выполнение останавливается. Это полезно внутри фикстуры или обработчика маршрута, если обнаружена ошибка, после которой продолжать тест бессмысленно.
+
+**Использование**
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('does not publish to shared page', async ({ page }) => {
+  await page.route('**/publish', route => {
+    test.abort('Tests must not publish to the shared page. Use the `clone` option.');
+    return route.abort();
+  });
+  // ...
+});
+```
+
+**Аргументы**
+- `message` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-abort-option-message"/><a href="#test-abort-option-message" class="list-anchor">#</a>
+  
+  Необязательное сообщение о причине прерывания. Оно попадёт в сообщение об ошибке теста.
+
+---
+
+### test.afterAll {/* #test-after-all */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.afterAll</x-search>
 
@@ -163,7 +212,7 @@ Playwright продолжит выполнение всех применимых
 
 ---
 
-### test.afterEach {#test-after-each}
+### test.afterEach {/* #test-after-each */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.afterEach</x-search>
 
@@ -217,7 +266,7 @@ Playwright продолжит выполнение всех применимых
 
 ---
 
-### test.beforeAll {#test-before-all}
+### test.beforeAll {/* #test-before-all */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.beforeAll</x-search>
 
@@ -273,7 +322,7 @@ Playwright продолжит выполнение всех применимых
 
 ---
 
-### test.beforeEach {#test-before-each}
+### test.beforeEach {/* #test-before-each */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.beforeEach</x-search>
 
@@ -327,7 +376,7 @@ Playwright продолжит выполнение всех применимых
 
 ---
 
-### test.describe {#test-describe}
+### test.describe {/* #test-describe */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.describe</x-search>
 
@@ -417,8 +466,28 @@ test.describe('two annotated tests', {
 
 Узнайте больше о [аннотациях тестов](../test-annotations.mdx).
 
+**Блокировки**
+
+Вы можете объявить именованные блокировки для всех тестов в группе, указав дополнительные параметры. Тесты с одинаковым именем блокировки никогда не выполняются одновременно. Подробнее см. в разделе [Блокировки тестов](../test-parallel.mdx#test-locks).
+
+```js
+import { test, expect } from '@playwright/test';
+
+test.describe('two tests with a lock', {
+  lock: 'user-settings',
+}, () => {
+  test('one', async ({ page }) => {
+    // ...
+  });
+
+  test('two', async ({ page }) => {
+    // ...
+  });
+});
+```
+
 **Аргументы**
-- `title` [string] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-option-title"/><a href="#test-describe-option-title" class="list-anchor">#</a>
+- `title` [string] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-option-title"/><a href="#test-describe-option-title" class="list-anchor">#</a>
   
   Заголовок группы.
 - `details` [Object] *(опционально)* <font size="2">Добавлено в: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-option-details"/><a href="#test-describe-option-details" class="list-anchor">#</a>
@@ -433,14 +502,17 @@ test.describe('two annotated tests', {
       
       
     
-  Дополнительные детали для всех тестов в группе.
+- `lock` [string] | [Array]&lt;[string]&gt; *(необязательно)*
+    
+    
+  Дополнительные сведения для всех тестов в группе.
 - `callback` [function]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-option-callback"/><a href="#test-describe-option-callback" class="list-anchor">#</a>
   
   Функция обратного вызова, которая выполняется сразу при вызове [test.describe()](/api/class-test.mdx#test-describe). Любые тесты, объявленные в этой функции обратного вызова, будут принадлежать группе.
 
 ---
 
-### test.describe.configure {#test-describe-configure}
+### test.describe.configure {/* #test-describe-configure */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.describe.configure</x-search>
 
@@ -492,7 +564,15 @@ test.describe('two annotated tests', {
   test('runs second', async ({ page }) => {});
   ```
   
-* Запуск нескольких описаний параллельно, но тесты внутри каждого описания по порядку.
+* Объявление блокировок для всех тестов в области видимости.
+  
+  ```js
+  test.describe.configure({ lock: 'user-settings' });
+  test('update user settings', async ({ page }) => {});
+  test('reset user settings', async ({ page }) => {});
+  ```
+  
+* Параллельный запуск нескольких блоков describe, при этом тесты внутри каждого блока describe выполняются последовательно.
   
   ```js
   test.describe.configure({ mode: 'parallel' });
@@ -511,8 +591,11 @@ test.describe('two annotated tests', {
   ```
   
 **Аргументы**
-- `options` [Object] *(опционально)*
-  - `mode` "default" | "parallel" | "serial" *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-configure-option-mode"/><a href="#test-describe-configure-option-mode" class="list-anchor">#</a>
+- `options` [Object] *(необязательно)*
+  - `lock` [string] | [Array]&lt;[string]&gt; *(необязательно)* <font size="2">Добавлено в: v1.64</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-configure-option-lock"/><a href="#test-describe-configure-option-lock" class="list-anchor">#</a>
+    
+    Дополнительные именованные блокировки для всех тестов в текущей области видимости, включая вложенные группы. Блокировки добавляются к тем, которые объявлены в параметрах [test.describe()](/api/class-test.mdx#test-describe) и в предыдущих вызовах [test.describe.configure()](/api/class-test.mdx#test-describe-configure).
+  - `mode` "default" | "parallel" | "serial" *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-configure-option-mode"/><a href="#test-describe-configure-option-mode" class="list-anchor">#</a>
     
     Режим выполнения. Узнайте больше о режимах выполнения [здесь](../test-parallel.mdx).
   - `retries` [number] *(опционально)* <font size="2">Добавлено в: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-configure-option-retries"/><a href="#test-describe-configure-option-retries" class="list-anchor">#</a>
@@ -524,7 +607,7 @@ test.describe('two annotated tests', {
 
 ---
 
-### test.describe.fixme {#test-describe-fixme}
+### test.describe.fixme {/* #test-describe-fixme */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.25</font><x-search>test.test.describe.fixme</x-search>
 
@@ -574,7 +657,7 @@ test.describe.fixme(() => {
 
 ---
 
-### test.describe.only {#test-describe-only}
+### test.describe.only {/* #test-describe-only */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.describe.only</x-search>
 
@@ -627,7 +710,7 @@ test.describe.only(() => {
 
 ---
 
-### test.describe.skip {#test-describe-skip}
+### test.describe.skip {/* #test-describe-skip */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.describe.skip</x-search>
 
@@ -677,7 +760,7 @@ test.describe.skip(() => {
 
 ---
 
-### test.extend {#test-extend}
+### test.extend {/* #test-extend */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.extend</x-search>
 
@@ -825,7 +908,7 @@ module.exports = defineConfig({
 
 ---
 
-### test.fail {#test-fail}
+### test.fail {/* #test-fail */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.fail</x-search>
 
@@ -839,6 +922,7 @@ module.exports = defineConfig({
 * `test.fail(condition, description)`
 * `test.fail(callback, description)`
 * `test.fail()`
+* `test.fail(description)`
 
 **Использование**
 
@@ -878,7 +962,7 @@ test('fail in WebKit 2', async ({ page }) => {
 });
 ```
 
-Вы также можете вызвать `test.fail()` без аргументов внутри тела теста, чтобы всегда помечать тест как провальный. Мы рекомендуем вместо этого объявлять провальный тест с помощью `test.fail(title, body)`.
+Вы также можете вызвать `test.fail()` без условия внутри тела теста, чтобы всегда помечать тест как ожидаемо неуспешный, при необходимости указав `description`. Вместо этого мы рекомендуем объявлять ожидаемо неуспешный тест с помощью `test.fail(title, body)`.
 
 ```js
 import { test, expect } from '@playwright/test';
@@ -921,7 +1005,7 @@ test('less readable', async ({ page }) => {
 
 ---
 
-### test.fail.only {#test-fail-only}
+### test.fail.only {/* #test-fail-only */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.49</font><x-search>test.test.fail.only</x-search>
 
@@ -969,7 +1053,7 @@ test('not in the focused group', async ({ page }) => {
 
 ---
 
-### test.fixme {#test-fixme}
+### test.fixme {/* #test-fixme */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.fixme</x-search>
 
@@ -983,6 +1067,7 @@ test('not in the focused group', async ({ page }) => {
 * `test.fixme(condition, description)`
 * `test.fixme(callback, description)`
 * `test.fixme()`
+* `test.fixme(description)`
 
 **Использование**
 
@@ -1022,7 +1107,7 @@ test('to be fixed in Safari 2', async ({ page }) => {
 });
 ```
 
-Вы также можете вызвать `test.fixme()` без аргументов внутри тела теста, чтобы всегда отмечать тест как провалившийся. Мы рекомендуем использовать `test.fixme(title, body)` вместо этого.
+Также можно вызвать `test.fixme()` без условия внутри тела теста, чтобы всегда помечать тест как «fixme», при необходимости указав `description`. Вместо этого мы рекомендуем использовать `test.fixme(title, body)`.
 
 ```js
 import { test, expect } from '@playwright/test';
@@ -1065,7 +1150,7 @@ test('less readable', async ({ page }) => {
 
 ---
 
-### test.info {#test-info}
+### test.info {/* #test-info */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.info</x-search>
 
@@ -1088,7 +1173,7 @@ test('example test', async ({ page }) => {
 
 ---
 
-### test.only {#test-only}
+### test.only {/* #test-only */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.only</x-search>
 
@@ -1127,7 +1212,7 @@ test.only('focus this test', async ({ page }) => {
 
 ---
 
-### test.setTimeout {#test-set-timeout}
+### test.setTimeout {/* #test-set-timeout */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.setTimeout</x-search>
 
@@ -1183,7 +1268,7 @@ test.only('focus this test', async ({ page }) => {
 
 ---
 
-### test.skip {#test-skip}
+### test.skip {/* #test-skip */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.skip</x-search>
 
@@ -1199,6 +1284,7 @@ test.only('focus this test', async ({ page }) => {
 * `test.skip(condition, description)`
 * `test.skip(callback, description)`
 * `test.skip()`
+* `test.skip(description)`
 
 **Использование**
 
@@ -1238,13 +1324,13 @@ test('тест только для Safari 2', async ({ page }) => {
 });
 ```
 
-Вы также можете вызвать `test.skip()` без аргументов внутри тела теста, чтобы всегда пропускать тест. Однако мы рекомендуем вместо этого использовать `test.skip(title, body)`.
+Вы также можете вызвать `test.skip()` без условия внутри тела теста, чтобы всегда пропускать этот тест, при необходимости указав `description`. Однако мы рекомендуем вместо этого использовать `test.skip(title, body)`.
 
 ```js
 import { test, expect } from '@playwright/test';
 
 test('менее читаемый', async ({ page }) => {
-  test.skip();
+  test.skip('Пока не реализовано');
   // ...
 });
 ```
@@ -1281,7 +1367,7 @@ test('менее читаемый', async ({ page }) => {
 
 ---
 
-### test.slow {#test-slow}
+### test.slow {/* #test-slow */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.slow</x-search>
 
@@ -1289,6 +1375,7 @@ test('менее читаемый', async ({ page }) => {
 
 Обратите внимание, что [test.slow()](/api/class-test.mdx#test-slow) не может быть использован в хуке `beforeAll` или `afterAll`. Используйте [test.setTimeout()](/api/class-test.mdx#test-set-timeout) вместо этого.
 * `test.slow()`
+* `test.slow(description)`
 * `test.slow(condition, description)`
 * `test.slow(callback, description)`
 
@@ -1344,7 +1431,7 @@ test('провал в Safari 2', async ({ page }) => {
 
 ---
 
-### test.step {#test-step}
+### test.step {/* #test-step */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.step</x-search>
 
@@ -1383,8 +1470,14 @@ test('test', async ({ page }) => {
     Указывает, следует ли обрамлять шаг в отчете. По умолчанию `false`. Когда шаг обрамлен, ошибки, возникающие внутри шага, указывают на место вызова шага. Подробнее см. ниже.
   - `location` [Location] *(опционально)* <font size="2">Добавлено в: v1.48</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-option-location"/><a href="#test-step-option-location" class="list-anchor">#</a>
     
-    Указывает пользовательское местоположение для отображения шага в отчетах тестов и просмотрщике трассировок. По умолчанию отображается местоположение вызова [test.step()](/api/class-test.mdx#test-step).
-  - `timeout` [number] *(опционально)* <font size="2">Добавлено в: v1.50</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-option-timeout"/><a href="#test-step-option-timeout" class="list-anchor">#</a>
+Задает пользовательское местоположение шага в исходном коде для отображения в отчетах о тестировании и средстве просмотра трассировки. По умолчанию отображается местоположение вызова [test.step()](/api/class-test.mdx#test-step).
+  - `params` [Object]&lt;[string], [Object]&gt; *(необязательно)* <font size="2">Добавлено в: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-option-params"/><a href="#test-step-option-params" class="list-anchor">#</a>
+    
+    Произвольные сериализуемые параметры, описывающие шаг. Они передаются репортерам как `testStep.params` и отображаются в средстве просмотра трассировки.
+  - `subtitle` [string] *(необязательно)* <font size="2">Добавлено в: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-option-subtitle"/><a href="#test-step-option-subtitle" class="list-anchor">#</a>
+    
+    Подзаголовок шага, дополняющий заголовок, например целевой объект шага. Он передается репортерам как `testStep.subtitle` и отображается рядом с заголовком в отчетах о тестировании и средстве просмотра трассировки.
+  - `timeout` [number] *(необязательно)* <font size="2">Добавлено в: v1.50</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-option-timeout"/><a href="#test-step-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах, разрешенное для завершения шага. Если шаг не завершится в течение указанного времени, метод [test.step()](/api/class-test.mdx#test-step) выбросит [TimeoutError]. По умолчанию `0` (без тайм-аута).
 
@@ -1520,7 +1613,7 @@ test('example', async ({ page }) => {
 
 ---
 
-### test.step.skip {#test-step-skip}
+### test.step.skip {/* #test-step-skip */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.50</font><x-search>test.test.step.skip</x-search>
 
@@ -1556,8 +1649,14 @@ test('my test', async ({ page }) => {
     Указывает, следует ли обрамлять шаг в отчете. По умолчанию `false`. Когда шаг обрамлен, ошибки, возникающие внутри шага, указывают на место вызова шага. Подробнее см. ниже.
   - `location` [Location] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-skip-option-location"/><a href="#test-step-skip-option-location" class="list-anchor">#</a>
     
-    Указывает пользовательское местоположение для отображения шага в отчетах тестов и просмотрщике трассировок. По умолчанию отображается местоположение вызова [test.step()](/api/class-test.mdx#test-step).
-  - `timeout` [number] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-skip-option-timeout"/><a href="#test-step-skip-option-timeout" class="list-anchor">#</a>
+Задает пользовательское местоположение шага в исходном коде для отображения в отчетах о тестировании и средстве просмотра трассировок. По умолчанию отображается местоположение вызова [test.step()](/api/class-test.mdx#test-step).
+  - `params` [Object]&lt;[string], [Object]&gt; *(необязательно)* <font size="2">Добавлено в: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-skip-option-params"/><a href="#test-step-skip-option-params" class="list-anchor">#</a>
+    
+    Произвольные сериализуемые параметры, описывающие шаг. Они передаются репортерам как `testStep.params` и отображаются в средстве просмотра трассировок.
+  - `subtitle` [string] *(необязательно)* <font size="2">Добавлено в: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-skip-option-subtitle"/><a href="#test-step-skip-option-subtitle" class="list-anchor">#</a>
+    
+    Подзаголовок шага, дополняющий его заголовок, например цель шага. Он передается репортерам как `testStep.subtitle` и отображается рядом с заголовком в отчетах о тестировании и средстве просмотра трассировок.
+  - `timeout` [number] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-skip-option-timeout"/><a href="#test-step-skip-option-timeout" class="list-anchor">#</a>
     
     Максимальное время в миллисекундах для завершения шага. По умолчанию `0` (без тайм-аута).
 
@@ -1566,7 +1665,7 @@ test('my test', async ({ page }) => {
 
 ---
 
-### test.use {#test-use}
+### test.use {/* #test-use */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.use</x-search>
 
@@ -1615,7 +1714,7 @@ test('test with locale', async ({ page }) => {
 
 ## Свойства {#properties}
 
-### test.expect {#test-expect}
+### test.expect {/* #test-expect */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.expect</x-search>
 
@@ -1636,7 +1735,7 @@ test('example', async ({ page }) => {
 
 ## Устаревшие {#deprecated}
 
-### test.describe.parallel {#test-describe-parallel}
+### test.describe.parallel {/* #test-describe-parallel */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.describe.parallel</x-search>
 
@@ -1693,7 +1792,7 @@ test.describe.parallel(() => {
 
 ---
 
-### test.describe.parallel.only {#test-describe-parallel-only}
+### test.describe.parallel.only {/* #test-describe-parallel-only */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.describe.parallel.only</x-search>
 
@@ -1748,7 +1847,7 @@ test.describe.parallel.only(() => {
 
 ---
 
-### test.describe.serial {#test-describe-serial}
+### test.describe.serial {/* #test-describe-serial */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.describe.serial</x-search>
 
@@ -1809,7 +1908,7 @@ test.describe.serial(() => {
 
 ---
 
-### test.describe.serial.only {#test-describe-serial-only}
+### test.describe.serial.only {/* #test-describe-serial-only */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>test.test.describe.serial.only</x-search>
 
@@ -1871,11 +1970,6 @@ test.describe.serial.only(() => {
   Функция обратного вызова, которая выполняется сразу при вызове [test.describe.serial.only()](/api/class-test.mdx#test-describe-serial-only). Любые тесты, добавленные в эту функцию, будут принадлежать группе.
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -1888,10 +1982,11 @@ test.describe.serial.only(() => {
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -1910,6 +2005,7 @@ test.describe.serial.only(() => {
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -1917,9 +2013,18 @@ test.describe.serial.only(() => {
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -1937,6 +2042,7 @@ test.describe.serial.only(() => {
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -1949,6 +2055,7 @@ test.describe.serial.only(() => {
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -1970,6 +2077,7 @@ test.describe.serial.only(() => {
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

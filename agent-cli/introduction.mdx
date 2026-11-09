@@ -1,0 +1,140 @@
+---
+title: "Введение"
+---
+
+# Playwright CLI
+
+Интерфейс командной строки для автоматизации браузера, разработанный для агентов программирования. Команды с экономным расходом токенов и устанавливаемые навыки позволяют агентам совмещать автоматизацию браузера с работой над большими кодовыми базами и рассуждениями в пределах ограниченного контекстного окна.
+
+## Пример
+
+```bash
+$ playwright-cli open https://demo.playwright.dev/todomvc --headed
+$ playwright-cli type "Buy groceries"
+$ playwright-cli press Enter
+$ playwright-cli type "Water flowers"
+$ playwright-cli press Enter
+$ playwright-cli check e21
+$ playwright-cli screenshot
+```
+
+После каждой команды CLI выводит текущее состояние страницы:
+
+```txt
+### Page
+- Page URL: https://demo.playwright.dev/todomvc/#/
+- Page Title: React - TodoMVC
+### Snapshot
+- [Snapshot](.playwright-cli/page-2026-02-14T19-22-42-679Z.yml)
+```
+
+Файл снимка содержит дерево доступности с идентификаторами элементов (`ref`) для использования в следующей команде.
+
+## Основные возможности
+
+- **Экономный расход токенов** — краткий вывод CLI позволяет не загружать большие схемы инструментов в контекст модели
+- **Использование навыков** — агенты узнают о доступных возможностях через устанавливаемые навыки, а не из объёмного справочного текста
+- **Архитектура с фоновым процессом** — постоянно работающий процесс браузера избавляет от затрат на запуск при каждой команде
+- **Обращение по идентификаторам** — снимки дерева доступности с идентификаторами элементов обеспечивают детерминированное взаимодействие
+- **Кроссбраузерность** — поддержка Chrome, Firefox, WebKit и Edge
+- **Сессии** — несколько изолированных экземпляров браузера с отдельным состоянием
+
+## Сравнение Playwright CLI и MCP
+
+| | **Playwright CLI** | **[MCP](/mcp/introduction)** |
+|---|---------------|------|
+| **Лучше всего подходит для** | Агентов программирования (Claude Code, Copilot), работающих с большими кодовыми базами | Специализированных агентных циклов, исследовательской автоматизации |
+| **Принцип работы** | Агент выполняет команды оболочки | LLM вызывает инструменты MCP со структурированными параметрами |
+| **Расход токенов** | Ниже — краткий вывод CLI, навыки загружаются по мере необходимости | Выше — схемы инструментов и снимки в контексте |
+| **Режим по умолчанию** | Без графического интерфейса (headless) | С графическим интерфейсом (headed) |
+| **Настройка** | `npm install -g @playwright/cli` | Конфигурация JSON в клиенте MCP |
+
+## Все команды
+
+Выполните `playwright-cli --help`, чтобы получить встроенный список команд, или `playwright-cli --help <command>`, чтобы просмотреть
+аргументы и параметры отдельной команды.
+
+### Основные команды
+```bash
+open [url]                  attach [name]               close
+detach                      goto <url>                  type <text>
+click <target> [button]     dblclick <target> [button]  fill <target> <text>
+drag <start> <end>          drop <target>               hover <target>
+select <target> <val>       upload <files...>           check <target>
+uncheck <target>            snapshot [target]           find [text]
+eval <func> [target]        dialog-accept [prompt]      dialog-dismiss
+resize <w> <h>              delete-data
+```
+
+### Навигация
+```bash
+go-back                     go-forward                  reload
+```
+
+### Клавиатура
+```bash
+press <key>                 keydown <key>               keyup <key>
+```
+
+### Мышь
+```bash
+mousemove <x> <y>           mousedown [button]          mouseup [button]
+mousewheel <dx> <dy>
+```
+
+### Сохранение в файл
+```bash
+screenshot [target]         pdf
+```
+
+### Вкладки
+```bash
+tab-list                    tab-new [url]               tab-close [index]
+tab-select <index>
+```
+
+### Хранилище
+```bash
+state-load <file>           state-save [file]
+cookie-list                 cookie-get <name>           cookie-set <name> <val>
+cookie-delete <name>        cookie-clear
+localstorage-list           localstorage-get <key>      localstorage-set <k> <v>
+localstorage-delete <key>   localstorage-clear
+sessionstorage-list         sessionstorage-get <key>    sessionstorage-set <k> <v>
+sessionstorage-delete <k>   sessionstorage-clear
+```
+
+### Сеть
+```bash
+requests                    request <index>             request-headers <index>
+request-body <index>        response-headers <index>    response-body <index>
+route <pattern>             route-list                  unroute [pattern]
+network-state-set <state>
+```
+
+### Инструменты разработчика
+```bash
+console [min-level]         run-code [code]             recording-start
+recording-stop              tracing-start               tracing-stop
+video-start [file]          video-stop                  video-chapter <title>
+video-show-actions          video-hide-actions          show
+pause-at <location>         resume                      step-over
+generate-locator <target>   highlight [target]
+```
+
+### Установка
+```bash
+install                     install-browser [browser]
+```
+
+### Сессии браузера
+```bash
+-s=<name> <cmd>             list                        close-all
+kill-all
+```
+
+### Глобальные параметры
+```bash
+--help [command]            --json                      --raw
+--version
+```

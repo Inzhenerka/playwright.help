@@ -1,3 +1,4 @@
+import apiAnchors from './src/config/apiAnchors';
 import prismLight from './src/config/prismLight'
 import prismDark from './src/config/prismDark'
 
@@ -6,12 +7,14 @@ import path from "path";
 const isProd = process.env.NODE_ENV === "production";
 
 const hasStableVersion = require(path.join(__dirname, 'dotnet/versions.json')).includes('stable');
+const includeCurrentVersion = !isProd;
 
 let plugins = [
   [
     require.resolve("@docusaurus/plugin-content-docs"),
     {
       sidebarPath: require.resolve("./sidebars.js"),
+      includeCurrentVersion,
       // Docusaurus crashes if we don't have a stable version and run docusaurus commands.
       // This is a workaround to make it work since during roll we temporarily remove the stable version.
       ...(hasStableVersion ? {
@@ -34,7 +37,7 @@ let plugins = [
     }),
   ],
   require.resolve("@docusaurus/plugin-content-pages"),
-  ['docusaurus-plugin-yandex-metrica', {
+  [require.resolve('./src/config/yandexMetrica'), {
     counterID: '100339848',
   }],
   [
@@ -63,8 +66,17 @@ export default {
   organizationName: "Inzhenerka",
   projectName: "playwright.help",
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "throw",
-  scripts: ["/dotnet/js/redirection.js"],
+  onBrokenAnchors: "throw",
+  markdown: {
+    preprocessor: apiAnchors,
+    // Keep existing {#id} anchors valid in the translated docs.
+    mdx1Compat: { headingIds: true },
+    mermaid: true,
+    hooks: {
+      onBrokenMarkdownLinks: "throw",
+    },
+  },
+  scripts: [{ src: "/dotnet/js/redirection.js", "data-next-enabled": String(includeCurrentVersion) }],
   favicon: "img/playwright-logo.ico",
   i18n: {
     defaultLocale: "ru",
@@ -197,7 +209,7 @@ export default {
           ],
         },
       ],
-      copyright: `${new Date().getFullYear()} ООО "ИНЖЕНЕРКАТЕХ". На основе материалов Microsoft`,
+      copyright: `${new Date().getFullYear()} Inzhenerka.Tech. На основе материалов Microsoft`,
     },
     algolia: {
       indexName: 'playwright-dotnet',
@@ -214,6 +226,7 @@ export default {
       },
     ],
     '@docusaurus/theme-search-algolia',
+    '@docusaurus/theme-mermaid',
   ],
   plugins,
   customFields: {
@@ -221,7 +234,7 @@ export default {
   },
   trailingSlash: false,
   future: {
-    experimental_faster: true,
+    faster: true,
     v4: true,
   },
 } satisfies Config;

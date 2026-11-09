@@ -383,6 +383,9 @@ class Member {
         arg.type?.properties?.sort((p1, p2) => p1.name.localeCompare(p2.name));
       indexArg(arg);
     }
+    // Also index return type properties so they have enclosingMethod set.
+    if (this.kind === 'method' || this.kind === 'property')
+      indexArg(this);
   }
 
   /**
@@ -480,27 +483,36 @@ class Type {
   /**
    * @param {string} expression
    * @param {!Array<!Member>=} properties
+   * @param {!Object<string, string>=} langAliases
    * @return {Type}
    */
-  static parse(expression, properties = []) {
+  static parse(expression, properties = [], langAliases = {}) {
     expression = expression.replace(/\\\(/g, '(').replace(/\\\)/g, ')');
     const type = Type.fromParsedType(parseTypeExpression(expression));
     type.expression = expression;
     if (type.name === 'number')
       throw new Error('Number types should be either int or float, not number in: ' + expression);
-    if (!properties.length)
+    const hasAliases = Object.keys(langAliases).length > 0;
+    if (!properties.length && !hasAliases)
       return type;
     const types = [];
     type._collectAllTypes(types);
-    let success = false;
+    let assignedToObject = false;
     for (const t of types) {
       if (t.name === 'Object') {
-        t.properties = properties;
-        success = true;
+        if (properties.length)
+          t.properties = properties;
+        if (hasAliases)
+          t.langAliases = { ...langAliases };
+        assignedToObject = true;
       }
     }
-    if (!success)
-      throw new Error('Nested properties given, but there are no objects in type expression: ' + expression);
+    if (!assignedToObject) {
+      if (properties.length)
+        throw new Error('Nested properties given, but there are no objects in type expression: ' + expression);
+      if (hasAliases)
+        type.langAliases = { ...langAliases };
+    }
     return type;
   }
 
@@ -541,6 +553,7 @@ class Type {
         type.templates.push(Type.fromParsedType(t));
       return type;
     }
+
     return new Type(parsedType.name);
   }
 
@@ -562,6 +575,8 @@ class Type {
     this.templates = undefined;
     /** @type {string | undefined} */
     this.expression = undefined;
+    /** @type {Object<string, string> | undefined} */
+    this.langAliases = undefined;
   }
 
   visit(visitor) {
@@ -584,6 +599,8 @@ class Type {
     if (this.templates)
       type.templates = this.templates.map(type => type.clone());
     type.expression = this.expression;
+    if (this.langAliases)
+      type.langAliases = { ...this.langAliases };
     return type;
   }
 
@@ -687,9 +704,13 @@ function parseTypeExpression(type) {
     }
   }
   let union = null;
-  if (type[firstTypeLength] === '|')
+  if (type[firstTypeLength] === '|') {
     union = parseTypeExpression(type.substring(firstTypeLength + 1));
-  else if (type[firstTypeLength] === ',')
+    // In `[A]|[B], [C]`, the union ends at the comma: `[C]` is the next item
+    // of the list, not a part of the union.
+    next = union.next;
+    union.next = null;
+  } else if (type[firstTypeLength] === ',')
     next = parseTypeExpression(type.substring(firstTypeLength + 1));
 
   if (template && !template.unionName && isStringUnion(template)) {
@@ -763,22 +784,23 @@ function patchLinksInText(classOrMember, text, classesMap, membersMap, linkRende
         member = maybeMember;
         name = p2;
       }
-      if (p1 === 'param') {
-        const param = member.argsArray.find(a => a.name === name);
+      const param = member.argsArray.find(a => a.name === name);
+      const options = member.argsArray.find(a => a.name === 'options');
+      const parts = name.split('.');
+      const optionName = parts[0];
+      const option = options?.type?.properties?.find(a => a.name === optionName);
+      // An argument can be a param in one language and an option in another,
+      // so a link of either kind also finds an argument of the other kind.
+      const asParam = p1 === 'param' ? !!param || !option : !option && !!param;
+      if (asParam) {
         if (!param)
           throw new Error(`Referenced parameter ${match} not found in the parent method ${member.name}\n=========\n${text}`);
         return linkRenderer({ member, param: { name, alias: param.alias }, href }) || match;
-      } else {
-        // p1 === 'option'
-        const options = member.argsArray.find(a => a.name === 'options');
-        const parts = name.split('.');
-        const optionName = parts[0];
-        const option = options?.type?.properties?.find(a => a.name === optionName);
-        if (!option)
-          throw new Error(`Referenced option ${match} not found in the parent method ${member.name}\n=========\n${text}`);
-        parts[0] = option.alias;
-        return linkRenderer({ member, option: { name: optionName, alias: parts.join('.') }, href }) || match;
       }
+      if (!option)
+        throw new Error(`Referenced option ${match} not found in the parent method ${member.name}\n=========\n${text}`);
+      parts[0] = option.alias;
+      return linkRenderer({ member, option: { name: optionName, alias: parts.join('.') }, href }) || match;
     }
     throw new Error(`Undefined link prefix, expected event|method|property|param|option, got: ` + match);
   });
@@ -875,6 +897,9 @@ function csharpOptionOverloadSuffix(option, type) {
     case 'int': return 'Int';
     case 'long': return 'Int64';
     case 'Date': return 'Date';
+    // Object keeps the original option name, e.g. for `Object|Array<Object>` unions.
+    case 'Object': return '';
+    case 'Array': return 'List';
   }
   throw new Error(`CSharp option "${option}" has unsupported type overload "${type}"`);
 }

@@ -6,7 +6,21 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## List of assertions
+## Introduction
+
+Playwright includes web-specific assertions that automatically retry until the expected condition is met.  Consider the following example:
+
+```csharp
+await Expect(Page.GetByTestId("status")).ToHaveTextAsync("Submitted");
+```
+
+Playwright will re-test the element with the test ID of `status` until it has the `"Submitted"` text.  It will re-fetch the element and check it repeatedly until the condition is met or the timeout is reached.
+
+By default, the timeout for assertions is 5 seconds.
+
+## Auto-retrying assertions
+
+The following assertions will retry until the assertion passes or the assertion timeout is reached.
 
 | Assertion | Description |
 | :- | :- |
@@ -38,6 +52,25 @@ import HTMLCard from '@site/src/components/HTMLCard';
 | [Expect(Page).ToHaveTitleAsync()](/api/class-pageassertions.mdx#page-assertions-to-have-title) | Page has a title |
 | [Expect(Page).ToHaveURLAsync()](/api/class-pageassertions.mdx#page-assertions-to-have-url) | Page has a URL |
 | [Expect(Response).ToBeOKAsync()](/api/class-apiresponseassertions.mdx#api-response-assertions-to-be-ok) | Response has an OK status |
+
+## Custom Expect Message
+
+You can specify a custom expect message as a second argument to the `expect` function, for example:
+
+```csharp
+await Expect(Page.GetByText("Name"), "should be logged in").ToBeVisibleAsync();
+```
+
+When expect fails, the error would look like this:
+
+```bash
+Microsoft.Playwright.PlaywrightException : should be logged in
+
+Locator expected to be visible
+Call log:
+- Expect "ToBeVisibleAsync" with timeout 5000ms
+- waiting for GetByText("Name")
+```
 
 ## Setting a custom timeout
 
@@ -154,6 +187,8 @@ await Expect(Page.GetByText("Name")).ToBeVisibleAsync(new() { Timeout = 10_000 }
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -173,15 +208,18 @@ await Expect(Page.GetByText("Name")).ToBeVisibleAsync(new() { Timeout = 10_000 }
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

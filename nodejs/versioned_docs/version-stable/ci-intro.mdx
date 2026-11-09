@@ -30,11 +30,10 @@ on:
     branches: [ main, master ]
 jobs:
   test:
-    timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
-    - uses: actions/setup-node@v5
+    - uses: actions/checkout@v6
+    - uses: actions/setup-node@v6
       with:
         node-version: lts/*
     - name: Install dependencies
@@ -43,7 +42,7 @@ jobs:
       run: npx playwright install --with-deps
     - name: Run Playwright tests
       run: npx playwright test
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       if: ${{ !cancelled() }}
       with:
         name: playwright-report
@@ -59,28 +58,39 @@ Workflow выполняет следующие шаги:
 1. Запускает тесты Playwright
 1. Загружает HTML-отчёт в интерфейс GitHub
 
-Чтобы узнать больше об этом, см. ["Понимание GitHub Actions"](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions).
+Обратите внимание, что в рабочем процессе не задан параметр `timeout-minutes` на уровне задания. Вместо этого задайте [`globalTimeout`](./test-timeouts.mdx#global-timeout) в конфигурации:
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  // Завершить запуск с ошибкой через час, чтобы репортёры успели сформировать отчёт.
+  globalTimeout: 60 * 60 * 1000,
+});
+```
+
+Подробнее об этом см. в разделе ["Общие сведения о GitHub Actions"](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions).
 
 ## Создание репозитория и пуш в GitHub {#create-a-repo-and-push-to-github}
 
 После того как вы настроите [workflow GitHub Actions](#setting-up-github-actions), останется только [создать репозиторий на GitHub](https://docs.github.com/en/get-started/quickstart/create-a-repo) или отправить код в уже существующий репозиторий. Следуйте инструкциям GitHub и не забудьте [инициализировать git-репозиторий](https://github.com/git-guides/git-init) командой `git init`, чтобы затем вы могли [добавлять](https://github.com/git-guides/git-add), [коммитить](https://github.com/git-guides/git-commit) и [пушить](https://github.com/git-guides/git-push) свой код.
 
 ###### 
-<img width="861" alt="Создание репозитория и пуш в GitHub" src="https://user-images.githubusercontent.com/13063165/183423254-d2735278-a2ab-4d63-bb99-48d8e5e447bc.png"/>
+<img height="745" width="1721" alt="Создание репозитория и отправка в GitHub" src="https://user-images.githubusercontent.com/13063165/183423254-d2735278-a2ab-4d63-bb99-48d8e5e447bc.png"/>
 
 ## Открытие рабочих процессов {#opening-the-workflows}
 
 Перейдите на вкладку **Actions**, чтобы увидеть workflow. Там вы увидите, прошли ли ваши тесты или упали.
 
 ###### 
-![открытие рабочего процесса](https://user-images.githubusercontent.com/13063165/183423783-58bf2008-514e-4f96-9c12-c9a55703960c.png)
+<img src="https://user-images.githubusercontent.com/13063165/183423783-58bf2008-514e-4f96-9c12-c9a55703960c.png" alt="открытие рабочего процесса" width="1678" height="1207" />
 
 ## Просмотр логов тестов {#viewing-test-logs}
 
 Клик по запуску workflow покажет все действия, которые выполнил GitHub, а клик по **Run Playwright tests** — сообщения об ошибках, что ожидалось и что было получено, а также лог вызовов.
 
 ###### 
-![Просмотр логов тестов](https://user-images.githubusercontent.com/13063165/183423783-58bf2008-514e-4f96-9c12-c9a55703960c.png)
+<img src="https://user-images.githubusercontent.com/13063165/183423783-58bf2008-514e-4f96-9c12-c9a55703960c.png" alt="Просмотр журналов тестов" width="1678" height="1207" />
 
 ## HTML-отчет {#html-report}
 
@@ -90,7 +100,7 @@ HTML Report показывает полный отчёт по вашим тес�
 
 В разделе Artifacts нажмите на **playwright-report**, чтобы скачать отчёт в виде zip-архива.
 
-<img width="972" alt="Загрузка HTML-отчета" src="https://user-images.githubusercontent.com/13063165/183437023-524f1803-84e4-4862-9ce3-1d55af0e023e.png" />
+<img height="1245" width="1943" alt="Скачивание HTML-отчёта" src="https://user-images.githubusercontent.com/13063165/183437023-524f1803-84e4-4862-9ce3-1d55af0e023e.png" />
 
 ### Просмотр HTML-отчета {#viewing-the-html-report}
 
@@ -100,7 +110,7 @@ HTML Report показывает полный отчёт по вашим тес�
 npx playwright show-report name-of-my-extracted-playwright-report
 ```
 
-![просмотр HTML-отчета](https://github.com/microsoft/playwright/assets/13063165/c5f60e56-fb75-4a2d-a4b6-054b8c5d69c1)
+<img src="https://github.com/microsoft/playwright/assets/13063165/c5f60e56-fb75-4a2d-a4b6-054b8c5d69c1" alt="просмотр HTML-отчета" width="2296" height="1424" />
 
 Чтобы узнать больше об отчётах, посмотрите наше подробное руководство по [HTML Reporter](/test-reporters.mdx#html-reporter).
 
@@ -108,7 +118,7 @@ npx playwright show-report name-of-my-extracted-playwright-report
 
 После того как вы запустили отчет с помощью `npx playwright show-report`, нажмите на иконку трассировки рядом с именем файла теста, как показано на изображении выше. Вы сможете просмотреть трассировку ваших тестов и исследовать каждое действие, чтобы попытаться выяснить, почему тесты не проходят.
 
-![просмотр трассировки Playwright](https://github.com/microsoft/playwright/assets/13063165/10fe3585-8401-4051-b1c2-b2e92ac4c274)
+<img src="https://github.com/microsoft/playwright/assets/13063165/10fe3585-8401-4051-b1c2-b2e92ac4c274" alt="средство просмотра трассировок Playwright" width="3598" height="2218" />
 
 ## Публикация отчета в интернете {#publishing-report-on-the-web}
 
@@ -164,11 +174,6 @@ npx playwright show-report name-of-my-extracted-playwright-report
 - [Узнайте больше о запуске тестов у других CI-провайдеров](/ci.mdx)
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -181,10 +186,11 @@ npx playwright show-report name-of-my-extracted-playwright-report
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -203,6 +209,7 @@ npx playwright show-report name-of-my-extracted-playwright-report
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -210,9 +217,18 @@ npx playwright show-report name-of-my-extracted-playwright-report
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -230,6 +246,7 @@ npx playwright show-report name-of-my-extracted-playwright-report
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -242,6 +259,7 @@ npx playwright show-report name-of-my-extracted-playwright-report
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -263,6 +281,7 @@ npx playwright show-report name-of-my-extracted-playwright-report
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

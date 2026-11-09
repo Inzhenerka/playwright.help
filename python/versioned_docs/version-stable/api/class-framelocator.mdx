@@ -70,6 +70,46 @@ await page.locator('.result-frame').first.content_frame.get_by_role('button').cl
 </TabItem>
 </Tabs>
 
+**Любой фрейм**
+
+Вызов [page.frame_locator()](/api/class-page.mdx#page-frame-locator) или [frame.frame_locator()](/api/class-frame.mdx#frame-frame-locator) без селектора создаёт локатор фрейма, который начинает поиск в любом фрейме поддерева — так что вам не нужно сначала находить iframe.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Находит кнопку в любом фрейме на странице:
+page.frame_locator().get_by_role("button").click()
+
+# Находит iframe с идентификатором "my-frame" в любом месте страницы и нажимает кнопку внутри него:
+page.frame_locator().locator("#my-frame").content_frame.get_by_role("button").click()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Находит кнопку в любом фрейме на странице:
+await page.frame_locator().get_by_role("button").click()
+
+# Находит iframe с идентификатором "my-frame" в любом месте страницы и нажимает кнопку внутри него:
+await page.frame_locator().locator("#my-frame").content_frame.get_by_role("button").click()
+```
+
+</TabItem>
+</Tabs>
+
+Это влияет только на начало поиска — остальная часть локатора разрешается внутри одного фрейма, как и у любого другого локатора. Согласно приведённым выше правилам строгости, если соответствующие элементы найдены в нескольких фреймах, возникает ошибка.
+
+Такой локатор фрейма не указывает на конкретный `iframe`, поэтому для него не поддерживаются [frame_locator.owner](/api/class-framelocator.mdx#frame-locator-owner), [frame_locator.first](/api/class-framelocator.mdx#frame-locator-first), [frame_locator.last](/api/class-framelocator.mdx#frame-locator-last) и [frame_locator.nth()](/api/class-framelocator.mdx#frame-locator-nth).
+
 **Преобразование Locator в FrameLocator**
 
 Если у вас есть объект [Locator], указывающий на `iframe`, его можно преобразовать в [FrameLocator] с помощью [locator.content_frame](/api/class-locator.mdx#locator-content-frame).
@@ -82,7 +122,7 @@ await page.locator('.result-frame').first.content_frame.get_by_role('button').cl
 
 ## Методы {#methods}
 
-### frame_locator {#frame-locator-frame-locator}
+### frame_locator {/* #frame-locator-frame-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.17</font><x-search>frameLocator.frame_locator</x-search>
 
@@ -104,7 +144,7 @@ frame_locator.frame_locator(selector)
 
 ---
 
-### get_by_alt_text {#frame-locator-get-by-alt-text}
+### get_by_alt_text {/* #frame-locator-get-by-alt-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.get_by_alt_text</x-search>
 
@@ -155,7 +195,7 @@ await page.get_by_alt_text("Playwright logo").click()
 
 ---
 
-### get_by_label {#frame-locator-get-by-label}
+### get_by_label {/* #frame-locator-get-by-label */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.get_by_label</x-search>
 
@@ -210,7 +250,7 @@ await page.get_by_label("Password").fill("secret")
 
 ---
 
-### get_by_placeholder {#frame-locator-get-by-placeholder}
+### get_by_placeholder {/* #frame-locator-get-by-placeholder */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.get_by_placeholder</x-search>
 
@@ -263,7 +303,7 @@ await page.get_by_placeholder("name@example.com").fill("playwright@microsoft.com
 
 ---
 
-### get_by_role {#frame-locator-get-by-role}
+### get_by_role {/* #frame-locator-get-by-role */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.get_by_role</x-search>
 
@@ -324,8 +364,13 @@ await page.get_by_role("button", name=re.compile("submit", re.IGNORECASE)).click
   
   Атрибут, который обычно устанавливается `aria-checked` или нативными `<input type=checkbox>` контролами.
   
-  Узнайте больше о [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
-- `disabled` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-disabled"/><a href="#frame-locator-get-by-role-option-disabled" class="list-anchor">#</a>
+Подробнее об [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
+- `description` [str] | [Pattern] *(необязательно)* <font size="2">Добавлено в: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-description"/><a href="#frame-locator-get-by-role-option-description" class="list-anchor">#</a>
+  
+  Параметр для сопоставления с [доступным описанием](https://w3c.github.io/accname/#dfn-accessible-description). По умолчанию сопоставление выполняется без учёта регистра и ищет подстроку; используйте [exact](/api/class-framelocator.mdx#frame-locator-get-by-role-option-exact), чтобы управлять этим поведением.
+  
+  Подробнее о [доступном описании](https://w3c.github.io/accname/#dfn-accessible-description).
+- `disabled` [bool] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-disabled"/><a href="#frame-locator-get-by-role-option-disabled" class="list-anchor">#</a>
   
   Атрибут, который обычно устанавливается `aria-disabled` или `disabled`.
   
@@ -336,8 +381,8 @@ await page.get_by_role("button", name=re.compile("submit", re.IGNORECASE)).click
   
 - `exact` [bool] *(опционально)* <font size="2">Добавлено в: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-exact"/><a href="#frame-locator-get-by-role-option-exact" class="list-anchor">#</a>
   
-  Совпадает ли [name](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) точно: с учетом регистра и целой строки. По умолчанию false. Игнорируется, когда [name](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) является регулярным выражением. Обратите внимание, что точное совпадение все равно обрезает пробелы.
-- `expanded` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-expanded"/><a href="#frame-locator-get-by-role-option-expanded" class="list-anchor">#</a>
+Определяет, должны ли [name](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) и [description](/api/class-framelocator.mdx#frame-locator-get-by-role-option-description) совпадать точно: с учётом регистра и по всей строке. По умолчанию — false. Игнорируется, если значение является регулярным выражением. Обратите внимание, что даже при точном совпадении пробельные символы по краям строки удаляются.
+- `expanded` [bool] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-expanded"/><a href="#frame-locator-get-by-role-option-expanded" class="list-anchor">#</a>
   
   Атрибут, который обычно устанавливается `aria-expanded`.
   
@@ -379,7 +424,7 @@ await page.get_by_role("button", name=re.compile("submit", re.IGNORECASE)).click
 
 ---
 
-### get_by_test_id {#frame-locator-get-by-test-id}
+### get_by_test_id {/* #frame-locator-get-by-test-id */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.get_by_test_id</x-search>
 
@@ -433,7 +478,7 @@ await page.get_by_test_id("directions").click()
 
 ---
 
-### get_by_text {#frame-locator-get-by-text}
+### get_by_text {/* #frame-locator-get-by-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.get_by_text</x-search>
 
@@ -521,7 +566,7 @@ page.get_by_text(re.compile("^hello$", re.IGNORECASE))
 
 ---
 
-### get_by_title {#frame-locator-get-by-title}
+### get_by_title {/* #frame-locator-get-by-title */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.get_by_title</x-search>
 
@@ -574,7 +619,7 @@ await expect(page.get_by_title("Issues count")).to_have_text("25 issues")
 
 ---
 
-### locator {#frame-locator-locator}
+### locator {/* #frame-locator-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.17</font><x-search>frameLocator.locator</x-search>
 
@@ -619,7 +664,7 @@ frame_locator.locator(selector_or_locator, **kwargs)
 
 ## Свойства {#properties}
 
-### owner {#frame-locator-owner}
+### owner {/* #frame-locator-owner */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.43</font><x-search>frameLocator.owner</x-search>
 
@@ -668,11 +713,11 @@ await expect(locator).to_be_visible()
 
 ## Устаревшие {#deprecated}
 
-### first {#frame-locator-first}
+### first {/* #frame-locator-first */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.17</font><x-search>frameLocator.first</x-search>
 
-:::warning Устарело
+:::warning[Устарело]
 
 Используйте [locator.first](/api/class-locator.mdx#locator-first), а затем [locator.content_frame](/api/class-locator.mdx#locator-content-frame).
 
@@ -692,11 +737,11 @@ frame_locator.first
 
 ---
 
-### last {#frame-locator-last}
+### last {/* #frame-locator-last */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.17</font><x-search>frameLocator.last</x-search>
 
-:::warning Устарело
+:::warning[Устарело]
 
 Используйте [locator.last](/api/class-locator.mdx#locator-last), а затем [locator.content_frame](/api/class-locator.mdx#locator-content-frame).
 
@@ -716,11 +761,11 @@ frame_locator.last
 
 ---
 
-### nth {#frame-locator-nth}
+### nth {/* #frame-locator-nth */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.17</font><x-search>frameLocator.nth</x-search>
 
-:::warning Устарело
+:::warning[Устарело]
 
 Используйте [locator.nth()](/api/class-locator.mdx#locator-nth), а затем [locator.content_frame](/api/class-locator.mdx#locator-content-frame).
 
@@ -752,11 +797,15 @@ frame_locator.nth(index)
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [Error]: /api/class-error.mdx "Error"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
@@ -770,14 +819,17 @@ frame_locator.nth(index)
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

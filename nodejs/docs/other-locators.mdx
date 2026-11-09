@@ -78,6 +78,11 @@ Input elements of the type `button` and `submit` are matched by their `value` in
 
 Playwright supports the `:visible` pseudo class in CSS selectors. For example, `css=button` matches all the buttons on the page, while `css=button:visible` only matches visible buttons. This is useful to distinguish elements that are very similar but differ in visibility.
 
+:::note
+
+Prefer the [locator.visible()](/api/class-locator.mdx#locator-visible) shortcut over the `:visible` pseudo-class.
+:::
+
 Consider a page with two buttons, first invisible and second visible.
 
 ```html
@@ -99,7 +104,7 @@ Consider a page with two buttons, first invisible and second visible.
   
 ### CSS: elements that contain other elements
 
-The `:has()` pseudo-class is an [experimental CSS pseudo-class](https://developer.mozilla.org/en-US/docs/Web/CSS/:has). It returns an element if any of the selectors passed as parameters relative to the `:scope` of the given element match at least one element.
+The `:has()` pseudo-class is a [CSS pseudo-class](https://developer.mozilla.org/en-US/docs/Web/CSS/:has). It returns an element if any of the selectors passed as parameters relative to the `:scope` of the given element match at least one element.
 
 Following snippet returns text content of an `<article>` element that has a `<div class=promo>` inside.
 
@@ -116,7 +121,7 @@ Comma-separated list of CSS selectors will match all elements that can be select
 await page.locator('button:has-text("Log in"), button:has-text("Sign in")').click();
 ```
 
-The `:is()` pseudo-class is an [experimental CSS pseudo-class](https://developer.mozilla.org/en-US/docs/Web/CSS/:is) that may be useful for specifying a list of extra conditions on an element.
+The `:is()` pseudo-class is a [CSS pseudo-class](https://developer.mozilla.org/en-US/docs/Web/CSS/:is) that may be useful for specifying a list of extra conditions on an element.
 
 ### CSS: matching elements based on layout
 
@@ -165,9 +170,19 @@ It is usually possible to distinguish elements by some attribute or text content
 Sometimes page contains a number of similar elements, and it is hard to select a particular one. For example:
 
 ```html
-<section> <button>Buy</button> </section>
-<article><div> <button>Buy</button> </div></article>
-<div><div> <button>Buy</button> </div></div>
+<section>
+  <button>Buy</button>
+</section>
+<article>
+  <div>
+    <button>Buy</button>
+  </div>
+</article>
+<div>
+  <div>
+    <button>Buy</button>
+  </div>
+</div>
 ```
 
 In this case, `:nth-match(:text("Buy"), 3)` will select the third button from the snippet above. Note that index is one-based.
@@ -221,85 +236,6 @@ Alternatively, if you cannot find a suitable locator for the parent element, use
 ```js
 const parent = page.getByText('Hello').locator('xpath=..');
 ```
-
-## React locator
-
-:::note
-
-React locator is experimental and prefixed with `_`. The functionality might change in future.
-:::
-
-React locator allows finding elements by their component name and property values. The syntax is very similar to [CSS attribute selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) and supports all CSS attribute selector operators.
-
-In React locator, component names are transcribed with **CamelCase**.
-
-```js
-await page.locator('_react=BookItem').click();
-```
-
-More examples:
-- match by **component**: `_react=BookItem`
-- match by component and **exact property value**, case-sensitive: `_react=BookItem[author = "Steven King"]`
-- match by property value only, **case-insensitive**: `_react=[author = "steven king" i]`
-- match by component and **truthy property value**: `_react=MyButton[enabled]`
-- match by component and **boolean value**: `_react=MyButton[enabled = false]`
-- match by property **value substring**: `_react=[author *= "King"]`
-- match by component and **multiple properties**: `_react=BookItem[author *= "king" i][year = 1990]`
-- match by **nested** property value: `_react=[some.nested.value = 12]`
-- match by component and property value **prefix**: `_react=BookItem[author ^= "Steven"]`
-- match by component and property value **suffix**: `_react=BookItem[author $= "Steven"]`
-- match by component and **key**: `_react=BookItem[key = '2']`
-- match by property value **regex**: `_react=[author = /Steven(\\s+King)?/i]`
-
-To find React element names in a tree use [React DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi).
-
-:::note
-
-React locator supports React 15 and above.
-:::
-
-:::note
-React locator, as well as [React DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi), only work against **unminified** application builds.
-:::
-
-## Vue locator
-
-:::note
-
-Vue locator is experimental and prefixed with `_`. The functionality might change in future.
-:::
-
-Vue locator allows finding elements by their component name and property values. The syntax is very similar to [CSS attribute selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) and supports all CSS attribute selector operators.
-
-In Vue locator, component names are transcribed with **kebab-case**.
-
-```js
-await page.locator('_vue=book-item').click();
-```
-
-More examples:
-- match by **component**: `_vue=book-item`
-- match by component and **exact property value**, case-sensitive: `_vue=book-item[author = "Steven King"]`
-- match by property value only, **case-insensitive**: `_vue=[author = "steven king" i]`
-- match by component and **truthy property value**: `_vue=my-button[enabled]`
-- match by component and **boolean value**: `_vue=my-button[enabled = false]`
-- match by property **value substring**: `_vue=[author *= "King"]`
-- match by component and **multiple properties**: `_vue=book-item[author *= "king" i][year = 1990]`
-- match by **nested** property value: `_vue=[some.nested.value = 12]`
-- match by component and property value **prefix**: `_vue=book-item[author ^= "Steven"]`
-- match by component and property value **suffix**: `_vue=book-item[author $= "Steven"]`
-- match by property value **regex**: `_vue=[author = /Steven(\\s+King)?/i]`
-
-To find Vue element names in a tree use [Vue DevTools](https://chrome.google.com/webstore/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd?hl=en).
-
-:::note
-
-Vue locator supports Vue2 and above.
-:::
-
-:::note
-Vue locator, as well as [Vue DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi), only work against **unminified** application builds.
-:::
 
 ## XPath locator
 
@@ -474,11 +410,6 @@ By default, chained selectors resolve to an element queried by the last selector
 For example, `css=article >> text=Hello` captures the element with the text `Hello`, and `*css=article >> text=Hello` (note the `*`) captures the `article` element that contains some element with the text `Hello`.
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -491,10 +422,11 @@ For example, `css=article >> text=Hello` captures the element with the text `Hel
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -513,6 +445,7 @@ For example, `css=article >> text=Hello` captures the element with the text `Hel
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -520,9 +453,18 @@ For example, `css=article >> text=Hello` captures the element with the text `Hel
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -540,6 +482,7 @@ For example, `css=article >> text=Hello` captures the element with the text `Hel
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -552,6 +495,7 @@ For example, `css=article >> text=Hello` captures the element with the text `Hel
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -573,6 +517,7 @@ For example, `css=article >> text=Hello` captures the element with the text `Hel
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"

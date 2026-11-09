@@ -12,7 +12,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Методы {#methods}
 
-### NewContextAsync {#api-request-new-context}
+### NewContextAsync {/* #api-request-new-context */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.16</font><x-search>apiRequest.NewContextAsync</x-search>
 
@@ -28,11 +28,11 @@ await ApiRequest.NewContextAsync(options);
 - `options` `ApiRequestNewContextOptions?` *(необязательно)*
   - `BaseURL` [string]? *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-base-url"/><a href="#api-request-new-context-option-base-url" class="list-anchor">#</a>
     
-    Методы, такие как [ApiRequestContext.GetAsync()](/api/class-apirequestcontext.mdx#api-request-context-get), учитывают базовый URL, используя конструктор [`URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) для построения соответствующего URL. Примеры:
-    * baseURL: `http://localhost:3000` и отправка запроса на `/bar.html` приводит к `http://localhost:3000/bar.html`
-    * baseURL: `http://localhost:3000/foo/` и отправка запроса на `./bar.html` приводит к `http://localhost:3000/foo/bar.html`
-    * baseURL: `http://localhost:3000/foo` (без завершающего слэша) и навигация на `./bar.html` приводит к `http://localhost:3000/bar.html`
-  - `ClientCertificates` [IEnumerable]?&lt;ClientCertificates&gt; *(необязательно)* <font size="2">Добавлено в: 1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-client-certificates"/><a href="#api-request-new-context-option-client-certificates" class="list-anchor">#</a>
+Такие методы, как [ApiRequestContext.GetAsync()](/api/class-apirequestcontext.mdx#api-request-context-get), учитывают базовый URL, используя конструктор [`URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) для построения соответствующего URL. Примеры:
+    * baseURL: `http://localhost:3000` и отправка запроса к `/bar.html` дают в результате `http://localhost:3000/bar.html`
+    * baseURL: `http://localhost:3000/foo/` и отправка запроса к `./bar.html` дают в результате `http://localhost:3000/foo/bar.html`
+    * baseURL: `http://localhost:3000/foo` (без завершающей косой черты) и переход к `./bar.html` дают в результате `http://localhost:3000/bar.html`
+  - `ClientCertificates` [IEnumerable]?&lt;ClientCertificates&gt; *(необязательно)* <font size="2">Добавлено в: v1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-client-certificates"/><a href="#api-request-new-context-option-client-certificates" class="list-anchor">#</a>
     - `Origin` [string]
       
       Точный источник, для которого сертификат действителен. Источник включает протокол `https`, имя хоста и, возможно, порт.
@@ -76,8 +76,8 @@ await ApiRequest.NewContextAsync(options);
     Объект, содержащий дополнительные HTTP-заголовки, которые будут отправлены с каждым запросом. По умолчанию отсутствуют.
   - `FailOnStatusCode` [bool]? *(необязательно)* <font size="2">Добавлено в: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-fail-on-status-code"/><a href="#api-request-new-context-option-fail-on-status-code" class="list-anchor">#</a>
     
-    Следует ли выбрасывать исключение при кодах ответа, отличных от 2xx и 3xx. По умолчанию объект ответа возвращается для всех кодов состояния.
-  - `HttpCredentials` HttpCredentials? *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-http-credentials"/><a href="#api-request-new-context-option-http-credentials" class="list-anchor">#</a>
+Следует ли выбрасывать исключение при получении кодов ответа, отличных от 2xx и 3xx. По умолчанию объект ответа возвращается для всех кодов состояния.
+  - `HttpCredentials|HttpCredentialsList` HttpCredentials|HttpCredentialsList? | [IEnumerable]?&lt;HttpCredentials|HttpCredentialsList&gt; *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-http-credentials"/><a href="#api-request-new-context-option-http-credentials" class="list-anchor">#</a>
     - `Username` [string]
       
       
@@ -91,7 +91,9 @@ await ApiRequest.NewContextAsync(options);
       
       Эта опция применяется только к запросам, отправленным из соответствующего [APIRequestContext] и не влияет на запросы, отправленные из браузера. `'always'` - заголовок `Authorization` с учетными данными базовой аутентификации будет отправлен с каждым API-запросом. `'unauthorized` - учетные данные отправляются только при получении ответа 401 (Unauthorized) с заголовком `WWW-Authenticate`. По умолчанию `'unauthorized'`.
     
-    Учетные данные для [HTTP-аутентификации](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Если источник не указан, имя пользователя и пароль отправляются на любые серверы при неавторизованных ответах.
+Учётные данные для [HTTP-аутентификации](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). Если источник (origin) не указан, имя пользователя и пароль отправляются любым серверам в ответ на сообщения об отсутствии авторизации.
+    
+    Передайте массив, чтобы использовать разные учётные данные для разных источников. Используется первая запись, соответствующая источнику запроса, а записи без указанного источника соответствуют любому запросу.
   - `IgnoreHTTPSErrors` [bool]? *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-ignore-https-errors"/><a href="#api-request-new-context-option-ignore-https-errors" class="list-anchor">#</a>
     
     Следует ли игнорировать ошибки HTTPS при отправке сетевых запросов. По умолчанию `false`.
@@ -141,6 +143,8 @@ await ApiRequest.NewContextAsync(options);
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -160,15 +164,18 @@ await ApiRequest.NewContextAsync(options);
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

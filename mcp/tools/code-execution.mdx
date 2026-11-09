@@ -1,0 +1,106 @@
+---
+title: "Выполнение кода"
+---
+
+# Выполнение кода
+
+Выполняйте код Playwright и JavaScript для взаимодействий, выходящих за рамки отдельных вызовов инструментов.
+
+## browser_run_code_unsafe
+
+Выполняет фрагмент кода Playwright. Код представляет собой функцию JavaScript, вызываемую с единственным аргументом `page`,
+который предоставляет доступ ко всему [API Playwright](/docs/api/class-page). Возвращаемое значение
+сериализуется и передаётся в ответе инструмента.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `code` | string | нет | Функция JavaScript, содержащая код Playwright для выполнения |
+| `filename` | string | нет | Загрузить код из указанного файла вместо передачи в `code`. Относительные пути разрешаются относительно корня рабочего пространства. Если указаны оба параметра, `code` игнорируется |
+
+:::warning
+Этот инструмент выполняет произвольный JavaScript в процессе сервера Playwright и эквивалентен удалённому выполнению кода (RCE).
+:::
+
+### Проверка содержимого элемента
+
+```txt
+→ browser_run_code_unsafe {
+    code: "async (page) => { return await page.getByTestId('todo-count').textContent(); }"
+  }
+  "3 items left"
+```
+
+### Настройка геолокации
+
+```txt
+→ browser_run_code_unsafe {
+    code: "async (page) => { await page.context().grantPermissions(['geolocation']); await page.context().setGeolocation({ latitude: 37.7749, longitude: -122.4194 }); }"
+  }
+```
+
+### Ожидание определённого условия
+
+```txt
+→ browser_run_code_unsafe {
+    code: "async (page) => { await page.waitForSelector('.loading', { state: 'hidden' }); return 'Loading complete'; }"
+  }
+  "Loading complete"
+```
+
+### Работа с iframe
+
+```txt
+→ browser_run_code_unsafe {
+    code: "async (page) => { const frame = page.frameLocator('#payment-iframe'); return await frame.locator('.total').textContent(); }"
+  }
+  "$49.99"
+```
+
+### Операции с буфером обмена
+
+```txt
+→ browser_run_code_unsafe {
+    code: "async (page) => { await page.context().grantPermissions(['clipboard-read', 'clipboard-write']); return await page.evaluate(() => navigator.clipboard.readText()); }"
+  }
+```
+
+### Выполнение фрагмента кода из файла
+
+```txt
+→ browser_run_code_unsafe { filename: "scripts/seed-cart.js" }
+```
+
+## browser_evaluate
+
+Вычисляет выражение JavaScript на странице или для определённого элемента. В отличие от
+`browser_run_code_unsafe`, код выполняется внутри страницы, а не в процессе сервера.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `function` | string | да | `() => { /* code */ }` или `(element) => { /* code */ }`, если указан `target` |
+| `target` | string | нет | Идентификатор элемента или селектор элемента, для которого нужно выполнить код |
+| `filename` | string | нет | Сохранить результат в файл вместо возврата в виде текста |
+
+```txt
+→ browser_evaluate { function: "() => document.title" }
+  "TodoMVC - React"
+
+→ browser_evaluate { function: "element => element.getAttribute('data-testid')", target: "e15" }
+  "submit-button"
+
+→ browser_evaluate { function: "() => window.innerWidth + 'x' + window.innerHeight" }
+  "1280x720"
+```
+
+## Когда использовать выполнение кода
+
+| Сценарий | Используемый инструмент |
+|----------|-----|
+| Нажатие кнопки | `browser_click` |
+| Заполнение поля формы | `browser_type` или `browser_fill_form` |
+| Чтение текста элемента | `browser_snapshot` или `browser_find` |
+| Проверка вычисленных стилей | `browser_evaluate` |
+| Сложная многошаговая логика | `browser_run_code_unsafe` |
+| Геолокация и разрешения | `browser_run_code_unsafe` |
+| Пользовательские условия ожидания | `browser_run_code_unsafe` |
+| Взаимодействие с iframe | `browser_run_code_unsafe` |

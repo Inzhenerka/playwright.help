@@ -1,0 +1,101 @@
+---
+title: "Формы"
+---
+
+# Формы
+
+## browser_type
+
+Ввод текста в редактируемый элемент (input, textarea, contenteditable).
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `target` | string | да | Идентификатор элемента из снимка или уникальный селектор |
+| `text` | string | да | Текст для ввода в элемент |
+| `submit` | boolean | нет | Нажать Enter после ввода |
+| `slowly` | boolean | нет | Вводить текст по одному символу. Полезно для вызова обработчиков событий клавиатуры; по умолчанию весь текст вставляется сразу |
+
+```txt
+→ browser_type { target: "e5", text: "Buy groceries" }
+→ browser_type { target: "e5", text: "Buy groceries", submit: true }
+→ browser_type { target: "e8", text: "search query", slowly: true }
+```
+
+## browser_fill_form
+
+Заполнение нескольких полей формы за один вызов. Поддерживаются текстовые поля, флажки, переключатели, поля со списком и ползунки. Это эффективнее, чем вызывать `browser_type` и `browser_click` для каждого поля по отдельности.
+
+| Параметр | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `fields` | object[] | да | Поля для заполнения |
+
+Каждое поле представляет собой объект:
+
+| Ключ поля | Тип | Обязательный | Описание |
+|-----------|------|----------|-------------|
+| `name` | string | да | Понятное человеку название поля |
+| `target` | string | да | Идентификатор элемента или селектор |
+| `type` | string | да | `textbox`, `checkbox`, `radio`, `combobox` или `slider` |
+| `value` | string | да | Значение для заполнения. Для флажка или переключателя используйте `"true"` / `"false"`; для поля со списком — текст варианта |
+
+```txt
+→ browser_snapshot
+  - textbox "First name" [ref=e3]
+  - textbox "Last name" [ref=e5]
+  - textbox "Email" [ref=e7]
+  - checkbox "Accept terms" [ref=e9]
+  - combobox "Country" [ref=e11]
+  - radio "Annual plan" [ref=e15]
+
+→ browser_fill_form {
+    fields: [
+      { name: "First name",   target: "e3",  type: "textbox",  value: "Alice" },
+      { name: "Last name",    target: "e5",  type: "textbox",  value: "Smith" },
+      { name: "Email",        target: "e7",  type: "textbox",  value: "alice@example.com" },
+      { name: "Accept terms", target: "e9",  type: "checkbox", value: "true" },
+      { name: "Country",      target: "e11", type: "combobox", value: "United States" },
+      { name: "Annual plan",  target: "e15", type: "radio",    value: "true" }
+    ]
+  }
+```
+
+:::note
+Чтобы изменить состояние отдельного флажка или переключателя, нажмите на него с помощью `browser_click` или используйте `browser_fill_form` с `type: "checkbox"` (или `"radio"`) и `value: "true"` / `"false"`.
+:::
+
+## Секреты
+
+Значения, передаваемые в `browser_type` и `browser_fill_form`, сопоставляются с файлом секретов, указанным
+с помощью `--secrets <path>` (в формате dotenv). Совпавший заполнитель заменяется реальным значением
+до передачи на страницу, а в сгенерированном коде вместо значения отображается `SECRET_<name>`.
+
+## Рабочий процесс: заполнение многошаговой формы
+
+```txt
+Вы: Заполните регистрационную форму на этой странице.
+
+→ browser_snapshot
+  // Страница 1: Личные данные
+  - textbox "Email" [ref=e3]
+  - textbox "Password" [ref=e5]
+  - button "Next" [ref=e7]
+
+→ browser_type { target: "e3", text: "alice@example.com" }
+→ browser_type { target: "e5", text: "s3cureP@ss!" }
+→ browser_click { target: "e7" }
+
+  // Страница 2: Профиль
+  - textbox "Display name" [ref=e3]
+  - combobox "Timezone" [ref=e5]
+  - checkbox "Subscribe to newsletter" [ref=e7]
+  - button "Create account" [ref=e9]
+
+→ browser_fill_form {
+    fields: [
+      { name: "Display name", target: "e3", type: "textbox",  value: "Alice S." },
+      { name: "Timezone",     target: "e5", type: "combobox", value: "US/Pacific" },
+      { name: "Subscribe",    target: "e7", type: "checkbox", value: "true" }
+    ]
+  }
+→ browser_click { target: "e9" }
+```

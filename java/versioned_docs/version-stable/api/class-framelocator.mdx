@@ -25,6 +25,22 @@ page.locator(".result-frame").contentFrame().getByRole(AriaRole.BUTTON).click();
 page.locator(".result-frame").first().contentFrame().getByRole(AriaRole.BUTTON).click();
 ```
 
+**Любой фрейм**
+
+Вызов [Page.frameLocator()](/api/class-page.mdx#page-frame-locator) или [Frame.frameLocator()](/api/class-frame.mdx#frame-frame-locator) без селектора создаёт локатор фрейма, который начинает поиск в любом фрейме поддерева — поэтому вам не нужно сначала находить iframe.
+
+```java
+// Находит кнопку в любом фрейме на странице:
+page.frameLocator().getByRole(AriaRole.BUTTON).click();
+
+// Находит iframe с id "my-frame" в любом месте страницы и нажимает кнопку внутри него:
+page.frameLocator().locator("#my-frame").contentFrame().getByRole(AriaRole.BUTTON).click();
+```
+
+Это влияет только на начало поиска — остальная часть локатора разрешается внутри одного фрейма, как и у любого другого локатора. В соответствии с приведёнными выше правилами строгости, если соответствующие элементы найдены в нескольких фреймах, возникает ошибка.
+
+Такой локатор фрейма не указывает на конкретный `iframe`, поэтому методы [FrameLocator.owner()](/api/class-framelocator.mdx#frame-locator-owner), [FrameLocator.first()](/api/class-framelocator.mdx#frame-locator-first), [FrameLocator.last()](/api/class-framelocator.mdx#frame-locator-last) и [FrameLocator.nth()](/api/class-framelocator.mdx#frame-locator-nth) для него не поддерживаются.
+
 **Преобразование Locator в FrameLocator**
 
 Если у вас есть объект [Locator], указывающий на `iframe`, его можно преобразовать в [FrameLocator] с помощью [Locator.contentFrame()](/api/class-locator.mdx#locator-content-frame).
@@ -37,7 +53,7 @@ page.locator(".result-frame").first().contentFrame().getByRole(AriaRole.BUTTON).
 
 ## Методы {#methods}
 
-### frameLocator {#frame-locator-frame-locator}
+### frameLocator {/* #frame-locator-frame-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.17</font><x-search>frameLocator.frameLocator</x-search>
 
@@ -59,7 +75,7 @@ FrameLocator.frameLocator(selector);
 
 ---
 
-### getByAltText {#frame-locator-get-by-alt-text}
+### getByAltText {/* #frame-locator-get-by-alt-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.getByAltText</x-search>
 
@@ -91,7 +107,7 @@ page.getByAltText("Playwright logo").click();
 
 ---
 
-### getByLabel {#frame-locator-get-by-label}
+### getByLabel {/* #frame-locator-get-by-label */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.getByLabel</x-search>
 
@@ -126,7 +142,7 @@ page.getByLabel("Password").fill("secret");
 
 ---
 
-### getByPlaceholder {#frame-locator-get-by-placeholder}
+### getByPlaceholder {/* #frame-locator-get-by-placeholder */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.getByPlaceholder</x-search>
 
@@ -160,7 +176,7 @@ page.getByPlaceholder("name@example.com").fill("playwright@microsoft.com");
 
 ---
 
-### getByRole {#frame-locator-get-by-role}
+### getByRole {/* #frame-locator-get-by-role */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.getByRole</x-search>
 
@@ -206,8 +222,13 @@ page.getByRole(AriaRole.BUTTON,
     
     Атрибут, который обычно устанавливается `aria-checked` или нативными `<input type=checkbox>` контролами.
     
-    Узнайте больше о [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
-  - `setDisabled` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-disabled"/><a href="#frame-locator-get-by-role-option-disabled" class="list-anchor">#</a>
+Подробнее об атрибуте [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
+  - `setDescription` [String] | [Pattern] *(необязательно)* <font size="2">Добавлено в версии: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-description"/><a href="#frame-locator-get-by-role-option-description" class="list-anchor">#</a>
+    
+    Параметр для сопоставления с [доступным описанием](https://w3c.github.io/accname/#dfn-accessible-description). По умолчанию сопоставление выполняется без учёта регистра и ищет подстроку. Используйте [setExact](/api/class-framelocator.mdx#frame-locator-get-by-role-option-exact), чтобы управлять этим поведением.
+    
+    Подробнее о [доступном описании](https://w3c.github.io/accname/#dfn-accessible-description).
+  - `setDisabled` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-disabled"/><a href="#frame-locator-get-by-role-option-disabled" class="list-anchor">#</a>
     
     Атрибут, который обычно устанавливается `aria-disabled` или `disabled`.
     
@@ -218,8 +239,8 @@ page.getByRole(AriaRole.BUTTON,
     
   - `setExact` [boolean] *(опционально)* <font size="2">Добавлено в: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-exact"/><a href="#frame-locator-get-by-role-option-exact" class="list-anchor">#</a>
     
-    Совпадает ли [setName](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) точно: с учетом регистра и всей строки. По умолчанию false. Игнорируется, когда [setName](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) является регулярным выражением. Обратите внимание, что точное совпадение все равно обрезает пробелы.
-  - `setExpanded` [boolean] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-expanded"/><a href="#frame-locator-get-by-role-option-expanded" class="list-anchor">#</a>
+Определяет, проверяются ли [setName](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) и [setDescription](/api/class-framelocator.mdx#frame-locator-get-by-role-option-description) на точное совпадение: с учётом регистра и по всей строке. По умолчанию — false. Игнорируется, если значение является регулярным выражением. Обратите внимание, что даже при точном совпадении пробельные символы по краям строки удаляются.
+  - `setExpanded` [boolean] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-expanded"/><a href="#frame-locator-get-by-role-option-expanded" class="list-anchor">#</a>
     
     Атрибут, который обычно устанавливается `aria-expanded`.
     
@@ -261,7 +282,7 @@ page.getByRole(AriaRole.BUTTON,
 
 ---
 
-### getByTestId {#frame-locator-get-by-test-id}
+### getByTestId {/* #frame-locator-get-by-test-id */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.getByTestId</x-search>
 
@@ -295,7 +316,7 @@ page.getByTestId("directions").click();
 
 ---
 
-### getByText {#frame-locator-get-by-text}
+### getByText {/* #frame-locator-get-by-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.getByText</x-search>
 
@@ -351,7 +372,7 @@ page.getByText(Pattern.compile("^hello$", Pattern.CASE_INSENSITIVE));
 
 ---
 
-### getByTitle {#frame-locator-get-by-title}
+### getByTitle {/* #frame-locator-get-by-title */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.27</font><x-search>frameLocator.getByTitle</x-search>
 
@@ -385,7 +406,7 @@ assertThat(page.getByTitle("Issues count")).hasText("25 issues");
 
 ---
 
-### locator {#frame-locator-locator}
+### locator {/* #frame-locator-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.17</font><x-search>frameLocator.locator</x-search>
 
@@ -429,7 +450,7 @@ FrameLocator.locator(selectorOrLocator, options);
 
 ---
 
-### owner {#frame-locator-owner}
+### owner {/* #frame-locator-owner */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.43</font><x-search>frameLocator.owner</x-search>
 
@@ -455,11 +476,11 @@ assertThat(locator).isVisible();
 
 ## Deprecated {#deprecated}
 
-### first {#frame-locator-first}
+### first {/* #frame-locator-first */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.17</font><x-search>frameLocator.first</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 Используйте [Locator.first()](/api/class-locator.mdx#locator-first) с последующим [Locator.contentFrame()](/api/class-locator.mdx#locator-content-frame) вместо этого.
 
@@ -478,11 +499,11 @@ FrameLocator.first();
 
 ---
 
-### last {#frame-locator-last}
+### last {/* #frame-locator-last */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.17</font><x-search>frameLocator.last</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 Используйте [Locator.last()](/api/class-locator.mdx#locator-last) с последующим [Locator.contentFrame()](/api/class-locator.mdx#locator-content-frame) вместо этого.
 
@@ -501,11 +522,11 @@ FrameLocator.last();
 
 ---
 
-### nth {#frame-locator-nth}
+### nth {/* #frame-locator-nth */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.17</font><x-search>frameLocator.nth</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 Используйте [Locator.nth()](/api/class-locator.mdx#locator-nth) с последующим [Locator.contentFrame()](/api/class-locator.mdx#locator-content-frame) вместо этого.
 
@@ -535,6 +556,8 @@ FrameLocator.nth(index);
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -556,15 +579,18 @@ FrameLocator.nth(index);
 [RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -577,6 +603,7 @@ FrameLocator.nth(index);
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[BiConsumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html "BiConsumer"
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
@@ -584,6 +611,7 @@ FrameLocator.nth(index);
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[Integer]: https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html "Integer"
 [long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"

@@ -80,7 +80,7 @@ asyncio.run(main())
 
 ## Methods
 
-### add_script_tag {#frame-add-script-tag}
+### add_script_tag {/* #frame-add-script-tag */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.add_script_tag</x-search>
 
@@ -114,7 +114,7 @@ frame.add_script_tag(**kwargs)
 
 ---
 
-### add_style_tag {#frame-add-style-tag}
+### add_style_tag {/* #frame-add-style-tag */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.add_style_tag</x-search>
 
@@ -145,7 +145,7 @@ frame.add_style_tag(**kwargs)
 
 ---
 
-### content {#frame-content}
+### content {/* #frame-content */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.content</x-search>
 
@@ -155,14 +155,20 @@ Gets the full HTML contents of the frame, including the doctype.
 
 ```python
 frame.content()
+frame.content(**kwargs)
 ```
+
+**Arguments**
+- `include_shadow` [bool] *(optional)* <font size="2">Added in: v1.64</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-content-option-include-shadow"/><a href="#frame-content-option-include-shadow" class="list-anchor">#</a>
+  
+  When true, contents of open shadow roots are included as [declarative shadow DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM#declaratively_with_html), i.e. `<template shadowrootmode="open">` elements nested inside their host elements. Closed shadow roots are never included. Defaults to `false`.
 
 **Returns**
 - [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-content-return"/><a href="#frame-content-return" class="list-anchor">#</a>
 
 ---
 
-### drag_and_drop {#frame-drag-and-drop}
+### drag_and_drop {/* #frame-drag-and-drop */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.13</font><x-search>frame.drag_and_drop</x-search>
 
@@ -191,6 +197,9 @@ frame.drag_and_drop(source, target, **kwargs)
   
   
   This option has no effect.
+- `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-drag-and-drop-option-scroll"/><a href="#frame-drag-and-drop-option-scroll" class="list-anchor">#</a>
+  
+  Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
 - `source_position` [Dict] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-drag-and-drop-option-source-position"/><a href="#frame-drag-and-drop-option-source-position" class="list-anchor">#</a>
   - `x` [float]
     
@@ -225,7 +234,7 @@ frame.drag_and_drop(source, target, **kwargs)
 
 ---
 
-### evaluate {#frame-evaluate}
+### evaluate {/* #frame-evaluate */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.evaluate</x-search>
 
@@ -306,7 +315,7 @@ print(await frame.evaluate(f"1 + {x}")) # prints "11"
 <TabItem value="sync">
 
 ```py
-body_handle = frame.evaluate("document.body")
+body_handle = frame.evaluate_handle("document.body")
 html = frame.evaluate("([body, suffix]) => body.innerHTML + suffix", [body_handle, "hello"])
 body_handle.dispose()
 ```
@@ -315,7 +324,7 @@ body_handle.dispose()
 <TabItem value="async">
 
 ```py
-body_handle = await frame.evaluate("document.body")
+body_handle = await frame.evaluate_handle("document.body")
 html = await frame.evaluate("([body, suffix]) => body.innerHTML + suffix", [body_handle, "hello"])
 await body_handle.dispose()
 ```
@@ -336,7 +345,7 @@ await body_handle.dispose()
 
 ---
 
-### evaluate_handle {#frame-evaluate-handle}
+### evaluate_handle {/* #frame-evaluate-handle */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.evaluate_handle</x-search>
 
@@ -387,14 +396,14 @@ A string can also be passed in instead of a function.
 <TabItem value="sync">
 
 ```py
-a_handle = page.evaluate_handle("document") # handle for the "document"
+a_handle = frame.evaluate_handle("document") # handle for the "document"
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-a_handle = await page.evaluate_handle("document") # handle for the "document"
+a_handle = await frame.evaluate_handle("document") # handle for the "document"
 ```
 
 </TabItem>
@@ -413,8 +422,8 @@ a_handle = await page.evaluate_handle("document") # handle for the "document"
 <TabItem value="sync">
 
 ```py
-a_handle = page.evaluate_handle("document.body")
-result_handle = page.evaluate_handle("body => body.innerHTML", a_handle)
+a_handle = frame.evaluate_handle("document.body")
+result_handle = frame.evaluate_handle("body => body.innerHTML", a_handle)
 print(result_handle.json_value())
 result_handle.dispose()
 ```
@@ -423,8 +432,8 @@ result_handle.dispose()
 <TabItem value="async">
 
 ```py
-a_handle = await page.evaluate_handle("document.body")
-result_handle = await page.evaluate_handle("body => body.innerHTML", a_handle)
+a_handle = await frame.evaluate_handle("document.body")
+result_handle = await frame.evaluate_handle("body => body.innerHTML", a_handle)
 print(await result_handle.json_value())
 await result_handle.dispose()
 ```
@@ -445,7 +454,7 @@ await result_handle.dispose()
 
 ---
 
-### frame_element {#frame-frame-element}
+### frame_element {/* #frame-frame-element */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.frame_element</x-search>
 
@@ -490,11 +499,13 @@ assert frame == content_frame
 
 ---
 
-### frame_locator {#frame-frame-locator}
+### frame_locator {/* #frame-frame-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frame.frame_locator</x-search>
 
 When working with iframes, you can create a frame locator that will enter the iframe and allow selecting elements in that iframe.
+
+When called without [selector](/api/class-frame.mdx#frame-frame-locator-option-selector), the search starts in this frame or in any of the iframes inside it, so that you don't need to locate each iframe first. Note that the rest of the locator is resolved inside a single frame, just like any other locator. If it matches elements inside multiple frames, an error is thrown.
 
 **Usage**
 
@@ -526,17 +537,45 @@ await locator.click()
 </TabItem>
 </Tabs>
 
+Following snippet locates a button, either in the frame or in one of the iframes inside it:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+locator = frame.frame_locator().get_by_role("button")
+locator.click()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+locator = frame.frame_locator().get_by_role("button")
+await locator.click()
+```
+
+</TabItem>
+</Tabs>
+
 **Arguments**
-- `selector` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-frame-locator-option-selector"/><a href="#frame-frame-locator-option-selector" class="list-anchor">#</a>
+- `selector` [str] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-frame-locator-option-selector"/><a href="#frame-frame-locator-option-selector" class="list-anchor">#</a>
   
-  A selector to use when resolving DOM element.
+  A selector that matches the frame element. When not specified, locator is matched in this frame or in any of the iframes inside it.
 
 **Returns**
 - [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-frame-locator-return"/><a href="#frame-frame-locator-return" class="list-anchor">#</a>
 
 ---
 
-### get_by_alt_text {#frame-get-by-alt-text}
+### get_by_alt_text {/* #frame-get-by-alt-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.get_by_alt_text</x-search>
 
@@ -587,7 +626,7 @@ await page.get_by_alt_text("Playwright logo").click()
 
 ---
 
-### get_by_label {#frame-get-by-label}
+### get_by_label {/* #frame-get-by-label */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.get_by_label</x-search>
 
@@ -642,7 +681,7 @@ await page.get_by_label("Password").fill("secret")
 
 ---
 
-### get_by_placeholder {#frame-get-by-placeholder}
+### get_by_placeholder {/* #frame-get-by-placeholder */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.get_by_placeholder</x-search>
 
@@ -695,7 +734,7 @@ await page.get_by_placeholder("name@example.com").fill("playwright@microsoft.com
 
 ---
 
-### get_by_role {#frame-get-by-role}
+### get_by_role {/* #frame-get-by-role */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.get_by_role</x-search>
 
@@ -714,7 +753,7 @@ Consider the following DOM structure.
 <button>Submit</button>
 ```
 
-You can locate each element by it's implicit role:
+You can locate each element by its implicit role:
 
 <Tabs
   groupId="python-flavor"
@@ -757,6 +796,11 @@ await page.get_by_role("button", name=re.compile("submit", re.IGNORECASE)).click
   An attribute that is usually set by `aria-checked` or native `<input type=checkbox>` controls.
   
   Learn more about [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
+- `description` [str] | [Pattern] *(optional)* <font size="2">Added in: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-get-by-role-option-description"/><a href="#frame-get-by-role-option-description" class="list-anchor">#</a>
+  
+  Option to match the [accessible description](https://w3c.github.io/accname/#dfn-accessible-description). By default, matching is case-insensitive and searches for a substring, use [exact](/api/class-frame.mdx#frame-get-by-role-option-exact) to control this behavior.
+  
+  Learn more about [accessible description](https://w3c.github.io/accname/#dfn-accessible-description).
 - `disabled` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-get-by-role-option-disabled"/><a href="#frame-get-by-role-option-disabled" class="list-anchor">#</a>
   
   An attribute that is usually set by `aria-disabled` or `disabled`.
@@ -768,7 +812,7 @@ await page.get_by_role("button", name=re.compile("submit", re.IGNORECASE)).click
   
 - `exact` [bool] *(optional)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-get-by-role-option-exact"/><a href="#frame-get-by-role-option-exact" class="list-anchor">#</a>
   
-  Whether [name](/api/class-frame.mdx#frame-get-by-role-option-name) is matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when [name](/api/class-frame.mdx#frame-get-by-role-option-name) is a regular expression. Note that exact match still trims whitespace.
+  Whether [name](/api/class-frame.mdx#frame-get-by-role-option-name) and [description](/api/class-frame.mdx#frame-get-by-role-option-description) are matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when the value is a regular expression. Note that exact match still trims whitespace.
 - `expanded` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-get-by-role-option-expanded"/><a href="#frame-get-by-role-option-expanded" class="list-anchor">#</a>
   
   An attribute that is usually set by `aria-expanded`.
@@ -811,7 +855,7 @@ Many html elements have an implicitly [defined role](https://w3c.github.io/html-
 
 ---
 
-### get_by_test_id {#frame-get-by-test-id}
+### get_by_test_id {/* #frame-get-by-test-id */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.get_by_test_id</x-search>
 
@@ -825,7 +869,7 @@ Consider the following DOM structure.
 <button data-testid="directions">Itinéraire</button>
 ```
 
-You can locate the element by it's test id:
+You can locate the element by its test id:
 
 <Tabs
   groupId="python-flavor"
@@ -865,7 +909,7 @@ By default, the `data-testid` attribute is used as a test id. Use [selectors.set
 
 ---
 
-### get_by_text {#frame-get-by-text}
+### get_by_text {/* #frame-get-by-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.get_by_text</x-search>
 
@@ -953,7 +997,7 @@ Input elements of the type `button` and `submit` are matched by their `value` in
 
 ---
 
-### get_by_title {#frame-get-by-title}
+### get_by_title {/* #frame-get-by-title */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.get_by_title</x-search>
 
@@ -1006,7 +1050,7 @@ await expect(page.get_by_title("Issues count")).to_have_text("25 issues")
 
 ---
 
-### goto {#frame-goto}
+### goto {/* #frame-goto */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.goto</x-search>
 
@@ -1060,7 +1104,7 @@ frame.goto(url, **kwargs)
 
 ---
 
-### is_enabled {#frame-is-enabled}
+### is_enabled {/* #frame-is-enabled */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.is_enabled</x-search>
 
@@ -1089,7 +1133,7 @@ frame.is_enabled(selector, **kwargs)
 
 ---
 
-### locator {#frame-locator}
+### locator {/* #frame-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>frame.locator</x-search>
 
@@ -1134,7 +1178,7 @@ frame.locator(selector, **kwargs)
 
 ---
 
-### set_content {#frame-set-content}
+### set_content {/* #frame-set-content */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.set_content</x-search>
 
@@ -1167,7 +1211,7 @@ frame.set_content(html, **kwargs)
 
 ---
 
-### title {#frame-title}
+### title {/* #frame-title */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.title</x-search>
 
@@ -1184,7 +1228,7 @@ frame.title()
 
 ---
 
-### wait_for_function {#frame-wait-for-function}
+### wait_for_function {/* #frame-wait-for-function */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.wait_for_function</x-search>
 
@@ -1290,7 +1334,7 @@ await frame.wait_for_function("selector => !!document.querySelector(selector)", 
 
 ---
 
-### wait_for_load_state {#frame-wait-for-load-state}
+### wait_for_load_state {/* #frame-wait-for-load-state */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.wait_for_load_state</x-search>
 
@@ -1347,7 +1391,7 @@ await frame.wait_for_load_state() # the promise resolves after "load" event.
 
 ---
 
-### wait_for_url {#frame-wait-for-url}
+### wait_for_url {/* #frame-wait-for-url */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>frame.wait_for_url</x-search>
 
@@ -1384,7 +1428,7 @@ await frame.wait_for_url("**/target.html")
 **Arguments**
 - `url` [str] | [Pattern] | [Callable]\[[URL]\]:[bool]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-url-option-url"/><a href="#frame-wait-for-url-option-url" class="list-anchor">#</a>
   
-  A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+  A glob pattern, regex pattern, or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-url-option-timeout"/><a href="#frame-wait-for-url-option-timeout" class="list-anchor">#</a>
   
   Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.set_default_navigation_timeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -1403,7 +1447,7 @@ await frame.wait_for_url("**/target.html")
 
 ## Properties
 
-### child_frames {#frame-child-frames}
+### child_frames {/* #frame-child-frames */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.child_frames</x-search>
 
@@ -1418,7 +1462,7 @@ frame.child_frames
 
 ---
 
-### is_detached {#frame-is-detached}
+### is_detached {/* #frame-is-detached */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.is_detached</x-search>
 
@@ -1435,7 +1479,7 @@ frame.is_detached()
 
 ---
 
-### name {#frame-name}
+### name {/* #frame-name */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.name</x-search>
 
@@ -1459,7 +1503,7 @@ frame.name
 
 ---
 
-### page {#frame-page}
+### page {/* #frame-page */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.page</x-search>
 
@@ -1476,7 +1520,7 @@ frame.page
 
 ---
 
-### parent_frame {#frame-parent-frame}
+### parent_frame {/* #frame-parent-frame */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.parent_frame</x-search>
 
@@ -1493,7 +1537,7 @@ frame.parent_frame
 
 ---
 
-### url {#frame-url}
+### url {/* #frame-url */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.url</x-search>
 
@@ -1510,9 +1554,26 @@ frame.url
 
 ---
 
+### webmcp {/* #frame-webmcp */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>frame.webmcp</x-search>
+
+Tools that the frame registers through the experimental [WebMCP](https://webmachinelearning.github.io/webmcp/) browser API. See [WebMCP] for details.
+
+**Usage**
+
+```python
+frame.webmcp
+```
+
+**Type**
+- [WebMCP]
+
+---
+
 ## Deprecated
 
-### check {#frame-check}
+### check {/* #frame-check */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.check</x-search>
 
@@ -1563,6 +1624,9 @@ frame.check(selector, **kwargs)
     
     
   A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+- `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-check-option-scroll"/><a href="#frame-check-option-scroll" class="list-anchor">#</a>
+  
+  Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
 - `strict` [bool] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-check-option-strict"/><a href="#frame-check-option-strict" class="list-anchor">#</a>
   
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1578,7 +1642,7 @@ frame.check(selector, **kwargs)
 
 ---
 
-### click {#frame-click}
+### click {/* #frame-click */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.click</x-search>
 
@@ -1640,6 +1704,9 @@ frame.click(selector, **kwargs)
     
     
   A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+- `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-click-option-scroll"/><a href="#frame-click-option-scroll" class="list-anchor">#</a>
+  
+  Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
 - `strict` [bool] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-click-option-strict"/><a href="#frame-click-option-strict" class="list-anchor">#</a>
   
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1655,7 +1722,7 @@ frame.click(selector, **kwargs)
 
 ---
 
-### dblclick {#frame-dblclick}
+### dblclick {/* #frame-dblclick */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.dblclick</x-search>
 
@@ -1718,6 +1785,9 @@ frame.dblclick(selector, **kwargs)
     
     
   A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+- `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-dblclick-option-scroll"/><a href="#frame-dblclick-option-scroll" class="list-anchor">#</a>
+  
+  Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
 - `strict` [bool] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-dblclick-option-strict"/><a href="#frame-dblclick-option-strict" class="list-anchor">#</a>
   
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -1733,7 +1803,7 @@ frame.dblclick(selector, **kwargs)
 
 ---
 
-### dispatch_event {#frame-dispatch-event}
+### dispatch_event {/* #frame-dispatch-event */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.dispatch_event</x-search>
 
@@ -1838,7 +1908,7 @@ await frame.dispatch_event("#source", "dragstart", { "dataTransfer": data_transf
 
 ---
 
-### eval_on_selector {#frame-eval-on-selector}
+### eval_on_selector {/* #frame-eval-on-selector */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>frame.eval_on_selector</x-search>
 
@@ -1904,7 +1974,7 @@ html = await frame.eval_on_selector(".main-container", "(e, suffix) => e.outerHT
 
 ---
 
-### eval_on_selector_all {#frame-eval-on-selector-all}
+### eval_on_selector_all {/* #frame-eval-on-selector-all */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>frame.eval_on_selector_all</x-search>
 
@@ -1963,11 +2033,11 @@ divs_counts = await frame.eval_on_selector_all("div", "(divs, min) => divs.lengt
 
 ---
 
-### expect_navigation {#frame-wait-for-navigation}
+### expect_navigation {/* #frame-wait-for-navigation */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.expect_navigation</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 This method is inherently racy, please use [frame.wait_for_url()](/api/class-frame.mdx#frame-wait-for-url) instead.
 
@@ -2019,7 +2089,7 @@ Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/Hist
   Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.set_default_navigation_timeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 - `url` [str] | [Pattern] | [Callable]\[[URL]\]:[bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-url"/><a href="#frame-wait-for-navigation-option-url" class="list-anchor">#</a>
   
-  A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+  A glob pattern, regex pattern, or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
 - `wait_until` "load" | "domcontentloaded" | "networkidle" | "commit" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-wait-until"/><a href="#frame-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
   
   When to consider operation succeeded, defaults to `load`. Events can be either:
@@ -2033,7 +2103,7 @@ Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/Hist
 
 ---
 
-### fill {#frame-fill}
+### fill {/* #frame-fill */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.fill</x-search>
 
@@ -2087,7 +2157,7 @@ frame.fill(selector, value, **kwargs)
 
 ---
 
-### focus {#frame-focus}
+### focus {/* #frame-focus */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.focus</x-search>
 
@@ -2123,7 +2193,7 @@ frame.focus(selector, **kwargs)
 
 ---
 
-### get_attribute {#frame-get-attribute}
+### get_attribute {/* #frame-get-attribute */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.get_attribute</x-search>
 
@@ -2162,7 +2232,7 @@ frame.get_attribute(selector, name, **kwargs)
 
 ---
 
-### hover {#frame-hover}
+### hover {/* #frame-hover */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.hover</x-search>
 
@@ -2214,6 +2284,9 @@ frame.hover(selector, **kwargs)
     
     
   A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+- `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-hover-option-scroll"/><a href="#frame-hover-option-scroll" class="list-anchor">#</a>
+  
+  Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
 - `strict` [bool] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-hover-option-strict"/><a href="#frame-hover-option-strict" class="list-anchor">#</a>
   
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -2229,7 +2302,7 @@ frame.hover(selector, **kwargs)
 
 ---
 
-### inner_html {#frame-inner-html}
+### inner_html {/* #frame-inner-html */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.inner_html</x-search>
 
@@ -2265,7 +2338,7 @@ frame.inner_html(selector, **kwargs)
 
 ---
 
-### inner_text {#frame-inner-text}
+### inner_text {/* #frame-inner-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.inner_text</x-search>
 
@@ -2301,7 +2374,7 @@ frame.inner_text(selector, **kwargs)
 
 ---
 
-### input_value {#frame-input-value}
+### input_value {/* #frame-input-value */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.13</font><x-search>frame.input_value</x-search>
 
@@ -2339,7 +2412,7 @@ frame.input_value(selector, **kwargs)
 
 ---
 
-### is_checked {#frame-is-checked}
+### is_checked {/* #frame-is-checked */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.is_checked</x-search>
 
@@ -2375,7 +2448,7 @@ frame.is_checked(selector, **kwargs)
 
 ---
 
-### is_disabled {#frame-is-disabled}
+### is_disabled {/* #frame-is-disabled */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.is_disabled</x-search>
 
@@ -2411,7 +2484,7 @@ frame.is_disabled(selector, **kwargs)
 
 ---
 
-### is_editable {#frame-is-editable}
+### is_editable {/* #frame-is-editable */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.is_editable</x-search>
 
@@ -2447,7 +2520,7 @@ frame.is_editable(selector, **kwargs)
 
 ---
 
-### is_hidden {#frame-is-hidden}
+### is_hidden {/* #frame-is-hidden */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.is_hidden</x-search>
 
@@ -2474,19 +2547,13 @@ frame.is_hidden(selector, **kwargs)
 - `strict` [bool] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-is-hidden-option-strict"/><a href="#frame-is-hidden-option-strict" class="list-anchor">#</a>
   
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-is-hidden-option-timeout"/><a href="#frame-is-hidden-option-timeout" class="list-anchor">#</a>
-  
-  :::warning[Deprecated]
-  This option is ignored. [frame.is_hidden()](/api/class-frame.mdx#frame-is-hidden) does not wait for the element to become hidden and returns immediately.
-  :::
-  
 
 **Returns**
 - [bool]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-is-hidden-return"/><a href="#frame-is-hidden-return" class="list-anchor">#</a>
 
 ---
 
-### is_visible {#frame-is-visible}
+### is_visible {/* #frame-is-visible */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.is_visible</x-search>
 
@@ -2513,19 +2580,13 @@ frame.is_visible(selector, **kwargs)
 - `strict` [bool] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-is-visible-option-strict"/><a href="#frame-is-visible-option-strict" class="list-anchor">#</a>
   
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-is-visible-option-timeout"/><a href="#frame-is-visible-option-timeout" class="list-anchor">#</a>
-  
-  :::warning[Deprecated]
-  This option is ignored. [frame.is_visible()](/api/class-frame.mdx#frame-is-visible) does not wait for the element to become visible and returns immediately.
-  :::
-  
 
 **Returns**
 - [bool]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-is-visible-return"/><a href="#frame-is-visible-return" class="list-anchor">#</a>
 
 ---
 
-### press {#frame-press}
+### press {/* #frame-press */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.press</x-search>
 
@@ -2585,7 +2646,7 @@ frame.press(selector, key, **kwargs)
 
 ---
 
-### query_selector {#frame-query-selector}
+### query_selector {/* #frame-query-selector */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>frame.query_selector</x-search>
 
@@ -2625,7 +2686,7 @@ frame.query_selector(selector, **kwargs)
 
 ---
 
-### query_selector_all {#frame-query-selector-all}
+### query_selector_all {/* #frame-query-selector-all */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>frame.query_selector_all</x-search>
 
@@ -2661,7 +2722,7 @@ frame.query_selector_all(selector)
 
 ---
 
-### select_option {#frame-select-option}
+### select_option {/* #frame-select-option */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.select_option</x-search>
 
@@ -2720,9 +2781,18 @@ await frame.select_option("select#colors", value=["red", "green", "blue"])
 - `selector` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-select-option-option-selector"/><a href="#frame-select-option-option-selector" class="list-anchor">#</a>
   
   A selector to query for.
+- `element` [ElementHandle] | [List]\[[ElementHandle]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-select-option-option-element"/><a href="#frame-select-option-option-element" class="list-anchor">#</a>
+  
+  Option elements to select. Optional.
 - `force` [bool] *(optional)* <font size="2">Added in: v1.13</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-select-option-option-force"/><a href="#frame-select-option-option-force" class="list-anchor">#</a>
   
   Whether to bypass the [actionability](../actionability.mdx) checks. Defaults to `false`.
+- `index` [int] | [List]\[[int]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-select-option-option-index"/><a href="#frame-select-option-option-index" class="list-anchor">#</a>
+  
+  Options to select by index. Optional.
+- `label` [str] | [List]\[[str]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-select-option-option-label"/><a href="#frame-select-option-option-label" class="list-anchor">#</a>
+  
+  Options to select by label. If the `<select>` has the `multiple` attribute, all given options are selected, otherwise only the first option matching one of the passed options is selected. Optional.
 - `no_wait_after` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-select-option-option-no-wait-after"/><a href="#frame-select-option-option-no-wait-after" class="list-anchor">#</a>
   
   :::warning[Deprecated]
@@ -2737,25 +2807,16 @@ await frame.select_option("select#colors", value=["red", "green", "blue"])
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-select-option-option-timeout"/><a href="#frame-select-option-option-timeout" class="list-anchor">#</a>
   
   Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-- `element` [ElementHandle] | [List]\[[ElementHandle]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-select-option-option-element"/><a href="#frame-select-option-option-element" class="list-anchor">#</a>
-  
-  Option elements to select. Optional.
-- `index` [int] | [List]\[[int]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-select-option-option-index"/><a href="#frame-select-option-option-index" class="list-anchor">#</a>
-  
-  Options to select by index. Optional.
 - `value` [str] | [List]\[[str]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-select-option-option-value"/><a href="#frame-select-option-option-value" class="list-anchor">#</a>
   
   Options to select by value. If the `<select>` has the `multiple` attribute, all given options are selected, otherwise only the first option matching one of the passed options is selected. Optional.
-- `label` [str] | [List]\[[str]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-select-option-option-label"/><a href="#frame-select-option-option-label" class="list-anchor">#</a>
-  
-  Options to select by label. If the `<select>` has the `multiple` attribute, all given options are selected, otherwise only the first option matching one of the passed options is selected. Optional.
 
 **Returns**
 - [List]\[[str]\]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-select-option-return"/><a href="#frame-select-option-return" class="list-anchor">#</a>
 
 ---
 
-### set_checked {#frame-set-checked}
+### set_checked {/* #frame-set-checked */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>frame.set_checked</x-search>
 
@@ -2810,6 +2871,9 @@ frame.set_checked(selector, checked, **kwargs)
     
     
   A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+- `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-set-checked-option-scroll"/><a href="#frame-set-checked-option-scroll" class="list-anchor">#</a>
+  
+  Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
 - `strict` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-set-checked-option-strict"/><a href="#frame-set-checked-option-strict" class="list-anchor">#</a>
   
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -2825,7 +2889,7 @@ frame.set_checked(selector, checked, **kwargs)
 
 ---
 
-### set_input_files {#frame-set-input-files}
+### set_input_files {/* #frame-set-input-files */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.set_input_files</x-search>
 
@@ -2881,7 +2945,7 @@ frame.set_input_files(selector, files, **kwargs)
 
 ---
 
-### tap {#frame-tap}
+### tap {/* #frame-tap */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.tap</x-search>
 
@@ -2938,6 +3002,9 @@ frame.tap(selector, **kwargs)
     
     
   A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+- `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-tap-option-scroll"/><a href="#frame-tap-option-scroll" class="list-anchor">#</a>
+  
+  Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
 - `strict` [bool] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-tap-option-strict"/><a href="#frame-tap-option-strict" class="list-anchor">#</a>
   
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -2953,7 +3020,7 @@ frame.tap(selector, **kwargs)
 
 ---
 
-### text_content {#frame-text-content}
+### text_content {/* #frame-text-content */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.text_content</x-search>
 
@@ -2989,11 +3056,11 @@ frame.text_content(selector, **kwargs)
 
 ---
 
-### type {#frame-type}
+### type {/* #frame-type */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.type</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 In most cases, you should use [locator.fill()](/api/class-locator.mdx#locator-fill) instead. You only need to press keys one by one if there is special keyboard handling on the page - in this case use [locator.press_sequentially()](/api/class-locator.mdx#locator-press-sequentially).
 
@@ -3036,7 +3103,7 @@ To press a special key, like `Control` or `ArrowDown`, use [keyboard.press()](/a
 
 ---
 
-### uncheck {#frame-uncheck}
+### uncheck {/* #frame-uncheck */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.uncheck</x-search>
 
@@ -3087,6 +3154,9 @@ frame.uncheck(selector, **kwargs)
     
     
   A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+- `scroll` "auto" | "none" *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-uncheck-option-scroll"/><a href="#frame-uncheck-option-scroll" class="list-anchor">#</a>
+  
+  Controls whether Playwright scrolls the element into view before performing the action. Defaults to `"auto"`, which scrolls the element into view when necessary, including scrolling nested scrollable containers. When set to `"none"`, Playwright does not scroll the element and the action fails if the element is not already in the viewport. This is useful to assert that an element is reachable by the user without additional scrolling.
 - `strict` [bool] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-uncheck-option-strict"/><a href="#frame-uncheck-option-strict" class="list-anchor">#</a>
   
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
@@ -3102,7 +3172,7 @@ frame.uncheck(selector, **kwargs)
 
 ---
 
-### wait_for_selector {#frame-wait-for-selector}
+### wait_for_selector {/* #frame-wait-for-selector */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.wait_for_selector</x-search>
 
@@ -3202,7 +3272,7 @@ asyncio.run(main())
 
 ---
 
-### wait_for_timeout {#frame-wait-for-timeout}
+### wait_for_timeout {/* #frame-wait-for-timeout */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>frame.wait_for_timeout</x-search>
 
@@ -3242,11 +3312,15 @@ frame.wait_for_timeout(timeout)
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [Error]: /api/class-error.mdx "Error"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
@@ -3260,14 +3334,17 @@ frame.wait_for_timeout(timeout)
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

@@ -52,7 +52,44 @@ export default defineConfig({
 
 ## Свойства {#properties}
 
-### dependencies {#test-project-dependencies}
+### default {/* #test-project-default */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>testProject.default</x-search>
+
+Определяет, запускается ли проект без аргумента командной строки `--project`. По умолчанию `true`.
+
+Чтобы запустить проект с `default: false`, укажите его через аргумент командной строки `--project`.
+
+Проект с `default: false` всё равно запустится, если другой запускаемый проект указывает его в [testProject.dependencies](/api/class-testproject.mdx#test-project-dependencies) или [testProject.teardown](/api/class-testproject.mdx#test-project-teardown).
+
+**Usage**
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  projects: [
+    {
+      name: 'chromium',
+      use: devices['Desktop Chrome'],
+    },
+    {
+      name: 'slow',
+      testDir: './slow-tests',
+      default: false,
+    },
+  ],
+});
+```
+
+Теперь `npx playwright test` запускает только проект `chromium`, а `npx playwright test --project=slow` запускает `slow`.
+
+**Type**
+- [boolean]
+
+---
+
+### dependencies {/* #test-project-dependencies */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.31</font><x-search>testProject.dependencies</x-search>
 
@@ -95,7 +132,7 @@ export default defineConfig({
 
 ---
 
-### expect {#test-project-expect}
+### expect {/* #test-project-expect */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.expect</x-search>
 
@@ -120,11 +157,11 @@ testProject.expect
       допустимая воспринимаемая разница в цвете между одним и тем же пикселем в сравниваемых изображениях, в диапазоне от `0` (строго) до `1` (мягко). Компаратор `"pixelmatch"` вычисляет разницу в цвете в [цветовом пространстве YIQ](https://en.wikipedia.org/wiki/YIQ) и по умолчанию устанавливает значение `threshold` в `0.2`.
     - `maxDiffPixels` [number] *(опционально)*
       
-      допустимое количество пикселей, которые могут отличаться, по умолчанию не установлено.
-    - `maxDiffPixelRatio` [number] *(опционально)*
+допустимое количество пикселей, которые могут отличаться; по умолчанию не задано. Обратите внимание, что `threshold` определяет, какие пиксели считаются отличающимися.
+    - `maxDiffPixelRatio` [number] *(необязательно)*
       
-      допустимое соотношение пикселей, которые отличаются, к общему количеству пикселей, между `0` и `1`, по умолчанию не установлено.
-    - `animations` "allow" | "disabled" *(опционально)*
+      допустимое отношение количества отличающихся пикселей к общему количеству пикселей, от `0` до `1` ; по умолчанию не задано. Обратите внимание, что `threshold` определяет, какие пиксели считаются отличающимися.
+    - `animations` "allow" | "disabled" *(необязательно)*
       
       См. [animations](/api/class-page.mdx#page-screenshot-option-animations) в [page.screenshot()](/api/class-page.mdx#page-screenshot). По умолчанию `"disabled"`.
     - `caret` "hide" | "initial" *(опционально)*
@@ -135,16 +172,25 @@ testProject.expect
       См. [scale](/api/class-page.mdx#page-screenshot-option-scale) в [page.screenshot()](/api/class-page.mdx#page-screenshot). По умолчанию `"css"`.
     - `stylePath` [string] | [Array]&lt;[string]&gt; *(опционально)*
       
-      См. [style](/api/class-page.mdx#page-screenshot-option-style) в [page.screenshot()](/api/class-page.mdx#page-screenshot).
-    - `pathTemplate` [string] *(опционально)*
+См. [style](/api/class-page.mdx#page-screenshot-option-style) в [page.screenshot()](/api/class-page.mdx#page-screenshot).
+    - `type` "png" | "webp" *(необязательно)*
       
-      Шаблон, управляющий расположением скриншотов. См. [testProject.snapshotPathTemplate](/api/class-testproject.mdx#test-project-snapshot-path-template) для деталей.
+      Формат создаваемых скриншотов, когда имя снимка не указано; по умолчанию — `"png"`. Для снимков с явно указанным именем используется формат, соответствующий расширению `.png` или `.webp`.
+    - `pathTemplate` [string] *(необязательно)*
+      
+      Шаблон, определяющий расположение скриншотов. Подробнее см. [testProject.snapshotPathTemplate](/api/class-testproject.mdx#test-project-snapshot-path-template).
+    - `timeout` [number] *(необязательно)*
+      
+      Тайм-аут по умолчанию для [expect(page).toHaveScreenshot()](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1) в миллисекундах; по умолчанию используется глобальный тайм-аут expect. Значение `0` отключает тайм-аут.
     
     Конфигурация для метода [expect(page).toHaveScreenshot()](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1).
   - `toMatchAriaSnapshot` [Object] *(опционально)*
     - `pathTemplate` [string] *(опционально)*
       
-      Шаблон, управляющий расположением снимков aria. См. [testProject.snapshotPathTemplate](/api/class-testproject.mdx#test-project-snapshot-path-template) для деталей.
+Шаблон, определяющий расположение снимков ARIA. Подробнее см. [testProject.snapshotPathTemplate](/api/class-testproject.mdx#test-project-snapshot-path-template).
+    - `children` "contain"  | "equal"  | "deep-equal" *(необязательно)*
+      
+      Определяет, как дочерние элементы корня снимка сопоставляются с фактическим деревом доступности. Это эквивалентно добавлению свойства `/children` на верхнем уровне каждого шаблона снимка ARIA. Отдельные снимки могут переопределить это поведение, явно указав свойство `/children`.
     
     Конфигурация для метода [expect(locator).toMatchAriaSnapshot()](/api/class-locatorassertions.mdx#locator-assertions-to-match-aria-snapshot-2).
   - `toMatchSnapshot` [Object] *(опционально)*
@@ -153,10 +199,10 @@ testProject.expect
       допустимая воспринимаемая разница в цвете между одним и тем же пикселем в сравниваемых изображениях, в диапазоне от `0` (строго) до `1` (мягко). Компаратор `"pixelmatch"` вычисляет разницу в цвете в [цветовом пространстве YIQ](https://en.wikipedia.org/wiki/YIQ) и по умолчанию устанавливает значение `threshold` в `0.2`.
     - `maxDiffPixels` [number] *(опционально)*
       
-      допустимое количество пикселей, которые могут отличаться, по умолчанию не установлено.
-    - `maxDiffPixelRatio` [number] *(опционально)*
+допустимое количество пикселей, которые могут отличаться; по умолчанию не задано. Обратите внимание, что `threshold` определяет, какие пиксели считаются отличающимися.
+    - `maxDiffPixelRatio` [number] *(необязательно)*
       
-      допустимое соотношение пикселей, которые отличаются, к общему количеству пикселей, между `0` и `1`, по умолчанию не установлено.
+      допустимое отношение количества отличающихся пикселей к общему количеству пикселей, от `0` до `1`; по умолчанию не задано. Обратите внимание, что `threshold` определяет, какие пиксели считаются отличающимися.
     
     Конфигурация для метода [expect(value).toMatchSnapshot()](/api/class-snapshotassertions.mdx#snapshot-assertions-to-match-snapshot-1).
   - `toPass` [Object] *(опционально)*
@@ -171,7 +217,7 @@ testProject.expect
 
 ---
 
-### fullyParallel {#test-project-fully-parallel}
+### fullyParallel {/* #test-project-fully-parallel */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.fullyParallel</x-search>
 
@@ -190,7 +236,7 @@ testProject.fullyParallel
 
 ---
 
-### grep {#test-project-grep}
+### grep {/* #test-project-grep */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.grep</x-search>
 
@@ -209,7 +255,7 @@ testProject.grep
 
 ---
 
-### grepInvert {#test-project-grep-invert}
+### grepInvert {/* #test-project-grep-invert */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.grepInvert</x-search>
 
@@ -228,7 +274,7 @@ testProject.grepInvert
 
 ---
 
-### ignoreSnapshots {#test-project-ignore-snapshots}
+### ignoreSnapshots {/* #test-project-ignore-snapshots */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.44</font><x-search>testProject.ignoreSnapshots</x-search>
 
@@ -266,7 +312,7 @@ export default defineConfig({
 
 ---
 
-### metadata {#test-project-metadata}
+### metadata {/* #test-project-metadata */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.metadata</x-search>
 
@@ -283,7 +329,7 @@ testProject.metadata
 
 ---
 
-### name {#test-project-name}
+### name {/* #test-project-name */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.name</x-search>
 
@@ -305,7 +351,7 @@ testProject.name
 
 ---
 
-### outputDir {#test-project-output-dir}
+### outputDir {/* #test-project-output-dir */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.outputDir</x-search>
 
@@ -338,7 +384,7 @@ testProject.outputDir
 
 ---
 
-### repeatEach {#test-project-repeat-each}
+### repeatEach {/* #test-project-repeat-each */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.repeatEach</x-search>
 
@@ -357,7 +403,7 @@ testProject.repeatEach
 
 ---
 
-### respectGitIgnore {#test-project-respect-git-ignore}
+### respectGitIgnore {/* #test-project-respect-git-ignore */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.45</font><x-search>testProject.respectGitIgnore</x-search>
 
@@ -374,7 +420,7 @@ testProject.respectGitIgnore
 
 ---
 
-### retries {#test-project-retries}
+### retries {/* #test-project-retries */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.retries</x-search>
 
@@ -395,7 +441,7 @@ testProject.retries
 
 ---
 
-### snapshotDir {#test-project-snapshot-dir}
+### snapshotDir {/* #test-project-snapshot-dir */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.snapshotDir</x-search>
 
@@ -416,7 +462,7 @@ testProject.snapshotDir
 
 ---
 
-### snapshotPathTemplate {#test-project-snapshot-path-template}
+### snapshotPathTemplate {/* #test-project-snapshot-path-template */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.28</font><x-search>testProject.snapshotPathTemplate</x-search>
 
@@ -476,24 +522,26 @@ test.describe('suite', () => {
 ```
 
 Список поддерживаемых токенов:
-* `{arg}` - Относительный путь снимка **без расширения**. Это исходит из аргументов, переданных в `toHaveScreenshot()`, `toMatchAriaSnapshot()` или `toMatchSnapshot()`; если вызвано без аргументов, это будет автоматически сгенерированное имя снимка.
+* `{arg}` - Относительный путь к снимку **без расширения**. Формируется из аргументов, переданных в `toHaveScreenshot()`, `toMatchAriaSnapshot()` или `toMatchSnapshot()`; при вызове без аргументов используется автоматически сгенерированное имя снимка.
   * Значение: `foo/bar/baz`
-* `{ext}` - Расширение снимка (с ведущей точкой).
+* `{ext}` - Расширение снимка (с точкой в начале).
   * Значение: `.png`
 * `{platform}` - Значение `process.platform`.
-* `{projectName}` - Имя проекта, безопасное для файловой системы, если оно есть.
+* `{projectName}` - Имя проекта, преобразованное в допустимое для файловой системы, если оно задано.
   * Значение: `''` (пустая строка).
-* `{snapshotDir}` - [testProject.snapshotDir](/api/class-testproject.mdx#test-project-snapshot-dir) проекта.
-  * Значение: `/home/playwright/tests` (так как `snapshotDir` не указан в конфигурации, он по умолчанию равен `testDir`)
-* `{testDir}` - [testProject.testDir](/api/class-testproject.mdx#test-project-test-dir) проекта.
-  * Значение: `/home/playwright/tests` (абсолютный путь, так как `testDir` разрешается относительно директории с конфигурацией)
-* `{testFileDir}` - Директории в относительном пути от `testDir` до **тестового файла**.
+* `{snapshotDir}` - Значение [testProject.snapshotDir](/api/class-testproject.mdx#test-project-snapshot-dir) проекта.
+  * Значение: `/home/playwright/tests` (поскольку `snapshotDir` не указан в конфигурации, по умолчанию используется `testDir`)
+* `{testDir}` - Значение [testProject.testDir](/api/class-testproject.mdx#test-project-test-dir) проекта.
+  * Значение: `/home/playwright/tests` (абсолютный путь, поскольку `testDir` разрешается относительно каталога с файлом конфигурации)
+* `{testFileDir}` - Каталоги в относительном пути от `testDir` до **файла теста**.
   * Значение: `page`
-* `{testFileName}` - Имя тестового файла с расширением.
+* `{testFileBaseName}` - Имя файла теста без последнего расширения.
+  * Значение: `page-click.spec`
+* `{testFileName}` - Имя файла теста с расширением.
   * Значение: `page-click.spec.ts`
-* `{testFilePath}` - Относительный путь от `testDir` до **тестового файла**.
+* `{testFilePath}` - Относительный путь от `testDir` до **файла теста**.
   * Значение: `page/page-click.spec.ts`
-* `{testName}` - Имя теста, безопасное для файловой системы, включая родительские описания, но исключая имя файла.
+* `{testName}` - Название теста, преобразованное в допустимое для файловой системы, включая названия родительских блоков describe, но без имени файла.
   * Значение: `suite-test-should-work`
 
 Каждый токен может быть предшествован одним символом, который будет использоваться **только если** этот токен имеет непустое значение.
@@ -521,7 +569,7 @@ export default defineConfig({
 
 ---
 
-### teardown {#test-project-teardown}
+### teardown {/* #test-project-teardown */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.34</font><x-search>testProject.teardown</x-search>
 
@@ -571,7 +619,7 @@ export default defineConfig({
 
 ---
 
-### testDir {#test-project-test-dir}
+### testDir {/* #test-project-test-dir */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.testDir</x-search>
 
@@ -630,7 +678,7 @@ testProject.testDir
 
 ---
 
-### testIgnore {#test-project-test-ignore}
+### testIgnore {/* #test-project-test-ignore */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.testIgnore</x-search>
 
@@ -651,7 +699,7 @@ testProject.testIgnore
 
 ---
 
-### testMatch {#test-project-test-match}
+### testMatch {/* #test-project-test-match */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.testMatch</x-search>
 
@@ -672,7 +720,7 @@ testProject.testMatch
 
 ---
 
-### timeout {#test-project-timeout}
+### timeout {/* #test-project-timeout */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.timeout</x-search>
 
@@ -693,7 +741,7 @@ testProject.timeout
 
 ---
 
-### use {#test-project-use}
+### use {/* #test-project-use */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.10</font><x-search>testProject.use</x-search>
 
@@ -727,7 +775,7 @@ testProject.use
 
 ---
 
-### workers {#test-project-workers}
+### workers {/* #test-project-workers */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.52</font><x-search>testProject.workers</x-search>
 
@@ -763,11 +811,6 @@ export default defineConfig({
 - [number] | [string]
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -780,10 +823,11 @@ export default defineConfig({
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -802,6 +846,7 @@ export default defineConfig({
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -809,9 +854,18 @@ export default defineConfig({
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -829,6 +883,7 @@ export default defineConfig({
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -841,6 +896,7 @@ export default defineConfig({
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -862,6 +918,7 @@ export default defineConfig({
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

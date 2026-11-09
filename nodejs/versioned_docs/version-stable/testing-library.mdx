@@ -8,14 +8,16 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Принципы миграции {#migration-principles}
 
-Этот гид описывает миграцию к [Экспериментальному тестированию компонентов](./test-components) Playwright с [DOM Testing Library](https://testing-library.com/docs/dom-testing-library/intro/), [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/), [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro) и [Svelte Testing Library](https://testing-library.com/docs/svelte-testing-library/intro).
+Это руководство описывает переход на [компонентное тестирование](./test-components) Playwright с [DOM Testing Library](https://testing-library.com/docs/dom-testing-library/intro/), [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) и [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro).
 
 :::note
 
 Если вы используете DOM Testing Library в браузере (например, вы собираете end-to-end тесты с помощью webpack), вы можете сразу перейти на Playwright Test. Примеры ниже сосредоточены на тестах компонентов, но для end-to-end теста вам просто нужно заменить `await mount` на `await page.goto('http://localhost:3000/')`, чтобы открыть страницу, которую вы тестируете.
 :::
 
-## Шпаргалка {#cheat-sheet}
+Playwright отображает компонент с помощью **истории (story)** — небольшой обёртки, которая встраивает компонент в один конкретный сценарий и предоставляется со страницы **галереи (gallery)** вашим собственным сервером разработки. Там, где Testing Library вызывает `render()` непосредственно в тесте, Playwright переносит эту настройку в историю и обращается к ней из теста по идентификатору. О том, как настроить галерею, см. в разделе [Тестирование компонентов](./test-components).
+
+## Шпаргалка
 
 | Testing Library                                                                 | Playwright                                                             |
 | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
@@ -32,9 +34,9 @@ import HTMLCard from '@site/src/components/HTMLCard';
 | `screen.queryByPlaceholderText('...')`                                          | `component.getByPlaceholder('...')`                                    |
 | `screen.findByText('...')`                                                      | `component.getByText('...')`                                           |
 | `screen.getByTestId('...')`                                                     | `component.getByTestId('...')`                                         |
-| `render(<Component />);`                                                        | `mount(<Component />);`                                                |
-| `const { unmount } = render(<Component />);`                                    | `const { unmount } = await mount(<Component />);`                      |
-| `const { rerender } = render(<Component />);`                                   | `const { update } = await mount(<Component />);`                       |
+| `render(<Component />);` | Экспорт сценария и `await mount('Component/Default');` |
+| `const { unmount } = render(<Component />);`                                    | `const component = await mount('...'); await component.unmount();`     |
+| `const { rerender } = render(<Component />);`                                   | `const component = await mount('...'); await component.update(props);` |
 
 ## Пример {#example}
 
@@ -60,31 +62,40 @@ test('вход в систему', async () => {
 });
 ```
 
-Пошаговая миграция на Playwright Test:
+Построчная миграция на Playwright Test. Сначала сценарий переносится из теста в историю рядом с компонентом:
+
+```js title="src/pages/SignInPage.story.tsx"
+import { SignInPage } from './SignInPage';
+
+export const Default = () => <SignInPage />; // 1
+```
+
+Затем тест монтирует эту историю по её идентификатору:
 
 ```js
-const { test, expect } = require('@playwright/experimental-ct-react'); // 1
+const { test, expect } = require('@playwright/test'); // 2
 
-test('вход в систему', async ({ mount }) => { // 2
-  // Настройка страницы.
-  const component = await mount(<SignInPage />); // 3
+test('sign in', async ({ mount }) => { // 3
+  // Подготовка страницы.
+  const component = await mount('pages/SignInPage/Default'); // 4
 
   // Выполнение действий.
-  await component.getByLabel('Username').fill('John'); // 4
+  await component.getByLabel('Username').fill('John'); // 5
   await component.getByLabel('Password').fill('secret');
   await component.getByRole('button', { name: 'Sign in' }).click();
 
-  // Проверка состояния входа, ожидая появления сообщения "Добро пожаловать".
-  await expect(component.getByText('Welcome, John')).toBeVisible(); // 5
+  // Проверка состояния после входа: ожидаем появления сообщения "Welcome".
+  await expect(component.getByText('Welcome, John')).toBeVisible(); // 6
 });
 ```
 
-Основные моменты миграции (см. встроенные комментарии в коде Playwright Test):
-1. Импортируйте все из `@playwright/experimental-ct-react` (или -vue, -svelte) для тестов компонентов или из `@playwright/test` для end-to-end тестов.
-1. Функция теста получает `page`, которая изолирована от других тестов, и `mount`, который рендерит компонент на этой странице. Это два из [полезных фикстур](./api/class-fixtures) в Playwright Test.
-1. Замените `render` на `mount`, который возвращает [локатор компонента](./locators).
-1. Используйте локаторы, созданные с помощью [locator.locator()](/api/class-locator.mdx#locator-locator) или [page.locator()](/api/class-page.mdx#page-locator), чтобы выполнять большинство действий.
-1. Используйте [assertions](./test-assertions) для проверки состояния.
+Основные моменты миграции (см. комментарии в примерах кода Playwright Test):
+1. Всё, что раньше настраивалось непосредственно при вызове `render()`, — пропсы, провайдеры, тестовые данные — теперь становится экспортируемой историей. Истории выполняются в браузере, поэтому передавать объекты в тест больше не требуется.
+1. Импортируйте всё из `@playwright/test` как для компонентных, так и для сквозных тестов.
+1. Тестовая функция получает `page`, изолированную от других тестов, и `mount`, которая отображает историю на этой странице. Это две из [полезных фикстур](./api/class-fixtures) в Playwright Test.
+1. Замените `render` на [fixtures.mount()](/api/class-fixtures.mdx#fixtures-mount): этот метод принимает идентификатор истории и возвращает [локатор компонента](./locators), область поиска которого ограничена корневым элементом галереи.
+1. Для выполнения большинства действий используйте локаторы, созданные с помощью [locator.locator()](/api/class-locator.mdx#locator-locator) или [page.locator()](/api/class-page.mdx#page-locator).
+1. Используйте [проверки](./test-assertions) для проверки состояния.
 
 ## Миграция запросов {#migrating-queries}
 
@@ -147,19 +158,14 @@ const helloMessage = messages.getByText('hello');
 
 ## Дальнейшее чтение {#further-reading}
 
-Узнайте больше о тестовом раннере Playwright:
+Узнайте больше о средстве запуска тестов Playwright Test:
 - [Начало работы](./intro)
-- [Экспериментальное тестирование компонентов](./test-components)
+- [Тестирование компонентов](./test-components)
 - [Локаторы](./locators.mdx)
-- [Утверждения](./test-assertions)
-- [Авто-ожидание](./actionability)
+- [Проверки](./test-assertions)
+- [Автоматическое ожидание](./actionability)
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -172,10 +178,11 @@ const helloMessage = messages.getByText('hello');
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -194,6 +201,7 @@ const helloMessage = messages.getByText('hello');
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -201,9 +209,18 @@ const helloMessage = messages.getByText('hello');
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -221,6 +238,7 @@ const helloMessage = messages.getByText('hello');
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -233,6 +251,7 @@ const helloMessage = messages.getByText('hello');
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -254,6 +273,7 @@ const helloMessage = messages.getByText('hello');
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

@@ -26,6 +26,22 @@ page.locator(".result-frame").contentFrame().getByRole(AriaRole.BUTTON).click();
 page.locator(".result-frame").first().contentFrame().getByRole(AriaRole.BUTTON).click();
 ```
 
+**Any frame**
+
+Calling [Page.frameLocator()](/api/class-page.mdx#page-frame-locator) or [Frame.frameLocator()](/api/class-frame.mdx#frame-frame-locator) without a selector creates a frame locator that starts the search in any frame of the subtree - so that you don't need to locate the iframe first.
+
+```java
+// Finds the button in any frame on the page:
+page.frameLocator().getByRole(AriaRole.BUTTON).click();
+
+// Finds the iframe with id "my-frame" anywhere on the page, and clicks the button inside it:
+page.frameLocator().locator("#my-frame").contentFrame().getByRole(AriaRole.BUTTON).click();
+```
+
+Only the start of the search is affected - the rest of the locator is resolved inside a single frame, just like any other locator. Following the strictness rules above, an error is thrown when elements are matched in multiple frames.
+
+Such a frame locator does not point to a particular `iframe`, so [FrameLocator.owner()](/api/class-framelocator.mdx#frame-locator-owner), [FrameLocator.first()](/api/class-framelocator.mdx#frame-locator-first), [FrameLocator.last()](/api/class-framelocator.mdx#frame-locator-last) and [FrameLocator.nth()](/api/class-framelocator.mdx#frame-locator-nth) are not supported on it.
+
 **Converting Locator to FrameLocator**
 
 If you have a [Locator] object pointing to an `iframe` it can be converted to [FrameLocator] using [Locator.contentFrame()](/api/class-locator.mdx#locator-content-frame).
@@ -39,7 +55,7 @@ If you have a [FrameLocator] object it can be converted to [Locator] pointing to
 
 ## Methods
 
-### frameLocator {#frame-locator-frame-locator}
+### frameLocator {/* #frame-locator-frame-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.frameLocator</x-search>
 
@@ -61,7 +77,7 @@ FrameLocator.frameLocator(selector);
 
 ---
 
-### getByAltText {#frame-locator-get-by-alt-text}
+### getByAltText {/* #frame-locator-get-by-alt-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.getByAltText</x-search>
 
@@ -93,7 +109,7 @@ page.getByAltText("Playwright logo").click();
 
 ---
 
-### getByLabel {#frame-locator-get-by-label}
+### getByLabel {/* #frame-locator-get-by-label */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.getByLabel</x-search>
 
@@ -128,7 +144,7 @@ page.getByLabel("Password").fill("secret");
 
 ---
 
-### getByPlaceholder {#frame-locator-get-by-placeholder}
+### getByPlaceholder {/* #frame-locator-get-by-placeholder */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.getByPlaceholder</x-search>
 
@@ -162,7 +178,7 @@ page.getByPlaceholder("name@example.com").fill("playwright@microsoft.com");
 
 ---
 
-### getByRole {#frame-locator-get-by-role}
+### getByRole {/* #frame-locator-get-by-role */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.getByRole</x-search>
 
@@ -181,7 +197,7 @@ Consider the following DOM structure.
 <button>Submit</button>
 ```
 
-You can locate each element by it's implicit role:
+You can locate each element by its implicit role:
 
 ```java
 assertThat(page
@@ -209,6 +225,11 @@ page.getByRole(AriaRole.BUTTON,
     An attribute that is usually set by `aria-checked` or native `<input type=checkbox>` controls.
     
     Learn more about [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
+  - `setDescription` [String] | [Pattern] *(optional)* <font size="2">Added in: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-description"/><a href="#frame-locator-get-by-role-option-description" class="list-anchor">#</a>
+    
+    Option to match the [accessible description](https://w3c.github.io/accname/#dfn-accessible-description). By default, matching is case-insensitive and searches for a substring, use [setExact](/api/class-framelocator.mdx#frame-locator-get-by-role-option-exact) to control this behavior.
+    
+    Learn more about [accessible description](https://w3c.github.io/accname/#dfn-accessible-description).
   - `setDisabled` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-disabled"/><a href="#frame-locator-get-by-role-option-disabled" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-disabled` or `disabled`.
@@ -220,7 +241,7 @@ page.getByRole(AriaRole.BUTTON,
     
   - `setExact` [boolean] *(optional)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-exact"/><a href="#frame-locator-get-by-role-option-exact" class="list-anchor">#</a>
     
-    Whether [setName](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) is matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when [setName](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) is a regular expression. Note that exact match still trims whitespace.
+    Whether [setName](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) and [setDescription](/api/class-framelocator.mdx#frame-locator-get-by-role-option-description) are matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when the value is a regular expression. Note that exact match still trims whitespace.
   - `setExpanded` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-expanded"/><a href="#frame-locator-get-by-role-option-expanded" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-expanded`.
@@ -263,7 +284,7 @@ Many html elements have an implicitly [defined role](https://w3c.github.io/html-
 
 ---
 
-### getByTestId {#frame-locator-get-by-test-id}
+### getByTestId {/* #frame-locator-get-by-test-id */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.getByTestId</x-search>
 
@@ -277,7 +298,7 @@ Consider the following DOM structure.
 <button data-testid="directions">Itinéraire</button>
 ```
 
-You can locate the element by it's test id:
+You can locate the element by its test id:
 
 ```java
 page.getByTestId("directions").click();
@@ -297,7 +318,7 @@ By default, the `data-testid` attribute is used as a test id. Use [Selectors.set
 
 ---
 
-### getByText {#frame-locator-get-by-text}
+### getByText {/* #frame-locator-get-by-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.getByText</x-search>
 
@@ -353,7 +374,7 @@ Input elements of the type `button` and `submit` are matched by their `value` in
 
 ---
 
-### getByTitle {#frame-locator-get-by-title}
+### getByTitle {/* #frame-locator-get-by-title */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.getByTitle</x-search>
 
@@ -387,7 +408,7 @@ assertThat(page.getByTitle("Issues count")).hasText("25 issues");
 
 ---
 
-### locator {#frame-locator-locator}
+### locator {/* #frame-locator-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.locator</x-search>
 
@@ -431,7 +452,7 @@ FrameLocator.locator(selectorOrLocator, options);
 
 ---
 
-### owner {#frame-locator-owner}
+### owner {/* #frame-locator-owner */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.43</font><x-search>frameLocator.owner</x-search>
 
@@ -457,11 +478,11 @@ assertThat(locator).isVisible();
 
 ## Deprecated
 
-### first {#frame-locator-first}
+### first {/* #frame-locator-first */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.first</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 Use [Locator.first()](/api/class-locator.mdx#locator-first) followed by [Locator.contentFrame()](/api/class-locator.mdx#locator-content-frame) instead.
 
@@ -481,11 +502,11 @@ FrameLocator.first();
 
 ---
 
-### last {#frame-locator-last}
+### last {/* #frame-locator-last */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.last</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 Use [Locator.last()](/api/class-locator.mdx#locator-last) followed by [Locator.contentFrame()](/api/class-locator.mdx#locator-content-frame) instead.
 
@@ -505,11 +526,11 @@ FrameLocator.last();
 
 ---
 
-### nth {#frame-locator-nth}
+### nth {/* #frame-locator-nth */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.nth</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 Use [Locator.nth()](/api/class-locator.mdx#locator-nth) followed by [Locator.contentFrame()](/api/class-locator.mdx#locator-content-frame) instead.
 
@@ -541,6 +562,8 @@ FrameLocator.nth(index);
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -562,15 +585,18 @@ FrameLocator.nth(index);
 [RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -583,6 +609,7 @@ FrameLocator.nth(index);
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[BiConsumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html "BiConsumer"
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
@@ -590,6 +617,7 @@ FrameLocator.nth(index);
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[Integer]: https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html "Integer"
 [long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"

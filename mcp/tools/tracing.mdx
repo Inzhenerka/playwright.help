@@ -1,0 +1,93 @@
+---
+title: "Трассировка"
+---
+
+# Трассировка
+
+Записывайте трассировки выполнения, которые фиксируют снимки DOM, скриншоты, сетевую активность и сообщения консоли на каждом шаге. Требуется [возможность](../capabilities.mdx) **devtools**.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--caps=devtools"]
+    }
+  }
+}
+```
+
+## browser_start_tracing
+
+Запускает запись трассировки со включённым сохранением скриншотов и снимков DOM. Не принимает параметров. Трассировки
+записываются в реальном времени в папку `traces/` внутри выходного каталога, поэтому ссылки доступны уже во время записи.
+
+```txt
+→ browser_start_tracing
+
+  Trace recording started
+  - [Action log](traces/trace-1772620500000.trace)
+  - [Network log](traces/trace-1772620500000.network)
+  - [Resources](traces/resources)
+```
+
+## browser_stop_tracing
+
+Останавливает запись трассировки. Не принимает параметров. Завершается с ошибкой, если запись трассировки не была запущена.
+
+```txt
+→ browser_stop_tracing
+
+  Trace recording stopped.
+  - [Trace](traces/trace-1772620500000.trace)
+  - [Network log](traces/trace-1772620500000.network)
+  - [Resources](traces/resources)
+```
+
+Просматривайте трассировки в [Playwright Trace Viewer](/docs/trace-viewer-intro):
+
+```bash
+npx playwright show-trace traces/trace-1772620500000.trace
+```
+
+Средство просмотра трассировок показывает временную шкалу всех действий со снимками DOM (до и после), скриншотами, сетевыми запросами и ответами, сообщениями консоли и данными о времени выполнения.
+
+## Рабочий процесс: отладка ошибки при оформлении заказа
+
+```txt
+Вы: При оформлении заказа возникает ошибка. Запиши трассировку.
+
+→ browser_start_tracing
+→ browser_navigate { url: "https://store.example.com/cart" }
+→ browser_click { target: "e15" }
+→ browser_fill_form { fields: [
+    { name: "Name",    target: "e30", type: "textbox", value: "Alice Smith" },
+    { name: "Address", target: "e32", type: "textbox", value: "123 Main St" },
+    { name: "Zip",     target: "e34", type: "textbox", value: "94102" }
+  ]}
+→ browser_click { target: "e40" }
+
+  - heading "Error" [level=1] [ref=e2]
+  - text: Payment processing failed
+
+→ browser_console_messages { level: "error" }
+  [ERROR] POST /api/payment 422: {"error":"Card number required"}
+
+→ browser_stop_tracing
+  // Поделитесь трассировкой с командой для полного анализа временной шкалы
+```
+
+## Автоматическая запись сеансов
+
+Чтобы автоматически сохранять журнал каждого сеанса, используйте следующую конфигурацию:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--caps=devtools", "--save-session"]
+    }
+  }
+}
+```

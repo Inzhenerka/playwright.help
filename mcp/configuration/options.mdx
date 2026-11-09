@@ -1,0 +1,267 @@
+---
+title: "Конфигурация"
+---
+
+# Конфигурация
+
+Параметры можно задавать тремя способами, в порядке возрастания приоритета: через файл конфигурации, переменные окружения и аргументы командной строки.
+
+## Режимы с графическим интерфейсом и без него
+
+По умолчанию Playwright MCP запускает браузер **с графическим интерфейсом**, чтобы вы могли видеть происходящее. Чтобы запустить браузер без графического интерфейса:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--headless"]
+    }
+  }
+}
+```
+
+## Выбор браузера
+
+```json
+["@playwright/mcp@latest", "--browser=firefox"]
+```
+
+| Значение | Браузер |
+|-------|---------|
+| `chrome` | Google Chrome (по умолчанию) |
+| `firefox` | Mozilla Firefox |
+| `webkit` | WebKit (движок Safari) |
+| `msedge` | Microsoft Edge |
+
+## Эмуляция устройств
+
+```json
+["@playwright/mcp@latest", "--device=iPhone 15"]
+```
+
+`--mobile` эмулирует типовое мобильное устройство — Pixel 10 в Chromium, iPhone 17 в WebKit.
+
+## Размер области просмотра
+
+```json
+["@playwright/mcp@latest", "--viewport-size=1280x720"]
+```
+
+## Прокси
+
+```json
+["@playwright/mcp@latest", "--proxy-server=http://myproxy:3128", "--proxy-bypass=localhost,*.internal.com"]
+```
+
+## Автономный HTTP-сервер
+
+При запуске браузера с графическим интерфейсом в системе без дисплея или из рабочих процессов IDE запустите MCP-сервер отдельно с использованием HTTP-транспорта:
+
+```bash
+npx @playwright/mcp@latest --port 8931
+```
+
+Затем укажите HTTP-конечную точку в настройках MCP-клиента:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "url": "http://localhost:8931/mcp"
+    }
+  }
+}
+```
+
+Используйте `--host 0.0.0.0`, чтобы прослушивать все сетевые интерфейсы (полезно в контейнерах). Используйте `--shared-browser-context`, чтобы несколько подключённых клиентов совместно использовали один контекст браузера.
+
+## Секреты
+
+Значения, которые LLM никогда не должна видеть в ответах инструментов, можно хранить в файле dotenv:
+
+```bash
+npx @playwright/mcp@latest --secrets ./.secrets
+```
+
+Совпадающий с секретами обычный текст в ответах инструментов скрывается, а при вводе заполнителя на странице подставляется реальное значение. Это вспомогательная функция, а не граница безопасности.
+
+## Файл конфигурации
+
+Для расширенных настроек используйте файл конфигурации в формате JSON:
+
+```bash
+npx @playwright/mcp@latest --config path/to/config.json
+```
+
+### Схема
+
+```typescript
+{
+  browser?: {
+    browserName?: 'chromium' | 'firefox' | 'webkit';
+    isolated?: boolean;
+    userDataDir?: string;
+    launchOptions?: playwright.LaunchOptions;
+    contextOptions?: playwright.BrowserContextOptions;
+    cdpEndpoint?: string;
+    cdpHeaders?: Record<string, string>;
+    cdpTimeout?: number;
+    remoteEndpoint?: string | playwright.ConnectOptions & { endpoint: string };
+    initPage?: string[];
+    initScript?: string[];
+  };
+  extension?: boolean;
+  server?: {
+    port?: number;
+    host?: string;
+    allowedHosts?: string[];
+  };
+  capabilities?: ('network' | 'storage' | 'testing' | 'vision' | 'pdf' | 'devtools' | 'config')[];
+  saveSession?: boolean;
+  sharedBrowserContext?: boolean;
+  secrets?: Record<string, string>;
+  outputDir?: string;
+  outputMaxSize?: number;
+  console?: { level?: 'error' | 'warning' | 'info' | 'debug' };
+  network?: {
+    allowedOrigins?: string[];
+    blockedOrigins?: string[];
+  };
+  testIdAttribute?: string;
+  timeouts?: {
+    action?: number;      // по умолчанию: 5000 мс
+    navigation?: number;  // по умолчанию: 60000 мс
+    expect?: number;      // по умолчанию: 5000 мс
+    settle?: number;      // по умолчанию: 500 мс
+  };
+  imageResponses?: 'allow' | 'omit';
+  snapshot?: {
+    mode?: 'full' | 'none';
+    boxes?: boolean;
+  };
+  allowUnrestrictedFileAccess?: boolean;
+  codegen?: 'typescript' | 'python' | 'java' | 'csharp' | 'none';
+}
+```
+
+Актуальная эталонная схема находится в [`config.d.ts`](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/tools/mcp/config.d.ts).
+
+### Скрипты инициализации
+
+Выполняйте код на каждой странице до запуска собственных скриптов страницы:
+
+```json
+{
+  "browser": {
+    "initScript": ["./setup.js"]
+  }
+}
+```
+
+```js
+// setup.js
+window.isPlaywrightMCP = true;
+```
+
+### Инициализация страницы
+
+Выполняйте код Playwright с использованием объекта страницы при запуске:
+
+```json
+{
+  "browser": {
+    "initPage": ["./setup-page.ts"]
+  }
+}
+```
+
+```ts
+// setup-page.ts
+export default async ({ page }) => {
+  await page.context().grantPermissions(['geolocation']);
+  await page.context().setGeolocation({ latitude: 37.7749, longitude: -122.4194 });
+};
+```
+
+## Все параметры командной строки
+
+### Браузер
+
+| Параметр | Описание | Переменная окружения |
+|--------|-------------|--------------|
+| `--browser <browser>` | Браузер или канал Chrome: `chrome`, `firefox`, `webkit`, `msedge` | `PLAYWRIGHT_MCP_BROWSER` |
+| `--headless` | Запуск без графического интерфейса (по умолчанию — с графическим интерфейсом) | `PLAYWRIGHT_MCP_HEADLESS` |
+| `--executable-path <path>` | Путь к исполняемому файлу браузера | `PLAYWRIGHT_MCP_EXECUTABLE_PATH` |
+| `--device <device>` | Устройство для эмуляции, например `"iPhone 15"` | `PLAYWRIGHT_MCP_DEVICE` |
+| `--mobile` | Эмуляция типового мобильного устройства | `PLAYWRIGHT_MCP_MOBILE` |
+| `--viewport-size <size>` | Размер области просмотра в пикселях, например `"1280x720"` | `PLAYWRIGHT_MCP_VIEWPORT_SIZE` |
+| `--user-agent <ua>` | Пользовательская строка User-Agent | `PLAYWRIGHT_MCP_USER_AGENT` |
+| `--ignore-https-errors` | Игнорирование ошибок HTTPS | `PLAYWRIGHT_MCP_IGNORE_HTTPS_ERRORS` |
+| `--proxy-server <url>` | Прокси-сервер, например `http://myproxy:3128` | `PLAYWRIGHT_MCP_PROXY_SERVER` |
+| `--proxy-bypass <hosts>` | Домены, для которых прокси не используется, через запятую | `PLAYWRIGHT_MCP_PROXY_BYPASS` |
+| `--grant-permissions <perms>` | Разрешения, которые нужно предоставить, например `geolocation` | `PLAYWRIGHT_MCP_GRANT_PERMISSIONS` |
+| `--block-service-workers` | Блокировка Service Worker | `PLAYWRIGHT_MCP_BLOCK_SERVICE_WORKERS` |
+| `--sandbox` / `--no-sandbox` | Включение или отключение песочницы браузера | `PLAYWRIGHT_MCP_SANDBOX` |
+| `--init-page <path...>` | Файлы TypeScript, выполняемые с использованием объекта страницы Playwright | `PLAYWRIGHT_MCP_INIT_PAGE` |
+| `--init-script <path...>` | Файлы JavaScript, добавляемые как скрипты инициализации страницы | `PLAYWRIGHT_MCP_INIT_SCRIPT` |
+
+### Профиль и сеанс
+
+| Параметр | Описание | Переменная окружения |
+|--------|-------------|--------------|
+| `--isolated` | Хранение профиля браузера в памяти без сохранения на диск | `PLAYWRIGHT_MCP_ISOLATED` |
+| `--user-data-dir <path>` | Пользовательский каталог профиля | `PLAYWRIGHT_MCP_USER_DATA_DIR` |
+| `--storage-state <path>` | Начальное состояние хранилища для изолированных сеансов | `PLAYWRIGHT_MCP_STORAGE_STATE` |
+| `--extension` | Подключение через расширение Playwright для браузера | `PLAYWRIGHT_MCP_EXTENSION` |
+| `--profile-dir-name <name>` | Каталог профиля браузера для подключения с помощью `--extension`, например `"Profile 1"` | `PLAYWRIGHT_MCP_PROFILE_DIR_NAME` |
+| `--cdp-endpoint <endpoint>` | Конечная точка CDP или имя канала для подключения | `PLAYWRIGHT_MCP_CDP_ENDPOINT` |
+| `--cdp-header <headers...>` | Заголовки запроса на подключение по CDP | `PLAYWRIGHT_MCP_CDP_HEADERS` |
+| `--cdp-timeout <ms>` | Тайм-аут подключения по CDP, по умолчанию 30000 мс | `PLAYWRIGHT_MCP_CDP_TIMEOUT` |
+| `--endpoint <endpoint>` | Конечная точка привязанного браузера для подключения | — |
+| `--save-session` | Сохранение сеанса MCP в выходной каталог | — |
+
+### Сервер
+
+| Параметр | Описание | Переменная окружения |
+|--------|-------------|--------------|
+| `--port <port>` | Порт для прослушивания HTTP-транспорта | `PLAYWRIGHT_MCP_PORT` |
+| `--host <host>` | Хост для привязки сервера, по умолчанию localhost | `PLAYWRIGHT_MCP_HOST` |
+| `--allowed-hosts <hosts...>` | Хосты, через которые сервер может обслуживать запросы; `*` отключает проверку | `PLAYWRIGHT_MCP_ALLOWED_HOSTS` |
+| `--shared-browser-context` | Совместное использование одного контекста браузера HTTP-клиентами | — |
+| `--config <path>` | Путь к файлу конфигурации | `PLAYWRIGHT_MCP_CONFIG` |
+
+### Инструменты и вывод
+
+| Параметр | Описание | Переменная окружения |
+|--------|-------------|--------------|
+| `--caps <caps>` | Возможности, которые нужно включить, через запятую | `PLAYWRIGHT_MCP_CAPS` |
+| `--console-level <level>` | Уровень сообщений консоли: `error`, `warning`, `info`, `debug` | `PLAYWRIGHT_MCP_CONSOLE_LEVEL` |
+| `--codegen <lang>` | Язык генерации кода: `typescript`, `python`, `java`, `csharp`, `none` | `PLAYWRIGHT_MCP_CODEGEN` |
+| `--test-id-attribute <attr>` | Атрибут, используемый для тестовых идентификаторов, по умолчанию `data-testid` | `PLAYWRIGHT_MCP_TEST_ID_ATTRIBUTE` |
+| `--snapshot-mode <mode>` | `full` (по умолчанию) или `none` | — |
+| `--snapshot-boxes` | Включение `[box=x,y,width,height]` в снимки | — |
+| `--image-responses <mode>` | `allow` (по умолчанию) или `omit` | `PLAYWRIGHT_MCP_IMAGE_RESPONSES` |
+| `--output-dir <path>` | Каталог для выходных файлов с автоматически назначаемыми именами | `PLAYWRIGHT_MCP_OUTPUT_DIR` |
+| `--output-max-size <bytes>` | Пороговый размер, при превышении которого удаляются старые выходные файлы | `PLAYWRIGHT_MCP_OUTPUT_MAX_SIZE` |
+| `--secrets <path>` | Файл секретов в формате dotenv | `PLAYWRIGHT_MCP_SECRETS_FILE` |
+
+### Тайм-ауты
+
+| Параметр | Описание | Переменная окружения |
+|--------|-------------|--------------|
+| `--timeout-action <ms>` | Тайм-аут действия, по умолчанию 5000 мс | `PLAYWRIGHT_MCP_TIMEOUT_ACTION` |
+| `--timeout-navigation <ms>` | Тайм-аут навигации, по умолчанию 60000 мс | `PLAYWRIGHT_MCP_TIMEOUT_NAVIGATION` |
+| `--timeout-settle <ms>` | Время ожидания завершения запущенных процессов после каждого действия, по умолчанию 500 мс | `PLAYWRIGHT_MCP_TIMEOUT_SETTLE` |
+
+### Управление доступом
+
+| Параметр | Описание | Переменная окружения |
+|--------|-------------|--------------|
+| `--allowed-origins <origins>` | Источники (origins), к которым браузер может отправлять запросы, через точку с запятой | `PLAYWRIGHT_MCP_ALLOWED_ORIGINS` |
+| `--blocked-origins <origins>` | Источники (origins), которые нужно блокировать, через точку с запятой; проверяются в первую очередь | `PLAYWRIGHT_MCP_BLOCKED_ORIGINS` |
+| `--allow-unrestricted-file-access` | Разрешение доступа к файлам вне корневых каталогов рабочей области и навигации по `file://` | `PLAYWRIGHT_MCP_ALLOW_UNRESTRICTED_FILE_ACCESS` |
+
+:::note
+Списки источников и ограничение доступа к файлам — это вспомогательные меры защиты от непреднамеренного доступа, а не граница безопасности: они не действуют на перенаправления, и их можно намеренно обойти. Для реальной изоляции используйте разрешения на уровне клиента.
+:::

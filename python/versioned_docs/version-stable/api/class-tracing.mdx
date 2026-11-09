@@ -55,7 +55,7 @@ await context.tracing.stop(path = "trace.zip")
 
 ## Методы {#methods}
 
-### group {#tracing-group}
+### group {/* #tracing-group */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.49</font><x-search>tracing.group</x-search>
 
@@ -119,11 +119,11 @@ await page.context.tracing.group_end()
   Указывает пользовательское расположение для группы, которое будет показано в просмотрщике трассировок. По умолчанию используется расположение вызова [tracing.group()](/api/class-tracing.mdx#tracing-group).
 
 **Возвращает**
-- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-group-return"/><a href="#tracing-group-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-group-return"/><a href="#tracing-group-return" class="list-anchor">#</a>
 
 ---
 
-### group_end {#tracing-group-end}
+### group_end {/* #tracing-group-end */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.49</font><x-search>tracing.group_end</x-search>
 
@@ -140,11 +140,11 @@ tracing.group_end()
 
 ---
 
-### start {#tracing-start}
+### start {/* #tracing-start */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>tracing.start</x-search>
 
-Начать трассировку.
+Запускает трассировку. Освобождение возвращённого объекта [Disposable] останавливает трассировку без сохранения результатов, аналогично вызову [tracing.stop()](/api/class-tracing.mdx#tracing-stop) без указания пути.
 
 :::note
 
@@ -186,18 +186,25 @@ await context.tracing.stop(path = "trace.zip")
 </Tabs>
 
 **Аргументы**
-- `name` [str] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-name"/><a href="#tracing-start-option-name" class="list-anchor">#</a>
+- `aria_snapshots` [bool] *(необязательный)* <font size="2">Добавлено в: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-aria-snapshots"/><a href="#tracing-start-option-aria-snapshots" class="list-anchor">#</a>
+  
+  Определяет, следует ли сохранять ARIA-снимок страницы при каждом действии.
+- `live` [bool] *(необязательный)* <font size="2">Добавлено в: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-live"/><a href="#tracing-start-option-live" class="list-anchor">#</a>
+  
+  Если этот параметр включён, трассировка записывается в неархивированный файл, который обновляется в реальном времени по мере выполнения действий, вместо кеширования изменений и их упаковки в zip-архив по завершении. Это удобно для просмотра трассировки в реальном времени во время выполнения теста.
+- `name` [str] *(необязательный)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-name"/><a href="#tracing-start-option-name" class="list-anchor">#</a>
   
   Если указано, промежуточные файлы трассировки будут сохранены в файлы с данным префиксом имени внутри директории [traces_dir](/api/class-browsertype.mdx#browser-type-launch-option-traces-dir), указанной в [browser_type.launch()](/api/class-browsertype.mdx#browser-type-launch). Чтобы указать имя конечного zip-файла трассировки, необходимо передать опцию `path` в [tracing.stop()](/api/class-tracing.mdx#tracing-stop).
 - `screenshots` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-screenshots"/><a href="#tracing-start-option-screenshots" class="list-anchor">#</a>
   
-  Нужно ли захватывать скриншоты во время трассировки. Скриншоты используются для создания предварительного просмотра временной шкалы.
-- `snapshots` [bool] *(опционально)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-snapshots"/><a href="#tracing-start-option-snapshots" class="list-anchor">#</a>
+Следует ли делать скриншоты во время трассировки. Скриншоты используются для создания предварительного просмотра на временной шкале.
+- `screen_snapshots` [bool] *(необязательно)* <font size="2">Добавлено в: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-screen-snapshots"/><a href="#tracing-start-option-screen-snapshots" class="list-anchor">#</a>
   
-  Если эта опция включена, трассировка будет
-  * захватывать снимок DOM при каждом действии
-  * записывать сетевую активность
-- `sources` [bool] *(опционально)* <font size="2">Добавлено в: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-sources"/><a href="#tracing-start-option-sources" class="list-anchor">#</a>
+  Следует ли делать скриншот страницы при каждом действии.
+- `snapshots` [bool] *(необязательно)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-snapshots"/><a href="#tracing-start-option-snapshots" class="list-anchor">#</a>
+  
+  Следует ли сохранять снимок DOM и записывать сетевую активность при каждом действии.
+- `sources` [bool] *(необязательно)* <font size="2">Добавлено в: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-sources"/><a href="#tracing-start-option-sources" class="list-anchor">#</a>
   
   Включать ли исходные файлы для действий трассировки.
 - `title` [str] *(опционально)* <font size="2">Добавлено в: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-title"/><a href="#tracing-start-option-title" class="list-anchor">#</a>
@@ -205,15 +212,15 @@ await context.tracing.stop(path = "trace.zip")
   Имя трассировки, отображаемое в Trace Viewer.
 
 **Возвращает**
-- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-return"/><a href="#tracing-start-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-return"/><a href="#tracing-start-return" class="list-anchor">#</a>
 
 ---
 
-### start_chunk {#tracing-start-chunk}
+### start_chunk {/* #tracing-start-chunk */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.15</font><x-search>tracing.start_chunk</x-search>
 
-Начать новый фрагмент трассировки. Если вы хотите записать несколько трассировок в одном [BrowserContext], используйте [tracing.start()](/api/class-tracing.mdx#tracing-start) один раз, а затем создайте несколько фрагментов трассировки с помощью [tracing.start_chunk()](/api/class-tracing.mdx#tracing-start-chunk) и [tracing.stop_chunk()](/api/class-tracing.mdx#tracing-stop-chunk).
+Начинает новый фрагмент трассировки. Освобождение возвращённого объекта [Disposable] останавливает фрагмент без его сохранения, аналогично вызову [tracing.stop_chunk()](/api/class-tracing.mdx#tracing-stop-chunk) без указания пути. Если вы хотите записать несколько трассировок в одном и том же [BrowserContext], вызовите [tracing.start()](/api/class-tracing.mdx#tracing-start) один раз, а затем создавайте отдельные фрагменты трассировки с помощью [tracing.start_chunk()](/api/class-tracing.mdx#tracing-start-chunk) и [tracing.stop_chunk()](/api/class-tracing.mdx#tracing-stop-chunk).
 
 **Использование**
 
@@ -274,11 +281,70 @@ await context.tracing.stop_chunk(path = "trace2.zip")
   Имя трассировки, отображаемое в Trace Viewer.
 
 **Возвращает**
-- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-chunk-return"/><a href="#tracing-start-chunk-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-chunk-return"/><a href="#tracing-start-chunk-return" class="list-anchor">#</a>
 
 ---
 
-### stop {#tracing-stop}
+### start_har {/* #tracing-start-har */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.60</font><x-search>tracing.start_har</x-search>
+
+Начинает запись сетевой активности в этом контексте в формате HAR (HTTP Archive). Файл HAR записывается на диск при вызове [tracing.stop_har()](/api/class-tracing.mdx#tracing-stop-har) или при освобождении возвращённого объекта [Disposable].
+
+Для каждого экземпляра [Tracing] одновременно может быть активна только одна запись HAR.
+
+**Usage**
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+context.tracing.start_har("trace.har")
+page = context.new_page()
+page.goto("https://playwright.dev")
+context.tracing.stop_har()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await context.tracing.start_har("trace.har")
+page = await context.new_page()
+await page.goto("https://playwright.dev")
+await context.tracing.stop_har()
+```
+
+</TabItem>
+</Tabs>
+
+**Arguments**
+- `path` [Union]\[[str], [pathlib.Path]\]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-path"/><a href="#tracing-start-har-option-path" class="list-anchor">#</a>
+  
+  Путь в файловой системе для записи файла HAR. Если имя файла заканчивается на `.zip`, HAR сохраняется как zip-архив с телами ответов в отдельных файлах.
+- `content` "omit" | "embed" | "attach" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-content"/><a href="#tracing-start-har-option-content" class="list-anchor">#</a>
+  
+  Необязательная настройка для управления содержимым ресурсов. Если указано `omit`, содержимое не сохраняется. Если указано `attach`, ресурсы сохраняются как отдельные файлы или записи в ZIP-архиве. Если указано `embed`, содержимое сохраняется непосредственно в файле HAR в соответствии со спецификацией HAR. По умолчанию используется `attach` для выходных файлов `.zip` и `embed` для всех остальных расширений файлов.
+- `mode` "full" | "minimal" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-mode"/><a href="#tracing-start-har-option-mode" class="list-anchor">#</a>
+  
+  Если задано значение `minimal`, записывается только информация, необходимая для маршрутизации из HAR. При этом не записываются размеры, временные характеристики, сведения о странице, файлы cookie, сведения о безопасности и другие типы информации HAR, которые не используются при воспроизведении из HAR. По умолчанию используется `full`.
+- `url_filter` [str] | [Pattern] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-url-filter"/><a href="#tracing-start-har-option-url-filter" class="list-anchor">#</a>
+  
+  Шаблон glob или регулярное выражение для фильтрации запросов, сохраняемых в HAR. По умолчанию фильтрация отсутствует.
+
+**Returns**
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-return"/><a href="#tracing-start-har-return" class="list-anchor">#</a>
+
+---
+
+### stop {/* #tracing-stop */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.12</font><x-search>tracing.stop</x-search>
 
@@ -301,7 +367,7 @@ tracing.stop(**kwargs)
 
 ---
 
-### stop_chunk {#tracing-stop-chunk}
+### stop_chunk {/* #tracing-stop-chunk */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.15</font><x-search>tracing.stop_chunk</x-search>
 
@@ -322,6 +388,22 @@ tracing.stop_chunk(**kwargs)
 **Возвращает**
 - [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-stop-chunk-return"/><a href="#tracing-stop-chunk-return" class="list-anchor">#</a>
 
+---
+
+### stop_har {/* #tracing-stop-har */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Добавлено в: v1.60</font><x-search>tracing.stop_har</x-search>
+
+Останавливает запись HAR и сохраняет HAR-файл по пути, указанному в [tracing.start_har()](/api/class-tracing.mdx#tracing-start-har).
+
+**Использование**
+
+```python
+tracing.stop_har()
+```
+
+**Возвращает**
+- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-stop-har-return"/><a href="#tracing-stop-har-return" class="list-anchor">#</a>
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -332,11 +414,15 @@ tracing.stop_chunk(**kwargs)
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [Error]: /api/class-error.mdx "Error"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
@@ -350,14 +436,17 @@ tracing.stop_chunk(**kwargs)
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

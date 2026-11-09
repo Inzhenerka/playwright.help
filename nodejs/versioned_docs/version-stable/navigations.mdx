@@ -26,7 +26,11 @@ await page.goto('https://example.com');
 Если страница выполняет перенаправление на стороне клиента до `load`, [page.goto()](/api/class-page.mdx#page-goto) будет ожидать, пока перенаправленная страница не вызовет событие `load`.
 :::
 
-## Когда страница загружена? {#when-is-the-page-loaded}
+:::note
+В Firefox навигация, инициированная самой страницей, может прервать [page.goto()](/api/class-page.mdx#page-goto) с ошибкой `NS_BINDING_ABORTED`. Это [известное ограничение Firefox](https://github.com/microsoft/playwright/issues/20749).
+:::
+
+## Когда страница считается загруженной?
 
 Современные страницы выполняют множество действий после того, как событие `load` было вызвано. Они загружают данные лениво, заполняют интерфейс, загружают ресурсы, скрипты и стили после того, как событие `load` было вызвано. Нет способа определить, что страница `загружена`, это зависит от страницы, фреймворка и т.д. Так когда же можно начинать взаимодействовать с ней?
 
@@ -45,7 +49,7 @@ Playwright работает как очень быстрый пользоват�
 
 ## Гидратация {#hydration}
 
-В какой-то момент вы столкнетесь с ситуацией, когда Playwright выполняет действие, но ничего, казалось бы, не происходит. Или вы вводите текст в поле ввода, и он исчезает. Наиболее вероятная причина этого - плохая [гидратация](https://en.wikipedia.org/wiki/Hydration_(web_development)) страницы.
+В какой-то момент вы столкнётесь с ситуацией, когда Playwright выполняет действие, но, по всей видимости, ничего не происходит. Или вы вводите текст в поле ввода, а затем он исчезает. Наиболее вероятная причина такого поведения — некорректная [гидратация](https://en.wikipedia.org/wiki/Hydration_%28web_development%29) страницы.
 
 Когда страница гидратируется, сначала статическая версия страницы отправляется в браузер. Затем отправляется динамическая часть, и страница становится "живой". Как очень быстрый пользователь, Playwright начнет взаимодействовать со страницей в момент, когда он ее увидит. И если кнопка на странице включена, но слушатели еще не добавлены, Playwright выполнит свою работу, но клик не будет иметь никакого эффекта.
 
@@ -60,7 +64,17 @@ await page.getByText('Click me').click();
 await page.waitForURL('**/login');
 ```
 
-## События навигации {#navigation-events}
+## Кеш переходов назад и вперёд (BFCache)
+
+Современные браузеры используют кеш переходов назад и вперёд (Back/Forward Cache, BFCache), чтобы мгновенно загружать страницу, когда пользователь переходит назад или вперёд. Для этого браузер замораживает DOM страницы и кучу JavaScript в памяти, а при возвращении на страницу размораживает их.
+
+По умолчанию Playwright отключает BFCache во всех браузерах, чтобы обеспечить согласованную и чистую среду тестирования. 
+
+Даже если вы явно включите BFCache, **тестирование восстановления страниц из BFCache не поддерживается**. Поскольку при восстановлении из BFCache этап загрузки по сети пропускается, браузер не генерирует стандартные события жизненного цикла навигации (такие как `commit`, `domcontentloaded` или `load`). Внутреннее состояние `Page` в Playwright в значительной степени зависит от этих событий сетевого уровня для поддержания синхронизации. 
+
+В результате восстановление страницы из BFCache (например, с помощью `page.goBack()`) обходит механизм отслеживания жизненного цикла Playwright, что приводит к превышению времени ожидания и полной рассинхронизации объекта `Page`, из-за которой последующие взаимодействия завершаются ошибками.
+
+## События навигации
 
 Playwright разделяет процесс отображения нового документа на странице на **навигацию** и **загрузку**.
 
@@ -76,11 +90,6 @@ Playwright разделяет процесс отображения нового
 - вызывается событие [page.on('load')](/api/class-page.mdx#page-event-load)
 - страница выполняет динамически загруженные скрипты
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -93,10 +102,11 @@ Playwright разделяет процесс отображения нового
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -115,6 +125,7 @@ Playwright разделяет процесс отображения нового
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
@@ -122,9 +133,18 @@ Playwright разделяет процесс отображения нового
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
@@ -142,6 +162,7 @@ Playwright разделяет процесс отображения нового
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -154,6 +175,7 @@ Playwright разделяет процесс отображения нового
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal "AbortSignal"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
@@ -175,6 +197,7 @@ Playwright разделяет процесс отображения нового
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
+[URLPattern]: https://developer.mozilla.org/en-US/docs/Web/API/URLPattern "URLPattern"
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams "URLSearchParams"
 
 [все доступные теги образов]: https://mcr.microsoft.com/en-us/product/playwright/about "все доступные теги образов"

@@ -35,7 +35,7 @@ context.tracing().stop(new Tracing.StopOptions()
 
 ## Methods
 
-### group {#tracing-group}
+### group {/* #tracing-group */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.49</font><x-search>tracing.group</x-search>
 
@@ -75,11 +75,11 @@ page.context().tracing().groupEnd();
     Specifies a custom location for the group to be shown in the trace viewer. Defaults to the location of the [Tracing.group()](/api/class-tracing.mdx#tracing-group) call.
 
 **Returns**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-group-return"/><a href="#tracing-group-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-group-return"/><a href="#tracing-group-return" class="list-anchor">#</a>
 
 ---
 
-### groupEnd {#tracing-group-end}
+### groupEnd {/* #tracing-group-end */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.49</font><x-search>tracing.groupEnd</x-search>
 
@@ -96,11 +96,11 @@ Tracing.groupEnd();
 
 ---
 
-### start {#tracing-start}
+### start {/* #tracing-start */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>tracing.start</x-search>
 
-Start tracing.
+Start tracing. Disposing the returned [Disposable] stops tracing without saving the trace, similarly to calling [Tracing.stop()](/api/class-tracing.mdx#tracing-stop) without a path.
 
 :::note
 
@@ -123,17 +123,24 @@ context.tracing().stop(new Tracing.StopOptions()
 
 **Arguments**
 - `options` `Tracing.StartOptions` *(optional)*
+  - `setAriaSnapshots` [boolean] *(optional)* <font size="2">Added in: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-aria-snapshots"/><a href="#tracing-start-option-aria-snapshots" class="list-anchor">#</a>
+    
+    Whether to capture aria snapshot of the page on every action.
+  - `setLive` [boolean] *(optional)* <font size="2">Added in: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-live"/><a href="#tracing-start-option-live" class="list-anchor">#</a>
+    
+    When enabled, the trace is written to an unarchived file that is updated in real time as actions occur, instead of caching changes and archiving them into a zip file at the end. This is useful for live trace viewing during test execution.
   - `setName` [String] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-name"/><a href="#tracing-start-option-name" class="list-anchor">#</a>
     
     If specified, intermediate trace files are going to be saved into the files with the given name prefix inside the [setTracesDir](/api/class-browsertype.mdx#browser-type-launch-option-traces-dir) directory specified in [BrowserType.launch()](/api/class-browsertype.mdx#browser-type-launch). To specify the final trace zip file name, you need to pass `path` option to [Tracing.stop()](/api/class-tracing.mdx#tracing-stop) instead.
   - `setScreenshots` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-screenshots"/><a href="#tracing-start-option-screenshots" class="list-anchor">#</a>
     
     Whether to capture screenshots during tracing. Screenshots are used to build a timeline preview.
+  - `setScreenSnapshots` [boolean] *(optional)* <font size="2">Added in: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-screen-snapshots"/><a href="#tracing-start-option-screen-snapshots" class="list-anchor">#</a>
+    
+    Whether to capture a screenshot of the page on every action.
   - `setSnapshots` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-snapshots"/><a href="#tracing-start-option-snapshots" class="list-anchor">#</a>
     
-    If this option is true tracing will
-    * capture DOM snapshot on every action
-    * record network activity
+    Whether to capture DOM snapshot and record network activity on every action.
   - `setSources` [boolean] *(optional)* <font size="2">Added in: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-sources"/><a href="#tracing-start-option-sources" class="list-anchor">#</a>
     
     Whether to include source files for trace actions. List of the directories with source code for the application must be provided via `PLAYWRIGHT_JAVA_SRC` environment variable (the paths should be separated by ';' on Windows and by ':' on other platforms).
@@ -142,15 +149,15 @@ context.tracing().stop(new Tracing.StopOptions()
     Trace name to be shown in the Trace Viewer.
 
 **Returns**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-return"/><a href="#tracing-start-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-return"/><a href="#tracing-start-return" class="list-anchor">#</a>
 
 ---
 
-### startChunk {#tracing-start-chunk}
+### startChunk {/* #tracing-start-chunk */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>tracing.startChunk</x-search>
 
-Start a new trace chunk. If you'd like to record multiple traces on the same [BrowserContext], use [Tracing.start()](/api/class-tracing.mdx#tracing-start) once, and then create multiple trace chunks with [Tracing.startChunk()](/api/class-tracing.mdx#tracing-start-chunk) and [Tracing.stopChunk()](/api/class-tracing.mdx#tracing-stop-chunk).
+Start a new trace chunk. Disposing the returned [Disposable] stops the chunk without saving it, similarly to calling [Tracing.stopChunk()](/api/class-tracing.mdx#tracing-stop-chunk) without a path. If you'd like to record multiple traces on the same [BrowserContext], use [Tracing.start()](/api/class-tracing.mdx#tracing-start) once, and then create multiple trace chunks with [Tracing.startChunk()](/api/class-tracing.mdx#tracing-start-chunk) and [Tracing.stopChunk()](/api/class-tracing.mdx#tracing-stop-chunk).
 
 **Usage**
 
@@ -184,11 +191,48 @@ context.tracing().stopChunk(new Tracing.StopChunkOptions()
     Trace name to be shown in the Trace Viewer.
 
 **Returns**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-chunk-return"/><a href="#tracing-start-chunk-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-chunk-return"/><a href="#tracing-start-chunk-return" class="list-anchor">#</a>
 
 ---
 
-### stop {#tracing-stop}
+### startHar {/* #tracing-start-har */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>tracing.startHar</x-search>
+
+Start recording a HAR (HTTP Archive) of network activity in this context. The HAR file is written to disk when [Tracing.stopHar()](/api/class-tracing.mdx#tracing-stop-har) is called, or when the returned [Disposable] is disposed.
+
+Only one HAR recording can be active at a time per [Tracing] instance.
+
+**Usage**
+
+```java
+context.tracing().startHar(Paths.get("trace.har"));
+Page page = context.newPage();
+page.navigate("https://playwright.dev");
+context.tracing().stopHar();
+```
+
+**Arguments**
+- `path` [Path]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-path"/><a href="#tracing-start-har-option-path" class="list-anchor">#</a>
+  
+  Path on the filesystem to write the HAR file to. If the file name ends with `.zip`, the HAR is saved as a zip archive with response bodies attached as separate files.
+- `options` `Tracing.StartHarOptions` *(optional)*
+  - `setContent` `enum HarContentPolicy { OMIT, EMBED, ATTACH }` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-content"/><a href="#tracing-start-har-option-content" class="list-anchor">#</a>
+    
+    Optional setting to control resource content management. If `omit` is specified, content is not persisted. If `attach` is specified, resources are persisted as separate files or entries in the ZIP archive. If `embed` is specified, content is stored inline the HAR file as per HAR specification. Defaults to `attach` for `.zip` output files and to `embed` for all other file extensions.
+  - `setMode` `enum HarMode { FULL, MINIMAL }` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-mode"/><a href="#tracing-start-har-option-mode" class="list-anchor">#</a>
+    
+    When set to `minimal`, only record information necessary for routing from HAR. This omits sizes, timing, page, cookies, security and other types of HAR information that are not used when replaying from HAR. Defaults to `full`.
+  - `setUrlFilter` [String] | [Pattern] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-url-filter"/><a href="#tracing-start-har-option-url-filter" class="list-anchor">#</a>
+    
+    A glob or regex pattern to filter requests that are stored in the HAR. Defaults to none.
+
+**Returns**
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-return"/><a href="#tracing-start-har-return" class="list-anchor">#</a>
+
+---
+
+### stop {/* #tracing-stop */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>tracing.stop</x-search>
 
@@ -212,7 +256,7 @@ Tracing.stop(options);
 
 ---
 
-### stopChunk {#tracing-stop-chunk}
+### stopChunk {/* #tracing-stop-chunk */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>tracing.stopChunk</x-search>
 
@@ -234,6 +278,23 @@ Tracing.stopChunk(options);
 **Returns**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-stop-chunk-return"/><a href="#tracing-stop-chunk-return" class="list-anchor">#</a>
 
+---
+
+### stopHar {/* #tracing-stop-har */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>tracing.stopHar</x-search>
+
+Stop HAR recording and save the HAR file to the path given to [Tracing.startHar()](/api/class-tracing.mdx#tracing-start-har).
+
+**Usage**
+
+```java
+Tracing.stopHar();
+```
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-stop-har-return"/><a href="#tracing-stop-har-return" class="list-anchor">#</a>
+
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
@@ -245,6 +306,8 @@ Tracing.stopChunk(options);
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -266,15 +329,18 @@ Tracing.stopChunk(options);
 [RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -287,6 +353,7 @@ Tracing.stopChunk(options);
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[BiConsumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html "BiConsumer"
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
@@ -294,6 +361,7 @@ Tracing.stopChunk(options);
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[Integer]: https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html "Integer"
 [long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"

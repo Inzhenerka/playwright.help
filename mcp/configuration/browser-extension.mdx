@@ -1,0 +1,104 @@
+---
+title: "Подключение к браузерам"
+---
+
+# Подключение к браузерам
+
+Вместо запуска нового браузера подключитесь к уже работающему экземпляру.
+
+## Подключение по имени канала
+
+Подключитесь к работающему Chrome или Edge по имени его канала. Перейдите на страницу `chrome://inspect/#remote-debugging` в целевом браузере и включите параметр "Allow remote debugging for this browser instance" («Разрешить удалённую отладку для этого экземпляра браузера»).
+
+<img src="/img/mcp/chrome-remote-debugging.png" width="752" height="426" alt="Настройки удалённой отладки Chrome на странице chrome://inspect/#remote-debugging" />
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--cdp-endpoint=chrome"]
+    }
+  }
+}
+```
+
+Поддерживаемые каналы: `chrome`, `chrome-beta`, `chrome-dev`, `chrome-canary`, `msedge`, `msedge-beta`, `msedge-dev`, `msedge-canary`.
+
+Это самый простой способ подключения — не нужно запускать Chrome со специальными флагами или знать порт отладки.
+
+## Подключение через конечную точку CDP
+
+Подключитесь к любому браузеру на базе Chromium с конечной точкой Chrome DevTools Protocol:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--cdp-endpoint=http://localhost:9222"]
+    }
+  }
+}
+```
+
+Или укажите её в [файле конфигурации](./options.mdx):
+
+```json
+{
+  "browser": {
+    "cdpEndpoint": "http://localhost:9222"
+  }
+}
+```
+
+Этот способ работает с Chrome/Chromium, запущенным с флагом `--remote-debugging-port`, а также с Edge, приложениями Electron и облачными браузерными сервисами.
+
+## Подключение к серверу Playwright
+
+Чтобы подключиться к браузеру, уже работающему под управлением сервера Playwright, используйте `--endpoint`:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--endpoint=ws://localhost:3000/"]
+    }
+  }
+}
+```
+
+В [файле конфигурации](./options.mdx) для этого используется параметр `browser.remoteEndpoint`.
+
+## Подключение через расширение браузера
+
+[Расширение Playwright](https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadbfplnigmagldckm) подключается к уже открытым вкладкам браузера, используя ваши текущие сеансы авторизации, файлы cookie и установленные расширения.
+
+<img src="/img/mcp/playwright-extension.png" width="662" height="427" alt="Расширение Playwright в Интернет-магазине Chrome" />
+
+1. Установите расширение в Chrome или Edge
+2. Настройте сервер MCP:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--extension"]
+    }
+  }
+}
+```
+
+По умолчанию расширение подключается к последнему использованному профилю браузера, в котором оно установлено. Чтобы выбрать конкретный профиль, используйте `--profile-dir-name`:
+
+```json
+["@playwright/mcp@latest", "--extension", "--profile-dir-name=Profile 1"]
+```
+
+### Когда использовать режим расширения
+
+- **SSO / 2FA** — пропускайте сложные процедуры входа, используя уже авторизованный сеанс
+- **Расширения браузера** — взаимодействуйте со страницами, работа которых зависит от установленных расширений
+- **Открытые вкладки** — автоматизируйте работу со страницами, которые у вас уже открыты

@@ -43,10 +43,9 @@ on:
     branches: [ main, master ]
 jobs:
   test:
-    timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - uses: actions/setup-java@v5
       with:
         distribution: 'temurin'
@@ -75,10 +74,10 @@ jobs:
     name: 'Playwright Tests'
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright/java:v1.56.0-noble
+      image: mcr.microsoft.com/playwright/java:v1.64.0-noble
       options: --user 1001
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
@@ -99,11 +98,10 @@ on:
   deployment_status:
 jobs:
   test:
-    timeout-minutes: 60
     runs-on: ubuntu-latest
     if: github.event.deployment_status.state == 'success'
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - uses: actions/setup-java@v5
       with:
         distribution: 'temurin'
@@ -160,7 +158,7 @@ trigger:
 
 pool:
   vmImage: ubuntu-latest
-container: mcr.microsoft.com/playwright/java:v1.56.0-noble
+container: mcr.microsoft.com/playwright/java:v1.64.0-noble
 
 steps:
 - task: JavaToolInstaller@1
@@ -183,7 +181,7 @@ steps:
 executors:
   pw-noble-development:
     docker:
-      - image: mcr.microsoft.com/playwright/java:v1.56.0-noble
+      - image: mcr.microsoft.com/playwright/java:v1.64.0-noble
 ```
 
 Примечание: При использовании определения агента docker вы указываете класс ресурсов, где Playwright запускается на уровне 'medium' [здесь](https://circleci.com/docs/configuration-reference?#docker-execution-environment). Поведение Playwright по умолчанию - устанавливать количество рабочих процессов в соответствии с обнаруженным количеством ядер (2 в случае уровня medium). Переопределение количества рабочих процессов на большее значение приведет к ненужным тайм-аутам и сбоям.
@@ -194,7 +192,7 @@ Jenkins поддерживает Docker-агенты для конвейеров
 
 ```groovy
 pipeline {
-   agent { docker { image 'mcr.microsoft.com/playwright/java:v1.56.0-noble' } }
+   agent { docker { image 'mcr.microsoft.com/playwright/java:v1.64.0-noble' } }
    stages {
       stage('e2e-tests') {
          steps {
@@ -211,7 +209,7 @@ pipeline {
 Bitbucket Pipelines может использовать публичные [Docker-образы как среды сборки](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). Чтобы запустить тесты Playwright на Bitbucket, используйте наш публичный Docker-образ ([см. Dockerfile](./docker.mdx)).
 
 ```yml
-image: mcr.microsoft.com/playwright/java:v1.56.0-noble
+image: mcr.microsoft.com/playwright/java:v1.64.0-noble
 ```
 
 ### GitLab CI {#gitlab-ci}
@@ -224,7 +222,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright/java:v1.56.0-noble
+  image: mcr.microsoft.com/playwright/java:v1.64.0-noble
   script:
   ...
 ```
@@ -264,6 +262,8 @@ xvfb-run mvn test
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -285,15 +285,18 @@ xvfb-run mvn test
 [RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -306,6 +309,7 @@ xvfb-run mvn test
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[BiConsumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html "BiConsumer"
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
@@ -313,6 +317,7 @@ xvfb-run mvn test
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[Integer]: https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html "Integer"
 [long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"

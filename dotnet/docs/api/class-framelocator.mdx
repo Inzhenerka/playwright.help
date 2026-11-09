@@ -26,6 +26,22 @@ await page.Locator(".result-frame").ContentFrame.GetByRole(AriaRole.Button).Clic
 await page.Locator(".result-frame").First.ContentFrame.getByRole(AriaRole.Button).ClickAsync();
 ```
 
+**Any frame**
+
+Calling [Page.FrameLocator()](/api/class-page.mdx#page-frame-locator) or [Frame.FrameLocator()](/api/class-frame.mdx#frame-frame-locator) without a selector creates a frame locator that starts the search in any frame of the subtree - so that you don't need to locate the iframe first.
+
+```csharp
+// Finds the button in any frame on the page:
+await page.FrameLocator().GetByRole(AriaRole.Button).ClickAsync();
+
+// Finds the iframe with id "my-frame" anywhere on the page, and clicks the button inside it:
+await page.FrameLocator().Locator("#my-frame").ContentFrame.GetByRole(AriaRole.Button).ClickAsync();
+```
+
+Only the start of the search is affected - the rest of the locator is resolved inside a single frame, just like any other locator. Following the strictness rules above, an error is thrown when elements are matched in multiple frames.
+
+Such a frame locator does not point to a particular `iframe`, so [FrameLocator.Owner](/api/class-framelocator.mdx#frame-locator-owner), [FrameLocator.First](/api/class-framelocator.mdx#frame-locator-first), [FrameLocator.Last](/api/class-framelocator.mdx#frame-locator-last) and [FrameLocator.Nth()](/api/class-framelocator.mdx#frame-locator-nth) are not supported on it.
+
 **Converting Locator to FrameLocator**
 
 If you have a [Locator] object pointing to an `iframe` it can be converted to [FrameLocator] using [Locator.ContentFrame](/api/class-locator.mdx#locator-content-frame).
@@ -39,7 +55,7 @@ If you have a [FrameLocator] object it can be converted to [Locator] pointing to
 
 ## Methods
 
-### FrameLocator {#frame-locator-frame-locator}
+### FrameLocator {/* #frame-locator-frame-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.FrameLocator</x-search>
 
@@ -61,7 +77,7 @@ FrameLocator.FrameLocator(selector);
 
 ---
 
-### GetByAltText {#frame-locator-get-by-alt-text}
+### GetByAltText {/* #frame-locator-get-by-alt-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.GetByAltText</x-search>
 
@@ -93,7 +109,7 @@ await page.GetByAltText("Playwright logo").ClickAsync();
 
 ---
 
-### GetByLabel {#frame-locator-get-by-label}
+### GetByLabel {/* #frame-locator-get-by-label */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.GetByLabel</x-search>
 
@@ -128,7 +144,7 @@ await page.GetByLabel("Password").FillAsync("secret");
 
 ---
 
-### GetByPlaceholder {#frame-locator-get-by-placeholder}
+### GetByPlaceholder {/* #frame-locator-get-by-placeholder */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.GetByPlaceholder</x-search>
 
@@ -164,7 +180,7 @@ await page
 
 ---
 
-### GetByRole {#frame-locator-get-by-role}
+### GetByRole {/* #frame-locator-get-by-role */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.GetByRole</x-search>
 
@@ -183,7 +199,7 @@ Consider the following DOM structure.
 <button>Submit</button>
 ```
 
-You can locate each element by it's implicit role:
+You can locate each element by its implicit role:
 
 ```csharp
 await Expect(Page
@@ -211,6 +227,11 @@ await page
     An attribute that is usually set by `aria-checked` or native `<input type=checkbox>` controls.
     
     Learn more about [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
+  - `Description|DescriptionRegex` [string]? | [Regex]? *(optional)* <font size="2">Added in: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-description"/><a href="#frame-locator-get-by-role-option-description" class="list-anchor">#</a>
+    
+    Option to match the [accessible description](https://w3c.github.io/accname/#dfn-accessible-description). By default, matching is case-insensitive and searches for a substring, use [Exact](/api/class-framelocator.mdx#frame-locator-get-by-role-option-exact) to control this behavior.
+    
+    Learn more about [accessible description](https://w3c.github.io/accname/#dfn-accessible-description).
   - `Disabled` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-disabled"/><a href="#frame-locator-get-by-role-option-disabled" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-disabled` or `disabled`.
@@ -222,7 +243,7 @@ await page
     
   - `Exact` [bool]? *(optional)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-exact"/><a href="#frame-locator-get-by-role-option-exact" class="list-anchor">#</a>
     
-    Whether [Name|NameRegex](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) is matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when [Name|NameRegex](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) is a regular expression. Note that exact match still trims whitespace.
+    Whether [Name|NameRegex](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) and [Description|DescriptionRegex](/api/class-framelocator.mdx#frame-locator-get-by-role-option-description) are matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when the value is a regular expression. Note that exact match still trims whitespace.
   - `Expanded` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-expanded"/><a href="#frame-locator-get-by-role-option-expanded" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-expanded`.
@@ -265,7 +286,7 @@ Many html elements have an implicitly [defined role](https://w3c.github.io/html-
 
 ---
 
-### GetByTestId {#frame-locator-get-by-test-id}
+### GetByTestId {/* #frame-locator-get-by-test-id */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.GetByTestId</x-search>
 
@@ -279,7 +300,7 @@ Consider the following DOM structure.
 <button data-testid="directions">Itinéraire</button>
 ```
 
-You can locate the element by it's test id:
+You can locate the element by its test id:
 
 ```csharp
 await page.GetByTestId("directions").ClickAsync();
@@ -299,7 +320,7 @@ By default, the `data-testid` attribute is used as a test id. Use [Selectors.Set
 
 ---
 
-### GetByText {#frame-locator-get-by-text}
+### GetByText {/* #frame-locator-get-by-text */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.GetByText</x-search>
 
@@ -355,7 +376,7 @@ Input elements of the type `button` and `submit` are matched by their `value` in
 
 ---
 
-### GetByTitle {#frame-locator-get-by-title}
+### GetByTitle {/* #frame-locator-get-by-title */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frameLocator.GetByTitle</x-search>
 
@@ -389,7 +410,7 @@ await Expect(Page.GetByTitle("Issues count")).toHaveText("25 issues");
 
 ---
 
-### Locator {#frame-locator-locator}
+### Locator {/* #frame-locator-locator */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.Locator</x-search>
 
@@ -432,7 +453,7 @@ FrameLocator.Locator(selectorOrLocator, options);
 
 ---
 
-### Owner {#frame-locator-owner}
+### Owner {/* #frame-locator-owner */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.43</font><x-search>frameLocator.Owner</x-search>
 
@@ -458,11 +479,11 @@ await Expect(locator).ToBeVisibleAsync();
 
 ## Deprecated
 
-### First {#frame-locator-first}
+### First {/* #frame-locator-first */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.First</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 Use [Locator.First](/api/class-locator.mdx#locator-first) followed by [Locator.ContentFrame](/api/class-locator.mdx#locator-content-frame) instead.
 
@@ -482,11 +503,11 @@ FrameLocator.First
 
 ---
 
-### Last {#frame-locator-last}
+### Last {/* #frame-locator-last */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.Last</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 Use [Locator.Last](/api/class-locator.mdx#locator-last) followed by [Locator.ContentFrame](/api/class-locator.mdx#locator-content-frame) instead.
 
@@ -506,11 +527,11 @@ FrameLocator.Last
 
 ---
 
-### Nth {#frame-locator-nth}
+### Nth {/* #frame-locator-nth */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.Nth</x-search>
 
-:::warning Deprecated
+:::warning[Deprecated]
 
 Use [Locator.Nth()](/api/class-locator.mdx#locator-nth) followed by [Locator.ContentFrame](/api/class-locator.mdx#locator-content-frame) instead.
 
@@ -543,6 +564,8 @@ FrameLocator.Nth(index);
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -562,15 +585,18 @@ FrameLocator.Nth(index);
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

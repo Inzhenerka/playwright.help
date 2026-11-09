@@ -139,7 +139,12 @@ Playwright включает ряд CSS псевдоклассов для соо�
 
 Playwright поддерживает псевдокласс `:visible` в CSS селекторах. Например, `css=button` соответствует всем кнопкам на странице, в то время как `css=button:visible` соответствует только видимым кнопкам. Это полезно для различения элементов, которые очень похожи, но отличаются видимостью.
 
-Рассмотрим страницу с двумя кнопками, первая из которых невидима, а вторая видима.
+:::note
+
+Предпочитайте сокращённый метод [locator.visible](/api/class-locator.mdx#locator-visible) псевдоклассу `:visible`.
+:::
+
+Рассмотрим страницу с двумя кнопками: первая невидима, а вторая видима.
 
 ```html
 <button style='display: none'>Invisible</button>
@@ -198,7 +203,7 @@ Playwright поддерживает псевдокласс `:visible` в CSS с�
 
 ### CSS: элементы, содержащие другие элементы {#css-elements-that-contain-other-elements}
 
-Псевдокласс `:has()` является [экспериментальным CSS псевдоклассом](https://developer.mozilla.org/en-US/docs/Web/CSS/:has). Он возвращает элемент, если любой из селекторов, переданных в качестве параметров относительно `:scope` данного элемента, соответствует хотя бы одному элементу.
+Псевдокласс `:has()` — это [псевдокласс CSS](https://developer.mozilla.org/en-US/docs/Web/CSS/:has). Он возвращает элемент, если хотя бы один из селекторов, переданных в качестве параметров и применяемых относительно `:scope` данного элемента, соответствует хотя бы одному элементу.
 
 Следующий фрагмент возвращает текстовое содержимое элемента `<article>`, который содержит внутри `<div class=promo>`.
 
@@ -256,7 +261,7 @@ await page.locator('button:has-text("Log in"), button:has-text("Sign in")').clic
 </TabItem>
 </Tabs>
 
-Псевдокласс `:is()` является [экспериментальным CSS псевдоклассом](https://developer.mozilla.org/en-US/docs/Web/CSS/:is), который может быть полезен для указания списка дополнительных условий на элемент.
+Псевдокласс `:is()` — это [псевдокласс CSS](https://developer.mozilla.org/en-US/docs/Web/CSS/:is), который может быть полезен для задания списка дополнительных условий для элемента.
 
 ### CSS: соответствие элементов на основе расположения {#css-matching-elements-based-on-layout}
 
@@ -332,9 +337,19 @@ await page.locator("[type=radio]:left-of(:text(\"Label 3\"))").first.click()
 Иногда на странице содержится несколько похожих элементов, и сложно выбрать конкретный. Например:
 
 ```html
-<section> <button>Buy</button> </section>
-<article><div> <button>Buy</button> </div></article>
-<div><div> <button>Buy</button> </div></div>
+<section>
+  <button>Buy</button>
+</section>
+<article>
+  <div>
+    <button>Buy</button>
+  </div>
+</article>
+<div>
+  <div>
+    <button>Buy</button>
+  </div>
+</div>
 ```
 
 В этом случае `:nth-match(:text("Buy"), 3)` выберет третью кнопку из приведенного выше фрагмента. Обратите внимание, что индекс начинается с единицы.
@@ -497,126 +512,7 @@ parent = page.get_by_text("Hello").locator('xpath=..')
 </TabItem>
 </Tabs>
 
-## React локатор {#react-locator}
-
-:::note
-
-React локатор является экспериментальным и имеет префикс `_`. Функциональность может измениться в будущем.
-:::
-
-React локатор позволяет находить элементы по имени их компонента и значениям свойств. Синтаксис очень похож на [CSS селекторы атрибутов](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) и поддерживает все операторы селекторов атрибутов CSS.
-
-В React локаторе имена компонентов записываются в **CamelCase**.
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-page.locator("_react=BookItem").click()
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-await page.locator("_react=BookItem").click()
-```
-
-</TabItem>
-</Tabs>
-
-Больше примеров:
-- соответствие по **компоненту**: `_react=BookItem`
-- соответствие по компоненту и **точному значению свойства**, чувствительно к регистру: `_react=BookItem[author = "Steven King"]`
-- соответствие только по значению свойства, **нечувствительно к регистру**: `_react=[author = "steven king" i]`
-- соответствие по компоненту и **истинному значению свойства**: `_react=MyButton[enabled]`
-- соответствие по компоненту и **логическому значению**: `_react=MyButton[enabled = false]`
-- соответствие по **подстроке значения свойства**: `_react=[author *= "King"]`
-- соответствие по компоненту и **нескольким свойствам**: `_react=BookItem[author *= "king" i][year = 1990]`
-- соответствие по **вложенному** значению свойства: `_react=[some.nested.value = 12]`
-- соответствие по компоненту и **префиксу значения свойства**: `_react=BookItem[author ^= "Steven"]`
-- соответствие по компоненту и **суффиксу значения свойства**: `_react=BookItem[author $= "Steven"]`
-- соответствие по компоненту и **ключу**: `_react=BookItem[key = '2']`
-- соответствие по **регулярному выражению значения свойства**: `_react=[author = /Steven(\\s+King)?/i]`
-
-Чтобы найти имена React элементов в дереве, используйте [React DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi).
-
-:::note
-
-React локатор поддерживает React 15 и выше.
-:::
-
-:::note
-React локатор, как и [React DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi), работает только с **неминифицированными** сборками приложений.
-:::
-
-## Локатор Vue {#vue-locator}
-
-:::note
-
-Локатор Vue является экспериментальным и имеет префикс `_`. Функциональность может измениться в будущем.
-:::
-
-Локатор Vue позволяет находить элементы по имени их компонента и значениям свойств. Синтаксис очень похож на [CSS селекторы атрибутов](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) и поддерживает все операторы CSS селекторов атрибутов.
-
-В локаторе Vue имена компонентов записываются в **kebab-case**.
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-page.locator("_vue=book-item").click()
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-await page.locator("_vue=book-item").click()
-```
-
-</TabItem>
-</Tabs>
-
-Больше примеров:
-- поиск по **компоненту**: `_vue=book-item`
-- поиск по компоненту и **точному значению свойства**, с учетом регистра: `_vue=book-item[author = "Steven King"]`
-- поиск только по значению свойства, **без учета регистра**: `_vue=[author = "steven king" i]`
-- поиск по компоненту и **истинному значению свойства**: `_vue=my-button[enabled]`
-- поиск по компоненту и **логическому значению**: `_vue=my-button[enabled = false]`
-- поиск по **подстроке значения** свойства: `_vue=[author *= "King"]`
-- поиск по компоненту и **нескольким свойствам**: `_vue=book-item[author *= "king" i][year = 1990]`
-- поиск по **вложенному** значению свойства: `_vue=[some.nested.value = 12]`
-- поиск по компоненту и **префиксу значения** свойства: `_vue=book-item[author ^= "Steven"]`
-- поиск по компоненту и **суффиксу значения** свойства: `_vue=book-item[author $= "Steven"]`
-- поиск по значению свойства с использованием **регулярного выражения**: `_vue=[author = /Steven(\\s+King)?/i]`
-
-Чтобы найти имена элементов Vue в дереве, используйте [Vue DevTools](https://chrome.google.com/webstore/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd?hl=en).
-
-:::note
-
-Локатор Vue поддерживает Vue2 и выше.
-:::
-
-:::note
-Локатор Vue, как и [Vue DevTools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi), работает только с **неминифицированными** сборками приложений.
-:::
-
-## Локатор XPath {#xpath-locator}
+## XPath-локатор
 
 :::warning
 
@@ -984,11 +880,15 @@ document
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [Error]: /api/class-error.mdx "Error"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
@@ -1002,14 +902,17 @@ document
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

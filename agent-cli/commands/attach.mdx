@@ -1,0 +1,185 @@
+---
+title: "Подключение и отключение"
+---
+
+# Подключение и отключение
+
+Подключайтесь к существующему браузеру вместо запуска нового.
+
+## Команды
+
+| Команда | Описание |
+|---------|-------------|
+| `attach <name>` | Подключиться по имени к браузеру Playwright, зарегистрированному под этим именем |
+| `attach --cdp=<channel>` | Подключиться к запущенному браузеру по имени канала |
+| `attach --cdp=<url>` | Подключиться через конечную точку Chrome DevTools Protocol |
+| `attach --endpoint=<url>` | Подключиться к конечной точке сервера Playwright |
+| `attach --extension` | Подключиться через расширение Playwright (по умолчанию к Chrome) |
+| `attach --extension=<channel>` | Подключиться через расширение Playwright к определённому каналу |
+| `detach` | Завершить сеанс, оставив внешний браузер работающим |
+
+Можно указать только одну цель подключения — сочетание позиционного имени с `--cdp`, `--endpoint` или
+`--extension` приведёт к ошибке.
+
+## Поиск браузеров для подключения
+
+```bash
+playwright-cli list --all
+```
+
+Помимо открытых сеансов, эта команда выводит список серверов браузеров Playwright, зарегистрированных в любых рабочих пространствах, и
+найденных локальных профилей Chrome/Edge. Для каждого элемента приводится точная команда `attach` для подключения:
+
+```txt
+### Browsers available to attach via CDP
+- chrome:
+  - data-dir: /Users/me/Library/Application Support/Google/Chrome
+  - attach (extension): `playwright-cli attach --extension=chrome`
+  - attach (remote debugging): enable at chrome://inspect/#remote-debugging
+```
+
+## Подключение по имени канала
+
+Подключитесь к запущенному экземпляру Chrome или Edge по имени его канала. В браузере должна быть включена удалённая отладка — перейдите на страницу `chrome://inspect/#remote-debugging` в целевом браузере и установите флажок "Allow remote debugging for this browser instance".
+
+<img src="/img/mcp/chrome-remote-debugging.png" width="752" height="426" alt="Настройки удалённой отладки Chrome на странице chrome://inspect/#remote-debugging" />
+
+```bash
+# Подключиться к Chrome
+playwright-cli attach --cdp=chrome
+
+# Подключиться к Chrome Canary
+playwright-cli attach --cdp=chrome-canary
+
+# Подключиться к Microsoft Edge
+playwright-cli attach --cdp=msedge
+
+# Подключиться к Edge Dev
+playwright-cli attach --cdp=msedge-dev
+```
+
+Поддерживаемые каналы: `chrome`, `chrome-beta`, `chrome-dev`, `chrome-canary`, `msedge`, `msedge-beta`, `msedge-dev`, `msedge-canary`.
+
+Это самый простой способ подключения — не нужно запускать Chrome со специальными флагами или знать порт отладки.
+
+## Конечная точка CDP
+
+Подключитесь к любому браузеру на базе Chromium с конечной точкой Chrome DevTools Protocol:
+
+```bash
+# Запустить Chrome с удалённой отладкой
+google-chrome --remote-debugging-port=9222
+
+# Подключиться из CLI
+playwright-cli attach --cdp=http://localhost:9222
+playwright-cli snapshot
+playwright-cli click e5
+```
+
+Поддерживаются:
+- Chrome / Chromium с `--remote-debugging-port`
+- Edge с удалённой отладкой
+- Приложения Electron, предоставляющие доступ по CDP
+- Облачные браузерные сервисы (Browserbase и другие)
+
+## Конечная точка сервера Playwright
+
+Подключитесь к удалённому серверу Playwright:
+
+```bash
+playwright-cli attach --endpoint=ws://localhost:3000
+playwright-cli snapshot
+```
+
+## Подключение по зарегистрированному имени
+
+Браузер Playwright может зарегистрировать себя под определённым именем — именно так `npx playwright test --debug=cli`
+предоставляет доступ к приостановленному тесту. Передайте это имя в качестве позиционного аргумента:
+
+```bash
+playwright-cli attach tw-a3f19c
+```
+
+См. [Отладка тестов](./test-debugging.mdx).
+
+## Расширение браузера
+
+Подключайтесь к существующим вкладкам браузера с помощью [расширения Playwright](https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadbfplnigmagldckm). Это позволяет повторно использовать сеансы с выполненным входом, файлы cookie и установленные расширения.
+
+<img src="/img/mcp/playwright-extension.png" width="662" height="427" alt="Расширение Playwright в Интернет-магазине Chrome" />
+
+```bash
+# Подключиться к Chrome (по умолчанию)
+playwright-cli attach --extension
+
+# Подключиться к определённому каналу
+playwright-cli attach --extension=chrome-canary
+playwright-cli attach --extension=msedge
+playwright-cli attach --extension=msedge-dev
+```
+
+Если канал не указан, расширение по умолчанию подключается к Chrome.
+
+### Когда использовать режим расширения
+
+- **SSO / 2FA** — пропускайте сложные процедуры входа, повторно используя сеанс, в котором уже выполнена аутентификация
+- **Расширения браузера** — взаимодействуйте со страницами, которые зависят от установленных расширений
+- **Существующие вкладки** — автоматизируйте работу со страницами, которые у вас уже открыты
+
+## Именование сеансов
+
+Команда attach создаёт сеанс. Если параметр `--session` не указан, сеанс получает имя цели подключения —
+`--cdp=msedge` создаёт сеанс с именем `msedge`, а `attach tw-a3f19c` создаёт сеанс с именем
+`tw-a3f19c`, — поэтому параллельные подключения к Chrome и Edge не конфликтуют из-за общего имени `default`.
+
+```bash
+playwright-cli attach --cdp=chrome -s=debug-session
+playwright-cli -s=debug-session snapshot
+playwright-cli -s=debug-session click e5
+```
+
+## Отключение
+
+Команда `detach` завершает сеанс, не затрагивая браузер, к которому он был подключён. Используйте `close` только для
+браузеров, запущенных самим CLI.
+
+```bash
+playwright-cli detach                   # отключить подключённый сеанс по умолчанию
+playwright-cli -s=msedge detach         # отключить именованный подключённый сеанс
+```
+
+## Рабочий процесс: подключение к запущенному Chrome
+
+```bash
+# 1. В Chrome перейдите на страницу chrome://inspect/#remote-debugging
+#    и включите "Allow remote debugging for this browser instance"
+
+# 2. Подключитесь по имени канала
+playwright-cli attach --cdp=chrome
+
+# 3. Взаимодействуйте с существующими вкладками
+playwright-cli snapshot
+playwright-cli screenshot --filename=current-state.png
+
+# 4. Сохраните состояние для будущих сеансов в режиме headless
+playwright-cli state-save auth.json
+
+# 5. Оставьте Chrome работающим
+playwright-cli -s=chrome detach
+```
+
+## Рабочий процесс: отладка удалённого браузера
+
+```bash
+# На удалённом компьютере: запустите Chrome с отладкой
+google-chrome --remote-debugging-port=9222
+
+# На своём компьютере: подключитесь через SSH-туннель
+ssh -L 9222:localhost:9222 user@remote-host
+
+# Подключитесь и проверьте состояние браузера
+playwright-cli attach --cdp=http://localhost:9222
+playwright-cli snapshot
+playwright-cli screenshot --filename=remote-state.png
+playwright-cli console error
+```

@@ -1,0 +1,91 @@
+---
+title: "Навигация"
+---
+
+# Навигация
+
+## Команды
+
+| Команда | Описание |
+|---------|-------------|
+| `open [url]` | Открыть браузер и, при необходимости, перейти по указанному URL |
+| `goto <url>` | Перейти по указанному URL |
+| `go-back` | Вернуться на предыдущую страницу |
+| `go-forward` | Перейти вперёд на следующую страницу |
+| `reload` | Перезагрузить текущую страницу |
+| `close` | Закрыть браузер |
+| `detach` | Отключиться от подключённого браузера, оставив его работающим |
+
+## Открытие браузера
+
+```bash
+# Открыть браузер без перехода на страницу
+playwright-cli open
+
+# Открыть браузер и перейти на страницу
+playwright-cli open https://example.com
+
+# С дополнительными параметрами
+playwright-cli open https://example.com --headed
+playwright-cli open https://example.com --browser=firefox
+playwright-cli open https://example.com --persistent
+playwright-cli open https://example.com --mobile
+playwright-cli open https://example.com --device="iPhone 15"
+playwright-cli open https://example.com --config=cli.config.json
+```
+
+Команда `open` закрывает любой браузер, уже работающий под тем же именем сессии, а затем запускает новый экземпляр. Полный список параметров приведён в разделе
+[Конфигурация](../configuration.mdx).
+
+## Переход на страницу
+
+```bash
+$ playwright-cli goto https://demo.playwright.dev/todomvc
+### Page
+- Page URL: https://demo.playwright.dev/todomvc/#/
+- Page Title: React - TodoMVC
+### Snapshot
+- [Snapshot](.playwright-cli/page-2026-02-14T19-22-42-679Z.yml)
+```
+
+## Навигация по истории
+
+```bash
+$ playwright-cli goto https://example.com/page1
+$ playwright-cli goto https://example.com/page2
+$ playwright-cli go-back
+# Теперь открыта page1
+
+$ playwright-cli go-forward
+# Теперь открыта page2
+
+$ playwright-cli reload
+# Страница page2 перезагружена
+```
+
+## Закрытие браузера
+
+```bash
+playwright-cli close                    # закрыть браузер текущей сессии
+playwright-cli -s=name close            # закрыть браузер сессии с указанным именем
+playwright-cli close-all                # закрыть все сессии браузера
+playwright-cli kill-all                 # принудительно завершить зависшие процессы браузера
+```
+
+Для сессии, созданной с помощью [`attach`](./attach.mdx), используйте вместо этого `detach` — эта команда завершает сессию,
+не закрывая браузер, к которому вы подключились.
+
+## Рабочий процесс: навигация с использованием истории
+
+```bash
+$ playwright-cli open https://demo.playwright.dev/todomvc
+$ playwright-cli fill e5 "Buy groceries" --submit
+$ playwright-cli goto https://example.com
+$ playwright-cli go-back
+$ playwright-cli snapshot
+# - heading "todos" [level=1]
+# - textbox "What needs to be done?" [ref=e5]
+# - listitem:
+#   - checkbox "Toggle Todo" [ref=e10]
+#   - text: "Buy groceries"
+```

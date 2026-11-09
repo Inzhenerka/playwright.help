@@ -9,20 +9,158 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 This API is used for the Web API testing. You can use it to trigger API endpoints, configure micro-services, prepare environment or the service to your e2e test.
 
-Each Playwright browser context has associated with it [APIRequestContext] instance which shares cookie storage with the browser context and can be accessed via [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) or [Page.request()](/api/class-page.mdx#page-request). It is also possible to create a new APIRequestContext instance manually by calling [APIRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context).
+Each Playwright browser context has an associated [APIRequestContext], accessible via [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) or [Page.request()](/api/class-page.mdx#page-request) (these return the
+
+**same instance** — `page.request` is a shortcut for `page.context().request`). You can also create a standalone, isolated instance with [APIRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context).
 
 **Cookie management**
 
-[APIRequestContext] returned by [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) and [Page.request()](/api/class-page.mdx#page-request) shares cookie storage with the corresponding [BrowserContext]. Each API request will have `Cookie` header populated with the values from the browser context. If the API response contains `Set-Cookie` header it will automatically update [BrowserContext] cookies and requests made from the page will pick them up. This means that if you log in using this API, your e2e test will be logged in and vice versa.
+The [APIRequestContext] returned by [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) and
 
-If you want API requests to not interfere with the browser cookies you should create a new [APIRequestContext] by calling [APIRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context). Such `APIRequestContext` object will have its own isolated cookie storage.
+[Page.request()](/api/class-page.mdx#page-request) uses the same cookie jar as its [BrowserContext]:
+
+If you want API requests that do **not** share cookies with the browser, create an isolated context via [APIRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context). Such `APIRequestContext` object will have its own isolated cookie storage.
 
 
 ---
 
 ## Methods
 
-### delete {#api-request-context-delete}
+### addCookies {/* #api-request-context-add-cookies */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>apiRequestContext.addCookies</x-search>
+
+Adds cookies into this request context. They will be sent with matching subsequent requests. For [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) and [Page.request()](/api/class-page.mdx#page-request), this is equivalent to calling [BrowserContext.addCookies()](/api/class-browsercontext.mdx#browser-context-add-cookies) on the corresponding browser context.
+
+**Usage**
+
+```java
+request.addCookies(Arrays.asList(cookieObject1, cookieObject2));
+```
+
+**Arguments**
+- `cookies` [List]&lt;Cookies&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-add-cookies-option-cookies"/><a href="#api-request-context-add-cookies-option-cookies" class="list-anchor">#</a>
+  - `setName` [String]
+    
+    
+  - `setValue` [String]
+    
+    
+  - `setUrl` [String] *(optional)*
+    
+    Either `url` or both `domain` and `path` are required. Optional.
+  - `setDomain` [String] *(optional)*
+    
+    For the cookie to apply to all subdomains as well, prefix domain with a dot, like this: ".example.com". Either `url` or both `domain` and `path` are required. Optional.
+  - `setPath` [String] *(optional)*
+    
+    Either `url` or both `domain` and `path` are required. Optional.
+  - `setExpires` [double] *(optional)*
+    
+    Unix time in seconds. Optional.
+  - `setHttpOnly` [boolean] *(optional)*
+    
+    Optional.
+  - `setSecure` [boolean] *(optional)*
+    
+    Optional.
+  - `setSameSite` `enum SameSiteAttribute { STRICT, LAX, NONE }` *(optional)*
+    
+    Optional.
+  - `setPartitionKey` [String] *(optional)*
+    
+    For partitioned third-party cookies (aka [CHIPS](https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Privacy_sandbox/Partitioned_cookies)), the partition key. Optional.
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-add-cookies-return"/><a href="#api-request-context-add-cookies-return" class="list-anchor">#</a>
+
+---
+
+### clearCookies {/* #api-request-context-clear-cookies */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>apiRequestContext.clearCookies</x-search>
+
+Removes cookies from this request context. Accepts optional filter. For [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) and [Page.request()](/api/class-page.mdx#page-request), this is equivalent to calling [BrowserContext.clearCookies()](/api/class-browsercontext.mdx#browser-context-clear-cookies) on the corresponding browser context.
+
+**Usage**
+
+```java
+request.clearCookies();
+request.clearCookies(new APIRequestContext.ClearCookiesOptions().setName("session-id"));
+request.clearCookies(new APIRequestContext.ClearCookiesOptions().setDomain("my-origin.com"));
+request.clearCookies(new APIRequestContext.ClearCookiesOptions().setPath("/api/v1"));
+request.clearCookies(new APIRequestContext.ClearCookiesOptions()
+                         .setName("session-id")
+                         .setDomain("my-origin.com"));
+```
+
+**Arguments**
+- `options` `ApiRequestContext.ClearCookiesOptions` *(optional)*
+  - `setDomain` [String] | [Pattern] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-option-domain"/><a href="#api-request-context-clear-cookies-option-domain" class="list-anchor">#</a>
+    
+    Only removes cookies with the given domain.
+  - `setName` [String] | [Pattern] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-option-name"/><a href="#api-request-context-clear-cookies-option-name" class="list-anchor">#</a>
+    
+    Only removes cookies with the given name.
+  - `setPath` [String] | [Pattern] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-option-path"/><a href="#api-request-context-clear-cookies-option-path" class="list-anchor">#</a>
+    
+    Only removes cookies with the given path.
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-clear-cookies-return"/><a href="#api-request-context-clear-cookies-return" class="list-anchor">#</a>
+
+---
+
+### cookies {/* #api-request-context-cookies */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>apiRequestContext.cookies</x-search>
+
+If no URLs are specified, this method returns all cookies. If URLs are specified, only cookies that affect those URLs are returned. For [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) and [Page.request()](/api/class-page.mdx#page-request), this is equivalent to calling [BrowserContext.cookies()](/api/class-browsercontext.mdx#browser-context-cookies) on the corresponding browser context.
+
+**Usage**
+
+```java
+APIRequestContext.cookies();
+APIRequestContext.cookies(urls);
+```
+
+**Arguments**
+- `urls` [String] | [List]&lt;[String]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-cookies-option-urls"/><a href="#api-request-context-cookies-option-urls" class="list-anchor">#</a>
+  
+  Optional list of URLs.
+
+**Returns**
+- [List]&lt;Cookies&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-cookies-return"/><a href="#api-request-context-cookies-return" class="list-anchor">#</a>
+  - `name` [String]
+    
+    
+  - `value` [String]
+    
+    
+  - `domain` [String]
+    
+    
+  - `path` [String]
+    
+    
+  - `expires` [double]
+    
+    Unix time in seconds.
+  - `httpOnly` [boolean]
+    
+    
+  - `secure` [boolean]
+    
+    
+  - `sameSite` `enum SameSiteAttribute { STRICT, LAX, NONE }`
+    
+    
+  - `partitionKey` [String] *(optional)*
+    
+    
+---
+
+### delete {/* #api-request-context-delete */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.delete</x-search>
 
@@ -48,7 +186,7 @@ APIRequestContext.delete(url, options);
 
 ---
 
-### dispose {#api-request-context-dispose}
+### dispose {/* #api-request-context-dispose */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.dispose</x-search>
 
@@ -72,7 +210,7 @@ APIRequestContext.dispose(options);
 
 ---
 
-### fetch {#api-request-context-fetch}
+### fetch {/* #api-request-context-fetch */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.fetch</x-search>
 
@@ -119,7 +257,7 @@ APIResponse response = request.fetch("https://example.com/api/uploadScript",
 
 ---
 
-### get {#api-request-context-get}
+### get {/* #api-request-context-get */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.get</x-search>
 
@@ -148,7 +286,7 @@ request.get("https://example.com/api/getText", RequestOptions.create()
 
 ---
 
-### head {#api-request-context-head}
+### head {/* #api-request-context-head */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.head</x-search>
 
@@ -174,7 +312,7 @@ APIRequestContext.head(url, options);
 
 ---
 
-### patch {#api-request-context-patch}
+### patch {/* #api-request-context-patch */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.patch</x-search>
 
@@ -200,7 +338,7 @@ APIRequestContext.patch(url, options);
 
 ---
 
-### post {#api-request-context-post}
+### post {/* #api-request-context-post */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.post</x-search>
 
@@ -255,7 +393,7 @@ APIResponse response = request.post("https://example.com/api/uploadScript",
 
 ---
 
-### put {#api-request-context-put}
+### put {/* #api-request-context-put */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.put</x-search>
 
@@ -281,7 +419,7 @@ APIRequestContext.put(url, options);
 
 ---
 
-### storageState {#api-request-context-storage-state}
+### storageState {/* #api-request-context-storage-state */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.storageState</x-search>
 
@@ -299,12 +437,34 @@ APIRequestContext.storageState(options);
   - `setIndexedDB` [boolean] *(optional)* <font size="2">Added in: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-indexed-db"/><a href="#api-request-context-storage-state-option-indexed-db" class="list-anchor">#</a>
     
     Set to `true` to include IndexedDB in the storage state snapshot.
+  - `setOpfs` [boolean] *(optional)* <font size="2">Added in: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-opfs"/><a href="#api-request-context-storage-state-option-opfs" class="list-anchor">#</a>
+    
+    Set to `true` to include the origin private file system in the storage state snapshot.
   - `setPath` [Path] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-path"/><a href="#api-request-context-storage-state-option-path" class="list-anchor">#</a>
     
     The file path to save the storage state to. If [setPath](/api/class-apirequestcontext.mdx#api-request-context-storage-state-option-path) is a relative path, then it is resolved relative to current working directory. If no path is provided, storage state is still returned, but won't be saved to the disk.
 
 **Returns**
 - [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-storage-state-return"/><a href="#api-request-context-storage-state-return" class="list-anchor">#</a>
+
+---
+
+## Properties
+
+### tracing() {/* #api-request-context-tracing */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>apiRequestContext.tracing()</x-search>
+
+Tracing recorder for requests made through this API request context.
+
+**Usage**
+
+```java
+APIRequestContext.tracing()
+```
+
+**Returns**
+- [Tracing]
 
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
@@ -317,6 +477,8 @@ APIRequestContext.storageState(options);
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -338,15 +500,18 @@ APIRequestContext.storageState(options);
 [RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
@@ -359,6 +524,7 @@ APIRequestContext.storageState(options);
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
+[BiConsumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html "BiConsumer"
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
@@ -366,6 +532,7 @@ APIRequestContext.storageState(options);
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[Integer]: https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html "Integer"
 [long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"
